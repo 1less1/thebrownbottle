@@ -26,12 +26,13 @@ Follow steps [HERE](https://reactnative.dev/docs/set-up-your-environment) for in
 </div>
 
 ### Creating React Native Project with **Expo Go**
+**NOTE:** Only do step 1 if you want to create a NEW project
 1. Go to the directory where you want to create a new React Native Project
     ```bash
     npx create-expo-app@latest <app-name> # Creates a new React Native Project in a folder within the current directory
     ```
 
-2. If you already have a React Native project and are **cloning** from a Git Repo run the following command **IN** the directory that contains the React Native Project files:
+2. If you already have a React Native project and are **cloning** from a Git Repo run the following command **IN** the directory that contains the **React Native Project files** aka "brown-bottle-app":
     ```bash
     npm install
     ```
@@ -65,3 +66,7 @@ npx expo start # Uses the expo cli which brings up a menu where the user can pic
     <p>Add a new AVD with the <b>+</b> or press the <b>triangle</b> to run an existing emulation</p>
     <img src="./images/avd_menu.png" alt="AVD Menu">
 </div>
+
+## Project Materials
+
+Access preliminary UI design images [HERE](./ui_designs/)
