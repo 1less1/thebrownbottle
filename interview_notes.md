@@ -4,14 +4,17 @@
 The Brown Bottle currently schedules with "paper and pencil". Employees hand in their availibility through notes and management fills out a spreadsheet template by hand. 
 - There are different spreadsheets for each role. Ex: Schedule Spreadsheet for just Servers
 - Friday, Saturday, and Sundays cannot be permanent days off
-- Currently highlights workers age 16 or under since thye cannot work past 7:00 pm
+- Currently highlights workers age 16 or under since they cannot work past 7:00 pm
 
 ## UI Design
 - When an employee logs in they see a calendar. On the calendar their upcoming shifts are highlighted.
+    - The calendar preview should show the current week
 - Bottom Navigation Bar is preferred
+- **IDEA:** Make scheduling screen for managers very similar to current spreadsheet technique
 
 ## App Features
 - Be able to pick a day and filter by restaurant section and/or role to see who is working
+    - Ex: Filter by Role: Server, Section: Front
 - If a worker has an approved permanent day off, it should be "greyed out" (unavailable) so they cannot be scheduled
 - Time off requests can be sent in by employees. 
     * They should be "first come, first serve" (order by timestamp).
