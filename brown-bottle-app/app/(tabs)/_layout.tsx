@@ -27,33 +27,49 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="index"
+        name="index" //home screen, not currently in a folder because the app wouldn't open anything if it was
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="tasks/index"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Tasks',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="tray.2" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="calendar"
+        name="calendar/index"
         options={{
           title: 'Calendar',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
         }}
       />
       <Tabs.Screen
-    name="profile"
-    options={{
-      title: 'Profile',
-      tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-    }}
-  />
+      name="chat/index"
+      options={{
+        title: 'Chat',
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+      name="profile/index"
+      options={{
+        title: 'Profile',
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        }}
+      />
+    {/* TEST SCREEN, DISABLED
+      <Tabs.Screen
+      name="test/index"
+      options={{
+        title: 'Test',
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name="clear.fill" color={color} />,
+        }}
+      />
+      */}
     </Tabs>
     
     

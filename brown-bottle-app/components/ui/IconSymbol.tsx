@@ -13,6 +13,12 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'person.fill': 'person', //trying to import and map the person icon for android and ios
+  'bubble.left':'message',
+  'calendar':'event',
+  'tray.2':'edit',
+  'clear.fill':'clear',
+
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
