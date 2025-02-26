@@ -27,7 +27,7 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="index" //home screen, not currently in a folder because the app wouldn't open anything if it was
+        name="home/index" //home screen, not currently in a folder because the app wouldn't open anything if it was
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,

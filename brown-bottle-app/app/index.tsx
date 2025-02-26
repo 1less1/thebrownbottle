@@ -1,6 +1,7 @@
 import { TouchableOpacity, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
+
 export default function LandingScreen() {
   const router = useRouter();
 
@@ -56,7 +57,7 @@ export default function LandingScreen() {
             paddingHorizontal: 10,
             alignItems: 'center',
           }}
-          onPress={() => router.push('/(tabs)')}
+          onPress={() => router.push('/(tabs)/home')} // should direct to the home screen
         >
           <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold' }}>Enter App</Text>
         </TouchableOpacity>
