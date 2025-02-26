@@ -7,3 +7,7 @@ At first the tabs were files, but I was able to make them into folders and get t
 
 ## Theme
 Added theme support for the tabs I made
+
+## Startup Screen
+I made an index.tsx file with a "LandingScreen" in the app folder -> app/index.tsx
+I then told the app/_layout.tsx file to have the new index.tsx file -> "index" load first on the app "stack"

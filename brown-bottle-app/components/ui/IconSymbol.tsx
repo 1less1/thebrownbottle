@@ -14,7 +14,7 @@ const MAPPING = {
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
   'person.fill': 'person', //trying to import and map the person icon for android and ios
-  'bubble.left':'message',
+  'bubble.left.fill': 'chat',
   'calendar':'event',
   'tray.2':'edit',
   'clear.fill':'clear',
@@ -45,5 +45,9 @@ export function IconSymbol({
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  // Debugging
+  //console.log("Received icon name:", name);
+  //console.log("Mapped icon name:", MAPPING[name]);
+
+  return <MaterialIcons color={color} size={size} name={MAPPING[name] ?? 'help'} />;
 }

@@ -5,6 +5,9 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+
+
+// This is the "Home Page" when the (tabs) directory is loaded on the stack 
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
