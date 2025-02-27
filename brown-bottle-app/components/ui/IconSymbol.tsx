@@ -18,6 +18,7 @@ const MAPPING = {
   'calendar':'event',
   'tray.2':'edit',
   'clear.fill':'clear',
+  'shield.fill':'security',
 
 } as Partial<
   Record<

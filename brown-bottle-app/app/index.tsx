@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 export default function LandingScreen() {
   const router = useRouter();
 
+  const isAdmin = true;
+
   return (
     <View
       style={{
@@ -59,12 +61,35 @@ export default function LandingScreen() {
           }}
           onPress={() => router.push('/(tabs)/home')} // should direct to the home screen
         >
-          <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold' }}>Enter App</Text>
+          <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold' }}>Employee Login</Text>
         </TouchableOpacity>
       </View>
 
     </View>
 
   );
+
+  /*
+  const styles = {
+    button: {
+      backgroundColor: '#FFDEAB',
+      borderRadius: 5,
+      shadowColor: 'black',
+      shadowOffset: { width: 2, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 5,
+      elevation: 5,
+      paddingVertical: 10,
+      paddingHorizontal: 10,
+      alignItems: 'center' as const, // Explicitly cast to FlexAlignType
+    } as ViewStyle, // Ensure TypeScript treats it as a valid ViewStyle
+  };
+    text: {
+      color: 'black',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  };
+  */
   
 }

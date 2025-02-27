@@ -61,15 +61,14 @@ export default function TabLayout() {
         tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
-    {/* TEST SCREEN, DISABLED
       <Tabs.Screen
-      name="test/index"
+      name="admin/index"
       options={{
-        title: 'Test',
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="clear.fill" color={color} />,
+        title: 'Admin',
+        tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
         }}
       />
-      */}
+      
     </Tabs>
     
     
