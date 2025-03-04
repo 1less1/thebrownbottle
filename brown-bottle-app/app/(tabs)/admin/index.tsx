@@ -7,7 +7,7 @@ const Admin = () => {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.text}>Admin Page</ThemedText>
-      <ThemedText style={styles.text}>This is a chat page</ThemedText>
+      <ThemedText style={styles.text}>Make sure Admin route is protected so that users can't manually open it</ThemedText>
     </ThemedView>
   );
 };
