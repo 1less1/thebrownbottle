@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useLocalSearchParams} from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
 
@@ -10,6 +10,9 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+
+  const { isAdmin } = useLocalSearchParams();
+  const isAdminBoolean = String(isAdmin).toLowerCase() === 'true';
 
   return (
     <Tabs
@@ -27,7 +30,7 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="home/index" //home screen, not currently in a folder because the app wouldn't open anything if it was
+        name="home/index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
@@ -61,13 +64,17 @@ export default function TabLayout() {
         tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
+
+      {/* Only show the Admin tab if isAdminBoolean is true */}
+      {isAdminBoolean && (
       <Tabs.Screen
-      name="admin/index"
-      options={{
-        title: 'Admin',
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
+        name="admin/index"
+        options={{
+          title: 'Admin',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
         }}
       />
+      )}
       
     </Tabs>
     
