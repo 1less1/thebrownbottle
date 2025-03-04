@@ -1,79 +1,120 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Colors } from '@/constants/Colors';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: Colors.yellowTan,
+    borderRadius: 10,
+    shadowColor: 'black',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'black', 
+    fontSize: 16, 
+    fontWeight: 'bold'
+  },
+  box: {
+    alignItems: 'center',
+    backgroundColor: Colors.yellowTan,
+    paddingVertical: 20,
+    paddingHorizontal: 40,
+    borderRadius: 5,
+    shadowColor: 'black',
+    shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5, 
+    elevation: 5, 
+  }
+});
 
 // This is the "Home Page" when the (tabs) directory is loaded on the stack 
 export default function HomeScreen() {
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image // renders the react image on the home page
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Jit trippin</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Lets see if it works!</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View
+      style={{
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        backgroundColor: Colors.greyWhite,
+      }}>
+
+      { /* Clock In View */}
+      <View style={{ marginTop: 20, width: '90%' }}>
+
+        <Text
+          style={{
+            textAlign: 'left',
+            fontSize: 16,
+            color: 'black',
+          }}>
+          Today
+        </Text>
+
+        <View style={[styles.box, {backgroundColor: Colors.darkTan, width: '100%',}]}>
+        
+          <Text
+            style={{
+              textAlign: 'center',
+              fontSize: 40,
+              color: 'black',
+              fontWeight: 'bold'
+            }}>
+            12:57pm
+          </Text>
+
+        <TouchableOpacity style={[styles.button, {marginTop: 6,}]} onPress={() => console.log("Clocked In!")}>
+          <Text style={styles.buttonText}>Clock In</Text>
+        </TouchableOpacity>
+
+        </View>
+
+      </View>
+
+
+      <View style={{ marginTop: 20, width: '90%' }}>
+
+        <Text
+          style={{
+            textAlign: 'left', // ✅ Left-align text inside its container
+            fontSize: 16,
+            color: 'black',
+          }}>         
+          Announcements
+        </Text>
+
+        <View style={[styles.box, {backgroundColor: Colors.darkTan, paddingHorizontal: 10,}]}>
+
+          <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%'}]}>
+            <Text>thebrownbottle.com is prone to IDOR. #normalizecybercriminals</Text>
+          </View>
+
+          <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%', marginTop: 6}]}>
+            <Text>My friend Jahmen from ROTC works at the Brown Bottle Bar. #wtf</Text>
+          </View>
+
+          <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%', marginTop: 6}]}>
+            <Text>Aaryn got his arm slammed in a stove. #bitchmoves</Text>
+          </View>
+
+          <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%', marginTop: 6}]}>
+            <Text>Who is going to the Banana Bar Crawl? I think Brad is. Get over here boi. #peelsonwheels</Text>
+          </View>
+
+        </View>
+
+      </View>
+
+
+    </View>
+
   );
 }
 
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
+

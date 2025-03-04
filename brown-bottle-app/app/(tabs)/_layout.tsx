@@ -13,71 +13,87 @@ export default function TabLayout() {
 
   const { isAdmin } = useLocalSearchParams();
   const isAdminBoolean = String(isAdmin).toLowerCase() === 'true';
+  console.log(isAdmin);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
+          ios: { position: "absolute" },
           default: {},
         }),
-      }}>
+      }}
+    >
+
       <Tabs.Screen
         name="home/index"
         options={{
-          title: 'Home',
+          title: "Home",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="tasks/index"
         options={{
-          title: 'Tasks',
+          title: "Tasks",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="tray.2" color={color} />,
         }}
       />
+
       <Tabs.Screen
         name="calendar/index"
         options={{
-          title: 'Calendar',
+          title: "Calendar",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="calendar" color={color} />,
         }}
       />
+
       <Tabs.Screen
-      name="chat/index"
-      options={{
-        title: 'Chat',
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-      name="profile/index"
-      options={{
-        title: 'Profile',
-        tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
+        name="chat/index"
+        options={{
+          title: "Chat",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
         }}
       />
 
-      {/* Only show the Admin tab if isAdminBoolean is true */}
-      {isAdminBoolean && (
       <Tabs.Screen
-        name="admin/index"
+        name="profile/index"
         options={{
-          title: 'Admin',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
+          title: "Profile",
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="person.fill" color={color} />,
         }}
       />
+
+      {/* Completely exclude the Admin tab if isAdminBoolean is false */}
+      {isAdminBoolean? (
+        <Tabs.Screen
+          name="admin/index"
+          options={{
+            title: "Admin",
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
+          }}
+        />
+
+        ) : (
+
+        <Tabs.Screen
+          name="admin/index"
+          options={{
+            title: "You Should Not Be Seeing This",
+            tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
+            href: null,
+          }} 
+        />
+
       )}
       
     </Tabs>
-    
-    
+
   );
+
 }

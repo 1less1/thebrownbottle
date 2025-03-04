@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-
+import { Colors } from '@/constants/Colors';
 
 const styles = StyleSheet.create({
   button: {
@@ -33,14 +33,14 @@ export default function LandingScreen() {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#FBF7F7', // Light Background
+        backgroundColor: Colors.greyWhite, // Greyish White Background
       }}>
 
     <View
       style={{
         alignItems: 'center',
         marginTop: 10,
-        backgroundColor: '#ECE1D4', // Light brown box
+        backgroundColor: Colors.darkTan, // Dark Tan Box
         paddingVertical: 20,
         paddingHorizontal: 40,
         borderRadius: 5,
