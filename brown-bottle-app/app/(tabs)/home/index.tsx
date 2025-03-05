@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
+import { CircularImage } from '@/components';
+
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.yellowTan,
@@ -43,10 +45,22 @@ export default function HomeScreen() {
         justifyContent: 'center', 
         alignItems: 'center',
         backgroundColor: Colors.greyWhite,
+        height: '100%',
+        width: '100%',
       }}>
 
+
+      {/* Top Strip - Box */}
+      <View style={{backgroundColor: Colors.darkTan, position: 'absolute', top: 0, height: 140, width: '100%'}} />
+
+      <View style={{marginTop: 60}}>
+        <CircularImage size={120} />
+      </View>
+      
+
+
       { /* Clock In View */}
-      <View style={{ marginTop: 20, width: '90%' }}>
+      <View style={{ margin: 20, width: '90%' }}>
 
         <Text
           style={{
@@ -69,8 +83,8 @@ export default function HomeScreen() {
             12:57pm
           </Text>
 
-        <TouchableOpacity style={[styles.button, {marginTop: 6,}]} onPress={() => console.log("Clocked In!")}>
-          <Text style={styles.buttonText}>Clock In</Text>
+        <TouchableOpacity style={[styles.button, {marginTop: 6, width: '90%'}]} onPress={() => console.log("Clocked In!")}>
+          <Text style={styles.buttonText}>CLOCK IN</Text>
         </TouchableOpacity>
 
         </View>
@@ -78,7 +92,7 @@ export default function HomeScreen() {
       </View>
 
 
-      <View style={{ marginTop: 20, width: '90%' }}>
+      <View style={{ width: '90%' }}>
 
         <Text
           style={{
@@ -96,10 +110,6 @@ export default function HomeScreen() {
           </View>
 
           <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%', marginTop: 6}]}>
-            <Text>My friend Jahmen from ROTC works at the Brown Bottle Bar. #wtf</Text>
-          </View>
-
-          <View style={[styles.box, {backgroundColor: Colors.lightTan, width: '90%', marginTop: 6}]}>
             <Text>Aaryn got his arm slammed in a stove. #bitchmoves</Text>
           </View>
 
@@ -110,7 +120,6 @@ export default function HomeScreen() {
         </View>
 
       </View>
-
 
     </View>
 
