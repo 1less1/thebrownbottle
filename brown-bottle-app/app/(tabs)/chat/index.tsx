@@ -1,14 +1,13 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { Text, StyleSheet } from 'react-native';
+import DefaultView from '@/components/DefaultView';
 
 const Chat = () => {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.text}>Chat Page</ThemedText>
-      <ThemedText style={styles.text}>This is a chat page</ThemedText>
-    </ThemedView>
+    <DefaultView style={styles.container}>
+      <Text style={styles.text}>Chat Page</Text>
+      <Text style={styles.text}>This is a chat page</Text>
+    </DefaultView>
   );
 };
 
@@ -24,3 +23,5 @@ const styles = StyleSheet.create({
 });
 
 export default Chat;
+
+
