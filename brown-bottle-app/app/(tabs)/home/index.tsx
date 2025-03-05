@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
 export default function HomeScreen() {
 
   return (
+  
     <View
       style={{
         flex: 1, 
