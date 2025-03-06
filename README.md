@@ -1,6 +1,6 @@
 # thebrownbottle
 <div align="center">
-    <img src="./images/brown_bottle_logo.jpg" alt="Update ENV Variables">>
+    <img src="./images/brown_bottle_logo.jpg" alt="Brown Bottle Logo">
 </div>
 
 ### CS4800 Research 
@@ -69,7 +69,7 @@ Follow steps [HERE](https://reactnative.dev/docs/set-up-your-environment) for in
     ```
 
 <div align="center">
-    <img src="./images/expo_start_screen.png" alt="Update ENV Variables">>
+    <img src="./images/expo_start_screen.png" alt="Expo Start Screen">
 </div>
 
 
