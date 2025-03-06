@@ -32,3 +32,4 @@ Thinking about removing the light/dark mode feature completley. Kinda would just
 ## Dom Edits
 Added shadow effect to the Card.tsx file and recolored the navbar to be simplified (no light or dark mode).
 Added more colors to the constants/Colors.ts file.
+Added ClockWidget in components and inserted it into ClockIn.tsx. This has a live clock that updates and has the states for clocking in and out!
