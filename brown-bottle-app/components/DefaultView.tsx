@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 80,
   },
   defaultContainer: {
     flex: 1,

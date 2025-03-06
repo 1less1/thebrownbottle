@@ -1,27 +1,19 @@
-import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet, Image, Platform } from 'react-native';
+
 import DefaultView from '@/components/DefaultView';
+import { Colors } from '@/constants/Colors';
+import { View, Text } from 'react-native';
 
-const Chat = () => {
+export default function Chat() {
   return (
-    <DefaultView style={styles.container}>
-      <Text style={styles.text}>Chat Page</Text>
-      <Text style={styles.text}>This is a chat page</Text>
+    <DefaultView>
+      <View>
+      <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold', marginTop: 20 }}>
+            Chat
+          </Text>   
+      </View>
+
+
+
     </DefaultView>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 20,
-  },
-});
-
-export default Chat;
-
-
+)};

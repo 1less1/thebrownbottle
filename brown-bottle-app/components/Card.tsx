@@ -22,12 +22,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.yellowTan, // Default background, can be overridden
     paddingVertical: 20,
     paddingHorizontal: 40,
-    borderRadius: 5,
-    shadowColor: 'black',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5, // Android shadow
+    borderRadius: 15,
   },
 });
 

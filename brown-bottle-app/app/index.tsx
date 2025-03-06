@@ -1,19 +1,15 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#FFDEAB',
-    borderRadius: 10,
-    shadowColor: 'black',
-    shadowOffset: { width: 2, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
+    borderRadius: 5,
+    backgroundColor: Colors.lightTan, // Dark Tan Button
     paddingVertical: 10,
     paddingHorizontal: 10,
     alignItems: 'center',
+    width: 300,
   },
   buttonText: {
       color: 'black', 
@@ -39,27 +35,13 @@ export default function LandingScreen() {
     <View
       style={{
         alignItems: 'center',
-        marginTop: 10,
-        backgroundColor: Colors.darkTan, // Dark Tan Box
-        paddingVertical: 20,
-        paddingHorizontal: 40,
-        borderRadius: 5,
-        shadowColor: 'black',
-        shadowOffset: { width: 2, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5, 
-        elevation: 5, 
+        
       }}>
 
-        <Text
-          style={{
-            textAlign: 'center',
-            fontSize: 24,
-            color: 'black',
-            fontWeight: 'bold'
-          }}>
-          Welcome to Brown Bottle App!
-        </Text>
+        <Image
+        source={require('@/assets/images/brown_bottle_logo.jpg')} // Adjust the path to your image
+        style={{ width: 150, height: 150, marginTop: 20}}
+      />
 
       </View>
 

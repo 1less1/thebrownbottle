@@ -1,26 +1,19 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, Image, Platform } from 'react-native';
 
-const Calendar = () => {
+import DefaultView from '@/components/DefaultView';
+import { Colors } from '@/constants/Colors';
+import { View, Text } from 'react-native';
+
+export default function Tasks() {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.text}>Calendar Page</ThemedText>
-      <ThemedText style={styles.text}>nothing here yet</ThemedText>
-    </ThemedView>
-  );
-};
+    <DefaultView>
+      <View>
+      <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold', marginTop: 20 }}>
+            Calendar 
+          </Text>   
+      </View>
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 20,
-  },
-});
 
-export default Calendar;
+
+    </DefaultView>
+)};
