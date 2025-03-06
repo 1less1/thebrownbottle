@@ -23,6 +23,15 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 40,
     borderRadius: 15,
+
+    // Shadow for iOS
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+
+    // Elevation for Android
+    elevation: 6,
   },
 });
 

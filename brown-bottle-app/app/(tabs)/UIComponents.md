@@ -27,3 +27,8 @@ Includes SafeAreaView: ensres apps content is only displayed in the "safe area" 
 ## Removed
 
 Thinking about removing the light/dark mode feature completley. Kinda would just make our code more complex, not even that important.
+
+
+## Dom Edits
+Added shadow effect to the Card.tsx file and recolored the navbar to be simplified (no light or dark mode).
+Added more colors to the constants/Colors.ts file.

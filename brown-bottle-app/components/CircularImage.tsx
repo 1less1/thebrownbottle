@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
 // Import the fallback image correctly
-const defaultProfilePic = require('../assets/images/generic_profile_pic.png'); // Adjust path from components/
+const defaultProfilePic = require('../assets/images/generic_profile_pic.png');
 
 interface CircularImageProps {
   imageUri?: string; // Optional image URL

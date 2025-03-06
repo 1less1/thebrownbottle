@@ -92,12 +92,12 @@ npx expo start # Uses the expo cli which brings up a menu where the user can pic
 Access preliminary UI design images [HERE](./ui_designs/)
 
 ### Project Colors
-Light Tan - #F0E7E0
-Dark Tan - #ECE1D4
-Yellowish Tan - #FFDEAB
-Brown - #7C580D
-Greyish White (App Background) - #FBF7F7
-Bright White - #FBF7F7
+Light Tan - #F0E7E0  
+Dark Tan - #ECE1D4  
+Yellowish Tan - #FFDEAB  
+Brown - #7C580D  
+Greyish White (App Background) - #FBF7F7  
+Bright White - #FBF7F7  
 
 ## MYSQL
 IMPORTANT: Have the .env file in thebrownbottle root directory for docker compose to read.

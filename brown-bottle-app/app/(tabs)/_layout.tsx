@@ -16,18 +16,24 @@ export default function TabLayout() {
   console.log(isAdmin);
 
   return (
+    // New Taskbar Theme!
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: Colors.brown,
+        tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: { position: "absolute" },
-          default: {},
-        }),
-      }}
-    >
+        tabBarStyle: {
+          backgroundColor: 'white', // Static background color -> White
+          borderTopWidth: 1,
+          borderTopColor: Colors.lightGray, // Border color
+          elevation: 5, // Shadow for Android
+          shadowOpacity: 0.1, // Shadow for iOS
+          shadowRadius: 3,
+        },
+      }}>
+
 
       <Tabs.Screen
         name="home/index"

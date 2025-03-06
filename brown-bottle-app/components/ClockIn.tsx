@@ -23,7 +23,7 @@ const ClockInCard: React.FC = () => {
   };
 
   return (
-    <Card style={{ backgroundColor: Colors.lightTan, width: '100%', padding: 16 }}>
+    <Card style={{ backgroundColor: Colors.darkTan, width: '100%', padding: 16 }}>
       <Text style={styles.regularText}>
         {isClockedIn ? "You're Clocked In" : "You're Not Checked In Yet"}
       </Text>

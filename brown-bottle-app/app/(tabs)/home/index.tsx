@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
 
 export default function HomeScreen() {
   return (
+    
     <DefaultView>
 
       {/* Top Strip */}
@@ -51,6 +52,8 @@ export default function HomeScreen() {
         <AnnouncementsCard />
       </View>
     </DefaultView>
+
+
   );
 }
 

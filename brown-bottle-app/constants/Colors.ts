@@ -24,11 +24,18 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   
+  /* App Theme Colors */
   lightTan: '#F0E7E0',
   darkTan: '#ECE1D4',
   yellowTan: '#FFDEAB',
   brown: '#7C580D',
+  darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
-  brightWhite:'#FBF7F7',
+  
+  /* General Colors */
+  white:'#FFFFFF',
+  lightGray: '#E5E5EA',
+  gray: '#B1B1B5',
+  darkGray: '6B6B6E',
 
 };
