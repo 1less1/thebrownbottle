@@ -99,6 +99,28 @@ Brown - #7C580D
 Greyish White (App Background) - #FBF7F7
 Bright White - #FBF7F7
 
+## MYSQL
+IMPORTANT: Have the .env file in thebrownbottle root directory for docker compose to read.
+
+Start in the root directory of the repository. 
+HINT: You should be able to list the files and see docker-compose.yaml
+
+Make sure docker service is running! (Open docker desktop or start the service from the command line)
+
+Start MySQL container:
+
+```bash
+docker compose up # Runs in foreground
+
+docker compose up -d # Runs in background
+```
+
+Connect to the MySQL container through the command line
+```bash
+mysql -h 127.0.0.1 -P 3306 -u root -p
+```
+
+
 ## Project Resources
 * To be continued...
 
