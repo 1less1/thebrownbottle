@@ -7,6 +7,23 @@
 #### Student Researchers: Dominick Olhava, Ishimwe Gentil, Aaryn Warrior
 #### Faculty Advisor: Dr. Andrew Berns
 
+## Project Description
+Our group of student researchers are developing a mobile application that is accessible on Android and IOS to facilitate scheduling, time off requests, business chat rooms, logging takeout orders, potentially keeping track of stock, and other business necessities per request for a local Cedar Falls restaurant called The Brown Bottle. This business currently has very little electronic management systems and everything is done with pencil and paper. Within this application there will be both a standard and administrative user for certain app functionalities. 
+
+Bi-Weekly interviews are conducted with the restaurant team in order to create user stories and fulfill their wishes and vision for the app.  
+
+We will be utilizing the **React-Native** tech stack with **Expo Go** to develop the frontend as well as MySQL and Python to create a backend. The project will include aspects of all computer science disciplines taught at UNI. Frontend development will involve software engineering with best coding practices. Backend development will involve database systems and networking to communicate with the frontend. 
+
+This project will implement **Agile** programming cycles periodically to keep development on track. Discord will be used for team communication. GitHub will be the primary platform to use for version control. Figjam will be used to log team tasks and document code changes. Figma will be used for designing the user interface. Microsoft VS Code will be the IDE of choice. For a team based work environment we have decided to meet weekly on Tuesdays and Thursdays to plan, research, and build the project.
+
+The Brown Bottle App should be released in **Fall of 2025** for commercial use!
+
+### Beta Home Screen Design
+<div align="center">
+    <img src="./ui_designs/beta_home_screen.gif" alt="Beta Home Screen Design">
+</div>
+
+
 ## Installing React Native 
 
 ### Initial Dependencies

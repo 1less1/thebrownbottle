@@ -10,10 +10,10 @@ const ClockWidget = () => {
         const hours = now.getHours();
         const minutes = now.getMinutes();
 
-        const ampm = hours <= 12? 'pm' : 'am'; // Determines if it is am or pm based on if the hours is above or below 12 (24 hour format)
+        const ampm = hours < 12 ? 'am' : 'pm'; // Correct AM/PM determination
         const hour12 = hours % 12 || 12;
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-        return `${hour12}:${formattedMinutes}${ampm}`;
+        return `${hour12}:${formattedMinutes}${ampm}`;        
     };
 
     const [currentTime, setCurrentTime] = useState<string>(getCurrentTime());

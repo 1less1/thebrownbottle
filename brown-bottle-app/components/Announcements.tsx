@@ -5,9 +5,9 @@ import { Colors } from '../constants/Colors';
 
 const AnnouncementsCard = () => {
   const announcements = [
-    { id: 1, text: 'thebrownbottle.com is prone to IDOR. #normalizecybercriminals' },
-    { id: 2, text: 'Aaryn got his arm slammed in a stove. #bitchmoves' },
-    { id: 3, text: 'Who is going to the Banana Bar Crawl? I think Brad is. Get over here boi. #peelsonwheels' },
+    { id: 1, text: 'The work schedules for the month of May have been poste. -Brad' },
+    { id: 2, text: 'There is a bartender shift on 4/27 needing to be covered!!!' },
+    { id: 3, text: 'Remember to bring your IDs to work next week so we can calibarate you in our system -Tim' },
   ];
 
   return (
