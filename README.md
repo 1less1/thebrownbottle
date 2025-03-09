@@ -20,8 +20,9 @@ The Brown Bottle App should be released in **Fall of 2025** for commercial use!
 
 ### Beta Home Screen Design
 <div align="center">
-    <img src="./ui_designs/beta_home_screen2.gif" alt="Beta Home Screen Design">
+    <img src="./ui_designs/beta_home_screen2.gif" alt="Beta Home Screen Design" height="475">
 </div>
+
 
 
 ## Installing React Native 
