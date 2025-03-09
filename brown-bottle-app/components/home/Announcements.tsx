@@ -1,9 +1,11 @@
 import React from 'react';
 import { Text, StyleSheet, View } from 'react-native';
-import Card from "@/components/Card";
 import { Colors } from '@/constants/Colors'; 
 
-const AnnouncementsCard = () => {
+import Card from "@/components/Card";
+import AltCard from '@/components/AltCard';
+
+const Announcements= () => {
   const announcements = [
     { id: 1, text: 'The work schedules for the month of May have been posted. -Brad' },
     { id: 2, text: 'There is a bartender shift on 4/27 needing to be covered!!!' },
@@ -13,9 +15,9 @@ const AnnouncementsCard = () => {
   return (
     <Card style={styles.container}>
       {announcements.map((announcement, index) => (
-        <Card key={announcement.id} style={[styles.announcement, index !== 0 && { marginTop: 6 }]}>
+        <AltCard key={announcement.id} style={[styles.announcement, index !== 0 && { marginTop: 6 }]}>
           <Text style={styles.text}>{announcement.text}</Text>
-        </Card>
+        </AltCard>
       ))}
     </Card>
   );
@@ -24,19 +26,20 @@ const AnnouncementsCard = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.darkTan,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
   announcement: {
     backgroundColor: Colors.lightTan,
-    width: '90%',
+    width: '100%',
     padding: 10,
     alignItems: 'center',
   },
   text: {
     color: 'black',
+    fontSize: 14,
   },
 });
 
-export default AnnouncementsCard;
+export default Announcements;

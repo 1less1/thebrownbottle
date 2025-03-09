@@ -1,6 +1,6 @@
 # What I did
 
-# If you work on any other pages, please use the Card and DefaultView 
+**If you work on any other pages, please use the Card and DefaultView**  
 So Far, I've only used Card in the hom/index, and DefaultView in home/index and chat/index. I will pdate more pages as i get time, or you can. Also with the UI, I will make more changes to closely follow the preliminary design.
 
 ## Card component
@@ -10,7 +10,7 @@ Made a Card.tsx to replace the "box" that was being used previously. It allows a
 ## DefaultView
 
 Made this component to put some of the view styles we want to be default on every screen.
-
+``` JavaScript
 Includes: style={{
         flex: 1,
         justifyContent: 'center',
@@ -19,6 +19,7 @@ Includes: style={{
         height: '100%',
         width: '100%',
       }}>
+```
 
 Includes SafeAreaView: ensres apps content is only displayed in the "safe area" avoids areas typically covered on smartphones.
 
@@ -38,4 +39,5 @@ Added ClockWidget in components and inserted it into ClockIn.tsx. This has a liv
 3/8 Edits:
 Grouped components exclusively used on the home screen in a folder: /components/home/component_file.tsx
 - You can reference these components in an import statement with: '@components/home/component_file.tsx'
-In Card.tsx I made alignItems: undefined in the Style Sheet so it can be overridden easier for differrent use cases. This means you will have to designate the alignment manually every time you want to use a card component to: 'flext-start', 'center', 'flex-end'.
+In Card.tsx I made **alignItems: undefined** in the Style Sheet so it can be overridden easier for differrent use cases. This means you will have to designate the alignment manually every time you want to use a card component to: 'flext-start', 'center', 'flex-end'.
+

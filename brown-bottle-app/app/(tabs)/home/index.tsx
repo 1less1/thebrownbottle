@@ -4,7 +4,7 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import CircularImage from '@/components/CircularImage';
 import ClockInCard from '@/components/home/ClockIn';
-import AnnouncementsCard from '@/components/home/Announcements';
+import Announcements from '@/components/home/Announcements';
 
 const styles = StyleSheet.create({
   borderTop: {
@@ -52,7 +52,7 @@ export default function HomeScreen() {
         <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 15 }}>Announcements</Text>
 
         {/* Announcements Container */}
-        <AnnouncementsCard />
+        <Announcements />
       </View>
 
     </DefaultView>

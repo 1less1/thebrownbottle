@@ -16,25 +16,22 @@ export default function Tasks() {
     <DefaultView>
 
       {/* Top Strip */}
-      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 25, width: '100%', }} />
+      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%', }} />
 
       {/* Tasks Header */}
-      <View style={{ marginTop: 35, marginBottom: 10, width:'85%' }}>
+      <View style={{ marginTop: 65, marginBottom: 10, width:'85%' }}>
         <View style={{alignSelf:'flex-start'}}>
-          <Text style={{ textAlign: 'left', fontSize: 35, color: 'black', fontWeight: 'bold' }}>
+          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
               Your Tasks:
           </Text>
         </View>
       </View>
 
+      {/* Task List */}
       <View style={{ width: '85%'}}>
         <TaskList/>
       </View>
-
-
-
-
-
+    
     </DefaultView>
 
   )
