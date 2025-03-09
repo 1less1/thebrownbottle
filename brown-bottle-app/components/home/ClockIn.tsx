@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import Card from '@/components/Card'; 
 import { Colors } from '@/constants/Colors'; 
-import ClockWidget from '@/components/ClockWidget';
+import ClockWidget from '@/components/home/ClockWidget';
 
 const ClockInCard: React.FC = () => {
 
@@ -28,7 +28,7 @@ const ClockInCard: React.FC = () => {
   */
 
   return (
-    <Card style={{ backgroundColor: Colors.darkTan, width: '100%', padding: 16 }}>
+    <Card style={{ backgroundColor: Colors.darkTan, width: '100%', padding: 16, alignItems:'center' }}>
 
       {/* The ClockWidget Component has all of this code now! */}
       {/*
@@ -58,7 +58,7 @@ const ClockInCard: React.FC = () => {
 const styles = StyleSheet.create({
   timeText: {
     textAlign: 'center',
-    fontSize: 30,
+    fontSize: 36,
     color: 'black',
     fontWeight: 'bold',
   },

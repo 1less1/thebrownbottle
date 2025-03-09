@@ -1,11 +1,11 @@
 import React from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 import Card from "@/components/Card";
-import { Colors } from '../constants/Colors'; 
+import { Colors } from '@/constants/Colors'; 
 
 const AnnouncementsCard = () => {
   const announcements = [
-    { id: 1, text: 'The work schedules for the month of May have been poste. -Brad' },
+    { id: 1, text: 'The work schedules for the month of May have been posted. -Brad' },
     { id: 2, text: 'There is a bartender shift on 4/27 needing to be covered!!!' },
     { id: 3, text: 'Remember to bring your IDs to work next week so we can calibarate you in our system -Tim' },
   ];
@@ -24,6 +24,7 @@ const AnnouncementsCard = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.darkTan,
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
@@ -31,6 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightTan,
     width: '90%',
     padding: 10,
+    alignItems: 'center',
   },
   text: {
     color: 'black',

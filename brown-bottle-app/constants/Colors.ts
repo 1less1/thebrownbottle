@@ -25,7 +25,8 @@ export const Colors = {
   },
   
   /* App Theme Colors */
-  lightTan: '#F0E7E0',
+  lightTan: '#FAF3ED',
+  mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
   yellowTan: '#FFDEAB',
   brown: '#7C580D',

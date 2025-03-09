@@ -48,7 +48,9 @@ const ClockWidget = () => {
 
 
 return (
+    
     <View>
+
         <Text style={[styles.regularText, {textAlign: 'center', }]}>
             {isClockedIn ? "You're Clocked In!" : "You're Not Checked In Yet."}
         </Text>

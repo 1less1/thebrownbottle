@@ -18,7 +18,7 @@ const Card: React.FC<CardProps> = ({ children, style }) => {
 // Default styles for the Card component
 const styles = StyleSheet.create({
   card: {
-    alignItems: 'center',
+    alignItems: undefined,
     backgroundColor: Colors.yellowTan, // Default background, can be overridden
     paddingVertical: 20,
     paddingHorizontal: 40,
