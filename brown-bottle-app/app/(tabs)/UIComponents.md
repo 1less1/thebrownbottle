@@ -32,12 +32,15 @@ Thinking about removing the light/dark mode feature completley. Kinda would just
 
 ## Dom Edits
 3/6 Edits:
-Added shadow effect to the Card.tsx file and recolored the navbar to be simplified (no light or dark mode).
-Added more colors to the constants/Colors.ts file.
-Added ClockWidget in components and inserted it into ClockIn.tsx. This has a live clock that updates and has the react states for clocking in and out!
+- Added shadow effect to the Card.tsx file and recolored the navbar to be simplified (no light or dark mode).
+- Added more colors to the constants/Colors.ts file.
+- Added ClockWidget in components and inserted it into ClockIn.tsx. This has a live clock that updates and has the react states for clocking in and out!
 
 3/8 Edits:
-Grouped components exclusively used on the home screen in a folder: /components/home/component_file.tsx
-- You can reference these components in an import statement with: '@components/home/component_file.tsx'
-In Card.tsx I made **alignItems: undefined** in the Style Sheet so it can be overridden easier for differrent use cases. This means you will have to designate the alignment manually every time you want to use a card component to: 'flext-start', 'center', 'flex-end'.
+- Grouped components exclusively used on the home screen in a folder: /components/home/component_file.tsx
+  - You can reference these components in an import statement with: '@components/home/component_file.tsx'
+- In Card.tsx I made **alignItems: undefined** in the Style Sheet so it can be overridden easier for differrent use cases. This means you will have to designate the alignment manually every time you want to use a card component to: 'flext-start', 'center', 'flex-end'.
 
+3/9 Edits:
+- Made an **AltCard.tsx** component that is the exact same to the **Card.tsx** componenet except it has **"NO Elevation or Background Shadow Effect"**. 
+- Also added working check box cards to the Tasks page!
