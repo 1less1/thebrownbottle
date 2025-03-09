@@ -3,7 +3,7 @@ import { Text, StyleSheet, View } from 'react-native';
 import Card from "@/components/Card";
 import { Colors } from '@/constants/Colors'; 
 
-import CheckBoxCard from './CheckBoxCard';
+import CheckBoxCard from '@/components/tasks/CheckBoxCard';
 
 const TaskList = () => {
   const tasks = [
