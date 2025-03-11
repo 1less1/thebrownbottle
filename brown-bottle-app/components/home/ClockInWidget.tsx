@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Colors } from '@/constants/Colors'; 
 
-const ClockWidget = () => {
+import Card from "@/components/Card";
+
+const ClockInWidget = () => {
 
 
     // Function that fetches the current time and formats it as "hours:minutes"
@@ -48,25 +51,29 @@ const ClockWidget = () => {
 
 
 return (
+
+    <Card style={{ backgroundColor: Colors.darkTan, width: '100%', padding: 16, alignItems:'center' }}>
     
-    <View>
+        <View>
 
-        <Text style={[styles.regularText, {textAlign: 'center', }]}>
-            {isClockedIn ? "You're Clocked In!" : "You're Not Checked In Yet."}
-        </Text>
+            <Text style={[styles.regularText, {textAlign: 'center', }]}>
+                {isClockedIn ? "You're Clocked In!" : "You're Not Checked In Yet."}
+            </Text>
 
-        <Text style={styles.timeText}>{currentTime}</Text>
+            <Text style={styles.timeText}>{currentTime}</Text>
 
-        <TouchableOpacity
-            style={[styles.button, { marginTop: 10 }]}
-            onPress={handlePress}
-        >
-            <Text style={styles.buttonText}>{isClockedIn ? 'Clock Out' : 'Clock In'}</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.button, { marginTop: 10 }]}
+                onPress={handlePress}
+            >
+                <Text style={styles.buttonText}>{isClockedIn ? 'Clock Out' : 'Clock In'}</Text>
+            </TouchableOpacity>
 
-    </View>
-);
+        </View>
 
+    </Card> 
+
+    );
 };
 
 const styles = StyleSheet.create({
@@ -98,4 +105,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ClockWidget;
+export default ClockInWidget;

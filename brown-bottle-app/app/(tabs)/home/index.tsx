@@ -3,8 +3,8 @@ import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
 import CircularImage from '@/components/CircularImage';
-import ClockInCard from '@/components/home/ClockIn';
 import Announcements from '@/components/home/Announcements';
+import ClockWidget from '@/components/home/ClockInWidget';
 
 const styles = StyleSheet.create({
   borderTop: {
@@ -42,8 +42,7 @@ export default function HomeScreen() {
       {/* Clock In View */}
       <View style={{ margin: 20, width: '85%', marginBottom: 60 }}>
         <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 15 }}>Today</Text>
-        {/* Clock In Card */}
-        <ClockInCard />
+        <ClockWidget />
       </View>
 
 
