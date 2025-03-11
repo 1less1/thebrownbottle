@@ -21,7 +21,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: 'white', // Static background color -> White
           borderTopWidth: 1,
