@@ -9,6 +9,9 @@ const CalendarWidget = () => {
 
     return (
 
+        // I want to make a working calendar component that can change months, and highlight current shifts for the user
+        // Every day with a highlighted shift should have a modal popup that shows info on the selected shift: times, role, etc.
+
         <View>
 
 
