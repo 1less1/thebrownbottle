@@ -38,10 +38,11 @@ const DefaultView: React.FC<DefaultViewProps> = ({
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.greyWhite, // Set background color to greyWhite by default
+    backgroundColor: Colors.mediumTan, // Set background color to greyWhite by default
   },
   scrollView: {
     flex: 1,
+    backgroundColor: Colors.greyWhite, // Ensure default background
   },
   scrollContent: {
     paddingBottom: 80,
