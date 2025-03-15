@@ -33,12 +33,15 @@ const styles = StyleSheet.create({
   announcement: {
     backgroundColor: Colors.lightTan,
     width: '100%',
-    padding: 10,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  
   },
   text: {
     color: Colors.black,
-    fontSize: 16,
+    fontSize: 14,
   },
 });
 

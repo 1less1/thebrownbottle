@@ -1,62 +1,64 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
-
 import AltCard from '@/components/AltCard';
 
 interface CalendarModalProps {
-  visible: boolean;
+  visible: boolean,
+  isShift: boolean;
   date: string | null;
   shiftTime?: string | null;
-  events: string[];
+  role?: string | null;
+  events?: string[] |null;
   onClose: () => void;
 }
 
-const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, shiftTime, events, onClose }) => {
-
+const CalendarModal: React.FC<CalendarModalProps> = ({ visible, isShift, date, shiftTime, role, events, onClose }) => {
   return (
-
     <Modal visible={visible} transparent animationType="fade">
+      <View style={styles.overlay}>
+        <AltCard style={{ backgroundColor: Colors.white, width: '75%', padding: 16, margin: 0 }}>
+          {/* Date Header */}
+          <Text style={styles.dateText}>{date}</Text>
 
-        <View style={styles.overlay}>
-
-            <AltCard style={{ backgroundColor: Colors.white, width: '85%', padding: 16, margin: 0}}>
-
-
-
-                {/* Date Header */}
-                <Text style={styles.dateText}>{date}</Text>
-
-                {/* Shift Time (conditionally render) */}
-                {shiftTime && (
+          {/* Shift Time + Role */}
+          {isShift ? (
+            <>
+              {shiftTime && (
                 <Text style={styles.styledText}>
-                    Shift Time: {shiftTime}
+                  Shift Time: {shiftTime}
                 </Text>
-                )}
-
-                {/* Events List */}
-                {events.length > 0 ? (
+              )}
+              {role && (
+                <Text style={styles.styledText}>
+                  Role: {role}
+                </Text>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Safely check if events is not null */}
+              {events?.length ? (
                 events.map((event, index) => (
-                    <Text key={index} style={styles.styledText}>
+                  <Text key={index} style={styles.styledText}>
                     • {event}
-                    </Text>
+                  </Text>
                 ))
+              ) : (
+                <Text style={styles.noEventsText}>No events for this day...</Text>
+              )}
+            </>
+          )}
 
-                ) : (
+          {/* Close Button */}
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
 
-                    <Text style={styles.noEventsText}>No events for this day</Text>
-                )}
-
-                {/* Close Button */}
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                    <Text style={styles.closeButtonText}>Close</Text>
-                </TouchableOpacity>
-
-
-            </AltCard>
+        </AltCard>
 
       </View>
-      
+
     </Modal>
 
   );
@@ -70,19 +72,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: Colors.darkBrown,
     marginBottom: 8,
   },
-  styledText:{
-    fontSize: 16,
+  styledText: {
+    fontSize: 14,
     fontWeight: '400',
     color: Colors.black,
-    marginTop: 6
+    marginTop: 6,
   },
   noEventsText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '400',
     color: Colors.gray,
     fontStyle: 'italic',

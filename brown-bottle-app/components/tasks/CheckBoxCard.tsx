@@ -46,10 +46,10 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between', // Ensures the checkbox stays on the right
-      padding: 10,
-      backgroundColor: Colors.lightTan,
       width: '100%',
-      
+      backgroundColor: Colors.lightTan,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
     },
     checkedCard: {
       opacity: 0.5, // Reduce opacity when checked

@@ -18,38 +18,27 @@ LocaleConfig.locales['en'] = {
 };
 LocaleConfig.defaultLocale = 'en';
 
-// EventData Object Defined
+
 interface EventData {
-  date: string;
-  shiftTime?: string;
-  events: string[];
+  visible: boolean,
+  isShift: boolean;
+  date: string | null;
+  shiftTime?: string | null;
+  role?: string | null;
+  events?: string[] |null;
 }
 
-// React Native Calendars read dates in the format: YYYY-MM-DD
-const events: { [key: string]: EventData } = {
-  '2025-03-15': {
-    date: '2025-03-15',
-    shiftTime: '9:00 AM - 5:00 PM',
-    events: ['Server'],
-  },
-  '2025-03-28': {
-    date: '2025-03-28',
-    shiftTime: '4:00 PM - 8:45 PM',
-    events: ['Bartender'],
-  },
-  '2025-04-28': {
-    date: '2025-04-28',
-    events: ['New Schedules due'],
-  },
-};
+interface Props {
+  events: { [key: string]: EventData };
+}
 
-const CalendarWidget = () => {
+const CalendarWidget: React.FC<Props> = ({ events }) => {
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
 
   const handleDayPress = (day: any) => {
-    const event = events[day.dateString as keyof typeof events]; // Type assertion
+    const event = events[day.dateString as keyof typeof events];
     if (event) {
-      setSelectedEvent(event); // Set the event data for the modal
+      setSelectedEvent(event);
     }
   };
 
@@ -94,12 +83,14 @@ const CalendarWidget = () => {
 
         <CalendarModal
           visible={!!selectedEvent}
+          isShift={selectedEvent.isShift}
           date={selectedEvent.date}
           shiftTime={selectedEvent.shiftTime}
+          role={selectedEvent.role}
           events={selectedEvent.events}
           onClose={() => setSelectedEvent(null)}
         />
-        
+
       )}
     </View>
   );
