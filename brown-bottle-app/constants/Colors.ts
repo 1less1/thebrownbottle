@@ -34,6 +34,7 @@ export const Colors = {
   greyWhite: '#FBF7F7',
   
   /* General Colors */
+  black: '#000000',
   white:'#FFFFFF',
   lightGray: '#E5E5EA',
   gray: '#B1B1B5',
