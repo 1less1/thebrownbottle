@@ -52,7 +52,7 @@ const ClockInWidget = () => {
 
 return (
 
-    <Card style={{ backgroundColor: Colors.darkTan, width: '100%', padding: 16, alignItems:'center' }}>
+    <Card style={{ backgroundColor: Colors.white, width: '100%', padding: 16, alignItems:'center' }}>
     
         <View>
 
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
   },
   button: {
-      backgroundColor: 'white',
+      backgroundColor: Colors.darkBrown,
       paddingVertical: 10,
       paddingHorizontal: 20, 
       width: '100%',
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
       minWidth: 180,
   },
   buttonText: {
-      color: "black",
+      color: Colors.white,
       fontSize: 25,
       fontWeight: 'bold',
       textAlign: 'center',

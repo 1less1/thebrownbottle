@@ -42,7 +42,7 @@ const TaskList = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.darkTan,
+    backgroundColor: Colors.white,
     alignItems: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 4, // Compensate for the vertical margin of 6 for the first and last entry of the tasks list!

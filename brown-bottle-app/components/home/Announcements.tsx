@@ -25,7 +25,7 @@ const Announcements= () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.darkTan,
+    backgroundColor: Colors.white,
     alignItems: 'flex-start',
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    color: 'black',
-    fontSize: 14,
+    color: Colors.black,
+    fontSize: 16,
   },
 });
 
