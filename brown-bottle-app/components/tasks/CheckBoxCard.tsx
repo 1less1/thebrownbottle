@@ -19,25 +19,28 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({text}) => {
 
     return (
 
-      <TouchableOpacity onPress={toggleCheck} activeOpacity={0.8}>
+      <View style={{ width:'100%' }}>
 
-        <AltCard style={[styles.checkBoxCard, checked && styles.checkedCard]}>
+        <TouchableOpacity onPress={toggleCheck} activeOpacity={0.8} >
 
-            <Text style={styles.text}>{text}</Text>
-            
-            <Ionicons
-                name={checked ? 'checkbox' : 'square-outline'}
-                size={24}
-                color="black"
-                style={styles.checkbox}
-            />
+          <AltCard style={[styles.checkBoxCard, checked && styles.checkedCard]}>
 
-        </AltCard>
+              <Text style={styles.text}>{text}</Text>
+              
+              <Ionicons
+                  name={checked ? 'checkbox' : 'square-outline'}
+                  size={24}
+                  color="black"
+                  style={styles.checkbox}
+              />
 
-      </TouchableOpacity>
+          </AltCard>
+
+        </TouchableOpacity>
+
+      </View>
 
     );
-
 };
 
 const styles = StyleSheet.create({
