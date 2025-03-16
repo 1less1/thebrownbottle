@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -28,8 +29,23 @@ export default function RootLayout() {
   }
 
   return (
+
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      
+      {/* Universal status bar */}
+      <StatusBar 
+        backgroundColor={Colors.mediumTan} // Set your universal color here
+        style="dark" // Text and Icon Coor
+      />
+      
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: Colors.mediumTan, // Ensure header matches status bar color
+          },
+          headerTintColor: Colors.black, // Header text color
+        }}
+      >
         {/* Landing Page Loaded First */}
         <Stack.Screen name="index" options={{headerShown: false}} />
 
@@ -37,8 +53,11 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
         <Stack.Screen name="+not-found" />
+
       </Stack>
-      <StatusBar style="auto" />
+
     </ThemeProvider>
+
   );
-}
+};
+

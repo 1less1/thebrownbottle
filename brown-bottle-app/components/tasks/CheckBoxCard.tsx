@@ -19,23 +19,22 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({text}) => {
 
     return (
 
-        <TouchableOpacity onPress={toggleCheck} activeOpacity={0.8}>
+      <TouchableOpacity onPress={toggleCheck} activeOpacity={0.8}>
 
-            <AltCard style={[styles.checkBoxCard, checked && styles.checkedCard]}>
+        <AltCard style={[styles.checkBoxCard, checked && styles.checkedCard]}>
 
-                <Text style={styles.text}>{text}</Text>
-                
-                <Ionicons
-                    name={checked ? 'checkbox' : 'square-outline'}
-                    size={24}
-                    color="black"
-                    style={styles.checkbox}
-                />
+            <Text style={styles.text}>{text}</Text>
+            
+            <Ionicons
+                name={checked ? 'checkbox' : 'square-outline'}
+                size={24}
+                color="black"
+                style={styles.checkbox}
+            />
 
-                </AltCard>
+        </AltCard>
 
       </TouchableOpacity>
-
 
     );
 
@@ -50,6 +49,8 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.lightTan,
       paddingHorizontal: 16,
       paddingVertical: 12,
+      margin: 6,
+      alignSelf: 'center' // Gets Card to be center aligned in parent
     },
     checkedCard: {
       opacity: 0.5, // Reduce opacity when checked

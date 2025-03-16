@@ -22,7 +22,7 @@ interface EventData {
 const Calendar: React.FC<Props> = ({ events }) => {
 
     return (
-        <Card style={{ backgroundColor: Colors.white, width: '85%', padding: 16, alignItems:'center', margin: 14}}>
+        <Card style={styles.container}>
 
             <CalendarWidget events={events} />
 
@@ -32,5 +32,16 @@ const Calendar: React.FC<Props> = ({ events }) => {
     );
 
 };
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    backgroundColor: Colors.white, 
+    alignItems: 'center', 
+    alignSelf: 'center', 
+    padding: 16, 
+    margin: 14,
+  },
+});
 
 export default Calendar;

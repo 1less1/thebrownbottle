@@ -4,7 +4,7 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
-import ClockWidget from '@/components/home/ClockInWidget';
+import ClockInWidget from '@/components/home/ClockInWidget';
 
 const styles = StyleSheet.create({
   borderTop: {
@@ -40,17 +40,15 @@ export default function HomeScreen() {
 
 
       {/* Clock In View */}
-      <View style={{ margin: 20, width: '85%', marginBottom: 60 }}>
-        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 15 }}>Today</Text>
-        <ClockWidget />
+      <View style={{ margin: 40, width: '85%' }}>
+        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Today</Text>
+        <ClockInWidget />
       </View>
 
 
-      {/* Announcements Section */}
+      {/* Announcements View */}
       <View style={{ width: '85%' }}>
-        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 15 }}>Announcements</Text>
-
-        {/* Announcements Container */}
+        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Announcements</Text>
         <Announcements />
       </View>
 

@@ -19,7 +19,7 @@ export default function Tasks() {
       <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%', }} />
 
       {/* Tasks Header */}
-      <View style={{ marginTop: 65, marginBottom: 10, width:'85%' }}>
+      <View style={{ marginTop: 65, width:'85%' }}>
         <View style={{alignSelf:'flex-start'}}>
           <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
               Your Tasks:
@@ -28,9 +28,10 @@ export default function Tasks() {
       </View>
 
       {/* Task List */}
-      <View style={{ width: '85%'}}>
+      <View style={{ width:'85%', margin: 20, }}>
         <TaskList/>
       </View>
+
     
     </DefaultView>
 

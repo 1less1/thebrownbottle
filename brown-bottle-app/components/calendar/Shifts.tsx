@@ -25,39 +25,25 @@ const Shifts: React.FC<ShiftsProps> = ({ events }) => {
 
   return (
 
-    <View style={{ width: '85%' }}>
+    <Card style={styles.container}>
 
-        <Card style={styles.container}>
-            
-            <Text style={{ textAlign: 'center', fontSize: 16, color: 'black', fontWeight: 'bold', alignSelf: 'flex-start' }}>
-                Your Upcoming Shifts: 
-            </Text>
+        {/* Loop over the first two events */}
+        {firstTwoEvents.map((event, index) => (
 
-            {/* Loop over the first two events */}
-            {firstTwoEvents.map((event, index) => (
+        event.isShift && event.visible && (
 
-            event.isShift && event.visible && (
+            <AltCard key={index} style={styles.shiftCard}>
 
-                <View key={index} style={{width: '100%'}}>
+                <Text style={styles.dateText}>Date: {event.date}</Text>
+                {event.shiftTime && <Text style={styles.styledText}>Shift Time: {event.shiftTime}</Text>}
+                {event.role && <Text style={styles.styledText}>Role: {event.role}</Text>}
 
-                    <AltCard style={styles.shiftContainer}>
+            </AltCard>
 
-                        <Text style={styles.dateText}>Date: {event.date}</Text>
-                        {event.shiftTime && <Text style={styles.styledText}>Shift Time: {event.shiftTime}</Text>}
-                        {event.role && <Text style={styles.styledText}>Role: {event.role}</Text>}
+        )
+        ))}
 
-                    </AltCard>
-
-                </View>
-            )
-            ))}
-
-        </Card>
-
-
-
-    </View>
-
+    </Card>
 
   );
 };
@@ -65,12 +51,14 @@ const Shifts: React.FC<ShiftsProps> = ({ events }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: Colors.white,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingHorizontal: 10,
-        paddingVertical: 6,
+        paddingVertical: 10,
       },
-    shiftContainer: {
+    shiftCard: {
+        width: '100%',
         backgroundColor: Colors.lightTan,
+        alignSelf: 'center',
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
         paddingHorizontal: 16,
@@ -81,7 +69,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         color: Colors.black,
-
     },
     styledText: {
         fontSize: 12,

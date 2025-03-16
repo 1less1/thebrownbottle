@@ -9,10 +9,10 @@ import CalendarWidget from '@/components/calendar/CalendarWidget';
 const TimeOff = () => {
 
     return (
-        <Card style={{ backgroundColor: Colors.white, width: '85%', padding: 16, alignItems:'center' }}>
+        <Card style={styles.container}>
             
-            <Text style={{ textAlign: 'center', fontSize:15, color: 'black' }}>
-                Time Off Requests
+            <Text style={{ textAlign: 'center', fontSize:15, fontStyle: 'italic', color: Colors.gray }}>
+                No time off requests yet...
             </Text>
 
         </Card>
@@ -21,5 +21,15 @@ const TimeOff = () => {
     );
 
 };
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: Colors.white,
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+      },
+});
+
 
 export default TimeOff;

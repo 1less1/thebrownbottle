@@ -17,35 +17,23 @@ const TaskList = () => {
 
   return (
 
-    <Card style={styles.container}>
+      <Card style={styles.container}>
 
-      {tasks.map((task) => (
+        {tasks.map((task, index) => (
+          <CheckBoxCard key={index} text={task.text}/>
+        ))}
 
-        <View // Wrapper for the CheckBoxCard
-          key={task.id} 
-          style={{ 
-            width: '100%', 
-            marginTop: 6, 
-            marginBottom: task.id === tasks.length ? 6 : 0, // Add marginBottom value of 6 to ONLY last item
-          }}>
-          
-          <CheckBoxCard text={task.text} />
-        
-        </View>
-
-      ))}
-
-    </Card>
-
+      </Card>
+      
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 4, // Compensate for the vertical margin of 6 for the first and last entry of the tasks list!
+    paddingVertical: 10,
   },
 });
 

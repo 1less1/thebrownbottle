@@ -48,7 +48,7 @@ export default function Tasks() {
       <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%', }} />
 
       {/* Calendar Header */}
-      <View style={{ marginTop: 65, marginBottom: 10, width:'85%' }}>
+      <View style={{ marginTop: 65, width:'85%' }}>
         <View style={{alignSelf:'flex-start'}}>
           <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
               Calendar:
@@ -56,11 +56,21 @@ export default function Tasks() {
         </View>
       </View>
 
-      <Shifts events={events}/>
+      {/* Upcoming Shifts View */}
+      <View style={{ width: '85%', marginVertical: 20 }}>
+        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Upcoming Shifts</Text>
+        <Shifts events={events}/>
+      </View>
 
-      <Calendar events={events}/>
+      <View style={{ width: '85%' }}>
+        <Calendar events={events}/>
+      </View>
 
-      <TimeOff />
+      {/* Time Off View */}
+      <View style={{ width: '85%', marginVertical: 20 }}>
+        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Time Off Requests</Text>
+        <TimeOff/>
+      </View>
 
     </DefaultView>
 )};
