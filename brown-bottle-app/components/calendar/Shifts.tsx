@@ -18,32 +18,48 @@ interface ShiftsProps {
 }
 
 const Shifts: React.FC<ShiftsProps> = ({ events }) => {
-  // Get the first two events from the events map
-  const firstTwoEvents = Object.keys(events)
-    .slice(0, 2) // Take only the first two keys
-    .map(key => events[key]); // Map to event data
 
-  return (
+    // Today's Date
+    const today = new Date();
 
-    <Card style={styles.container}>
+    // Get the next two Upcoming Shifts
+    const upcomingShifts = Object.values(events)
+        .filter(event => event.isShift && event.date) // Only valid shifts with a date
+        .filter(event => new Date(event.date!) >= today) // Only future dates
+        .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()) // Sort by ascending date
+        .slice(0, 2); // Get the next two shifts
 
-        {/* Loop over the first two events */}
-        {firstTwoEvents.map((event, index) => (
+    // Handle no upcoming shifts case
+    if (upcomingShifts.length === 0) {
+        return (
+        <Card style={styles.container}>
+            <Text style={styles.noShiftsText}>No Upcoming Shifts...</Text>
+        </Card>
+        );
+    }
 
-        event.isShift && event.visible && (
 
-            <AltCard key={index} style={styles.shiftCard}>
+    return (
 
-                <Text style={styles.dateText}>Date: {event.date}</Text>
-                {event.shiftTime && <Text style={styles.styledText}>Shift Time: {event.shiftTime}</Text>}
-                {event.role && <Text style={styles.styledText}>Role: {event.role}</Text>}
+        <Card style={styles.container}>
 
-            </AltCard>
+            {/* Display the next two Upcoming Shifts */}
+            {upcomingShifts.map((event, index) => (
 
-        )
-        ))}
+            event.isShift && event.visible && (
 
-    </Card>
+                <AltCard key={index} style={styles.shiftCard}>
+
+                    <Text style={styles.dateText}>Date: {event.date}</Text>
+                    {event.shiftTime && <Text style={styles.styledText}>Shift Time: {event.shiftTime}</Text>}
+                    {event.role && <Text style={styles.styledText}>Role: {event.role}</Text>}
+
+                </AltCard>
+
+            )
+            ))}
+
+        </Card>
 
   );
 };
@@ -75,6 +91,13 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: Colors.black,
     
+    },
+    noShiftsText: {
+        fontSize: 14,
+        fontWeight: '500',
+        fontStyle: 'italic',
+        color: Colors.gray,
+
     },
 });
 

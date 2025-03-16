@@ -17,11 +17,15 @@ interface EventData {
   events?: string[] |null;
 }
 
+// Key/Value Pairs
+// The Date is the "Key", the values are defined below
+// When pulling the data for each event from the backend, I am going to want to automatically assign "visible: true"
+// to all of the event objects after reading in all of the other attrubutes.
 const events: { [key: string]: EventData } = {
-  '2025-03-15': {
+  '2025-03-17': {
     visible: true,
     isShift: true,
-    date: '2025-03-15',
+    date: '2025-03-17',
     shiftTime: '9:00 AM - 5:00 PM',
     role: 'Server',
   },
