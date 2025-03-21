@@ -17,7 +17,7 @@ export default function TabLayout() {
     // New Taskbar Theme!
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.brown,
+        tabBarActiveTintColor: Colors.darkBrown,
         tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,

@@ -15,7 +15,7 @@ const Announcements= () => {
   return (
     <Card style={styles.container}>
       {announcements.map((announcement, index) => (
-        <AltCard key={announcement.id} style={[styles.announcement, index !== 0 && { marginTop: 6 }]}>
+        <AltCard key={announcement.id} style={[styles.announcement,]}>
           <Text style={styles.text}>{announcement.text}</Text>
         </AltCard>
       ))}
@@ -25,19 +25,23 @@ const Announcements= () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.darkTan,
-    alignItems: 'flex-start',
+    backgroundColor: Colors.white,
+    alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
   announcement: {
-    backgroundColor: Colors.lightTan,
     width: '100%',
-    padding: 10,
-    alignItems: 'center',
+    backgroundColor: Colors.lightTan,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    margin: 6,
+  
   },
   text: {
-    color: 'black',
+    color: Colors.black,
     fontSize: 14,
   },
 });
