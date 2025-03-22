@@ -13,7 +13,7 @@ const ClockInWidget = () => {
         const hours = now.getHours();
         const minutes = now.getMinutes();
 
-        const ampm = hours < 12 ? 'am' : 'pm'; // Correct AM/PM determination
+        const ampm = hours < 12 ? 'AM' : 'PM'; // Correct AM/PM determination
         const hour12 = hours % 12 || 12;
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
         return `${hour12}:${formattedMinutes}${ampm}`;        

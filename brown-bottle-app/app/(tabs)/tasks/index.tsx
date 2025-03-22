@@ -1,39 +1,44 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet} from 'react-native';
 
 import DefaultView from '@/components/DefaultView';
-import { Colors } from '@/constants/Colors';
 import { View, Text } from 'react-native';
+import { Colors } from '@/constants/Colors';
 
 import TaskList from '@/components/tasks/TaskList';
 
 const styles = StyleSheet.create ({
+  header: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "black",
+    marginLeft: 20,
+    marginTop: 40,
+    marginBottom:20,
+    
+  },
 
 });
 
 export default function Tasks() {
   return (
-
+    
+    <View style={{ flex: 1, paddingTop: 20, backgroundColor: Colors.white }}>
+      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
+        <Text style={styles.header}>Your Tasks</Text>
+      </View>
+    
+    {/* Tasks Header ^^^ */}
+    
     <DefaultView>
 
-      {/* Top Strip */}
-      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%', }} />
-
-      {/* Tasks Header */}
-      <View style={{ marginTop: 65, width:'85%' }}>
-        <View style={{alignSelf:'flex-start'}}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
-              Your Tasks:
-          </Text>
-        </View>
-      </View>
-
       {/* Task List */}
-      <View style={{ width:'85%', margin: 20, }}>
+      <View style={{ width:'85%', margin: 20 }}>
         <TaskList/>
       </View>
 
     
     </DefaultView>
+    </View>
 
   )
 };

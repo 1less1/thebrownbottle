@@ -7,10 +7,13 @@ import { View, Text } from 'react-native';
 export default function Chat() {
   return (
     <DefaultView>
-      <View>
-      <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold', marginTop: 20 }}>
-            Chat
-          </Text>   
+      
+      <View style={{ marginTop: 20, width:'85%' }}>
+        <View style={{alignSelf:'flex-start'}}>
+          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
+              Chat
+          </Text>
+        </View>
       </View>
 
 

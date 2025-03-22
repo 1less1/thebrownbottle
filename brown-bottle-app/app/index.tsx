@@ -5,7 +5,7 @@ import { Colors } from '@/constants/Colors';
 const styles = StyleSheet.create({
   button: {
     borderRadius: 5,
-    backgroundColor: Colors.lightTan, // Dark Tan Button
+    backgroundColor: Colors.darkTan, // Dark Tan Button
     paddingVertical: 10,
     paddingHorizontal: 10,
     alignItems: 'center',

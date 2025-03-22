@@ -4,19 +4,17 @@ import DefaultView from '@/components/DefaultView';
 import { Colors } from '@/constants/Colors';
 import { View, Text } from 'react-native';
 
-export default function Profile() {
+export default function TimeOff() {
   return (
-    <DefaultView>
+    <View>
       
       <View style={{ marginTop: 20, width:'85%' }}>
         <View style={{alignSelf:'flex-start'}}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
-              Profile
+          <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', }}>
+              time off stuff
           </Text>
         </View>
       </View>
 
-
-
-    </DefaultView>
+    </View>
 )};

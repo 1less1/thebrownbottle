@@ -49,13 +49,14 @@ export default function Tasks() {
     <DefaultView>
 
       {/* Top Strip */}
-      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%', }} />
+      {/* Temporarily getting rid of it because it looks weird on iOS */}
+      {/* <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%' }} /> */}
 
       {/* Calendar Header */}
-      <View style={{ marginTop: 65, width:'85%' }}>
+      <View style={{ marginTop: 20, width:'85%' }}>
         <View style={{alignSelf:'flex-start'}}>
           <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
-              Calendar:
+              Calendar
           </Text>
         </View>
       </View>
