@@ -31,7 +31,7 @@ export default function Admin() {
   };
 
   return (
-    <View style={{ flex: 1, paddingTop: 40, backgroundColor: "white" }}>
+    <View style={{ flex: 1, paddingTop: 20, backgroundColor: "white" }}>
       <Text style={styles.header}>Admin</Text>
 
       {/* Tab Bar */}
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   activeTabButton: {
     borderBottomWidth: 1,
-    borderBottomColor: "black", // Highlight active tab
+    borderBottomColor: "black", 
   },
   tabText: {
     fontSize: 14,

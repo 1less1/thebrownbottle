@@ -46,20 +46,15 @@ const events: { [key: string]: EventData } = {
 
 export default function Tasks() {
   return (
+    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
+      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
+        <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10}}>
+                Calendar
+            </Text>
+     </View>
+
     <DefaultView>
 
-      {/* Top Strip */}
-      {/* Temporarily getting rid of it because it looks weird on iOS */}
-      {/* <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 55, width: '100%' }} /> */}
-
-      {/* Calendar Header */}
-      <View style={{ marginTop: 20, width:'85%' }}>
-        <View style={{alignSelf:'flex-start'}}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
-              Calendar
-          </Text>
-        </View>
-      </View>
 
       {/* Upcoming Shifts View */}
       <View style={{ width: '85%', marginVertical: 20 }}>
@@ -78,4 +73,5 @@ export default function Tasks() {
       </View>
 
     </DefaultView>
+    </View>
 )};

@@ -16,14 +16,16 @@ const styles = StyleSheet.create({
 
 export default function HomeScreen() {
   return (
-    
+
+    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.mediumTan }}>
+
     <DefaultView>
 
       {/* Top Strip */}
-      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 140, width: '100%', }} />
+      <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 120, width: '100%', }} />
 
 
-      <View style={{ marginTop: 80 }}>
+      <View style={{ marginTop: 60 }}>
         <CircularImage size={145} />
       </View>
 
@@ -53,7 +55,7 @@ export default function HomeScreen() {
       </View>
 
     </DefaultView>
-
+    </View>
   );
 }
 

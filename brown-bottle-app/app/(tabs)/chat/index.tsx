@@ -6,17 +6,17 @@ import { View, Text } from 'react-native';
 
 export default function Chat() {
   return (
-    <DefaultView>
+    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
       
-      <View style={{ marginTop: 20, width:'85%' }}>
-        <View style={{alignSelf:'flex-start'}}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold' }}>
-              Chat
-          </Text>
-        </View>
-      </View>
-
-
-
+      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
+        <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10}}>
+                Chat
+            </Text>
+     </View>
+    
+    
+    <DefaultView>
+      <Text>Hello, the chat will be here</Text>
     </DefaultView>
+    </View>
 )};
