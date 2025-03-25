@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 8,
     alignItems: 'center',
-    flexDirection: 'column',  // Stack the icon and text vertically
-    padding: 15,  // Added more padding for a larger clickable area
-    width: 150,  // Specify width to prevent squishing on smaller screens
-    height: 150,  // Set a height to make it a reasonable size
-    justifyContent: 'center',  // Center content vertically within the button
+    flexDirection: 'column',  
+    padding: 15,  
+    width: 150,  
+    height: 150,  
+    justifyContent: 'center',  
   },
   icon: {
-    marginBottom: 8,  // Space between icon and text
+    marginBottom: 8, 
   },
   title: {
     fontSize: 16,  
