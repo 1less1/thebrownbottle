@@ -3,7 +3,7 @@ import { Text, StyleSheet, View } from 'react-native';
 import Card from "@/components/Card";
 import { Colors } from '@/constants/Colors'; 
 
-import CheckBoxCard from '@/components/tasks/CheckBoxCard';
+import CheckBoxCard from '@/components/tasks/features/CheckBoxCard';
 
 const TaskList = () => {
   const tasks = [
@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
+    width: '90%',
   },
 });
 

@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import Dashboard from "@/components/admin/Dashboard";
 import Schedule from "@/components/admin/Schedule";
 import Staff from "@/components/admin/Staff";
-import Tasks from "@/components/admin/Tasks";
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState(0); // Track active tab index
@@ -11,7 +10,6 @@ export default function Admin() {
     { key: "dashboard", title: "Dash" },
     { key: "schedule", title: "Schedule" },
     { key: "staff", title: "Staff" },
-    { key: "tasks", title: "Tasks" },
   ];
 
   // Function to render the content based on the active tab
@@ -23,8 +21,6 @@ export default function Admin() {
         return <Schedule />;
       case 2:
         return <Staff />;
-      case 3:
-        return <Tasks />;
       default:
         return null;
     }

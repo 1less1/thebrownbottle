@@ -33,6 +33,7 @@ export const Colors = {
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
   borderColor: '#D4CABE',
+  tabBG: '#FDFBFB',
   
   /* General Colors */
   black: '#000000',

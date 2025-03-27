@@ -48,11 +48,26 @@ export default function Profile() {
       </View>
 
       {/* Other Stuff */}
-      <View style={{ marginTop: 10, width: '85%' }}>
+      <View style={{width: '85%' }}>
           <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: 'bold', marginBottom: 10 }}>
            Recent Activity
           </Text>
       
+          <Card style={styles.progressCard}>
+            <Text style={{fontWeight:"bold", fontSize:20}}>Activity 1</Text>
+            <Text>some more info</Text>
+          </Card>
+
+          <Card style={styles.progressCard}>
+              <Text style={{fontWeight:"bold", fontSize:20}}>Activity 2</Text>
+              <Text>some more info</Text>
+            </Card>
+
+            <Card style={styles.progressCard}>
+              <Text style={{fontWeight:"bold", fontSize:20}}>Activity 3</Text>
+              <Text>some more info</Text>
+            </Card>
+
           </View>
     
     </DefaultView>
@@ -78,6 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     padding: 20,
     borderRadius: 8,
+    marginBottom: 15,
   },
   
 
