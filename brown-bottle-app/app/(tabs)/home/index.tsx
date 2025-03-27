@@ -1,6 +1,7 @@
-import { View, Text, StatusBar, StyleSheet } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
@@ -9,16 +10,12 @@ import Announcements from '@/components/home/Announcements';
 import ClockInWidget from '@/components/home/ClockInWidget';
 
 const styles = StyleSheet.create({
-  borderTop: {
-    borderTopWidth: 5,
-    borderTopColor: 'black', 
-  },
   topStrip: {
     backgroundColor: Colors.mediumTan,
     position: 'absolute',
     top: 0,
     left: 0,
-    height: 100,  // Adjust height to match your design
+    height: 120,  // Adjust height to match your design
     width: '100%',
     zIndex: 10,  // Ensure it is above other content
   },
@@ -30,6 +27,7 @@ const styles = StyleSheet.create({
 });
 
 export default function HomeScreen() {
+  // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.mediumTan);

@@ -1,4 +1,7 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCallback, useState, useContext } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
 import { useRouter } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 
@@ -19,6 +22,13 @@ const styles = StyleSheet.create({
 });
 
 export default function LandingScreen() {
+  // Dynamic Status Bar
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.greyWhite);
+      StatusBar.setBarStyle('dark-content');
+    }, [])
+  );
   const router = useRouter();
 
   const isAdmin = true;

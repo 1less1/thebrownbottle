@@ -1,8 +1,10 @@
-import { StyleSheet, Image, Platform } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCallback, useState, useContext } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import { Colors } from '@/constants/Colors';
-import { View, Text } from 'react-native';
 import CalendarWidget from '@/components/calendar/CalendarWidget';
 import Calendar from '@/components/calendar/Calendar';
 import Shifts from '@/components/calendar/Shifts';
@@ -45,6 +47,14 @@ const events: { [key: string]: EventData } = {
 };
 
 export default function Tasks() {
+  // Dynamic Status Bar
+    useFocusEffect(
+      useCallback(() => {
+        StatusBar.setBackgroundColor(Colors.white);
+        StatusBar.setBarStyle('dark-content');
+      }, [])
+    );
+  
   return (
     <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
       <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>

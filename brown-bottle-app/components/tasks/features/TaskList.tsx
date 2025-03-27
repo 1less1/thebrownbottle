@@ -31,6 +31,7 @@ const TaskList = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
+    alignSelf: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,

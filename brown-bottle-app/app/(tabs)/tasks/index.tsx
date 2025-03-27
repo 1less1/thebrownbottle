@@ -1,7 +1,7 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity,} from 'react-native';
-import { useState } from 'react';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { useCallback } from 'react';
+
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
@@ -27,6 +27,14 @@ const styles = StyleSheet.create ({
 });
 
 export default function Tasks() {
+  // Dynamic Status Bar
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.white);
+      StatusBar.setBarStyle('dark-content');
+    }, [])
+  );
+
   return (
     
     <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>

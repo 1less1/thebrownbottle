@@ -1,10 +1,22 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useCallback, useState, useContext } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+
+import { Colors } from '@/constants/Colors';
+
 import Dashboard from "@/components/admin/Dashboard";
 import Schedule from "@/components/admin/Schedule";
 import Staff from "@/components/admin/Staff";
 
 export default function Admin() {
+  // Dynamic Status Bar
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.white);
+      StatusBar.setBarStyle('dark-content');
+    }, [])
+  );
+
   const [activeTab, setActiveTab] = useState(0); // Track active tab index
   const tabs = [
     { key: "dashboard", title: "Dash" },
