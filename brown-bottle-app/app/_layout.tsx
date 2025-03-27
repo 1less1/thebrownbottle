@@ -32,11 +32,12 @@ export default function RootLayout() {
 
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       
-      {/* Universal status bar */}
+      {/* Universal status bar 
       <StatusBar 
         backgroundColor={Colors.mediumTan} // Set your universal color here
         style="dark" // Text and Icon Coor
       />
+      */}
       
       <Stack
         screenOptions={{

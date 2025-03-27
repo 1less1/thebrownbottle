@@ -1,6 +1,6 @@
 import { Tabs, useLocalSearchParams} from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -23,8 +23,8 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: 'white', // Static background color -> White
-          borderTopWidth: 1,
-          borderTopColor: Colors.lightGray, // Border color
+          borderTopWidth: 0.5,
+          borderColor: Colors.borderColor, // Border color
           elevation: 5, // Shadow for Android
           shadowOpacity: 0.1, // Shadow for iOS
           shadowRadius: 3,
