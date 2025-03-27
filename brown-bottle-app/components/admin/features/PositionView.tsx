@@ -15,7 +15,7 @@ const employees = [
 // Days of the week for better readability
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export default function Staff() {
+export default function PositionView() {
   const [text, setText] = useState('');
 
   // Filter employees based on the search text
@@ -25,7 +25,7 @@ export default function Staff() {
   );
 
   return (
-    <View style={{ flex: 1, padding: 10, backgroundColor: Colors.greyWhite }}>
+    <View style={{ flex: 1, padding: 10 }}>
       <TextInput
         style={styles.input}
         value={text}
@@ -40,8 +40,10 @@ export default function Staff() {
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <AltCard style={styles.employeeCard}>
-            <Text style={styles.employeeText}>{item.name}</Text>
-            <Text style={styles.employeeRole}>{item.role}</Text>
+            <Text style={styles.employeeText}>{item.name} - {item.role}</Text>
+            <Text style={styles.shiftText}>
+              {item.shifts.map((shift, index) => `${days[index]}: ${shift}`).join(" | ")}
+            </Text>
           </AltCard>
         )}
       />
@@ -73,9 +75,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  employeeRole: {
+  shiftText: {
     fontSize: 14,
-    color: 'gray',
     marginTop: 5,
+    color: 'gray',
   },
 });
+
+

@@ -21,10 +21,10 @@ const Card: React.FC<CardProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
   card: {
     alignItems: undefined,
-    backgroundColor: Colors.yellowTan, // Default background, can be overridden
+    backgroundColor: Colors.white, // Default background, can be overridden
     paddingVertical: 20,
     paddingHorizontal: 40,
-    borderRadius: 15,
+    borderRadius: 10,
 
     // Shadow for iOS
     shadowColor: '#000',
