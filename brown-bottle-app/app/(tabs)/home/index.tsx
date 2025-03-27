@@ -36,13 +36,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      
-      {/* Status Bar Strip */}
-      <View style={styles.topStrip} />
-
-      {/* Main Content */}
-      <View style={styles.contentContainer}>
+    <View style={{ flex: 1, }}>
         <DefaultView>
 
           {/* Continued... Strip */}
@@ -70,13 +64,12 @@ export default function HomeScreen() {
           </View>
 
           {/* Announcements View */}
-          <View style={{ width: '85%' }}>
+          <View style={{ width: '85%', marginBottom: 60 }}>
             <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Announcements</Text>
             <Announcements />
           </View>
 
         </DefaultView>
-      </View>
 
     </View>
   );
