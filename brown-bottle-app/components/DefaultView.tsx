@@ -6,16 +6,17 @@ import { Colors } from '@/constants/Colors';
 
 interface DefaultViewProps {
   children: React.ReactNode;
+  backgroundColor?: string; // Optional Prop -> Default is transparent
 }
 
 
-const DefaultView: React.FC<DefaultViewProps> = ({ children }) => {
+const DefaultView: React.FC<DefaultViewProps> = ({ children, backgroundColor = 'transparent' }) => {
 
   return (
 
     <SafeAreaProvider>
 
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
 
             {children}
 
@@ -29,7 +30,7 @@ const DefaultView: React.FC<DefaultViewProps> = ({ children }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: 'transparent',
+    //backgroundColor: 'transparent',
   },
 });
 

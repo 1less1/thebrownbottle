@@ -12,6 +12,7 @@ import ClockInWidget from '@/components/home/ClockInWidget';
 import NextShift from '@/components/home/NextShift';
 
 import Card from '@/components/Card';
+import AltCard from '@/components/AltCard';
 
 interface EventData {
   visible: true;
@@ -45,22 +46,7 @@ const events: { [key: string]: EventData } = {
   },
 };
 
-const styles = StyleSheet.create({
-  topStrip: {
-    backgroundColor: Colors.mediumTan,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    height: 120,  // Adjust height to match your design
-    width: '100%',
-    zIndex: 10,  // Ensure it is above other content
-  },
-  contentContainer: {
-    flex: 1,
-    marginTop: 80, // Add space so the content doesn't overlap with the strip
-    backgroundColor: Colors.white, // Rest of the screen background
-  },
-});
+
 
 export default function HomeScreen() {
   // Dynamic Status Bar (Android Only)
@@ -73,20 +59,31 @@ export default function HomeScreen() {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.mediumTan}>
 
 
-      <View style={{flex: 1, backgroundColor: Colors.greyWhite, alignContent: 'center'}}>
-      
+      <View style={{flex: 1, backgroundColor: Colors.greyWhite}}>
+
+
+        {/* Medium Tan Background that takes up 85% for Over Scroll */}
+        <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: '75%', width: '100%' }} />
+        {/* Easter Egg - If you delete this, you are BUNS! */}
+        <Text style={{ position: 'absolute', top: '75%', width:'100%', textAlign: 'center', padding: 5}}>Hey Jahmen ;)</Text>
+        
 
         <DefaultScrollView>
 
-          {/* Continued... Strip */}
-          <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 140, width: '100%', }} />
-                    {/* Circular Image */}
-                    <View style={{ marginTop: 60 }}>
+          
+          {/* First Strip */}
+          <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 180, width: '100%' }} />
+          {/* Second Strip */}
+          <View style={{ backgroundColor: Colors.greyWhite, position: 'absolute', top: 180, height: '100%', width: '100%' }} />
+          {/* Circular Image */}
+          <View style={{ marginTop: 110}}>
             <CircularImage size={145} />
           </View>
+
+          
 
           {/* Greeting Message */}
           <View style={{ marginTop: 10, marginBottom: 40 }}>
@@ -117,14 +114,19 @@ export default function HomeScreen() {
             <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Announcements</Text>
             <Announcements />
           </View>
+          
 
         </DefaultScrollView>
-
+        
 
       </View>
 
 
-    </DefaultView>
+    </DefaultView>            
 
   );
 }
+
+const styles = StyleSheet.create({
+  // Add styles later!
+});

@@ -18,7 +18,7 @@ export default function Chat() {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
 
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>

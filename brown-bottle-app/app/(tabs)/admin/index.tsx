@@ -42,13 +42,13 @@ export default function Admin() {
 
   return (
     
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
 
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
 
-        <View style={{ flex: 1, paddingTop: 15, backgroundColor: "white" }}>
+        <View style={{ flex: 1, paddingTop: 15, backgroundColor: Colors.white}}>
           <Text style={styles.header}>Admin</Text>
 
           {/* Tab Bar */}

@@ -10,10 +10,6 @@ import TaskList from '@/components/tasks/features/TaskList';
 import Active from '@/components/tasks/Active';
 import Upcoming from '@/components/tasks/Upcoming';
 import Completed from '@/components/tasks/Completed';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-
-// import TaskList from '@/components/tasks/TaskList';
 
 export default function Tasks() {
   // Dynamic Status Bar
@@ -47,7 +43,7 @@ export default function Tasks() {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
       
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>

@@ -23,7 +23,7 @@ export default function Profile() {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
 
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
