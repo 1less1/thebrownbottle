@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,  // Space between icon and text
   },
   title: {
-    fontSize: 16,  
+    fontSize: 14,  
     fontWeight: 'bold',
     color: '#333',
   },

@@ -5,10 +5,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
+import DefaultScrollView from '@/components/DefaultScrollView';
 import TaskList from '@/components/tasks/features/TaskList';
 import Active from '@/components/tasks/Active';
 import Upcoming from '@/components/tasks/Upcoming';
 import Completed from '@/components/tasks/Completed';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 // import TaskList from '@/components/tasks/TaskList';
@@ -44,38 +46,49 @@ export default function Tasks() {
   };
 
   return (
-    
-    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
-      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
-        <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10}}>
-                Tasks
-            </Text>
-     </View>
 
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.greyWhite}}>
-      {/* Tab Bar */}
-      <View style={styles.tabBar}>
-        {tabs.map((tab, index) => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[
-              styles.tabButton,
-              activeTab === index && styles.activeTabButton, // Style the active tab
-            ]}
-            onPress={() => setActiveTab(index)} // Set active tab on click
-          >
-            <Text style={styles.tabText}>{tab.title}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Render content based on selected tab */}
-      <DefaultView style={styles.tabContent}>{renderTabContent()}</DefaultView>
+    <DefaultView>
       
+
+      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
+
+
+        { /* Tasks Header */ }
+        <View style={{ width: '100%', paddingTop: 40, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
+          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10}}>
+            Tasks
+          </Text>
+        </View>
+
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.greyWhite}}>
+          
+          {/* Tab Bar */}
+          <View style={styles.tabBar}>
+            {tabs.map((tab, index) => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[
+                  styles.tabButton,
+                  activeTab === index && styles.activeTabButton, // Style the active tab
+                ]}
+                onPress={() => setActiveTab(index)} // Set active tab on click
+              >
+                <Text style={styles.tabText}>{tab.title}</Text>
+
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Render content based on selected tab */}
+          <DefaultScrollView style={styles.tabContent}>{renderTabContent()}</DefaultScrollView>
+          
+
+        </View>
+
       </View>
-     </View>
-    
-    
+
+      
+    </DefaultView>
 
   )
 };
@@ -94,7 +107,7 @@ const styles = StyleSheet.create ({
       flexDirection: "row",
       borderRadius: 10,
       width: "95%",
-      marginTop: 10,
+      marginTop: 20,
       marginBottom: 15,
       borderColor:'lightgrey',
       borderWidth: 1,

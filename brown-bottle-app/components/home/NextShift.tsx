@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 import Card from "@/components/Card";
-import AltCard from '../AltCard';
+import AltCard from '@/components/AltCard';
 
 interface EventData {
     visible: boolean;
@@ -13,25 +13,25 @@ interface EventData {
     events?: string[] | null;
 }
 
-interface ShiftsProps {
+interface ShiftProps {
     events: { [key: string]: EventData };
 }
 
-const Shifts: React.FC<ShiftsProps> = ({ events }) => {
+const NextShift: React.FC<ShiftProps> = ({ events }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize today's date to midnight for accurate comparisons
 
-    // Get the next two upcoming shifts
+    // Get the next upcoming shift
     const upcomingShifts = Object.values(events)
         .filter(event => event.isShift && event.visible && event.date) // Ensure event is a shift and visible
         .filter(event => new Date(event.date!) >= today) // Only future dates
         .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()) // Sort by date
-        .slice(0, 3); // Get the next three upcoming shifts
+        .slice(0, 1); // Get the next upcoming shift
 
     if (upcomingShifts.length === 0) {
         return (
             <Card style={styles.container}>
-                <Text style={styles.noShiftsText}>No Upcoming Shifts...</Text>
+                <Text style={styles.noShiftsText}>No Upcoming Shift...</Text>
             </Card>
         );
     }
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Shifts;
+export default NextShift;

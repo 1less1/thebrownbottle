@@ -1,4 +1,4 @@
-import DefaultView from '@/components/DefaultView';
+import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '@/components/Card';
 import { Colors } from '@/constants/Colors';
@@ -8,7 +8,7 @@ import AssignTasks from './features/AssignTasks';
 
 export default function Dashboard() {
   return (
-    <DefaultView>
+    <DefaultScrollView>
       
       <View style={{ marginTop: 10, width: '85%' }}>
 
@@ -32,7 +32,7 @@ export default function Dashboard() {
 
     </View>
 
-    </DefaultView>
+    </DefaultScrollView>
   );
 }
 

@@ -1,12 +1,12 @@
 import {View, Text} from 'react-native';
-import DefaultView from '@/components/DefaultView';
+import DefaultScrollView from '@/components/DefaultScrollView';
 import TaskList from './features/TaskList';
 
 export default function Active() {
 
     return(
-        <DefaultView >
+        <DefaultScrollView >
             <TaskList/>
-        </DefaultView>
+        </DefaultScrollView>
     )
 }

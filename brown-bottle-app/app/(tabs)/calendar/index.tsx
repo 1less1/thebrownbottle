@@ -5,7 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import CalendarWidget from '@/components/calendar/CalendarWidget';
+import DefaultScrollView from '@/components/DefaultScrollView';
 import Calendar from '@/components/calendar/Calendar';
 import Shifts from '@/components/calendar/Shifts';
 import TimeOff from '@/components/calendar/TimeOff';
@@ -24,17 +24,17 @@ interface EventData {
 // When pulling the data for each event from the backend, I am going to want to automatically assign "visible: true"
 // to all of the event objects after reading in all of the other attrubutes.
 const events: { [key: string]: EventData } = {
-  '2025-03-17': {
+  '2025-04-11': {
     visible: true,
     isShift: true,
-    date: '2025-03-17',
+    date: '2025-04-11',
     shiftTime: '9:00 AM - 5:00 PM',
     role: 'Server',
   },
-  '2025-03-28': {
+  '2025-04-15': {
     visible: true,
     isShift: true,
-    date: '2025-03-28',
+    date: '2025-04-15',
     shiftTime: '4:00 PM-8:45 PM',
     role: 'Bartender'
   },
@@ -56,32 +56,45 @@ export default function Tasks() {
     );
   
   return (
-    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
-      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
-        <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10}}>
-                Calendar
-            </Text>
-     </View>
 
     <DefaultView>
 
 
-      {/* Upcoming Shifts View */}
-      <View style={{ width: '85%', marginVertical: 20 }}>
-        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Upcoming Shifts</Text>
-        <Shifts events={events}/>
+      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
+
+
+        { /* Calendar Header */ }
+        <View style={{ width: '100%', paddingTop: 40, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor }}>
+          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
+            Calendar
+          </Text>
+        </View>
+
+        <DefaultScrollView>
+
+           {/* Upcoming Shifts View */}
+          <View style={{ width: '85%', marginVertical: 20 }}>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Upcoming Shifts</Text>
+            <Shifts events={events}/>
+          </View>
+
+          <View style={{ width: '85%' }}>
+            <Calendar events={events}/>
+          </View>
+
+          {/* Time Off View */}
+          <View style={{ width: '85%', marginTop: 20, marginBottom: 60 }}>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Time Off Requests</Text>
+            <TimeOff/>
+          </View>
+
+        </DefaultScrollView>
+
+
       </View>
 
-      <View style={{ width: '85%' }}>
-        <Calendar events={events}/>
-      </View>
-
-      {/* Time Off View */}
-      <View style={{ width: '85%', marginVertical: 20 }}>
-        <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Time Off Requests</Text>
-        <TimeOff/>
-      </View>
 
     </DefaultView>
-    </View>
-)};
+
+  )
+};

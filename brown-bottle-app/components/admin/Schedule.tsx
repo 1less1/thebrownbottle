@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import DefaultView from "@/components/DefaultView";
+import DefaultScrollView from "@/components/DefaultScrollView";
 import WeeklyView from "./features/WeeklyView";
 import PositionView from "./features/PositionView";
 import { Colors } from "@/constants/Colors";
@@ -26,7 +26,7 @@ export default function Admin() {
   };
 
   return (
-    <DefaultView>
+    <DefaultScrollView>
       {/* Tab Bar */}
       <View style={styles.tabBar}>
         {tabs.map((tab, index) => (
@@ -45,7 +45,7 @@ export default function Admin() {
 
       {/* Render content based on selected tab */}
       <View style={styles.tabContent}>{renderTabContent()}</View>
-      </DefaultView>
+      </DefaultScrollView>
   );
 }
 

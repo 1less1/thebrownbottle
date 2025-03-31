@@ -6,6 +6,7 @@ import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 
 import DefaultView from '@/components/DefaultView';
+import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/Card';
 import CircularImage from '@/components/CircularImage';
 
@@ -21,69 +22,85 @@ export default function Profile() {
   );
 
   return (
-    <View style={{ flex: 1, paddingTop: 60, backgroundColor: Colors.white }}>
-      <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.borderColor}}>
-      </View>
-    
+
     <DefaultView>
 
-      {/* Task List */}
-      <View style={{ width:'85%', margin: 20 }}>
-        <Card style={styles.profileCard}>
 
-      {/* Settings button later on */}
-        <View style={{alignItems:"flex-end"}}>
-          <Ionicons name="settings" size={30} color="gray" style={{marginBottom: 8}} />
+      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
+
+        <View style={{ width: '100%', paddingTop: 20, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor }}>
+            <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
+              {/* No Text Here - Keeps Same Spacing for Top Bar as other Screens! */}
+            </Text>
+        </View>
+
+
+        <DefaultScrollView>
+          
+          {/* Main Profile View */}
+          <View style={{ width:'85%', marginVertical: 20 }}>
+
+            <Card style={styles.profileCard}>
+
+              {/* Settings button for later on */}
+              <View style={{alignItems:"flex-end"}}>
+                <Ionicons name="settings" size={30} color="gray" style={{marginBottom: 8}} />
+              </View>
+          
+              <TouchableOpacity>
+                <View style={{alignItems: 'center', margin: 20}}>
+                  <CircularImage size={100} />
+                </View>
+              </TouchableOpacity>
+
+              <Text style={styles.profileCardText}>John Doe</Text>
+              <Text style={{textAlign:"center", marginTop:10}}>Server</Text>
+
+            </Card>
+
           </View>
           
-          <TouchableOpacity>
-            <View style={{alignItems: 'center', margin: 20}}>
-              <CircularImage size={100} />
-            </View>
-            </TouchableOpacity>
 
-          <Text style={styles.profileCardText}>John Doe</Text>
-          <Text style={{textAlign:"center", marginTop:10}}>Server</Text>
-        </Card>
-      </View>
+          {/* This week */}
+          <View style={{ marginVertical: 10, width: '85%' }}>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>This Week</Text>
 
-      {/* This week */}
-      <View style={{ marginTop: 10, width: '85%', marginBottom: 10 }}>
-          <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: 'bold', marginBottom: 10 }}>
-           This week
-          </Text>
+              <Card style={styles.progressCard}>
+                <Text style={{fontWeight:"bold", fontSize:16}}>6.5 Hours</Text>
+                <Text>some more info</Text>
+              </Card>
+          </View>
 
-        <Card style={styles.progressCard}>
-          <Text style={{fontWeight:"bold", fontSize:20}}>6.5 Hours</Text>
-          <Text>some more info</Text>
-          </Card>
-      </View>
 
-      {/* Other Stuff */}
-      <View style={{width: '85%' }}>
-          <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: 'bold', marginBottom: 10 }}>
-           Recent Activity
-          </Text>
-      
-          <Card style={styles.progressCard}>
-            <Text style={{fontWeight:"bold", fontSize:20}}>Activity 1</Text>
-            <Text>some more info</Text>
-          </Card>
+          {/* Filler Stuff */}
+          <View style={{ width: '85%', marginBottom: 60 }}>
 
-          <Card style={styles.progressCard}>
-              <Text style={{fontWeight:"bold", fontSize:20}}>Activity 2</Text>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Recent Activity</Text>
+        
+            <Card style={styles.progressCard}>
+              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 1</Text>
               <Text>some more info</Text>
             </Card>
 
             <Card style={styles.progressCard}>
-              <Text style={{fontWeight:"bold", fontSize:20}}>Activity 3</Text>
+              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 2</Text>
+              <Text>some more info</Text>
+            </Card>
+
+            <Card style={styles.progressCard}>
+              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 3</Text>
               <Text>some more info</Text>
             </Card>
 
           </View>
-    
+          
+        </DefaultScrollView>
+
+
+      </View>
+
+
     </DefaultView>
-    </View>
 
   )
 };

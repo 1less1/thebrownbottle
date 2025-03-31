@@ -32,26 +32,30 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>  {/* Wrap your app with SafeAreaProvider */}
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: Colors.mediumTan, // Ensure header matches status bar color
-            },
-            headerTintColor: Colors.black, // Header text color
-          }}
-        >
-          {/* Landing Page Loaded First */}
-          <Stack.Screen name="index" options={{ headerShown: false }} />
 
-          {/* Rest of app in (tabs) */}
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <>
 
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ThemeProvider>
-    </SafeAreaProvider>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: Colors.mediumTan, // Ensure header matches status bar color
+          },
+          headerTintColor: Colors.black, // Header text color
+        }}
+      >
+
+        {/* Landing Page Loaded First */}
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+
+        {/* Rest of app in (tabs) */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        <Stack.Screen name="+not-found" />
+
+      </Stack>
+
+    </>
+    
   );
 }
