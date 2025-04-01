@@ -3,7 +3,7 @@ import { Text, StyleSheet, View } from 'react-native';
 import Card from "@/components/Card";
 import { Colors } from '@/constants/Colors'; 
 
-import CheckBoxCard from '@/components/tasks/CheckBoxCard';
+import CheckBoxCard from '@/components/tasks/features/CheckBoxCard';
 
 const TaskList = () => {
   const tasks = [
@@ -13,6 +13,10 @@ const TaskList = () => {
       { id: 4, text: 'Check the inventory of dry goods and reorder if necessary.' },
       { id: 5, text: 'Prepare sauces for the dinner shift and label them with the date.' },
       { id: 6, text: 'Sharpen all knives and check for any needed repairs.' },
+      { id: 7, text: 'Test Task'},
+      { id: 8, text: 'Test Task'},
+      { id: 9, text: 'Andy is Bald'}
+      
     ];
 
   return (
@@ -31,9 +35,13 @@ const TaskList = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
+    alignSelf: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
+    marginTop: 15,
+    marginBottom: 60,
+    width: '90%',
   },
 });
 

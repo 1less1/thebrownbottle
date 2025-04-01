@@ -49,7 +49,10 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'space-between', // Ensures the checkbox stays on the right
       width: '100%',
-      backgroundColor: Colors.lightTan,
+      backgroundColor: Colors.white,
+      borderColor: Colors.lightGray,
+      borderWidth: 1,
+      borderRadius: 10,
       paddingHorizontal: 16,
       paddingVertical: 12,
       margin: 6,

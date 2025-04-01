@@ -1,58 +1,36 @@
-import React from 'react';
-import { View, ScrollView, SafeAreaView, RefreshControl, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/Colors'; // Assuming you have Colors set up
+import React, { ReactElement, useState } from 'react';
+import { View, ScrollView, RefreshControl, StyleSheet } from 'react-native';
+import { SafeAreaView, SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/Colors'; 
 
-// Define the type of props the DefaultView will receive
+
 interface DefaultViewProps {
   children: React.ReactNode;
-  style?: object;
-  refreshing?: boolean;
-  onRefresh?: () => void;
+  backgroundColor?: string; // Optional Prop -> Default is transparent
 }
 
-const DefaultView: React.FC<DefaultViewProps> = ({
-  children,
-  style,
-  refreshing = false,
-  onRefresh,
-}) => {
+
+const DefaultView: React.FC<DefaultViewProps> = ({ children, backgroundColor = 'transparent' }) => {
+
   return (
-    <SafeAreaView style={[styles.safeArea, style]}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          ) : undefined // Use `undefined` instead of `null`
-        }
-      >
-        <View style={styles.defaultContainer}>
-          {children}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+
+    <SafeAreaProvider>
+
+        <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+
+            {children}
+
+        </SafeAreaView>   
+
+    </SafeAreaProvider> 
+
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.greyWhite, // Set background color to greyWhite by default
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 80,
-  },
-  defaultContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.greyWhite, // Ensure default background color
-    height: '100%', // Full height of the screen
-    width: '100%',  // Full width of the screen
+    //backgroundColor: 'transparent',
   },
 });
 

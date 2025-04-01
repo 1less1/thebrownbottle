@@ -1,8 +1,3 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 const tintColorLight = '#0a7ea4'; // tab button color when pressed
 const tintColorDark = '#fff';  // tab button color when pressed
 
@@ -32,6 +27,8 @@ export const Colors = {
   brown: '#7C580D',
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
+  borderColor: '#D4CABE',
+  tabBG: '#FDFBFB',
   
   /* General Colors */
   black: '#000000',
