@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 
+import { Ionicons } from '@expo/vector-icons';  
+
 interface TimeOffModalProps {
   visible: boolean;
   onClose: () => void;
@@ -28,44 +30,54 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose }) => {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        
         <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Request Time Off</Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>×</Text>
+          
+          <TouchableWithoutFeedback>
+            
+            <View style={styles.modalContainer}>
+              
+              <View style={styles.header}>
+                <Text style={styles.title}>Request Time Off</Text>
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                  <Ionicons name="close" size={28} color={Colors.white}/>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.content}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Date</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter date"
+                    value={date}
+                    onChangeText={setDate}
+                  />
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Reason</Text>
+                  <TextInput
+                    style={[styles.input, styles.textarea]}
+                    placeholder="Enter reason"
+                    multiline
+                    numberOfLines={4}
+                    value={reason}
+                    onChangeText={setReason}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Submit Request</Text>
               </TouchableOpacity>
+
             </View>
 
-            <View style={styles.content}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Date</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter date"
-                  value={date}
-                  onChangeText={setDate}
-                />
-              </View>
+          </TouchableWithoutFeedback>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Reason</Text>
-                <TextInput
-                  style={[styles.input, styles.textarea]}
-                  placeholder="Enter reason"
-                  multiline
-                  numberOfLines={4}
-                  value={reason}
-                  onChangeText={setReason}
-                />
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Submit Request</Text>
-            </TouchableOpacity>
-          </View>
         </View>
+
       </TouchableWithoutFeedback>
     </Modal>
   );
