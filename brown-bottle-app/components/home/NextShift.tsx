@@ -4,29 +4,22 @@ import { Colors } from '@/constants/Colors';
 import Card from "@/components/Card";
 import AltCard from '@/components/AltCard';
 
-interface EventData {
-    visible: boolean;
-    isShift: boolean;
-    date: string | null;
-    shiftTime?: string | null;
-    role?: string | null;
-    events?: string[] | null;
+import { ShiftData } from '@/types/shift';
+
+interface Props {
+    shifts: ShiftData[];
 }
 
-interface ShiftProps {
-    events: { [key: string]: EventData };
-}
-
-const NextShift: React.FC<ShiftProps> = ({ events }) => {
+const NextShift: React.FC<Props> = ({ shifts }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Normalize today's date to midnight for accurate comparisons
 
-    // Get the next upcoming shift
-    const upcomingShifts = Object.values(events)
-        .filter(event => event.isShift && event.visible && event.date) // Ensure event is a shift and visible
-        .filter(event => new Date(event.date!) >= today) // Only future dates
+    // Get the next two upcoming shifts
+    const upcomingShifts = Object.values(shifts)
+        .filter(shift => shift.visible && shift.date) // Ensure event is a shift and visible
+        .filter(shift => new Date(shift.date!) >= today) // Only future dates
         .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime()) // Sort by date
-        .slice(0, 1); // Get the next upcoming shift
+        .slice(0, 1); // Get the next three upcoming shifts
 
     if (upcomingShifts.length === 0) {
         return (
@@ -38,16 +31,17 @@ const NextShift: React.FC<ShiftProps> = ({ events }) => {
 
     return (
         <Card style={styles.container}>
-            {upcomingShifts.map((event, index) => (
+            {upcomingShifts.map((shift, index) => (
                 <AltCard key={index} style={styles.shiftCard}>
-                    <Text style={styles.dateText}>Date: {event.date}</Text>
-                    {event.shiftTime && <Text style={styles.styledText}>Shift Time: {event.shiftTime}</Text>}
-                    {event.role && <Text style={styles.styledText}>Role: {event.role}</Text>}
+                    <Text style={styles.dateText}>Date: {shift.date}</Text>
+                    {shift.startTime && <Text style={styles.styledText}>Shift Time: {shift.startTime}</Text>}
+                    {shift.role && <Text style={styles.styledText}>Role: {shift.role}</Text>}
                 </AltCard>
             ))}
         </Card>
     );
 };
+
 
 
 

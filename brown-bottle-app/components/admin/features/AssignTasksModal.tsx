@@ -40,6 +40,16 @@ const AssignTaskModal: React.FC<AssignTaskModalProps> = ({ visible, onClose }) =
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
+
+              {/* Little section for default tasks */}
+              
+              <Text style={styles.label}>Select Common Task</Text>
+              <TouchableOpacity>
+                <View style={styles.defaultTasks}>
+                  <Text style={styles.description}>Choose from existing tasks</Text>
+                </View>
+              </TouchableOpacity>
+
               {/* Task Title */}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Task Title</Text>
@@ -108,6 +118,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  defaultTasks: {
+    backgroundColor:Colors.white,
+    borderRadius: 8,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 12,
   },
   modalContainer: {
     backgroundColor: Colors.light.background,
