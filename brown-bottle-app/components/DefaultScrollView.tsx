@@ -55,7 +55,7 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
         //scrollEventThrottle={16} // Smooth scrolling performance
         refreshControl={
           onRefresh ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brown} />
           ) : undefined
         }
       >

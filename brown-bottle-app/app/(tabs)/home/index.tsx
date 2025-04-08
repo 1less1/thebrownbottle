@@ -47,7 +47,6 @@ const events: { [key: string]: EventData } = {
 };
 
 
-
 export default function HomeScreen() {
   // Dynamic Status Bar (Android Only)
   useFocusEffect(
@@ -77,9 +76,9 @@ export default function HomeScreen() {
           {/* First Strip */}
           <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 180, width: '100%' }} />
           {/* Second Strip */}
-          <View style={{ backgroundColor: Colors.greyWhite, position: 'absolute', top: 180, height: '100%', width: '100%' }} />
+          <View style={{ backgroundColor: Colors.greyWhite, position: 'absolute', top: 150, height: '100%', width: '100%' }} />
           {/* Circular Image */}
-          <View style={{ marginTop: 110}}>
+          <View style={{ marginTop: 90}}>
             <CircularImage size={145} />
           </View>
 
@@ -104,7 +103,7 @@ export default function HomeScreen() {
 
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Upcoming</Text>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Your Next Shift</Text>
             <NextShift events={events} />
           </View>
 

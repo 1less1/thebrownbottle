@@ -14,7 +14,7 @@ export default function TabLayout() {
   console.log(isAdmin);
 
   return (
-    // New Taskbar Theme!
+    // New Navbar Theme!
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.darkBrown,
@@ -38,7 +38,7 @@ export default function TabLayout() {
           title: "Home",
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
         }}
-      />
+      />backgroundColor: 'rgba(255, 255, 255, 0.7)', 
 
       <Tabs.Screen
         name="tasks/index"

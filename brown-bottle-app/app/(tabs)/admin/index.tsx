@@ -5,7 +5,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
 import Dashboard from "@/components/admin/Dashboard";
 import Schedule from "@/components/admin/Schedule";
 import Staff from "@/components/admin/Staff";
@@ -48,7 +47,7 @@ export default function Admin() {
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
 
-        <View style={{ flex: 1, paddingTop: 15, backgroundColor: Colors.white}}>
+        <View style={{ flex: 1, backgroundColor: Colors.white}}>
           <Text style={styles.header}>Admin</Text>
 
           {/* Tab Bar */}
