@@ -8,10 +8,12 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 
 import { Ionicons } from '@expo/vector-icons';  
+import DefaultScrollView from '../DefaultScrollView';
 
 interface TimeOffModalProps {
   visible: boolean;
@@ -34,6 +36,8 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose }) => {
         <View style={styles.overlay}>
           
           <TouchableWithoutFeedback>
+
+            
             
             <View style={styles.modalContainer}>
               
@@ -43,36 +47,42 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose }) => {
                   <Ionicons name="close" size={28} color={Colors.white}/>
                 </TouchableOpacity>
               </View>
+              
+              <ScrollView contentContainerStyle={styles.content}>
 
-              <View style={styles.content}>
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Date</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Enter date"
-                    value={date}
-                    onChangeText={setDate}
-                  />
+                <View style={styles.content}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Date</Text>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Enter date"
+                      value={date}
+                      onChangeText={setDate}
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>Reason</Text>
+                    <TextInput
+                      style={[styles.input, styles.textarea]}
+                      placeholder="Enter reason"
+                      multiline
+                      numberOfLines={4}
+                      value={reason}
+                      onChangeText={setReason}
+                    />
+                  </View>
                 </View>
 
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Reason</Text>
-                  <TextInput
-                    style={[styles.input, styles.textarea]}
-                    placeholder="Enter reason"
-                    multiline
-                    numberOfLines={4}
-                    value={reason}
-                    onChangeText={setReason}
-                  />
-                </View>
-              </View>
+              </ScrollView>
 
               <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                 <Text style={styles.buttonText}>Submit Request</Text>
               </TouchableOpacity>
 
             </View>
+
+            
 
           </TouchableWithoutFeedback>
 

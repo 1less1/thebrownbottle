@@ -5,28 +5,26 @@ import AltCard from '@/components/AltCard';
 
 interface CalendarModalProps {
   visible: boolean,
-  isShift: boolean;
   date: string | null;
-  shiftTime?: string | null;
-  role?: string | null;
-  events?: string[] |null;
+  startTime: string | null;
+  role: string | null;
   onClose: () => void;
 }
 
-const CalendarModal: React.FC<CalendarModalProps> = ({ visible, isShift, date, shiftTime, role, events, onClose }) => {
+const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime, role, onClose }) => {
   return (
     <Modal visible={visible} transparent animationType="fade">
+      
       <View style={styles.overlay}>
+
         <AltCard style={{ backgroundColor: Colors.white, width: '75%', padding: 16, margin: 0 }}>
           {/* Date Header */}
           <Text style={styles.dateText}>{date}</Text>
-
-          {/* Shift Time + Role */}
-          {isShift ? (
+            
             <>
-              {shiftTime && (
+              {startTime && (
                 <Text style={styles.styledText}>
-                  Shift Time: {shiftTime}
+                  Start Time: {startTime}
                 </Text>
               )}
               {role && (
@@ -35,20 +33,6 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ visible, isShift, date, s
                 </Text>
               )}
             </>
-          ) : (
-            <>
-              {/* Safely check if events is not null */}
-              {events?.length ? (
-                events.map((event, index) => (
-                  <Text key={index} style={styles.styledText}>
-                    • {event}
-                  </Text>
-                ))
-              ) : (
-                <Text style={styles.noEventsText}>No events for this day...</Text>
-              )}
-            </>
-          )}
 
           {/* Close Button */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>

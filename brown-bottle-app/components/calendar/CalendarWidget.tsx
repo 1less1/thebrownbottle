@@ -19,38 +19,32 @@ LocaleConfig.locales['en'] = {
 LocaleConfig.defaultLocale = 'en';
 
 
-interface EventData {
-  visible: boolean,
-  isShift: boolean;
-  date: string | null;
-  shiftTime?: string | null;
-  role?: string | null;
-  events?: string[] |null;
-}
+import { ShiftData } from '@/types/shift';
 
 interface Props {
-  events: { [key: string]: EventData };
+  shifts: ShiftData[];
 }
 
-const CalendarWidget: React.FC<Props> = ({ events }) => {
-  const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+const CalendarWidget: React.FC<Props> = ({ shifts }) => {
+  const [selectedShift, setSelectedShift] = useState<ShiftData | null>(null);
 
   const handleDayPress = (day: any) => {
-    const event = events[day.dateString as keyof typeof events];
-    if (event) {
-      setSelectedEvent(event);
+    const shift = shifts.find(shift => shift.date === day.dateString);
+    if (shift) {
+      setSelectedShift(shift);
     }
   };
 
-  const markedDates = Object.keys(events).reduce((acc, date) => {
-    acc[date] = {
-      selected: true,
-      selectedColor: Colors.darkBrown, // Matches default selected style
-      marked: true,
-      // dotColor: Colors.darkBrown, // Optional if you want the dot too
-    };
+  const markedDates = shifts.reduce((acc, shift) => {
+    if (shift.date) {
+      acc[shift.date] = {
+        selected: true,
+        selectedColor: Colors.darkBrown,
+        marked: true,
+      };
+    }
     return acc;
-  }, {} as any);
+  }, {} as Record<string, any>);
 
 
   return (
@@ -79,16 +73,14 @@ const CalendarWidget: React.FC<Props> = ({ events }) => {
       />
 
       {/* Show modal if a date is selected */}
-      {selectedEvent && (
+      {selectedShift && (
 
         <CalendarModal
-          visible={!!selectedEvent}
-          isShift={selectedEvent.isShift}
-          date={selectedEvent.date}
-          shiftTime={selectedEvent.shiftTime}
-          role={selectedEvent.role}
-          events={selectedEvent.events}
-          onClose={() => setSelectedEvent(null)}
+          visible={!!selectedShift}
+          date={selectedShift.date}
+          startTime={selectedShift.startTime}
+          role={selectedShift.role}
+          onClose={() => setSelectedShift(null)}
         />
 
       )}
