@@ -2,18 +2,20 @@ services:
   # The code below is defining a MySQL Container
   db:
     container_name: bb-db
-    image: mysql:9.2.0
+    image: mysql:8.0
     restart: unless-stopped
     env_file: .env
     environment: # Below are environment variables that are defined in the local .env file
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      #MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306" # Maps localhost 3306 to container port 3306 
     volumes:
       - dbdata:/var/lib/mysql # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
+      # Mounting the local .sql dump file into the docker container as 'read only'
+      - ./thebrownbottle-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
     networks:
      - internal # The mysql container operates on the internal docker network 
 
