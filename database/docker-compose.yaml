@@ -11,7 +11,7 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306" # Maps container port 3306 to localhost 3306
+      - "3306:3306" # Maps localhost 3306 to container port 3306 
     volumes:
       - dbdata:/var/lib/mysql # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
     networks:
