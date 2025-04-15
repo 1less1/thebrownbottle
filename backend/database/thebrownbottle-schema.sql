@@ -14,7 +14,11 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema thebrownbottle
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `thebrownbottle` DEFAULT CHARACTER SET utf8 ;
+
+-- Make sure to comment out the bottom line every time you get a new schema.sql file
+-- CREATE SCHEMA IF NOT EXISTS `thebrownbottle` DEFAULT CHARACTER SET utf8 ;
+-- ---------------------------------------------------------------------------------
+
 USE `thebrownbottle` ;
 
 -- -----------------------------------------------------

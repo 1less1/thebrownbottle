@@ -7,7 +7,7 @@ services:
     env_file: .env
     environment: # Below are environment variables that are defined in the local .env file
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      #MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_DATABASE: ${DB_NAME} # Remember to comment out the database creation statement for the schema.sql file!
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
@@ -15,9 +15,29 @@ services:
     volumes:
       - dbdata:/var/lib/mysql # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
       # Mounting the local .sql dump file into the docker container as 'read only'
-      - ./thebrownbottle-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
+      - ./database/thebrownbottle-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
     networks:
      - internal # The mysql container operates on the internal docker network 
+  
+
+
+  # I may need to use nginx or traefik for https (tls)
+  api:
+    build: ./api # Looks for Dockerfile in this directory
+    container_name: bb-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000" # Maps localhost 5000 to container port 5000 
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - db 
+    networks:
+      - internal 
+
 
 volumes:
   dbdata:
