@@ -1,12 +1,16 @@
 from flask import Flask, jsonify
 import mysql.connector
 import os
+from flask_cors import CORS
+
+
 
 # Import the name of the python file for the different routes
 import shifts
 import tables
 
 app = Flask(__name__)
+CORS(app)
 
 def get_db_connection():
     return mysql.connector.connect(
