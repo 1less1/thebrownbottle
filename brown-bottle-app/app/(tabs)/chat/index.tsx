@@ -1,11 +1,14 @@
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useState, useContext, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
+
+// API Stuff
+import { getShifts, getTables } from '@/utils/api/shifts';
 
 export default function Chat() {
   // Dynamic Status Bar
@@ -15,6 +18,19 @@ export default function Chat() {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
+
+  // API Stuff
+  const [shifts, setShifts] = useState<any[]>([]);
+
+  useEffect(() => {
+    getShifts().then(setShifts).catch(console.error);
+  }, []);
+
+  const [tables, setTables] = useState<any[]>([]);
+
+  useEffect(() => {
+    getTables().then(setTables).catch(console.error);
+  }, []);
 
   return (
 
@@ -34,8 +50,22 @@ export default function Chat() {
         {/* Temporary Content */}
         <DefaultScrollView>
 
-          {/* Temporary Content */}
+          {/* Temporary Content 
           <Text>This will be the most GOAT chat of all time!</Text>
+          */}
+
+          <View>
+            {shifts.map((shift, index) => (
+              <Text key={index}>{shift.shift_id}</Text>
+            ))}
+          </View>
+
+          <View>
+            {tables.map((table, index) => (
+              <Text key={index}>{table.Tables_in_thebrownbottle}</Text>
+            ))}
+          </View>
+
           
         </DefaultScrollView>
 

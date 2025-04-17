@@ -40,7 +40,7 @@ export default function TimeOff() {
           <View style={style.cardRight}>
             
             <TouchableOpacity style={style.approveButton}>
-              <Ionicons name="checkmark-circle-outline" size={28}/>
+              <Ionicons name="checkmark-circle-outline" size={28} />
             </TouchableOpacity>
 
             <TouchableOpacity style={style.rejectButton}>
