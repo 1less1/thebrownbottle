@@ -67,7 +67,7 @@ export const deletePost = async (postId: string): Promise<{ success: boolean }> 
 
     if (!res.ok) throw new Error('Failed to delete post');
     return await res.json();
-  } catch (error) {
+  } catch (error) { 
     console.error('deletePost error:', error);
     throw error;
   }
