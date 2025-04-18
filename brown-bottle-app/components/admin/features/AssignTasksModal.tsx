@@ -5,110 +5,146 @@ import {
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
+import { insertTask } from '@/utils/api/task';
+
 interface AssignTaskModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
 const AssignTaskModal: React.FC<AssignTaskModalProps> = ({ visible, onClose }) => {
+  
   const [taskTitle, setTaskTitle] = useState('');
-  const [taskDetails, setTaskDetails] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  // Author is Temporary
+  const [author, setAuthor] = useState('');
   const [assignee, setAssignee] = useState('');
   const [dueDate, setDueDate] = useState('');
 
+
+  // Function that triggers when a new Task is submitted
   const handleSubmit = () => {
-    if (!taskTitle || !taskDetails || !assignee || !dueDate) {
+    if (!taskTitle || !taskDescription || !author || !assignee || !dueDate) {
       alert('Please fill in all fields!');
       return;
     }
 
-    console.log('Task Assigned:', { taskTitle, taskDetails, assignee, dueDate });
+    if (!isValidDate(dueDate)) {
+      alert ('Not a valid date!')
+      return;
+    }
+
+    insertTask(taskTitle, taskDescription, Number(author), Number(assignee), dueDate);
+    console.log('Task Assigned:', { taskTitle, taskDescription, author, assignee, dueDate });
     onClose();
   };
 
+
+  // Checks if inputted date is valid
+  const isValidDate = (date: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+    const parsed = new Date(date);
+    return !isNaN(parsed.getTime()) && parsed.toISOString().startsWith(date);
+  };
+
+
+  // UI Code
   return (
+
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Assign New Task</Text>
-              <Text style={styles.description}>This will be sent to staff members.</Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Text style={styles.closeButtonText}>×</Text>
+          <TouchableWithoutFeedback>
+
+            <View style={styles.modalContainer}>
+
+               {/* Header and Close Button*/}
+              <View style={styles.header}>
+                <Text style={styles.title}>Assign New Task</Text>
+                <Text style={styles.description}>This will be sent to staff members.</Text>
+                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>×</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView contentContainerStyle={styles.content}>
+
+                {/* Task Title */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Task Title</Text>
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Task title" 
+                    placeholderTextColor={Colors.gray} 
+                    value={taskTitle} 
+                    onChangeText={setTaskTitle} 
+                  />
+                </View>
+
+                {/* Task Description */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Description</Text>
+                  <TextInput 
+                    style={[styles.input, styles.textarea]} 
+                    placeholder="Task details..." 
+                    placeholderTextColor={Colors.gray} 
+                    multiline 
+                    numberOfLines={4} 
+                    value={taskDescription} 
+                    onChangeText={setTaskDescription} 
+                  />
+                </View>
+
+                {/* Author */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Author</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Person assigning"
+                    placeholderTextColor={Colors.gray}
+                    value={author}
+                    onChangeText={setAuthor}
+                  />
+                </View>
+
+                {/* Assignee */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Assign To</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Assign to person"
+                    placeholderTextColor={Colors.gray}
+                    value={assignee}
+                    onChangeText={setAssignee}
+                  />
+                </View>
+
+                {/* Due Date */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Due Date</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor={Colors.gray}
+                    value={dueDate}
+                    onChangeText={setDueDate}
+                  />
+                </View>
+
+              </ScrollView>
+
+              {/* Submit Button -> Triggers the handleSubmit() function */}
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Assign Task</Text>
               </TouchableOpacity>
+
             </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
-
-              {/* Little section for default tasks */}
-              
-              <Text style={styles.label}>Select Common Task</Text>
-              <TouchableOpacity>
-                <View style={styles.defaultTasks}>
-                  <Text style={styles.description}>Choose from existing tasks</Text>
-                </View>
-              </TouchableOpacity>
-
-              {/* Task Title */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Task Title</Text>
-                <TextInput 
-                  style={styles.input} 
-                  placeholder="Task title" 
-                  placeholderTextColor={Colors.gray} 
-                  value={taskTitle} 
-                  onChangeText={setTaskTitle} 
-                />
-              </View>
-
-              {/* Task Description */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Description</Text>
-                <TextInput 
-                  style={[styles.input, styles.textarea]} 
-                  placeholder="Task details..." 
-                  placeholderTextColor={Colors.gray} 
-                  multiline 
-                  numberOfLines={4} 
-                  value={taskDetails} 
-                  onChangeText={setTaskDetails} 
-                />
-              </View>
-
-              {/* Assignee */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Assign To</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Assign to person"
-                  placeholderTextColor={Colors.gray}
-                  value={assignee}
-                  onChangeText={setAssignee}
-                />
-              </View>
-
-              {/* Due Date */}
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Due Date</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter due date"
-                  placeholderTextColor={Colors.gray}
-                  value={dueDate}
-                  onChangeText={setDueDate}
-                />
-              </View>
-            </ScrollView>
-
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Assign Task</Text>
-            </TouchableOpacity>
-          </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
+
   );
 };
 
@@ -170,6 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 8,
     padding: 10,
+    marginTop: 5,
     fontSize: 14,
     borderWidth: 1,
     borderColor: Colors.borderColor,

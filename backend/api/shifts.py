@@ -5,7 +5,7 @@ import os
 def get_shifts(db):
     conn = db
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT shift_id FROM shift")  # Replace with your actual table
+    cursor.execute("SELECT shift_id FROM shift")
     results = cursor.fetchall()
     cursor.close()
     conn.close()

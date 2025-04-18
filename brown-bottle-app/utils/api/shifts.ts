@@ -2,7 +2,7 @@
 
 export async function getShifts() {
     try {
-      const response = await fetch("http://134.161.225.3:5000/shifts");
+      const response = await fetch("http://134.161.42.235:5000/shifts");
   
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -19,7 +19,7 @@ export async function getShifts() {
 
   export async function getTables() {
     try {
-      const response = await fetch("http://134.161.225.3:5000/tables");
+      const response = await fetch("http://134.161.42.235:5000/tables");
   
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
