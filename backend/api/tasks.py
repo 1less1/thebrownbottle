@@ -2,14 +2,14 @@ from flask import jsonify
 import mysql.connector
 import os
 
-# Inserts a new task
+# Inserts a new record into the "tasks" table
 def insert_task(db, request):
     
     try:
         conn = db
         data = request.get_json()
 
-        # Ensure required fields are present
+        # Ensure required fields are presentc - if not, return a HTTP 400 error code
         if not all(key in data for key in ['title', 'description', 'author_id', 'assignee_id', 'due_date']):
             return jsonify({"status": "error", "message": "Missing required fields"}), 400
 
@@ -22,7 +22,7 @@ def insert_task(db, request):
 
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO task (title, description, author_id, assignee_id, due_date, complete)
+            INSERT INTO tasks (title, description, author_id, assignee_id, due_date, complete)
             VALUES (%s, %s, %s, %s, %s, %s)
         """, (title, description, author_id, assignee_id, due_date, complete))
 
@@ -42,7 +42,7 @@ def insert_task(db, request):
 # Gets All Tasks from the task table (for now!!!)
 def get_tasks(db):
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM task;")
+    cursor.execute("SELECT * FROM tasks;")
     results = cursor.fetchall()
     cursor.close()
     return jsonify(results)

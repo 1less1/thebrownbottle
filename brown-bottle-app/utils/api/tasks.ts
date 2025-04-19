@@ -13,7 +13,7 @@ export async function insertTask(title: string, description: string, author_id: 
         complete: 0 // Default to incomplete/false (0)
       };
   
-      const response = await fetch("http://134.161.42.235:5000/tasks/insert", {
+      const response = await fetch("http://192.168.1.244:5000/tasks/insert", {
         method: "POST", // Using POST to send data
         headers: {
           "Content-Type": "application/json", // Ensure the backend understands the content type
@@ -38,7 +38,7 @@ export async function insertTask(title: string, description: string, author_id: 
 
   export async function getTasks() {
     try {
-      const response = await fetch("http://134.161.42.235:5000/tasks/get");
+      const response = await fetch("http://192.168.1.244:5000/tasks/get");
   
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

@@ -1,19 +1,21 @@
 services:
-  # The code below is defining a MySQL Container
+  # MySQL Container
   db:
     container_name: bb-db
     image: mysql:8.0
     restart: unless-stopped
     env_file: .env
-    environment: # Below are environment variables that are defined in the local .env file
+    environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME} # Remember to comment out the database creation statement for the schema.sql file!
+      MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306" # Maps localhost 3306 to container port 3306 
     volumes:
-      - dbdata:/var/lib/mysql # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
+      # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
+      - dbdata:/var/lib/mysql
+      
       # Mounting the local .sql dump file into the docker container as 'read only'
       - ./database/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
     networks:
@@ -21,18 +23,14 @@ services:
   
 
 
-  # I may need to use nginx or traefik for https (tls)
+  # Python Backend API Container 
   api:
     build: ./api # Looks for Dockerfile in this directory
     container_name: bb-api
     restart: unless-stopped
     ports:
       - "5000:5000" # Maps localhost 5000 to container port 5000 
-    environment:
-      DB_HOST: db
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
+    env_file: .env
     depends_on:
       - db 
     networks:
@@ -42,8 +40,8 @@ services:
 volumes:
   dbdata:
 
+
 networks:
   internal:
     name: app-network
-    driver: bridge 
-
+    driver: bridge

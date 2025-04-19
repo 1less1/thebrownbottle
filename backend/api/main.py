@@ -1,18 +1,24 @@
-from flask import Flask, request, jsonify
 import mysql.connector
 import os
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-
-
 # Import the name of the python file for the different routes
+import tasks
 import shifts
 import tables
-import tasks
 
+# Initialize environment variables
+BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
+BACKEND_PORT = os.environ["BACKEND_PORT"]
+
+
+# Initialize the App
 app = Flask(__name__)
 CORS(app)
 
+
+# Function which creates a MySQL connection
 def get_db_connection():
     return mysql.connector.connect(
         host=os.environ.get("DB_HOST", "localhost"),
@@ -57,4 +63,4 @@ def get_tasks():
 # App will be available on current host IP using port 5000
 # Ex: http://134.161.225.3:5000
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host=BACKEND_ADDRESS, port=int(BACKEND_PORT))

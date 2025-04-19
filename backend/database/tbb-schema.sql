@@ -32,9 +32,9 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
--- Table `thebrownbottle`.`task`
+-- Table `thebrownbottle`.`tasks`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`tasks` (
   `task_id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
   `description` VARCHAR(250) NOT NULL,
@@ -51,12 +51,13 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `fk_task_assigned`
+  CONSTRAINT `fk_task_assignee`
     FOREIGN KEY (`assignee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
+
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`announcement`

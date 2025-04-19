@@ -41,7 +41,7 @@ INSERT INTO `thebrownbottle`.`shift` (
 
 
 -- Sample Task Data for Testing
-INSERT INTO `thebrownbottle`.`task` 
+INSERT INTO `thebrownbottle`.`tasks` 
 (`title`, `description`, `author_id`, `assignee_id`, `due_date`, `complete`)
 VALUES 
 ('Design Menu Layout', 'Create a new menu layout for the spring season.', 1, 2, '2025-04-25', 0);
