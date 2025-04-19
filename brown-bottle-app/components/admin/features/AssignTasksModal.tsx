@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
-import { insertTask } from '@/utils/api/task';
+import { insertTask } from '@/utils/api/tasks';
 
 interface AssignTaskModalProps {
   visible: boolean;
