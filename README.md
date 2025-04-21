@@ -3,9 +3,11 @@
     <img src="./images/brown_bottle_logo.jpg" alt="Brown Bottle Logo">
 </div>
 
+
 ### CS4800 Research 
 #### Student Researchers: Dominick Olhava, Ishimwe Gentil, Aaryn Warrior
 #### Faculty Advisor: Dr. Andrew Berns
+
 
 ## Project Description
 Our group of student researchers are developing a mobile application that is accessible on Android and IOS to facilitate scheduling, time off requests, business chat rooms, logging takeout orders, potentially keeping track of stock, and other business necessities per request for a local Cedar Falls restaurant called The Brown Bottle. This business currently has very little electronic management systems and everything is done with pencil and paper. Within this application there will be both a standard and administrative user for certain app functionalities. 
@@ -43,13 +45,14 @@ Follow steps [HERE](https://reactnative.dev/docs/set-up-your-environment) for in
     <img src="./images/path_updated.png" alt="Update PATH">
 </div>
 
+
 ## Start Fresh
 1. Uninstall current **cli** programs.
     ```bash
     npm uninstall -g react-native-cli
     npm uninstall -g expo-cli
     react-native --version  # Should give an error if not installed globally
-    expo --version           # Should give an error if not installed globally
+    expo --version          # Should give an error if not installed globally
     ```
 
 2. Update **npm** to latest version globally.
@@ -60,28 +63,35 @@ Follow steps [HERE](https://reactnative.dev/docs/set-up-your-environment) for in
 3. Install the **expo cli** globally.
     ```bash
     npm install -g expo-cli
-    npm fund
     ```
 
-### Creating React Native Project with **Expo Go**
-**NOTE:** Only do step 1 if you want to create a NEW project
-1. Go to the directory where you want to create a new React Native Project
-    ```bash
-    npx create-expo-app <app-name> # Creates a new React Native Project in a folder within the current directory
-    ```
 
-2. If you already have a React Native project and are **cloning** from a Git Repo run the following command **IN** the directory that contains the **React Native Project files** aka "BrownBottleApp":
-    ```bash
-    npm install
-    ```
+## Start the React Native App with **Expo Go**
+1. Clone thebrownbottle repository.
 
-3. Start the **Expo Go** application.
-    - Navigate to the app-directory -> Ex: Brown Bottle App
-    ```bash
-    cd <app-directory>
-    ```      
+2. Start the **Expo Go** application for the first time.
+    - Navigate to the app-directory -> Ex: brown-bottle-app
+        ```bash
+        cd <app-directory>
+        ```      
 
-    - Run one the following **npm** command to start the app    
+    - Run the following **npm** command to install required dependencies
+        ```bash
+        npm install
+        ```
+
+    - Run the following **npx** command to start the app **after initial clone** (Clears build cache so existing app routes can be properly created)  
+        ```bash
+        npm run fresh
+        ```
+
+        **OR**
+
+        ```bash
+        npx expo start --clear
+        ```
+
+3. Start the app **AFTER** first start.
     ```bash
     npm start
     ```
@@ -90,13 +100,19 @@ Follow steps [HERE](https://reactnative.dev/docs/set-up-your-environment) for in
     <img src="./images/expo_start_screen.png" alt="Expo Start Screen">
 </div>
 
-
-Other Helpful Commands
-```bash
-npx expo start # Uses the expo cli which brings up a menu where the user can pick what platform to host their application on!
+### Other Commands
+Start the App in **Tunnel** Mode (Useful when the dev computer and mobile device are on different networks)
+```bash 
+npm run tunnel
 ```
 
-### Android Studio AVD Setup (Optional)
+Create a **NEW** Expo Go Project
+```bash
+npx create-expo-app <app-name> # Creates a new React Native Project in a folder within the current directory
+```
+
+
+## Android Studio AVD Setup (Optional)
 **NOTE**: You only need to set up the AVD once and then Expo Go will handle the rest!
 <div align="center">
     <p>Open the dropdown and select <b>Virtual Device Manager</b></p>
@@ -105,7 +121,54 @@ npx expo start # Uses the expo cli which brings up a menu where the user can pic
     <img src="./images/avd_menu.png" alt="AVD Menu">
 </div>
 
-## Project Materials
+
+## Docker 
+IMPORTANT: Have the **.env file** in the same directory as docker-compose.yaml file. Also, do **NOT** have a local instance of MySQL running on your development device!
+
+### Container Startup
+1. Start in the backend directory.  
+**HINT:** You should be able to list the files and see docker-compose.yaml
+
+2. Make sure docker daemon service is running! (Open docker desktop or start the service from the command line)
+
+### Container Commands  
+
+Build Containers  
+**NOTE:** Use when you change source code for backend containers!
+```bash
+docker compose up --build
+```
+
+Start Containers
+```bash
+docker compose up # Runs in foreground
+
+docker compose up -d # Runs in background
+```
+
+Connect to MySQL Container Instance
+```bash
+mysql -h 127.0.0.1 -P 3306 -u <username> -p
+```
+
+**OR** 
+
+Connect to Container Shell
+```bash
+docker exec -it <container-name> /bin/sh
+```
+
+Login to MySQL through Container Shell
+```bash
+mysql -u <mysql_username> -p
+```
+
+### Container Names
+- MySQL = **bb-db**
+- Backend Python Server = **bb-api**
+
+
+## Project Resources
 
 Access preliminary UI design images [HERE](./ui_designs/)
 
@@ -116,29 +179,4 @@ Yellowish Tan - #FFDEAB
 Brown - #7C580D  
 Greyish White (App Background) - #FBF7F7  
 Bright White - #FBF7F7  
-
-## MYSQL
-IMPORTANT: Have the .env file in thebrownbottle root directory for docker compose to read.
-
-Start in the root directory of the repository. 
-HINT: You should be able to list the files and see docker-compose.yaml
-
-Make sure docker service is running! (Open docker desktop or start the service from the command line)
-
-Start MySQL container:
-
-```bash
-docker compose up # Runs in foreground
-
-docker compose up -d # Runs in background
-```
-
-Connect to the MySQL container through the command line
-```bash
-mysql -h 127.0.0.1 -P 3306 -u root -p
-```
-
-
-## Project Resources
-* To be continued...
 
