@@ -49,13 +49,13 @@ def get_tables():
 
 # Task Routes - /tasks -----------------------------------
 
-@app.route('/tasks/insert', methods=['POST'])
+@app.route('/tasks/insert-task', methods=['POST'])
 def insert_task():
     return tasks.insert_task(get_db_connection(), request)
 
-@app.route('/tasks/get', methods=['GET'])
+@app.route('/tasks/get-user-tasks', methods=['GET'])
 def get_tasks():
-    return tasks.get_tasks(get_db_connection())
+    return tasks.get_user_tasks(get_db_connection(), request)
 
 # --------------------------------------------------------
 

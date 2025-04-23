@@ -1,10 +1,13 @@
 // This file will send a request to the backend python api which will fetch shift info 
 
-import { API_URL, API_PORT } from '@env';
+import Constants from 'expo-constants';
 
 export async function getShifts() {
+  
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const base_url = `${API_URL}:${API_PORT}`;
+  const base_url = API_BASE_URL;
 
   try {
     console.log(base_url);
@@ -26,7 +29,10 @@ export async function getShifts() {
 
 export async function getTables() {
 
-  const base_url = `${API_URL}:${API_PORT}`;
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const base_url = API_BASE_URL;
 
   try {
     const response = await fetch(`${base_url}/tables`);
