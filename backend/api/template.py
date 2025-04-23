@@ -1,42 +1,35 @@
 # This file will server as a template for database routes/queries
-
 from flask import jsonify
 import mysql.connector
 import os
+import request_helper
+
 
 def sample_GET_request(db, request):
 
     try:
 
-        conn = db
+        required_params = ['param1', 'param2', 'param3']
+        param_types = {'param1': int, 'param2': str, 'param3': float}
 
-        # ----------------------------------------------------------------------------
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
 
-        # You may or may not need this data section.
-        # You will need it if the incoming request has json data attached.
-        # If it has no data attached just delete this section and execute a query with the cursor!
+        if error:
+            return jsonify(error), 400
         
-        data = request.get_json()
+        # Extract validated params
+        param1 = params['param1']
+        param2 = params['param2']
+        param3 = params['param3']
 
-        # Make sure incoming request has necessary data
-        if not all(key in data for key in ['list', 'of', 'attributes']):
-            return jsonify({"status": "error", "message": "Missing required fields"}), 400
-
-        # Extract data from the request and assign it to local variables
-        list = data['list']
-        of = data['of']
-        attributes = data['attributes']
-
-        # ----------------------------------------------------------------------------
-
-
+        conn = db
         cursor = conn.cursor()
-
 
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
             SQL Script Created Here (%s, %s, %s)
-        """, (list, of, attributes))
+        """, (param1, param2, param3 ))
 
         # Fetch the result
         result = cursor.fetchall()
@@ -45,7 +38,7 @@ def sample_GET_request(db, request):
         cursor.close()
         conn.close()
 
-        # Return the results in a structured response
+
         return jsonify({"status": "success", "data": result}), 200
 
 
@@ -69,42 +62,32 @@ def sample_POST_request(db, request):
 
     try:
 
+        required_fields = ['field1', 'field2', 'field3']
+        field_types = {'field1': int, 'field2': str, 'field3': float}
+
+        # Validate the fields
+        fields, error = request_helper.verify_fields(request, required_fields, field_types)
+
+        # Extract validated fields
+        field1 = fields['field1']
+        field2 = fields['field2']
+        field3 = fields['field3']
+
         conn = db
-        data = request.get_json()
-
-        # Make sure POST request has necessary data
-        if not all(key in data for key in ['list', 'of', 'attributes']):
-            return jsonify({"status": "error", "message": "Missing required fields"}), 400
-        
-        
-        # Extract data from the request and assign it to local variables
-        list = data['list']
-        of = data['of']
-        attributes = data['attributes']
-
-
-        # Ensure required fields are present - if not, return a HTTP 400 error code
-        if not all(key in data for key in ['title', 'description', 'author_id', 'assignee_id', 'due_date', 'complete']):
-            return jsonify({"status": "error", "message": "Missing required fields"}), 400
-
-
         cursor = conn.cursor()
         
-
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
             SQL Script Created Here (%s, %s, %s)
-        """, (list, of, attributes))
+        """, (field1, field2, field3))
 
+        # Fetch the result
+        result = cursor.fetchall()
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        # Fetch the result
-        result = cursor.fetchall()
-
-        # Return the results in a structured response
         return jsonify({"status": "success", "data": result}), 200
 
 

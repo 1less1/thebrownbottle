@@ -1,25 +1,37 @@
 from flask import jsonify
 import mysql.connector
 import os
+import request_helper
+
+from datetime import datetime
 
 # Inserts a new record into the "tasks" table
 def insert_task(db, request):
-    
     try:
+        required_fields = ['title', 'description', 'author_id', 'assignee_id', 'due_date', 'complete']
+        field_types = {
+            'title': str,
+            'description': str,
+            'author_id': int,
+            'assignee_id': int,
+            'due_date': str,
+            'complete': int
+        }
+
+        # Validate the fields in JSON body
+        fields, error = request_helper.verify_fields(request, required_fields, field_types)
+
+        if error:
+            return jsonify(error), 400
+
+        title = fields['title']
+        description = fields['description']
+        author_id = fields['author_id']
+        assignee_id = fields['assignee_id']
+        due_date = fields['due_date']
+        complete = fields['complete']
+
         conn = db
-        data = request.get_json()
-
-        # Ensure required fields are present - if not, return a HTTP 400 error code
-        if not all(key in data for key in ['title', 'description', 'author_id', 'assignee_id', 'due_date', 'complete']):
-            return jsonify({"status": "error", "message": "Missing required fields"}), 400
-
-        title = data['title']
-        description = data['description']
-        author_id = data['author_id']
-        assignee_id = data['assignee_id']
-        due_date = data['due_date']
-        complete = data.get('complete', 0)
-
         cursor = conn.cursor()
 
         cursor.execute("""
@@ -27,24 +39,19 @@ def insert_task(db, request):
             VALUES (%s, %s, %s, %s, %s, %s);
         """, (title, description, author_id, assignee_id, due_date, complete))
 
-        # Fetch the result
         result = cursor.fetchall()
 
         conn.commit()
         cursor.close()
         conn.close()
-        
-        # Return the results in a structured response
+
         return jsonify({"status": "success", "data": result}), 200
 
     except mysql.connector.Error as e:
-        # Handle database-specific errors
         print(f"Database error: {e}")
         return jsonify({"status": "error", "message": "Database error occurred"}), 500
 
-
     except Exception as e:
-        # Handle general errors
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
     
@@ -52,38 +59,49 @@ def insert_task(db, request):
 
 # Get tasks assigned to a specific user (assignee_id included in GET request)
 def get_user_tasks(db, request):
-
     try:
-        # Retrieve assignee_id from URL query parameters
-        assignee_id = request.args.get('assignee_id')
+        required_params = ['assignee_id']
+        param_types = {'assignee_id': int}
 
-        # Ensure assignee_id is present
-        if not assignee_id:
-            return jsonify({"status": "error", "message": "Missing required fields: assignee_id"}), 400
+        # Validate the query parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+
+        assignee_id = params['assignee_id']
 
         conn = db
         cursor = conn.cursor()
 
         cursor.execute("""
-            SELECT * FROM tasks WHERE assignee_id = %s
+            SELECT 
+                task_id, 
+                title, 
+                description, 
+                author_id, 
+                assignee_id, 
+                DATE_FORMAT(due_date, '%Y-%m-%d') as due_date, 
+                complete 
+            FROM tasks 
+            WHERE assignee_id = %s
         """, (assignee_id,))
 
-        # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        #conn.commit()
         cursor.close()
         conn.close()
-
-        # Return the results in a structured response
-        return jsonify({"status": "success", "data": result}), 200
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify({"status": "success", "data": data}), 200
 
     except mysql.connector.Error as e:
-        # Handle database-specific errors
         print(f"Database error: {e}")
         return jsonify({"status": "error", "message": "Database error occurred"}), 500
 
     except Exception as e:
-        # Handle general errors
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
