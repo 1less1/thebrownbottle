@@ -4,10 +4,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # Import the name of the python file for the different routes
-import tasks
 import shifts
 import tables
-import announcements
+import task
+import announcement
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -48,24 +48,30 @@ def get_tables():
 # --------------------------------------------------------
 
 
-# Task Routes - /tasks -----------------------------------
+# Task Routes - /task -----------------------------------
 
-@app.route('/tasks/insert-task', methods=['POST'])
+@app.route('/task/insert-task', methods=['POST'])
 def insert_task():
-    return tasks.insert_task(get_db_connection(), request)
+    return task.insert_task(get_db_connection(), request)
 
-@app.route('/tasks/get-user-tasks', methods=['GET'])
+@app.route('/task/get-user-tasks', methods=['GET'])
 def get_tasks():
-    return tasks.get_user_tasks(get_db_connection(), request)
+    return task.get_user_tasks(get_db_connection(), request)
 
 # --------------------------------------------------------
 
-#Announgement Routes - /announcements ---------------------
-@app.route('/announcements/insert-announcement', methods=['POST'])
+
+#Announgement Routes - /announcement ---------------------
+
+@app.route('/announcement/insert-announcement', methods=['POST'])
 def insert_announcement():
-    return announcements.insert_announcement(get_db_connection(), request)
+    return announcement.insert_announcement(get_db_connection(), request)
 
+@app.route('/announcement/get-user-announcements', methods=['GET'])
+def get_user_announcements():
+    return announcement.get_user_announcements(get_db_connection(), request)
 
+# --------------------------------------------------------
 
 
 # App will be available on current host IP using port 5000

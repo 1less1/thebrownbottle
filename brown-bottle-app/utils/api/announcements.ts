@@ -16,7 +16,7 @@ export async function insertAnnouncement(employee_id: number, title: string, des
             description,
         };
 
-        const response = await fetch(`${baseURL}/announcements/insert-announcement`, {
+        const response = await fetch(`${baseURL}/announcement/insert-announcement`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -40,3 +40,34 @@ export async function insertAnnouncement(employee_id: number, title: string, des
 
 }
 
+export async function getUserAnnouncements(employee_id: number) {
+
+    // Retrieve Environment Variables
+    const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+  
+    const baseURL = API_BASE_URL;
+  
+    try {
+      // Sending the employee_id as a query parameter in the URL
+      const response = await fetch(`${baseURL}/announcement/get-user-announcements?employee_id=${employee_id}`, {
+        method: "GET", // GET is appropriate for fetching data
+        headers: {
+          "Content-Type": "application/json", // Ensure the backend understands the content type
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      
+      return data; // This will be the JSON response from Flask, containing the task ID
+  
+    } catch (error) {
+      console.error("Failed to fetch user announcements:", error);
+      throw error;
+    }
+  
+  }
+  

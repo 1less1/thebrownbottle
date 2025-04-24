@@ -21,7 +21,7 @@ export async function insertTask(title: string, description: string, author_id: 
       complete: 0 // Default to incomplete/false (0)
     };
 
-    const response = await fetch(`${baseURL}/tasks/insert-task`, {
+    const response = await fetch(`${baseURL}/task/insert-task`, {
       method: "POST", // Using POST to send data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type
@@ -46,7 +46,7 @@ export async function insertTask(title: string, description: string, author_id: 
   
 
 // Gets a particular user's tasks with a GET Request
-export async function getUserTasks(assignee_id: string) {
+export async function getUserTasks(assignee_id: number) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -55,7 +55,7 @@ export async function getUserTasks(assignee_id: string) {
 
   try {
     // Sending the assignee_id as a query parameter in the URL
-    const response = await fetch(`${baseURL}/tasks/get-user-tasks?assignee_id=${assignee_id}`, {
+    const response = await fetch(`${baseURL}/task/get-user-tasks?assignee_id=${assignee_id}`, {
       method: "GET", // GET is appropriate for fetching data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type
