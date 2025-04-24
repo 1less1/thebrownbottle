@@ -2,13 +2,13 @@
 
 import Constants from 'expo-constants';
 
-// Inserts a task into the database
+// Inserts a task into the database with a POST Request
 export async function insertTask(title: string, description: string, author_id: number, assignee_id: number, due_date: string) {
   
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const base_url = API_BASE_URL;
+  const baseURL = API_BASE_URL;
 
   try {
     // Data you want to send in the request body
@@ -21,7 +21,7 @@ export async function insertTask(title: string, description: string, author_id: 
       complete: 0 // Default to incomplete/false (0)
     };
 
-    const response = await fetch(`${base_url}/tasks/insert-task`, {
+    const response = await fetch(`${baseURL}/tasks/insert-task`, {
       method: "POST", // Using POST to send data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type
@@ -45,16 +45,17 @@ export async function insertTask(title: string, description: string, author_id: 
 }
   
 
+// Gets a particular user's tasks with a GET Request
 export async function getUserTasks(assignee_id: string) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const base_url = API_BASE_URL;
+  const baseURL = API_BASE_URL;
 
   try {
     // Sending the assignee_id as a query parameter in the URL
-    const response = await fetch(`${base_url}/tasks/get-user-tasks?assignee_id=${assignee_id}`, {
+    const response = await fetch(`${baseURL}/tasks/get-user-tasks?assignee_id=${assignee_id}`, {
       method: "GET", // GET is appropriate for fetching data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type
