@@ -5,7 +5,7 @@ import request_helper
 
 from datetime import datetime
 
-# Inserts a new record into the "tasks" table
+# Inserts a new record into the "task" table
 def insert_task(db, request):
     try:
         required_fields = ['title', 'description', 'author_id', 'assignee_id', 'due_date', 'complete']
@@ -35,7 +35,7 @@ def insert_task(db, request):
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO tasks (title, description, author_id, assignee_id, due_date, complete)
+            INSERT INTO task (title, description, author_id, assignee_id, due_date, complete)
             VALUES (%s, %s, %s, %s, %s, %s);
         """, (title, description, author_id, assignee_id, due_date, complete))
 
@@ -83,7 +83,7 @@ def get_user_tasks(db, request):
                 assignee_id, 
                 DATE_FORMAT(due_date, '%Y-%m-%d') as due_date, 
                 complete 
-            FROM tasks 
+            FROM task 
             WHERE assignee_id = %s
         """, (assignee_id,))
 

@@ -232,9 +232,9 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
--- Table `thebrownbottle`.`tasks`
+-- Table `thebrownbottle`.`task`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`tasks` (
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `task_id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
   `description` VARCHAR(250) NOT NULL,
