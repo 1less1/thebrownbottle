@@ -7,25 +7,26 @@ def insert_section(db, request):
 
     try:
 
-        required_fields = ['section_id', 'section_name', 'employee_id']
-        field_types = {'section_id': int, 'section_name': str, 'employee_id': int}
+        required_fields = ['section_name']
+        field_types = {'section_name': str}
 
         # Validate the fields
         fields, error = request_helper.verify_fields(request, required_fields, field_types)
 
         # Extract validated fields
-        section_id = fields['section_id']
         section_name = fields['section_name']
-        employee_id = fields['employee_id']
+
+        # This will make all section names appear UPPERCASE!
+        section_name = section_name.upper()
 
         conn = db
         cursor = conn.cursor()
         
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
-            INSERT INTO section (section_id, section_name, employee_id)
-            VALUES(%s,%s,%s);
-        """, (section_id, section_name, employee_id))
+            INSERT INTO section (section_name)
+            VALUES(%s);
+        """, (section_name,))
 
         # Fetch the result
         result = cursor.fetchall()
@@ -49,6 +50,7 @@ def insert_section(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 50
 
 
+'''
 def get_user_section(db, request):
     
     try:
@@ -96,4 +98,5 @@ def get_user_section(db, request):
     except Exception as e:
         # Handle general errors
         print(f"Error occurred: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 50
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+'''

@@ -8,7 +8,9 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- Schema thebrownbottle
 -- -----------------------------------------------------
 
--- Commented out CREATE SCHEMA statement for docker container.
+-- -----------------------------------------------------
+-- Schema thebrownbottle
+-- -----------------------------------------------------
 -- CREATE SCHEMA IF NOT EXISTS `thebrownbottle` DEFAULT CHARACTER SET utf8mb3 ;
 USE `thebrownbottle` ;
 
@@ -29,34 +31,6 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`employee` (
   UNIQUE INDEX `phone_number_UNIQUE` (`phone_number` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
--- Table `thebrownbottle`.`tasks`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`tasks` (
-  `task_id` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` VARCHAR(250) NOT NULL,
-  `author_id` INT UNSIGNED NOT NULL,
-  `assignee_id` INT UNSIGNED NOT NULL,
-  `due_date` DATE NOT NULL,
-  `complete` TINYINT(1) NOT NULL,
-  PRIMARY KEY (`task_id`),
-  UNIQUE INDEX `task_id_UNIQUE` (`task_id` ASC) VISIBLE,
-  INDEX `fk_task_employee_idx` (`author_id` ASC) VISIBLE,
-  INDEX `fk_task_assignee_idx` (`assignee_id` ASC) VISIBLE,
-  CONSTRAINT `fk_task_author`
-    FOREIGN KEY (`author_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_task_assignee`
-    FOREIGN KEY (`assignee_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
@@ -188,38 +162,38 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
--- Table `thebrownbottle`.`shift`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
-  `shift_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `employee_id` INT UNSIGNED NOT NULL,
-  `start_time` TIME NULL,
-  `end_time` TIME NULL,
-  `date` DATE NULL,
-  PRIMARY KEY (`shift_id`, `employee_id`),
-  UNIQUE INDEX `schedule_id_UNIQUE` (`employee_id` ASC) VISIBLE,
-  UNIQUE INDEX `employee_id_UNIQUE` (`shift_id` ASC) VISIBLE,
-  CONSTRAINT `sch_employee_id`
-    FOREIGN KEY (`employee_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
 -- Table `thebrownbottle`.`section`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`section` (
   `section_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `section_name` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`section_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`shift`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
+  `shift_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `employee_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`section_id`, `employee_id`),
-  UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
-  CONSTRAINT `section_employee_id`
+  `start_time` TIME NULL DEFAULT NULL,
+  `end_time` TIME NULL DEFAULT NULL,
+  `date` DATE NULL DEFAULT NULL,
+  `section_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`shift_id`, `employee_id`),
+  UNIQUE INDEX `schedule_id_UNIQUE` (`employee_id` ASC) VISIBLE,
+  UNIQUE INDEX `employee_id_UNIQUE` (`shift_id` ASC) VISIBLE,
+  INDEX `section_id_idx` (`section_id` ASC) VISIBLE,
+  CONSTRAINT `sch_employee_id`
     FOREIGN KEY (`employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `shift_section_id`
+    FOREIGN KEY (`section_id`)
+    REFERENCES `thebrownbottle`.`section` (`section_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
@@ -240,6 +214,9 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   UNIQUE INDEX `employee_id_UNIQUE` (`accepted_employee_id` ASC) VISIBLE,
   UNIQUE INDEX `requested_employee_id_UNIQUE` (`requested_employee_id` ASC) VISIBLE,
   INDEX `fk_shift_cover_request_shift1_idx` (`shift_id` ASC) VISIBLE,
+  CONSTRAINT `fk_shift_cover_request_shift1`
+    FOREIGN KEY (`shift_id`)
+    REFERENCES `thebrownbottle`.`shift` (`shift_id`),
   CONSTRAINT `requested_employee_id`
     FOREIGN KEY (`requested_employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
@@ -249,12 +226,36 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
     FOREIGN KEY (`accepted_employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
     ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`tasks`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`tasks` (
+  `task_id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(250) NOT NULL,
+  `description` VARCHAR(250) NOT NULL,
+  `author_id` INT UNSIGNED NOT NULL,
+  `assignee_id` INT UNSIGNED NOT NULL,
+  `due_date` DATE NOT NULL,
+  `complete` TINYINT(1) NOT NULL,
+  PRIMARY KEY (`task_id`),
+  UNIQUE INDEX `task_id_UNIQUE` (`task_id` ASC) VISIBLE,
+  INDEX `fk_task_employee_idx` (`author_id` ASC) VISIBLE,
+  INDEX `fk_task_assignee_idx` (`assignee_id` ASC) VISIBLE,
+  CONSTRAINT `fk_task_assignee`
+    FOREIGN KEY (`assignee_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `fk_shift_cover_request_shift1`
-    FOREIGN KEY (`shift_id`)
-    REFERENCES `thebrownbottle`.`shift` (`shift_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  CONSTRAINT `fk_task_author`
+    FOREIGN KEY (`author_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
