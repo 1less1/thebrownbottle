@@ -7,6 +7,7 @@ from flask_cors import CORS
 import tasks
 import shifts
 import tables
+import section
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -47,7 +48,7 @@ def get_tables():
 # --------------------------------------------------------
 
 
-# Task Routes - /tasks -----------------------------------
+# Tasks Routes - /tasks -----------------------------------
 
 @app.route('/tasks/insert-task', methods=['POST'])
 def insert_task():
@@ -56,6 +57,19 @@ def insert_task():
 @app.route('/tasks/get-user-tasks', methods=['GET'])
 def get_tasks():
     return tasks.get_user_tasks(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+# Section Routes - /section -----------------------------------
+
+@app.route('/section/insert-section', methods=['POST'])
+def insert_section():
+    return section.insert_section(get_db_connection(), request)
+
+@app.route('/section/get-user-section', methods=['GET'])
+def get_user_section():
+    return section.get_user_section(get_db_connection(), request)
+
 
 # --------------------------------------------------------
 
