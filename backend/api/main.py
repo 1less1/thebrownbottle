@@ -7,6 +7,7 @@ from flask_cors import CORS
 import tasks
 import shifts
 import tables
+import announcements
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -58,6 +59,13 @@ def get_tasks():
     return tasks.get_user_tasks(get_db_connection(), request)
 
 # --------------------------------------------------------
+
+#Announgement Routes - /announcements ---------------------
+@app.route('/announcements/insert-announcement', methods=['POST'])
+def insert_announcement():
+    return announcements.insert_announcement(get_db_connection(), request)
+
+
 
 
 # App will be available on current host IP using port 5000
