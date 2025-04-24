@@ -8,6 +8,7 @@ import shifts
 import tables
 import task
 import announcement
+import section
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -70,6 +71,19 @@ def insert_announcement():
 @app.route('/announcement/get-user-announcements', methods=['GET'])
 def get_user_announcements():
     return announcement.get_user_announcements(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+# Section Routes - /section -----------------------------------
+
+@app.route('/section/insert-section', methods=['POST'])
+def insert_section():
+    return section.insert_section(get_db_connection(), request)
+
+@app.route('/section/get-user-section', methods=['GET'])
+def get_user_section():
+    return section.get_user_section(get_db_connection(), request)
+
 
 # --------------------------------------------------------
 
