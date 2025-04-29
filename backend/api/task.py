@@ -57,7 +57,7 @@ def insert_task(db, request):
     
 
 
-# Get tasks assigned to a specific user (assignee_id included in GET request)
+# GET tasks assigned to a specific user (assignee_id included in GET request)
 def get_user_tasks(db, request):
     try:
         required_params = ['assignee_id']

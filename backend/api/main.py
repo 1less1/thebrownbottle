@@ -4,11 +4,13 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # Import the name of the python file for the different routes
-import shifts
-import tables
+
 import task
 import announcement
 import section
+import shift
+import shift_cover_request
+import time_off_request
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -37,19 +39,10 @@ def get_db_connection():
 def health_check():
     return {"status": "ok"}
 
-@app.route('/shifts')
-def get_shifts():
-    return shifts.get_shifts(get_db_connection())
-
-
-@app.route('/tables')
-def get_tables():
-    return tables.get_tables(get_db_connection())
-
 # --------------------------------------------------------
 
 
-# Task Routes - /task -----------------------------------
+# Task Routes - /task ------------------------------------
 
 @app.route('/task/insert-task', methods=['POST'])
 def insert_task():
@@ -62,7 +55,7 @@ def get_tasks():
 # --------------------------------------------------------
 
 
-#Announgement Routes - /announcement ---------------------
+# Announcement Routes - /announcement --------------------
 
 @app.route('/announcement/insert-announcement', methods=['POST'])
 def insert_announcement():
@@ -74,7 +67,8 @@ def get_user_announcements():
 
 # --------------------------------------------------------
 
-# Section Routes - /section -----------------------------------
+
+# Section Routes - /section ------------------------------
 
 @app.route('/section/insert-section', methods=['POST'])
 def insert_section():
@@ -84,6 +78,37 @@ def insert_section():
 def get_user_section():
     return section.get_user_section(get_db_connection(), request)
 
+
+# --------------------------------------------------------
+
+
+# Task Routes - /shift -----------------------------------
+
+@app.route('/shift/get-user-shifts', methods=['GET'])
+def get_user_shifts():
+    return shift.get_user_shifts(get_db_connection(), request)
+
+@app.route('/shift/insert-shifts', methods=['POST'])
+def insert_shifts():
+    return shift.insert_shifts(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+
+# Task Routes - /shift-cover-request ---------------------
+
+@app.route('/shift-cover-request/BLAH', methods=['GET'])
+def get_shift_cover_requests():
+    return shift_cover_request.get_shift_cover_requests(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+
+# Task Routes - /time-off-request ------------------------
+
+@app.route('/time-off-request/BLAH', methods=['GET'])
+def get_time_off_requests():
+    return time_off_request.get_time_off_requests(get_db_connection(), request)
 
 # --------------------------------------------------------
 

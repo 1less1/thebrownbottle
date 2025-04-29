@@ -43,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
   `title` VARCHAR(100) NOT NULL,
   `description` TEXT NOT NULL,
   PRIMARY KEY (`announcement_id`, `employee_id`),
-  UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
   UNIQUE INDEX `anncouncement_id_UNIQUE` (`announcement_id` ASC) VISIBLE,
   CONSTRAINT `employee_id`
     FOREIGN KEY (`employee_id`)

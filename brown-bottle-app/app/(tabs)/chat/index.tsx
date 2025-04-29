@@ -8,7 +8,7 @@ import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
 
 // API Stuff
-import { getShifts, getTables } from '@/utils/api/shifts';
+import { getShifts, getTables } from '@/utils/api/shift';
 
 export default function Chat() {
   // Dynamic Status Bar
