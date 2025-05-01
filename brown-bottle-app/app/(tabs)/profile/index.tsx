@@ -1,5 +1,5 @@
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useState, useContext, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
@@ -10,6 +10,22 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/Card';
 import CircularImage from '@/components/CircularImage';
 
+// Get Session Data
+import { useSession } from '@/utils/SessionContext';
+
+// API
+import { getUserData } from '@/utils/api/user';
+
+// Define the user data interface
+interface UserData {
+  admin: number;
+  email: string;
+  employee_id: number;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  wage: string;
+}
 
 
 export default function Profile() {
@@ -20,6 +36,22 @@ export default function Profile() {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
+
+  // Get session data
+  const {employeeId} = useSession();
+
+  const [userData, setUserData] = useState<UserData | null>(null);
+  
+  useEffect(() => {
+    if (employeeId) {
+      getUserData(employeeId)
+        .then(response => {
+          // "data" array is the first object returned in JSON Response
+          setUserData(response.data[0]);
+        })
+        .catch(console.error);
+    }
+  }, [employeeId]);
 
   return (
 
@@ -56,6 +88,25 @@ export default function Profile() {
               <Text style={styles.profileCardText}>John Doe</Text>
               <Text style={{textAlign:"center", marginTop:10}}>Server</Text>
 
+            </Card>
+
+          </View>
+
+          {/* User Info */}
+          <View style={{ marginVertical: 10, width: '85%' }}>
+            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>User Info</Text>
+
+            <Card style={styles.progressCard}>
+              {userData ? (
+                <>
+                  <Text>Name: {userData.first_name} {userData.last_name}</Text>
+                  <Text>Email: {userData.email}</Text>
+                  <Text>Phone: {userData.phone_number}</Text>
+                  <Text>Wage: ${userData.wage}</Text>
+                </>
+              ) : (
+                <Text>Loading user data...</Text>
+              )}
             </Card>
 
           </View>

@@ -8,14 +8,13 @@ from datetime import datetime
 # Inserts a new record into the "task" table
 def insert_task(db, request):
     try:
-        required_fields = ['title', 'description', 'author_id', 'assignee_id', 'due_date', 'complete']
+        required_fields = ['title', 'description', 'author_id', 'assignee_id', 'due_date',]
         field_types = {
             'title': str,
             'description': str,
             'author_id': int,
             'assignee_id': int,
             'due_date': str,
-            'complete': int
         }
 
         # Validate the fields in JSON body
@@ -29,15 +28,14 @@ def insert_task(db, request):
         author_id = fields['author_id']
         assignee_id = fields['assignee_id']
         due_date = fields['due_date']
-        complete = fields['complete']
 
         conn = db
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO task (title, description, author_id, assignee_id, due_date, complete)
+            INSERT INTO task (title, description, author_id, assignee_id, due_date)
             VALUES (%s, %s, %s, %s, %s, %s);
-        """, (title, description, author_id, assignee_id, due_date, complete))
+        """, (title, description, author_id, assignee_id, due_date))
 
         result = cursor.fetchall()
 

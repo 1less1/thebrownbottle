@@ -17,6 +17,9 @@ import AltCard from '@/components/AltCard';
 import { testShifts } from '@/data/testShifts';
 import { ShiftData } from '@/types/shift';
 
+// Get Session Data
+import { useSession } from '@/utils/SessionContext';
+
 export default function HomeScreen() {
   // Dynamic Status Bar (Android Only)
   useFocusEffect(
@@ -25,6 +28,9 @@ export default function HomeScreen() {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
+
+  // Get session data
+  const { employeeId} = useSession();
 
   return (
 
@@ -57,7 +63,7 @@ export default function HomeScreen() {
           {/* Greeting Message */}
           <View style={{ marginTop: 10, marginBottom: 40 }}>
             <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold' }}>
-              Hi, User
+              Hi, Employee ID: {employeeId}
             </Text>
             <Text style={{ textAlign: 'center', fontSize: 15, color: 'black' }}>
               Here's What's Happening...

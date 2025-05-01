@@ -18,7 +18,6 @@ export async function insertTask(title: string, description: string, author_id: 
       author_id,   
       assignee_id,      
       due_date,
-      complete: 0 // Default to incomplete/false (0)
     };
 
     const response = await fetch(`${baseURL}/task/insert-task`, {

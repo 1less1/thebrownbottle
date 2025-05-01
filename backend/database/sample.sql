@@ -14,37 +14,37 @@ VALUES
 
 -- Sample task data ------------------------------------------------------------------------------------------------------------------------------
 INSERT INTO `thebrownbottle`.`task` 
-(`title`, `description`, `author_id`, `assignee_id`, `due_date`, `complete`)
+(`title`, `description`, `author_id`, `assignee_id`, `due_date`)
 VALUES
 -- Task 1 by Emily Turner for Jenna Klein
-('Inventory Count', 'Count all wine bottles in storage.', 1, 3, '2025-05-05', 0),
+('Inventory Count', 'Count all wine bottles in storage.', 1, 3, '2025-05-05'),
 
 -- Task 2 by Marcus Reed for Tyler Nguyen
-('Clean Patio', 'Deep clean the outdoor patio seating area.', 2, 4, '2025-05-06', 0),
+('Clean Patio', 'Deep clean the outdoor patio seating area.', 2, 4, '2025-05-06'),
 
 -- Task 3 by Emily Turner for Sophia Martinez
-('Restock Bar', 'Refill bar shelves with necessary liquors and mixers.', 1, 5, '2025-05-07', 0),
+('Restock Bar', 'Refill bar shelves with necessary liquors and mixers.', 1, 5, '2025-05-07'),
 
 -- Task 4 by Marcus Reed for Jenna Klein
 ('Table Setup', 'Set up tables for the Friday evening event.', 2, 3, '2025-05-02', 1),
 
 -- Task 5 by Emily Turner for Tyler Nguyen
-('Check Lighting', 'Inspect all lights and replace any burnt-out bulbs.', 1, 4, '2025-05-04', 0);
+('Check Lighting', 'Inspect all lights and replace any burnt-out bulbs.', 1, 4, '2025-05-04');
 
 
 -- Sample announcement data ----------------------------------------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`announcement` (`employee_id`, `timestamp`, `title`, `description`)
+INSERT INTO `thebrownbottle`.`announcement` (`employee_id`, `title`, `description`)
 VALUES
-(1, CURRENT_TIMESTAMP, 'New Uniform Policy', 'Please review the updated uniform guidelines posted in the staff room.'),
-(2, CURRENT_TIMESTAMP, 'Shift Coverage', 'We need additional coverage for the Saturday evening shift. Please reach out if available.'),
-(1, CURRENT_TIMESTAMP, 'Inventory Audit', 'A full inventory audit is scheduled for Monday. Be prepared to assist.'),
-(2, CURRENT_TIMESTAMP, 'Holiday Schedule', 'The holiday work schedule has been released. Check the bulletin board for your shifts.'),
-(1, CURRENT_TIMESTAMP, 'Customer Feedback', 'Recent feedback has been positive! Keep up the excellent service.'),
-(2, CURRENT_TIMESTAMP, 'Training Session', 'Mandatory service training will take place this Friday at 3 PM.'),
-(1, CURRENT_TIMESTAMP, 'Menu Updates', 'Several new items have been added to the menu. Review them before your next shift.'),
-(2, CURRENT_TIMESTAMP, 'Safety Reminder', 'Remember to use proper lifting techniques when handling heavy items.'),
-(1, CURRENT_TIMESTAMP, 'Parking Changes', 'Staff parking spots have been reassigned. Check your new location.'),
-(2, CURRENT_TIMESTAMP, 'Team Meeting', 'There will be a brief team meeting before Friday’s dinner shift. Please arrive 15 minutes early.');
+(1,'New Uniform Policy', 'Please review the updated uniform guidelines posted in the staff room.'),
+(2, 'Shift Coverage', 'We need additional coverage for the Saturday evening shift. Please reach out if available.'),
+(1, 'Inventory Audit', 'A full inventory audit is scheduled for Monday. Be prepared to assist.'),
+(2, 'Holiday Schedule', 'The holiday work schedule has been released. Check the bulletin board for your shifts.'),
+(1, 'Customer Feedback', 'Recent feedback has been positive! Keep up the excellent service.'),
+(2, 'Training Session', 'Mandatory service training will take place this Friday at 3 PM.'),
+(1, 'Menu Updates', 'Several new items have been added to the menu. Review them before your next shift.'),
+(2, 'Safety Reminder', 'Remember to use proper lifting techniques when handling heavy items.'),
+(1, 'Parking Changes', 'Staff parking spots have been reassigned. Check your new location.'),
+(2, 'Team Meeting', 'There will be a brief team meeting before Friday’s dinner shift. Please arrive 15 minutes early.');
 
 
 -- Sample section data ---------------------------------------------------------------------------------------------------------------------------

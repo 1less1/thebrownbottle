@@ -38,14 +38,14 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
   `announcement_id` INT NOT NULL AUTO_INCREMENT,
-  `employee_id` INT UNSIGNED NOT NULL,
-  `timestamp` TIMESTAMP NOT NULL,
+  `author_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(100) NOT NULL,
   `description` TEXT NOT NULL,
-  PRIMARY KEY (`announcement_id`, `employee_id`),
-  UNIQUE INDEX `anncouncement_id_UNIQUE` (`announcement_id` ASC) VISIBLE,
-  CONSTRAINT `employee_id`
-    FOREIGN KEY (`employee_id`)
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`announcement_id`, `author_id`),
+  UNIQUE INDEX `announcement_id_UNIQUE` (`announcement_id` ASC) VISIBLE,
+  CONSTRAINT `author_id`
+    FOREIGN KEY (`author_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
@@ -54,17 +54,15 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`attendance`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`attendance` (
-  `attendance_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `employee_id` INT UNSIGNED NOT NULL,
-  `date` DATE NOT NULL,
-  `clock_in_time` TIMESTAMP NOT NULL,
-  `clock_out_time` TIMESTAMP NOT NULL,
-  PRIMARY KEY (`attendance_id`, `employee_id`),
-  UNIQUE INDEX `attendance_id_UNIQUE` (`attendance_id` ASC) VISIBLE,
-  UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
-  CONSTRAINT `att_employee_id`
-    FOREIGN KEY (`employee_id`)
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
+  `announcement_id` INT NOT NULL AUTO_INCREMENT,
+  `author_id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
+  `description` TEXT NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`announcement_id`),
+  CONSTRAINT `author_id`
+    FOREIGN KEY (`author_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
@@ -80,6 +78,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`availibility` (
   `employee_id` INT UNSIGNED NOT NULL,
   `day_of_week` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
   `status` ENUM('Pending', 'Approved', 'Denied') NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`availibility_id`, `employee_id`),
   UNIQUE INDEX `avalibility_id_UNIQUE` (`availibility_id` ASC) VISIBLE,
   UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
@@ -100,7 +99,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`chat` (
   `sender_id` INT UNSIGNED NOT NULL,
   `receiver_id` INT UNSIGNED NOT NULL,
   `message` TEXT NOT NULL,
-  `timestamp` TIMESTAMP NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`chat_id`, `sender_id`, `receiver_id`),
   UNIQUE INDEX `sender_id_UNIQUE` (`sender_id` ASC) VISIBLE,
   UNIQUE INDEX `receiver_id_UNIQUE` (`receiver_id` ASC) VISIBLE,
@@ -181,10 +180,9 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
   `end_time` TIME NULL DEFAULT NULL,
   `date` DATE NULL DEFAULT NULL,
   `section_id` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`shift_id`, `employee_id`),
-  UNIQUE INDEX `schedule_id_UNIQUE` (`employee_id` ASC) VISIBLE,
-  UNIQUE INDEX `employee_id_UNIQUE` (`shift_id` ASC) VISIBLE,
-  INDEX `section_id_idx` (`section_id` ASC) VISIBLE,
+  PRIMARY KEY (`shift_id`),
+  UNIQUE INDEX `employee_date_section_idx` (`employee_id`, `date`, `section_id`),
+  INDEX `section_id_idx` (`section_id`),
   CONSTRAINT `sch_employee_id`
     FOREIGN KEY (`employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
@@ -208,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   `accepted_employee_id` INT UNSIGNED NOT NULL,
   `requested_employee_id` INT UNSIGNED NOT NULL,
   `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cover_request_id`, `shift_id`, `accepted_employee_id`, `requested_employee_id`),
   UNIQUE INDEX `cover_request_id_UNIQUE` (`cover_request_id` ASC) VISIBLE,
   UNIQUE INDEX `employee_id_UNIQUE` (`accepted_employee_id` ASC) VISIBLE,
@@ -240,7 +239,8 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `author_id` INT UNSIGNED NOT NULL,
   `assignee_id` INT UNSIGNED NOT NULL,
   `due_date` DATE NOT NULL,
-  `complete` TINYINT(1) NOT NULL,
+  `complete` TINYINT(1) NOT NULL DEFAULT 0,  -- Default 0 for false
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`task_id`),
   UNIQUE INDEX `task_id_UNIQUE` (`task_id` ASC) VISIBLE,
   INDEX `fk_task_employee_idx` (`author_id` ASC) VISIBLE,
@@ -269,6 +269,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`time_off_request` (
   `end_date` DATE NOT NULL,
   `reason` TEXT NOT NULL,
   `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`request_id`, `employee_id`),
   UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
   UNIQUE INDEX `request_id_UNIQUE` (`request_id` ASC) VISIBLE,

@@ -9,8 +9,8 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 
-// Safe area context imports
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+// Session Provider Import - NEW
+import { SessionProvider } from '@/utils/SessionContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -34,6 +34,7 @@ export default function RootLayout() {
   return (
 
     <>
+      <SessionProvider>
 
       <StatusBar style="dark" />
       <Stack
@@ -54,6 +55,8 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
 
       </Stack>
+
+      </SessionProvider>
 
     </>
     

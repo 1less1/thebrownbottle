@@ -4,13 +4,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 # Import the name of the python file for the different routes
-
+import login
 import task
 import announcement
 import section
 import shift
 import shift_cover_request
 import time_off_request
+
 
 # Initialize environment variables
 BACKEND_ADDRESS = os.environ["BACKEND_ADDRESS"]
@@ -44,9 +45,9 @@ def health_check():
 
 # Login Route - /login ------------------------------------
 
-@app.route('/login', methods=['GET'])
-def login():
-    return login.login(get_db_connection(), request)
+@app.route('/login/get-user-data', methods=['GET'])
+def get_user_data():
+    return login.get_user_data(get_db_connection(), request)
 
 # --------------------------------------------------------
 

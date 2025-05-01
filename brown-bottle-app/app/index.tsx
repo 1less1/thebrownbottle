@@ -8,6 +8,8 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 
+import LoginScreen from '@/components/home/LoginScreen'
+
 const styles = StyleSheet.create({
   button: {
     borderRadius: 5,
@@ -32,9 +34,8 @@ export default function LandingScreen() {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
-  const router = useRouter();
 
-  const isAdmin = true;
+  const router = useRouter();
 
   return (
 
@@ -50,20 +51,27 @@ export default function LandingScreen() {
           />
         </View>
 
+
+        <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <LoginScreen/> 
+        </View>
+
+        { /* OLD LOGIN STUFF - COMMENTED OUT FOR NOW!!! 
         
-        { /* Normal Employee Login */}
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/(tabs)/home', params: {isAdmin: 'false'} })}>
             <Text style={styles.buttonText}>Employee Login</Text>
           </TouchableOpacity>
         </View>
         
-        { /* Admin Login */}
+        
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/(tabs)/home', params: {isAdmin: 'true'} })}>
             <Text style={styles.buttonText}>Admin Login</Text>
           </TouchableOpacity>
         </View>
+
+        */}
 
       </View>
 
