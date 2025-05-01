@@ -26,8 +26,8 @@ def insert_announcement(db, request):
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO announcement (title, description, employee_id)
-            VALUES (%s, %s, %s);
+            INSERT INTO announcement (title, description, employee_id, timestamp)
+            VALUES (%s, %s, %s, NOW());
         """, (title, description, employee_id))
 
         result = cursor.fetchall()
