@@ -42,6 +42,15 @@ def health_check():
 # --------------------------------------------------------
 
 
+# Login Route - /login ------------------------------------
+
+@app.route('/login', methods=['GET'])
+def login():
+    return login.login(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+
 # Task Routes - /task ------------------------------------
 
 @app.route('/task/insert-task', methods=['POST'])
