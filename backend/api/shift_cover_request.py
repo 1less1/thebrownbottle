@@ -11,14 +11,11 @@ def insert_shift_cover_request(db, request):
         field_types = {'shift_id': int, 'requested_employee_id': int,}
 
         # Validate the parameters
-        fields, error = request_helper.verify_params(request, required_fields, field_types)
-
-        if error:
-            return jsonify(error), 400
+        fields, error = request_helper.verify_fields(request, required_fields, field_types)
         
         # Extract validated params
         shift_id = fields['shift_id']
-        accepted_employee_id = None
+        # accepted_employee_id = None
         requested_employee_id = fields['requested_employee_id']
         status = "Pending"
 
@@ -28,10 +25,46 @@ def insert_shift_cover_request(db, request):
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
             INSERT INTO shift_cover_request (
-                shift_id, accepted_employee_id, requested_employee_id, status
+                shift_id, requested_employee_id, status
             )           
-            VALUES(%s, %s, %s,%s,);
-        """, (shift_id, accepted_employee_id, requested_employee_id, status))
+            VALUES(%s, %s, %s);
+        """, (shift_id, requested_employee_id, status))
+
+        # Fetch the result
+        result = cursor.fetchall()
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+
+        return jsonify({"status": "success", "data": result}), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred", }), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+
+def get_all_cover_requests(db, request):
+
+    try:
+                     
+        conn = db
+        cursor = conn.cursor()
+
+        # SQL Script - %s are placeholders for variables
+        cursor.execute("""
+            SELECT *
+            FROM shift_cover_request
+        """)
 
         # Fetch the result
         result = cursor.fetchall()
@@ -57,7 +90,7 @@ def insert_shift_cover_request(db, request):
 
 
 
-def getUserShiftCoverRequest(db, request):
+def get_user_shift_cover_request(db, request):
 
     try:
 
@@ -80,7 +113,7 @@ def getUserShiftCoverRequest(db, request):
         cursor.execute("""
             SELECT *
             FROM shift_cover_request
-            WHERE requested_employee_id = (%s);
+            WHERE requested_employee_id = %s;
         """, (requested_employee_id,))
 
         # Fetch the result
@@ -106,7 +139,7 @@ def getUserShiftCoverRequest(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
     
 
-def getAcceptedShiftCoverRequest(db, request):
+def get_accepted_shift_cover_request(db, request):
 
     try:
 
