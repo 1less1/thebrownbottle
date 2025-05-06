@@ -1,4 +1,4 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider, } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -34,9 +34,11 @@ export default function RootLayout() {
   return (
 
     <>
+      
       <SessionProvider>
 
       <StatusBar style="dark" />
+      
       <Stack
         screenOptions={{
           headerStyle: {
@@ -45,7 +47,7 @@ export default function RootLayout() {
           headerTintColor: Colors.black, // Header text color
         }}
       >
-
+    
         {/* Landing Page Loaded First */}
         <Stack.Screen name="index" options={{ headerShown: false }} />
 
@@ -59,6 +61,6 @@ export default function RootLayout() {
       </SessionProvider>
 
     </>
-    
+
   );
 }
