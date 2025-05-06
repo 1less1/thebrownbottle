@@ -16,24 +16,15 @@ VALUES
 INSERT INTO `thebrownbottle`.`task` 
 (`title`, `description`, `author_id`, `assignee_id`, `due_date`)
 VALUES
--- Task 1 by Emily Turner for Jenna Klein
 ('Inventory Count', 'Count all wine bottles in storage.', 1, 3, '2025-05-05'),
-
--- Task 2 by Marcus Reed for Tyler Nguyen
 ('Clean Patio', 'Deep clean the outdoor patio seating area.', 2, 4, '2025-05-06'),
-
--- Task 3 by Emily Turner for Sophia Martinez
 ('Restock Bar', 'Refill bar shelves with necessary liquors and mixers.', 1, 5, '2025-05-07'),
-
--- Task 4 by Marcus Reed for Jenna Klein
-('Table Setup', 'Set up tables for the Friday evening event.', 2, 3, '2025-05-02', 1),
-
--- Task 5 by Emily Turner for Tyler Nguyen
+('Table Setup', 'Set up tables for the Friday evening event.', 2, 3, '2025-05-02'),
 ('Check Lighting', 'Inspect all lights and replace any burnt-out bulbs.', 1, 4, '2025-05-04');
 
 
 -- Sample announcement data ----------------------------------------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`announcement` (`employee_id`, `title`, `description`)
+INSERT INTO `thebrownbottle`.`announcement` (`author_id`, `title`, `description`)
 VALUES
 (1,'New Uniform Policy', 'Please review the updated uniform guidelines posted in the staff room.'),
 (2, 'Shift Coverage', 'We need additional coverage for the Saturday evening shift. Please reach out if available.'),
