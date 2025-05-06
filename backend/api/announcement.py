@@ -50,8 +50,8 @@ def insert_announcement(db, request):
 def get_user_announcements(db, request):
     try:
 
-        required_params = ['employee_id']
-        param_types = {'employee_id': int}
+        required_params = ['author_id']
+        param_types = {'author_id': int}
 
         # Validate the parameters
         params, error = request_helper.verify_params(request, required_params, param_types)
@@ -60,14 +60,14 @@ def get_user_announcements(db, request):
             return jsonify(error), 400
         
         # Extract validated params
-        employee_id = params['employee_id']
+        employee_id = params['author_id']
 
         conn = db
         cursor = conn.cursor()
 
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
-            SELECT * FROM announcement WHERE employee_id = %s;
+            SELECT * FROM announcement WHERE author_id = %s;
         """, (employee_id, ))
 
         result = cursor.fetchall()

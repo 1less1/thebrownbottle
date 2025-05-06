@@ -35,7 +35,10 @@ services:
     depends_on:
       - db 
     networks:
-      - internal 
+      - internal
+    volumes:
+    - ./api:/app # Binded the local api directory to the container's app directory
+                 # This allows local changes to be refreshed in the container in real time 
 
 
 volumes:
