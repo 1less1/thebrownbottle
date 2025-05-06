@@ -107,9 +107,21 @@ def insert_shifts():
 
 # Task Routes - /shift-cover-request ---------------------
 
-@app.route('/shift-cover-request/BLAH', methods=['GET'])
-def get_shift_cover_requests():
-    return shift_cover_request.get_shift_cover_requests(get_db_connection(), request)
+@app.route('/shift-cover-request/create-shift-cover-cover-request', methods=['POST'])
+def insert_shift_cover_request():
+    return shift_cover_request.insert_shift_cover_request(get_db_connection(), request)
+
+@app.route('/shift-cover-request/get-all-cover-requests', methods=['GET'])
+def get_all_cover_requests():
+    return shift_cover_request.get_all_cover_requests(get_db_connection(), request)
+
+@app.route('/shift-cover-request/get-user-shift-cover-request', methods=['GET'])
+def get_user_shift_cover_request():
+    return shift_cover_request.get_user_shift_cover_request(get_db_connection(), request)
+
+@app.route('/shift/get-accepted-shift-cover-request', methods=['GET'])
+def get_accepted_shift_cover_request():
+    return shift_cover_request.get_accepted_shift_cover_request(get_db_connection(), request)
 
 # --------------------------------------------------------
 

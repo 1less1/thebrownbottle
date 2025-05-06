@@ -203,14 +203,14 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   `cover_request_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `shift_id` INT UNSIGNED NOT NULL,
-  `accepted_employee_id` INT UNSIGNED NOT NULL,
+  `accepted_employee_id` INT UNSIGNED DEFAULT NULL,
   `requested_employee_id` INT UNSIGNED NOT NULL,
   `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`cover_request_id`, `shift_id`, `accepted_employee_id`, `requested_employee_id`),
+  PRIMARY KEY (`cover_request_id`),
   UNIQUE INDEX `cover_request_id_UNIQUE` (`cover_request_id` ASC) VISIBLE,
-  UNIQUE INDEX `employee_id_UNIQUE` (`accepted_employee_id` ASC) VISIBLE,
-  UNIQUE INDEX `requested_employee_id_UNIQUE` (`requested_employee_id` ASC) VISIBLE,
+  -- UNIQUE INDEX `employee_id_UNIQUE` (`accepted_employee_id` ASC) VISIBLE,
+  -- UNIQUE INDEX `requested_employee_id_UNIQUE` (`requested_employee_id` ASC) VISIBLE,
   INDEX `fk_shift_cover_request_shift1_idx` (`shift_id` ASC) VISIBLE,
   CONSTRAINT `fk_shift_cover_request_shift1`
     FOREIGN KEY (`shift_id`)
