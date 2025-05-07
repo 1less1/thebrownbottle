@@ -73,7 +73,7 @@ def get_all_cover_requests(db, request):
         # Format data to be entries with "column_name": value
         data = [dict(zip(columns, row)) for row in result]
         
-        return jsonify(data[0]), 200
+        return jsonify(data), 200
 
 
     except mysql.connector.Error as e:
@@ -125,7 +125,7 @@ def get_user_shift_cover_request(db, request):
         # Format data to be entries with "column_name": value
         data = [dict(zip(columns, row)) for row in result]
         
-        return jsonify(data[0]), 200
+        return jsonify(data), 200
 
 
     except mysql.connector.Error as e:
@@ -176,7 +176,7 @@ def get_accepted_shift_cover_request(db, request):
         # Format data to be entries with "column_name": value
         data = [dict(zip(columns, row)) for row in result]
         
-        return jsonify(data[0]), 200
+        return jsonify(data), 200
 
 
 

@@ -79,7 +79,7 @@ def get_user_announcements(db, request):
         # Format data to be entries with "column_name": value
         data = [dict(zip(columns, row)) for row in result]
         
-        return jsonify(data[0]), 200
+        return jsonify(data), 200
 
 
     except mysql.connector.Error as e:

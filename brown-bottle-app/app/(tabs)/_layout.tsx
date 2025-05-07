@@ -1,7 +1,6 @@
 import { Tabs, useLocalSearchParams} from 'expo-router';
 import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
-
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -74,7 +73,7 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Completely exclude the Admin tab if isAdmin is false */}
+      {/* Completely exclude the Admin tab if isAdmin is false (0) -> We need to put some sort of SERVER SIDE CHECK to redirect users if they uncover the Admin tab (Auth Token?) */}
       {user?.isAdmin === 1 ? (
         <Tabs.Screen
           name="admin/index"

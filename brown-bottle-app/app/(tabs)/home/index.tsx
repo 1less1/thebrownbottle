@@ -70,13 +70,6 @@ export default function HomeScreen() {
             </Text>
           </View>
 
-          {/* Clock In View 
-          <View style={{ margin: 40, width: '85%' }}>
-            <Text style={{ textAlign: 'left', fontSize: 16, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Today</Text>
-            <ClockInWidget />
-          </View>
-          */}
-
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
             <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Your Next Shift</Text>

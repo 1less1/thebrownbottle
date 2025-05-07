@@ -1,7 +1,6 @@
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useCallback, useState, useContext, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-
 import { Colors } from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 

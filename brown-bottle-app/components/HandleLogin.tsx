@@ -26,7 +26,14 @@ const HandleLogin = () => {
     }
 
     try {
-      const user = await getUserData(Number(employeeIdInput));
+      const response = await getUserData(Number(employeeIdInput));
+
+      if (!response || response.length === 0) {
+        Alert.alert('Login Failed', 'No user found with this ID.');
+        return;
+      }
+      
+      const user = response[0]; 
 
 
       // Save to session context
