@@ -32,14 +32,17 @@ def sample_GET_request(db, request):
         """, (param1, param2, param3 ))
 
         # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        conn.commit()
         cursor.close()
         conn.close()
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data[0]), 200
 
-
-        return jsonify({"status": "success", "data": result}), 200
 
 
     except mysql.connector.Error as e:
@@ -81,14 +84,13 @@ def sample_POST_request(db, request):
             SQL Script Created Here (%s, %s, %s)
         """, (field1, field2, field3))
 
-        # Fetch the result
-        result = cursor.fetchall()
-
         conn.commit()
         cursor.close()
         conn.close()
 
-        return jsonify({"status": "success", "data": result}), 200
+
+        return jsonify({"status": "success"}), 200
+
 
 
     except mysql.connector.Error as e:

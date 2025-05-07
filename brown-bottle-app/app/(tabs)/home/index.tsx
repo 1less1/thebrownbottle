@@ -30,7 +30,7 @@ export default function HomeScreen() {
   );
 
   // Get session data
-  const { employeeId} = useSession();
+  const { setUser, user} = useSession();
 
   return (
 
@@ -63,7 +63,7 @@ export default function HomeScreen() {
           {/* Greeting Message */}
           <View style={{ marginTop: 10, marginBottom: 40 }}>
             <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold' }}>
-              Hi, Employee ID: {employeeId}
+              Hi, {user?.firstName ?? 'Guest'}!
             </Text>
             <Text style={{ textAlign: 'center', fontSize: 15, color: 'black' }}>
               Here's What's Happening...

@@ -30,15 +30,12 @@ def insert_shift_cover_request(db, request):
             VALUES(%s, %s, %s);
         """, (shift_id, requested_employee_id, status))
 
-        # Fetch the result
-        result = cursor.fetchall()
-
         conn.commit()
         cursor.close()
         conn.close()
 
 
-        return jsonify({"status": "success", "data": result}), 200
+        return jsonify({"status": "success"}), 200
 
 
     except mysql.connector.Error as e:
@@ -67,14 +64,16 @@ def get_all_cover_requests(db, request):
         """)
 
         # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        conn.commit()
         cursor.close()
         conn.close()
-
-
-        return jsonify({"status": "success", "data": result}), 200
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data[0]), 200
 
 
     except mysql.connector.Error as e:
@@ -117,14 +116,16 @@ def get_user_shift_cover_request(db, request):
         """, (requested_employee_id,))
 
         # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        conn.commit()
         cursor.close()
         conn.close()
-
-
-        return jsonify({"status": "success", "data": result}), 200
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data[0]), 200
 
 
     except mysql.connector.Error as e:
@@ -166,14 +167,17 @@ def get_accepted_shift_cover_request(db, request):
         """, (requested_employee_id,))
 
         # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        conn.commit()
         cursor.close()
         conn.close()
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data[0]), 200
 
-
-        return jsonify({"status": "success", "data": result}), 200
 
 
     except mysql.connector.Error as e:

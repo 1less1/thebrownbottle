@@ -30,13 +30,12 @@ def insert_announcement(db, request):
             VALUES (%s, %s, %s, NOW());
         """, (title, description, employee_id))
 
-        result = cursor.fetchall()
-
         conn.commit()
         cursor.close()
         conn.close()
 
-        return jsonify({"status": "success", "data": result}), 200
+
+        return jsonify({"status": "success"}), 200
     
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
@@ -70,14 +69,17 @@ def get_user_announcements(db, request):
             SELECT * FROM announcement WHERE author_id = %s;
         """, (employee_id, ))
 
+        # Fetch the result
+        columns = [col[0] for col in cursor.description]
         result = cursor.fetchall()
 
-        conn.commit()
         cursor.close()
         conn.close()
-
-
-        return jsonify({"status": "success", "data": result}), 200
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data[0]), 200
 
 
     except mysql.connector.Error as e:

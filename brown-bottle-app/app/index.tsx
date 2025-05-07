@@ -8,7 +8,7 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 
-import LoginScreen from '@/components/home/LoginScreen'
+import HandleLogin from '@/components/HandleLogin'
 
 const styles = StyleSheet.create({
   button: {
@@ -35,8 +35,6 @@ export default function LandingScreen() {
     }, [])
   );
 
-  const router = useRouter();
-
   return (
 
     <DefaultView backgroundColor={Colors.greyWhite}>
@@ -53,25 +51,8 @@ export default function LandingScreen() {
 
 
         <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <LoginScreen/> 
+          <HandleLogin/> 
         </View>
-
-        { /* OLD LOGIN STUFF - COMMENTED OUT FOR NOW!!! 
-        
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/(tabs)/home', params: {isAdmin: 'false'} })}>
-            <Text style={styles.buttonText}>Employee Login</Text>
-          </TouchableOpacity>
-        </View>
-        
-        
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/(tabs)/home', params: {isAdmin: 'true'} })}>
-            <Text style={styles.buttonText}>Admin Login</Text>
-          </TouchableOpacity>
-        </View>
-
-        */}
 
       </View>
 

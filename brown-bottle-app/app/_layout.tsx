@@ -37,26 +37,26 @@ export default function RootLayout() {
       
       <SessionProvider>
 
-      <StatusBar style="dark" />
+        <StatusBar style="dark" />
+        
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: Colors.mediumTan, // Ensure header matches status bar color
+            },
+            headerTintColor: Colors.black, // Header text color
+          }}
+        >
       
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: Colors.mediumTan, // Ensure header matches status bar color
-          },
-          headerTintColor: Colors.black, // Header text color
-        }}
-      >
-    
-        {/* Landing Page Loaded First */}
-        <Stack.Screen name="index" options={{ headerShown: false }} />
+          {/* Landing Page Loaded First */}
+          <Stack.Screen name="index" options={{ headerShown: false }} />
 
-        {/* Rest of app in (tabs) */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/* Rest of app in (tabs) */}
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        <Stack.Screen name="+not-found" />
+          <Stack.Screen name="+not-found" />
 
-      </Stack>
+        </Stack>
 
       </SessionProvider>
 

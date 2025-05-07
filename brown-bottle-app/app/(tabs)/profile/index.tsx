@@ -10,22 +10,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/Card';
 import CircularImage from '@/components/CircularImage';
 
-// Get Session Data
-import { useSession } from '@/utils/SessionContext';
-
-// API
-import { getUserData } from '@/utils/api/user';
-
-// Define the user data interface
-interface UserData {
-  admin: number;
-  email: string;
-  employee_id: number;
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  wage: string;
-}
+import HandleLogout from '@/components/HandleLogout';
 
 
 export default function Profile() {
@@ -36,22 +21,6 @@ export default function Profile() {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
-
-  // Get session data
-  const {employeeId} = useSession();
-
-  const [userData, setUserData] = useState<UserData | null>(null);
-  
-  useEffect(() => {
-    if (employeeId) {
-      getUserData(employeeId)
-        .then(response => {
-          // "data" array is the first object returned in JSON Response
-          setUserData(response.data[0]);
-        })
-        .catch(console.error);
-    }
-  }, [employeeId]);
 
   return (
 
@@ -74,10 +43,10 @@ export default function Profile() {
 
             <Card style={styles.profileCard}>
 
-              {/* Settings button for later on */}
-              <View style={{alignItems:"flex-end"}}>
-                <Ionicons name="settings" size={30} color="gray" style={{marginBottom: 8}} />
-              </View>
+            <View style={{ alignItems: 'flex-end', marginTop: 10 }}>
+              <HandleLogout />
+            </View>
+
           
               <TouchableOpacity>
                 <View style={{alignItems: 'center', margin: 20}}>
@@ -97,16 +66,9 @@ export default function Profile() {
             <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>User Info</Text>
 
             <Card style={styles.progressCard}>
-              {userData ? (
-                <>
-                  <Text>Name: {userData.first_name} {userData.last_name}</Text>
-                  <Text>Email: {userData.email}</Text>
-                  <Text>Phone: {userData.phone_number}</Text>
-                  <Text>Wage: ${userData.wage}</Text>
-                </>
-              ) : (
+              
                 <Text>Loading user data...</Text>
-              )}
+              
             </Card>
 
           </View>

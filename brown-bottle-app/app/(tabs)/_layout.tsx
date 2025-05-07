@@ -7,12 +7,14 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 
+// Get Session Data
+import { useSession } from '@/utils/SessionContext';
+
 export default function TabLayout() {
 
-  const { isAdmin } = useLocalSearchParams();
-  const isAdminBoolean = String(isAdmin).toLowerCase() === 'true';
-  console.log(isAdmin);
-
+    // Get session data
+  const { setUser, user} = useSession();
+  
   return (
     // New Navbar Theme!
     <Tabs
@@ -72,8 +74,8 @@ export default function TabLayout() {
         }}
       />
 
-      {/* Completely exclude the Admin tab if isAdminBoolean is false */}
-      {isAdminBoolean? (
+      {/* Completely exclude the Admin tab if isAdmin is false */}
+      {user?.isAdmin === 1 ? (
         <Tabs.Screen
           name="admin/index"
           options={{
@@ -81,19 +83,17 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
           }}
         />
-
-        ) : (
-
+      ) : (
         <Tabs.Screen
           name="admin/index"
           options={{
             title: "You Should Not Be Seeing This",
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="shield.fill" color={color} />,
-            href: null,
+            href: null, // This disables navigation to this tab
           }} 
         />
-
       )}
+
       
     </Tabs>
 

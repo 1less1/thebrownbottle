@@ -28,14 +28,12 @@ def insert_section(db, request):
             VALUES(%s);
         """, (section_name,))
 
-        # Fetch the result
-        result = cursor.fetchall()
-
         conn.commit()
         cursor.close()
         conn.close()
 
-        return jsonify({"status": "success", "data": result}), 200
+
+        return jsonify({"status": "success"}), 200
 
 
     except mysql.connector.Error as e:

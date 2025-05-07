@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 # Import the name of the python file for the different routes
 import login
+import user
 import task
 import announcement
 import section
@@ -43,11 +44,13 @@ def health_check():
 # --------------------------------------------------------
 
 
-# Login Route - /login ------------------------------------
 
-@app.route('/login/get-user-data', methods=['GET'])
+
+# User Routes - /user ------------------------------------
+
+@app.route('/user/get-user-data', methods=['GET'])
 def get_user_data():
-    return login.get_user_data(get_db_connection(), request)
+    return user.get_user_data(get_db_connection(), request)
 
 # --------------------------------------------------------
 
