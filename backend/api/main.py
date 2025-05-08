@@ -78,6 +78,10 @@ def insert_announcement():
 def get_user_announcements():
     return announcement.get_user_announcements(get_db_connection(), request)
 
+@app.route('/announcement/get-all-announcements', methods=['GET'])
+def get_all_announcements():
+    return announcement.get_all_announcements(get_db_connection(), request)
+
 # --------------------------------------------------------
 
 
@@ -95,7 +99,7 @@ def get_user_section():
 # --------------------------------------------------------
 
 
-# Task Routes - /shift -----------------------------------
+# Shift Routes - /shift ----------------------------------
 
 @app.route('/shift/get-user-shifts', methods=['GET'])
 def get_user_shifts():
@@ -108,7 +112,7 @@ def insert_shifts():
 # --------------------------------------------------------
 
 
-# Task Routes - /shift-cover-request ---------------------
+# Shift Cover Request Routes - /shift-cover-request ------
 
 @app.route('/shift-cover-request/create-shift-cover-cover-request', methods=['POST'])
 def insert_shift_cover_request():

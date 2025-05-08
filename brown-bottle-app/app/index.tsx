@@ -44,7 +44,7 @@ export default function LandingScreen() {
 
         <View style={{ alignItems: 'center' }}>
           <Image
-          source={require('@/assets/images/brown_bottle_logo.jpg')} // Adjust the path to your image
+          source={require('@/assets/images/brown_bottle_logo.jpg')}
           style={{ width: 150, height: 150, marginTop: 20}}
           />
         </View>

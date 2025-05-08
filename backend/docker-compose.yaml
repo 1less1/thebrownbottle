@@ -32,6 +32,8 @@ services:
     ports:
       - "5000:5000" # Maps localhost 5000 to container port 5000 
     env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
     depends_on:
       - db 
     networks:

@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 
+// POST Request that inserts an Announcement record in the Database
 export async function insertAnnouncement(author_id: number, title: string, description: string) {
 
   // Retrieve Environment Variables
@@ -27,8 +28,8 @@ export async function insertAnnouncement(author_id: number, title: string, descr
     }
 
     const data = await response.json();
-    console.log(data); // Log the response data (including announcement_id)
-    return data; // This will be the JSON response from Flask, containing the announcement ID
+    
+    return data; 
   
   } catch (error) {
     console.error("Failed to insert announcement:", error);
@@ -37,7 +38,8 @@ export async function insertAnnouncement(author_id: number, title: string, descr
 
 }
 
-export async function getUserAnnouncements(employee_id: number) {
+// GET Request that fetches Announcements made by a particular user (author_id)
+export async function getUserAnnouncements(author_id: number) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -45,11 +47,11 @@ export async function getUserAnnouncements(employee_id: number) {
   const baseURL = API_BASE_URL;
 
   try {
-    // Sending the employee_id as a query parameter in the URL
-    const response = await fetch(`${baseURL}/announcement/get-user-announcements?employee_id=${employee_id}`, {
-      method: "GET", // GET is appropriate for fetching data
+    
+    const response = await fetch(`${baseURL}/announcement/get-user-announcements?employee_id=${author_id}`, {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json", // Ensure the backend understands the content type
+        "Content-Type": "application/json", 
       },
     });
 
@@ -59,7 +61,7 @@ export async function getUserAnnouncements(employee_id: number) {
 
     const data = await response.json();
     
-    return data; // This will be the JSON response from Flask, containing the task ID
+    return data;
 
   } catch (error) {
     console.error("Failed to fetch user announcements:", error);
@@ -67,4 +69,37 @@ export async function getUserAnnouncements(employee_id: number) {
   }
   
 }
+
+// GET Request that fetches ALL Announcements made in the last 14 days!
+export async function getAllAnnouncements() {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/announcement/get-all-announcements`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
+  
+}
+  
   

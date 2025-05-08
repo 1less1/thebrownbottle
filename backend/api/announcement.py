@@ -5,11 +5,11 @@ import request_helper
 
 def insert_announcement(db, request):
     try:
-        required_fields = ['title', 'description', 'employee_id']
+        required_fields = ['title', 'description', 'author_id']
         field_types = {
             'title': str,
             'description': str,
-            'employee_id': int
+            'author_id': int
         }
 
         # Validate the fields in JSON body
@@ -20,15 +20,15 @@ def insert_announcement(db, request):
         
         title = fields['title']
         description = fields['description']
-        employee_id = fields['employee_id']
+        author_id = fields['author_id']
 
         conn = db
         cursor = conn.cursor()
 
         cursor.execute("""
-            INSERT INTO announcement (title, description, employee_id, timestamp)
-            VALUES (%s, %s, %s, NOW());
-        """, (title, description, employee_id))
+            INSERT INTO announcement (title, description, author_id)
+            VALUES (%s, %s, %s);
+        """, (title, description, author_id))
 
         conn.commit()
         cursor.close()
@@ -92,6 +92,54 @@ def get_user_announcements(db, request):
         # Handle general errors
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
+
+def get_all_announcements(db, request):
+    try:
+
+        conn = db
+        cursor = conn.cursor()
+
+        # SQL Script - Selects announcements from the last 14 days (2 weeks)
+        cursor.execute("""
+            SELECT 
+                a.announcement_id,
+                a.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                a.title,
+                a.description,
+                DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(a.timestamp, '%H:%i') AS time
+            FROM announcement a
+            JOIN employee e ON a.author_id = e.employee_id
+            WHERE a.timestamp >= NOW() - INTERVAL 14 DAY;
+        """)
+
+        # Fetch the result
+        columns = [col[0] for col in cursor.description]
+        result = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
+
     
 
     

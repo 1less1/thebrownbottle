@@ -73,7 +73,7 @@ export default function HomeScreen() {
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
             <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Your Next Shift</Text>
-            <NextShift shifts={testShifts} />
+            <NextShift employee_id={Number(user?.id) || 0} />
           </View>
 
 

@@ -1,8 +1,6 @@
-// This file will send a request to the backend python api which will fetch shift info 
-
 import Constants from 'expo-constants';
 
-export async function getShifts() {
+export async function getUserShifts(employee_id: number) {
   
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -11,15 +9,16 @@ export async function getShifts() {
 
   try {
     console.log(base_url);
-    const response = await fetch(`${base_url}/shifts`);
+    const response = await fetch(`${base_url}/shift/get-user-shifts?employee_id=${employee_id}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log(data);
-    return data; // This will be your JSON response from Flask
+    
+    return data;
+
   } catch (error) {
     console.error("Failed to fetch shifts:", error);
     throw error;
