@@ -3,13 +3,16 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 type User = {
-  id: string;
-  firstName: string;
-  lastName: string;
+  user_id: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  phoneNumber: string;
+  phone_number: string;
   wage: string;
-  isAdmin: number;
+  is_admin: number;
+  primary_role: number;
+  secondary_role: number;
+  tertiary_role: number;
 };
 
 type SessionContextType = {

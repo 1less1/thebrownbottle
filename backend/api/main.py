@@ -85,6 +85,15 @@ def get_all_announcements():
 # --------------------------------------------------------
 
 
+# Task Routes - /time-off-request ------------------------
+
+@app.route('/time-off-request/BLAH', methods=['GET'])
+def get_time_off_requests():
+    return time_off_request.get_time_off_requests(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+
 # Section Routes - /section ------------------------------
 
 @app.route('/section/insert-section', methods=['POST'])
@@ -129,15 +138,6 @@ def get_user_shift_cover_request():
 @app.route('/shift/get-accepted-shift-cover-request', methods=['GET'])
 def get_accepted_shift_cover_request():
     return shift_cover_request.get_accepted_shift_cover_request(get_db_connection(), request)
-
-# --------------------------------------------------------
-
-
-# Task Routes - /time-off-request ------------------------
-
-@app.route('/time-off-request/BLAH', methods=['GET'])
-def get_time_off_requests():
-    return time_off_request.get_time_off_requests(get_db_connection(), request)
 
 # --------------------------------------------------------
 

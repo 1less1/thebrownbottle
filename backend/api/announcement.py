@@ -9,7 +9,8 @@ def insert_announcement(db, request):
         field_types = {
             'title': str,
             'description': str,
-            'author_id': int
+            'author_id': int,
+            'role_id': int # role_id is optional since it is NOT included in required_fields list
         }
 
         # Validate the fields in JSON body
@@ -21,19 +22,25 @@ def insert_announcement(db, request):
         title = fields['title']
         description = fields['description']
         author_id = fields['author_id']
+        role_id = fields.get('role_id')  # Will be None if not provided
 
         conn = db
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO announcement (title, description, author_id)
-            VALUES (%s, %s, %s);
-        """, (title, description, author_id))
+        if role_id is not None: # Handles case WITH assigned role for the announcement
+            cursor.execute("""
+                INSERT INTO announcement (title, description, author_id, role_id)
+                VALUES (%s, %s, %s, %s);
+            """, (title, description, author_id, role_id))
+        else: # Handles case WITHOUT assigned role for the 
+            cursor.execute("""
+                INSERT INTO announcement (title, description, author_id)
+                VALUES (%s, %s, %s);
+            """, (title, description, author_id))
 
         conn.commit()
         cursor.close()
         conn.close()
-
 
         return jsonify({"status": "success"}), 200
     
@@ -106,13 +113,17 @@ def get_all_announcements(db, request):
                 a.announcement_id,
                 a.author_id,
                 CONCAT(e.first_name, ' ', e.last_name) AS author,
+                a.role_id,
+                r.role_name,
                 a.title,
                 a.description,
                 DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
                 DATE_FORMAT(a.timestamp, '%H:%i') AS time
             FROM announcement a
             JOIN employee e ON a.author_id = e.employee_id
-            WHERE a.timestamp >= NOW() - INTERVAL 14 DAY;
+            JOIN role r ON a.role_id = r.role_id
+            WHERE a.timestamp >= NOW() - INTERVAL 14 DAY
+            ORDER BY a.timestamp DESC;
         """)
 
         # Fetch the result

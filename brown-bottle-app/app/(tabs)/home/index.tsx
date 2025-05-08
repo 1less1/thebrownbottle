@@ -14,9 +14,6 @@ import NextShift from '@/components/home/NextShift';
 import Card from '@/components/Card';
 import AltCard from '@/components/AltCard';
 
-import { testShifts } from '@/data/testShifts';
-import { ShiftData } from '@/types/shift';
-
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
 
@@ -63,7 +60,7 @@ export default function HomeScreen() {
           {/* Greeting Message */}
           <View style={{ marginTop: 10, marginBottom: 40 }}>
             <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold' }}>
-              Hi, {user?.firstName ?? 'Guest'}!
+              Hi, {user?.first_name ?? 'Guest'}!
             </Text>
             <Text style={{ textAlign: 'center', fontSize: 15, color: 'black' }}>
               Here's What's Happening...
@@ -73,7 +70,7 @@ export default function HomeScreen() {
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
             <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Your Next Shift</Text>
-            <NextShift employee_id={Number(user?.id) || 0} />
+            <NextShift employee_id={Number(user?.user_id) || 0} />
           </View>
 
 
@@ -94,7 +91,3 @@ export default function HomeScreen() {
 
   );
 }
-
-const styles = StyleSheet.create({
-  // Add styles later!
-});

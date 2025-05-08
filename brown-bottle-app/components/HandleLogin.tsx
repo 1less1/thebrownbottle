@@ -38,14 +38,16 @@ const HandleLogin = () => {
 
       // Save to session context
       setUser({
-        id: user.employee_id.toString(),
-        firstName: user.first_name.toString(),
-        lastName: user.last_name.toString(),
+        user_id: user.employee_id.toString(),
+        first_name: user.first_name.toString(),
+        last_name: user.last_name.toString(),
         email: user.email.toString(),
-        phoneNumber: user.phone_number.toString(),
+        phone_number: user.phone_number.toString(),
         wage: user.wage.toString(),
-        isAdmin: Number(user.admin),
-        
+        is_admin: Number(user.admin),
+        primary_role: Number(user.primary_role),
+        secondary_role: Number(user.secondary_role),
+        tertiary_role: Number(user.tertiary_role)
       });
 
       // Navigate to home/dashboard

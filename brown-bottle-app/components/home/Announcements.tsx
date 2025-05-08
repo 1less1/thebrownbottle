@@ -14,6 +14,8 @@ interface Announcement {
   announcement_id: number;
   author_id: number;
   author: string;
+  role_id: number;
+  role_name: string;
   title: string;
   description: string;
   date: string; // MM/DD/YYYY format
@@ -28,7 +30,13 @@ const Announcements= () => {
     (async () => {
       try {
         const data = await getAllAnnouncements();
-        setAnnouncements(data);
+  
+        // Explicitly tell TypeScript what type 'data' is
+        const sortedData = (data as Announcement[]).sort(
+          (a, b) => b.announcement_id - a.announcement_id
+        );
+  
+        setAnnouncements(sortedData);
       } catch (error) {
         console.error('Error fetching announcements:', error);
       }
@@ -41,12 +49,18 @@ const Announcements= () => {
       <DefaultScrollView>
       
       {announcements.map((announcement) => (
-        <AltCard key={announcement.announcement_id} style={styles.announcement}>
-          <Text style={styles.headerText}>{announcement.title}</Text>
+        <AltCard key={announcement.announcement_id} style={styles.announcementContainer}>
+          <View style={styles.headerContainer}>
+            <Text style={styles.headerText}>{announcement.title}</Text>
+            <AltCard style={styles.roleContainer}>
+              <Text style={styles.roleText}>{announcement.role_name}</Text>
+            </AltCard>
+          </View>
           <Text style={styles.text}>{announcement.description}</Text>
           <Text style={styles.text}>- {announcement.author}</Text>
           <Text style={styles.dateText}>
-            Date: {announcement.date} and Time: {announcement.time}
+            Date: {announcement.date} <br/>
+            Time: {announcement.time}
           </Text>
         </AltCard>
       ))}
@@ -66,11 +80,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   scrollContainer: {
-    height: 300, // Set the height to display only three AltCards (adjust as needed)
+    height: 425, // Set the height to display only three AltCards (adjust as needed)
     width: '100%',
     flexDirection: 'column', // Stack cards vertically
   },
-  announcement: {
+  announcementContainer: {
     width: '100%',
     backgroundColor: Colors.lightTan,
     alignItems: 'flex-start',
@@ -79,10 +93,29 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     margin: 6,
   },
+  roleContainer: {
+    backgroundColor: Colors.darkTan,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderRadius: 0
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
   headerText: {
     color: Colors.black,
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  roleText: {
+    color: Colors.black,
+    fontSize: 14,
+    fontWeight: 'bold'
   },
   text: {
     color: Colors.black,
@@ -91,6 +124,8 @@ const styles = StyleSheet.create({
   dateText: {
     color: Colors.gray,
     fontSize: 14,
+    fontWeight: 500,
+    marginVertical: 4
   }
 });
 
