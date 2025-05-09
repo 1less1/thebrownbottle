@@ -3,6 +3,7 @@ import mysql.connector
 import os
 import request_helper
 
+# Just need to tweak the insert_announcement!!!
 def insert_announcement(db, request):
     try:
         required_fields = ['title', 'description', 'author_id']
@@ -53,6 +54,7 @@ def insert_announcement(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
     
 
+
 def get_user_announcements(db, request):
     try:
 
@@ -66,15 +68,30 @@ def get_user_announcements(db, request):
             return jsonify(error), 400
         
         # Extract validated params
-        employee_id = params['author_id']
+        author_id = params['author_id']
 
         conn = db
         cursor = conn.cursor()
 
         # SQL Script - %s are placeholders for variables
         cursor.execute("""
-            SELECT * FROM announcement WHERE author_id = %s;
-        """, (employee_id, ))
+            SELECT 
+                a.announcement_id,
+                a.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                a.role_id,
+                r.role_name,
+                a.title,
+                a.description,
+                DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(a.timestamp, '%H:%i') AS time
+            FROM announcement a
+            JOIN employee e ON a.author_id = e.employee_id
+            JOIN role r ON a.role_id = r.role_id
+            WHERE a.timestamp >= NOW() - INTERVAL 14 DAY
+            AND a.author_id = %s
+            ORDER BY a.timestamp DESC;
+        """, (author_id,))
 
         # Fetch the result
         columns = [col[0] for col in cursor.description]
@@ -100,6 +117,72 @@ def get_user_announcements(db, request):
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
     
+
+
+
+def get_announcements_by_role(db, request):
+    try:
+
+        required_params = ['role_id']
+        param_types = {'role_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        role_id = params['role_id']
+
+        conn = db
+        cursor = conn.cursor()
+
+        # SQL Script - %s are placeholders for variables
+        cursor.execute("""
+            SELECT 
+                a.announcement_id,
+                a.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                a.role_id,
+                r.role_name,
+                a.title,
+                a.description,
+                DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(a.timestamp, '%H:%i') AS time
+            FROM announcement a
+            JOIN employee e ON a.author_id = e.employee_id
+            JOIN role r ON a.role_id = r.role_id
+            WHERE a.timestamp >= NOW() - INTERVAL 14 DAY
+            AND a.role_id = %s
+            ORDER BY a.timestamp DESC;
+        """, (role_id,))
+
+        # Fetch the result
+        columns = [col[0] for col in cursor.description]
+        result = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+        
+        # Format data to be entries with "column_name": value
+        data = [dict(zip(columns, row)) for row in result]
+        
+        return jsonify(data), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
+
 
 def get_all_announcements(db, request):
     try:

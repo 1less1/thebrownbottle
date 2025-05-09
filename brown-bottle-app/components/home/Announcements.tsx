@@ -6,8 +6,9 @@ import { Colors } from '@/constants/Colors';
 import Card from "@/components/Card";
 import AltCard from '@/components/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
+import RoleDropdown from '@/components/RoleDropdown';
 
-import { getAllAnnouncements, getUserAnnouncements } from '@/utils/api/announcement';
+import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
 
 
 interface Announcement {
@@ -25,50 +26,64 @@ interface Announcement {
 const Announcements= () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getAllAnnouncements();
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
   
-        // Explicitly tell TypeScript what type 'data' is
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const data =
+          selectedRoleId == -1
+            ? await getAllAnnouncements()
+            : await getAnnouncementsByRole(selectedRoleId);
+  
         const sortedData = (data as Announcement[]).sort(
           (a, b) => b.announcement_id - a.announcement_id
         );
   
         setAnnouncements(sortedData);
       } catch (error) {
-        console.error('Error fetching announcements:', error);
+        console.error("Error fetching announcements:", error);
       }
-    })();
-  }, []);
+    };
+  
+    fetchAnnouncements();
+  }, [selectedRoleId]);  
 
   return (
     <Card style={styles.container}>
+
       <View style={styles.scrollContainer}>
-      <DefaultScrollView>
       
-      {announcements.map((announcement) => (
-        <AltCard key={announcement.announcement_id} style={styles.announcementContainer}>
-          <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>{announcement.title}</Text>
-            <AltCard style={styles.roleContainer}>
-              <Text style={styles.roleText}>{announcement.role_name}</Text>
-            </AltCard>
-          </View>
-          <Text style={styles.text}>{announcement.description}</Text>
-          <Text style={styles.text}>- {announcement.author}</Text>
-          <Text style={styles.dateText}>
-            Date: {announcement.date} <br/>
-            Time: {announcement.time}
-          </Text>
-        </AltCard>
-      ))}
+        <RoleDropdown
+        selectedRoleId={selectedRoleId}
+        onRoleSelect={setSelectedRoleId}
+        />
       
-      </DefaultScrollView>
+        <DefaultScrollView>
+        
+        {announcements.map((announcement) => (
+          <AltCard key={announcement.announcement_id} style={styles.announcementContainer}>
+            <View style={styles.headerContainer}>
+              <Text style={styles.headerText}>{announcement.title}</Text>
+              <AltCard style={styles.roleContainer}>
+                <Text style={styles.roleText}>{announcement.role_name}</Text>
+              </AltCard>
+            </View>
+            <Text style={styles.text}>{announcement.description}</Text>
+            <Text style={styles.text}>- {announcement.author}</Text>
+            <Text style={styles.dateText}>
+              Date: {announcement.date}{"\n"}
+              Time: {announcement.time}
+            </Text>
+          </AltCard>
+        ))}
+        
+        </DefaultScrollView>
+
       </View>
       
     </Card>
+
   );
 };
 
@@ -80,10 +95,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   scrollContainer: {
-    height: 425, // Set the height to display only three AltCards (adjust as needed)
+    maxHeight: 400,
     width: '100%',
-    flexDirection: 'column', // Stack cards vertically
-  },
+    flexDirection: 'column',
+  },  
   announcementContainer: {
     width: '100%',
     backgroundColor: Colors.lightTan,
@@ -124,7 +139,6 @@ const styles = StyleSheet.create({
   dateText: {
     color: Colors.gray,
     fontSize: 14,
-    fontWeight: 500,
     marginVertical: 4
   }
 });

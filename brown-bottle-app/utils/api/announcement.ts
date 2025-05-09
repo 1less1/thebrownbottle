@@ -38,7 +38,7 @@ export async function insertAnnouncement(author_id: number, title: string, descr
 
 }
 
-// GET Request that fetches Announcements made by a particular user (author_id)
+// GET Request that fetches Announcements made by a particular user (author_id) 
 export async function getUserAnnouncements(author_id: number) {
 
   // Retrieve Environment Variables
@@ -93,6 +93,38 @@ export async function getAllAnnouncements() {
 
     const data = await response.json();
 
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch ALL announcements:", error);
+    throw error;
+  }
+  
+}
+
+// GET Request that fetches Announcements made by a particular user (author_id) 
+export async function getAnnouncementsByRole(role_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/announcement/get-announcements-by-role?role_id=${role_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
     return data;
 
   } catch (error) {

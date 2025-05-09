@@ -74,7 +74,7 @@ export default function TabLayout() {
       />
 
       {/* Completely exclude the Admin tab if isAdmin is false (0) -> We need to put some sort of SERVER SIDE CHECK to redirect users if they uncover the Admin tab (Auth Token?) */}
-      {user?.isAdmin === 1 ? (
+      {user?.is_admin === 1 ? (
         <Tabs.Screen
           name="admin/index"
           options={{

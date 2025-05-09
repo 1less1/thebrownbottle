@@ -8,6 +8,7 @@ import login
 import user
 import task
 import announcement
+import role
 import section
 import shift
 import shift_cover_request
@@ -78,6 +79,10 @@ def insert_announcement():
 def get_user_announcements():
     return announcement.get_user_announcements(get_db_connection(), request)
 
+@app.route('/announcement/get-announcements-by-role', methods=['GET'])
+def get_announcements_by_role():
+    return announcement.get_announcements_by_role(get_db_connection(), request)
+
 @app.route('/announcement/get-all-announcements', methods=['GET'])
 def get_all_announcements():
     return announcement.get_all_announcements(get_db_connection(), request)
@@ -90,6 +95,15 @@ def get_all_announcements():
 @app.route('/time-off-request/BLAH', methods=['GET'])
 def get_time_off_requests():
     return time_off_request.get_time_off_requests(get_db_connection(), request)
+
+# --------------------------------------------------------
+
+
+# Role Routes - /role ------------------------------------
+
+@app.route('/role/get-all-roles', methods=['GET'])
+def get_all_roles():
+    return role.get_all_roles(get_db_connection(), request)
 
 # --------------------------------------------------------
 

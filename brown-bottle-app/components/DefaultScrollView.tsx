@@ -18,10 +18,6 @@ interface DefaultScrollViewProps {
 
 const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
   children,
-  style,
-  topSafeAreaColor = Colors.greyWhite, // Default Top Color
-  bottomSafeAreaColor = Colors.greyWhite, // Default Bottom Color 
-  scrollViewColor = Colors.greyWhite, // Default Scroll View Color
 }) => {
   const [refreshing, setRefreshing] = useState(false);
 
@@ -37,13 +33,6 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
   return (
     <>
 
-      {/* <SafeAreaView edges={["top"]} style={{ flex: 0, backgroundColor: topSafeAreaColor }} /> */}
-
-      {/* This View Dictates the Color behind the Scroll View */}
-      {/* The Scroll View has a "transparent" background color! 
-      <View style={{ flex: 1, backgroundColor: scrollViewColor }}> 
-      */}    
-          
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -63,8 +52,6 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
         <View style={styles.childrenContainer}>{children}</View>
 
       </ScrollView>
-
-      {/* <SafeAreaView edges={["bottom"]} style={{ flex: 0, backgroundColor: bottomSafeAreaColor }} /> */}
       
     </>
 
@@ -72,22 +59,17 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
   scrollView: {
-    flex: 1,
     backgroundColor: 'transparent',
+    width: '100%',
   },
   scrollContent: {
     flexGrow: 1,
   },
   childrenContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    // Removed flexGrow: 1
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: 'transparent', // Main content background
     width: '100%',
   },
 });
