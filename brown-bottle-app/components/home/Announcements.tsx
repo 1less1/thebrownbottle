@@ -9,79 +9,86 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/RoleDropdown';
 
 import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
+import { Announcement } from '@/types/api';
 
-
-interface Announcement {
-  announcement_id: number;
-  author_id: number;
-  author: string;
-  role_id: number;
-  role_name: string;
-  title: string;
-  description: string;
-  date: string; // MM/DD/YYYY format
-  time: string; // HH:MM format
-}
-
-const Announcements= () => {
+const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [loading, setLoading] = useState(true);
   
-  useEffect(() => {
+    useEffect(() => {
     const fetchAnnouncements = async () => {
+      setLoading(true);
+
       try {
         const data =
-          selectedRoleId == -1
+          selectedRoleId == 1
             ? await getAllAnnouncements()
             : await getAnnouncementsByRole(selectedRoleId);
-  
+
         const sortedData = (data as Announcement[]).sort(
           (a, b) => b.announcement_id - a.announcement_id
         );
-  
+
         setAnnouncements(sortedData);
       } catch (error) {
         console.error("Error fetching announcements:", error);
+      } finally {
+        setLoading(false);
       }
     };
-  
+
     fetchAnnouncements();
-  }, [selectedRoleId]);  
+  }, [selectedRoleId]); 
 
   return (
     <Card style={styles.container}>
-
+      
       <View style={styles.scrollContainer}>
-      
-        <RoleDropdown
-        selectedRoleId={selectedRoleId}
-        onRoleSelect={setSelectedRoleId}
-        />
-      
+        
+        <View style={styles.ddContainer}>
+          <RoleDropdown
+            selectedRoleId={selectedRoleId}
+            onRoleSelect={setSelectedRoleId}
+          />
+        </View>
+
         <DefaultScrollView>
-        
-        {announcements.map((announcement) => (
-          <AltCard key={announcement.announcement_id} style={styles.announcementContainer}>
-            <View style={styles.headerContainer}>
-              <Text style={styles.headerText}>{announcement.title}</Text>
-              <AltCard style={styles.roleContainer}>
-                <Text style={styles.roleText}>{announcement.role_name}</Text>
+
+          {loading ? (
+            <Text style={styles.altText}>Loading announcements...</Text>
+          
+          ) : (
+            
+            announcements.map((announcement) => (
+              
+              <AltCard
+                key={announcement.announcement_id}
+                style={styles.announcementContainer}>
+
+                <View style={styles.headerContainer}>
+                  <Text style={styles.headerText}>{announcement.title}</Text>
+                  <AltCard style={styles.roleContainer}>
+                    <Text style={styles.roleText}>{announcement.role_name}</Text>
+                  </AltCard>
+                </View>
+                <Text style={styles.text}>{announcement.description}</Text>
+                <Text style={styles.text}>- {announcement.author}</Text>
+                <Text style={styles.dateText}>
+                  Date: {announcement.date}{"\n"}
+                  Time: {announcement.time}
+                </Text>
+
               </AltCard>
-            </View>
-            <Text style={styles.text}>{announcement.description}</Text>
-            <Text style={styles.text}>- {announcement.author}</Text>
-            <Text style={styles.dateText}>
-              Date: {announcement.date}{"\n"}
-              Time: {announcement.time}
-            </Text>
-          </AltCard>
-        ))}
-        
+
+            ))
+          )}
+
         </DefaultScrollView>
 
       </View>
-      
+
     </Card>
 
   );
@@ -99,6 +106,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
   },  
+  ddContainer: {
+    marginBottom: 5
+  },
   announcementContainer: {
     width: '100%',
     backgroundColor: Colors.lightTan,
@@ -135,6 +145,11 @@ const styles = StyleSheet.create({
   text: {
     color: Colors.black,
     fontSize: 14,
+  },
+  altText: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    color: Colors.gray,
   },
   dateText: {
     color: Colors.gray,

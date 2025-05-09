@@ -6,33 +6,29 @@ import Card from "@/components/Card";
 import AltCard from '@/components/AltCard';
 
 import { getUserShifts } from '@/utils/api/shift';
+import { Shift }  from '@/types/api'
 
 interface Props {
   employee_id: number;
 }
 
-interface Shift {
-  shift_id: number;
-  employee_id: number;
-  date: string;       // MM/DD/YYYY
-  start_time: string; // HH:MM
-  end_time: string;   // HH:MM
-  section_name: string;
-  shiftDateTime?: Date;
-}
-
 const NextShift: React.FC<Props> = ({ employee_id }) => {
   const [shifts, setShifts] = useState<Shift[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
+    const fetchShifts = async () => {
       try {
         const data = await getUserShifts(employee_id);
         setShifts(data);
       } catch (error) {
         console.error('Error fetching user shifts:', error);
+      } finally {
+        setLoading(false);
       }
-    })();
+    };
+
+    fetchShifts();
   }, [employee_id]);
 
   const now = new Date();
@@ -53,12 +49,21 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
       return { ...shift, shiftDateTime };
     })
     .filter((shift) => shift.shiftDateTime && shift.shiftDateTime > now)
-    .sort((a, b) => a.shiftDateTime!.getTime() - b.shiftDateTime!.getTime())[0]; // get soonest shift
+    .sort((a, b) => a.shiftDateTime!.getTime() - b.shiftDateTime!.getTime())[0];
+
+  
+  if (loading) {
+    return (
+      <Card style={styles.container}>
+        <Text style={styles.altText}>Loading next shift...</Text>
+      </Card>
+    );
+  }
 
   if (!nextShift) {
     return (
       <Card style={styles.container}>
-        <Text style={styles.noShiftsText}>No Upcoming Shift...</Text>
+        <Text style={styles.altText}>No Upcoming Shift...</Text>
       </Card>
     );
   }
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.black,
   },
-  noShiftsText: {
+  altText: {
     fontSize: 14,
     fontStyle: 'italic',
     color: Colors.gray,
@@ -110,4 +115,3 @@ const styles = StyleSheet.create({
 });
 
 export default NextShift;
-

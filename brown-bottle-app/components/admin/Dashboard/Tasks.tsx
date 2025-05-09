@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';  // Import Ionicons for the icon
-import AnnouncementsModal from './AnnouncementsModal'; // Import the modal
+import { Ionicons } from '@expo/vector-icons';
+import { User } from '@/utils/SessionContext'; 
+import TasksModal from '@/components/admin/Dashboard/TasksModal';
 
-export default function Announcements() {
+interface TasksProps {
+  user: User;
+}
+
+const Tasks: React.FC<TasksProps> = ({ user }) => {
   const [modalVisible, setModalVisible] = useState(false);
 
   // Function to toggle modal visibility
@@ -13,18 +18,17 @@ export default function Announcements() {
 
   return (
     <View style={styles.container}>
-      {/* This is the clickable content */}
-      <TouchableOpacity onPress={toggleModal} style={styles.content}>
-        {/* Icon and Text */}
-        <Ionicons name="notifications" size={30} color="black" style={styles.icon} />
-        <Text style={styles.title}>Announcement</Text>
-      </TouchableOpacity>
+        {/* Touchable content */}
+        <TouchableOpacity onPress={toggleModal} style={styles.content}>
+        <Ionicons name="create" size={30} color="black" style={styles.icon} />
+        <Text style={styles.title}>Assign Task</Text>
+        </TouchableOpacity>
 
-      {/* Modal component that appears when the content is clicked */}
-      <AnnouncementsModal visible={modalVisible} onClose={toggleModal} />
+        {/* Modal component that appears when the content is clicked */}
+        <TasksModal visible={modalVisible} onClose={toggleModal} user={user} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -51,3 +55,5 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+export default Tasks;

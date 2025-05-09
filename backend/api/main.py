@@ -62,9 +62,9 @@ def get_user_data():
 def insert_task():
     return task.insert_task(get_db_connection(), request)
 
-@app.route('/task/get-user-tasks', methods=['GET'])
-def get_tasks():
-    return task.get_user_tasks(get_db_connection(), request)
+@app.route('/task/get-role-tasks', methods=['GET'])
+def get_role_tasks():
+    return task.get_role_tasks(get_db_connection(), request)
 
 # --------------------------------------------------------
 
@@ -110,14 +110,9 @@ def get_all_roles():
 
 # Section Routes - /section ------------------------------
 
-@app.route('/section/insert-section', methods=['POST'])
-def insert_section():
-    return section.insert_section(get_db_connection(), request)
-
-@app.route('/section/get-user-section', methods=['GET'])
-def get_user_section():
-    return section.get_user_section(get_db_connection(), request)
-
+@app.route('/section/get-all-sections', methods=['GET'])
+def get_all_sections():
+    return section.get_all_sections(get_db_connection(), request)
 
 # --------------------------------------------------------
 

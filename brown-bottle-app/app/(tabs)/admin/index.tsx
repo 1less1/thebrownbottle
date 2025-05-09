@@ -1,15 +1,20 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
+import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
-
 import DefaultView from '@/components/DefaultView';
-import Dashboard from "@/components/admin/Dashboard";
-import Schedule from "@/components/admin/Schedule";
-import Staff from "@/components/admin/Staff";
+import Dashboard from "@/components/admin/Dashboard/Dashboard";
+import Schedule from "@/components/admin/Schedule/Schedule";
+import Staff from "@/components/admin/Staff/Staff";
 
-export default function Admin() {
+// Get Session Data
+import { useSession } from '@/utils/SessionContext';
+
+const Admin = () => {
+  const { user } = useSession();
+  const [activeTab, setActiveTab] = useState(0);
+
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
@@ -18,36 +23,17 @@ export default function Admin() {
     }, [])
   );
 
-  const [activeTab, setActiveTab] = useState(0); // Track active tab index
+  // Define available tabs and corresponding components
   const tabs = [
-    { key: "dashboard", title: "Dash" },
-    { key: "schedule", title: "Schedule" },
-    { key: "staff", title: "Staff" },
+    { key: 'dashboard', title: 'Dashboard', component: user ? <Dashboard user={user} /> : <Text>Loading...</Text> },
+    { key: 'schedule', title: 'Schedule', component: <Schedule/> },
+    { key: 'staff', title: 'Staff', component: <Staff/> },
   ];
 
-  // Function to render the content based on the active tab
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 0:
-        return <Dashboard />;
-      case 1:
-        return <Schedule />;
-      case 2:
-        return <Staff />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    
     <DefaultView backgroundColor={Colors.white}>
-
-
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-
-
-        <View style={{ flex: 1, backgroundColor: Colors.white}}>
+        <View style={{ flex: 1, backgroundColor: Colors.white }}>
           <Text style={styles.header}>Admin</Text>
 
           {/* Tab Bar */}
@@ -67,50 +53,46 @@ export default function Admin() {
           </View>
 
           {/* Render content based on selected tab */}
-          <View style={styles.tabContent}>{renderTabContent()}</View>
-
+          <View style={styles.tabContent}>
+            {tabs[activeTab]?.component} {/* Render the component of the active tab */}
+          </View>
         </View>
-
       </View>
-      
-
     </DefaultView>
-
-    
-    
   );
-}
+};
 
 const styles = StyleSheet.create({
   header: {
     fontSize: 36,
-    fontWeight: "bold",
-    color: "black",
+    fontWeight: 'bold',
+    color: 'black',
     marginLeft: 20,
     marginTop: 40,
-    marginBottom:20,
+    marginBottom: 20,
   },
   tabBar: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderBottomWidth: 0.5,
-    borderBottomColor: "gray",
+    borderBottomColor: 'gray',
   },
   tabButton: {
     flex: 1,
     padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   activeTabButton: {
     borderBottomWidth: 1,
-    borderBottomColor: "black", 
+    borderBottomColor: 'black',
   },
   tabText: {
     fontSize: 14,
-    color: "black",
+    color: 'black',
   },
   tabContent: {
     flex: 1,
   },
 });
 
+export default Admin;

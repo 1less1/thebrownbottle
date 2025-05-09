@@ -8,7 +8,6 @@ import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
-import ClockInWidget from '@/components/home/ClockInWidget';
 import NextShift from '@/components/home/NextShift';
 
 import Card from '@/components/Card';
@@ -27,7 +26,7 @@ export default function HomeScreen() {
   );
 
   // Get session data
-  const { setUser, user} = useSession();
+  const { user } = useSession();
 
   return (
 

@@ -6,12 +6,12 @@ import request_helper
 # Just need to tweak the insert_announcement!!!
 def insert_announcement(db, request):
     try:
-        required_fields = ['title', 'description', 'author_id']
+        required_fields = ['title', 'description', 'author_id', 'role_id']
         field_types = {
             'title': str,
             'description': str,
             'author_id': int,
-            'role_id': int # role_id is optional since it is NOT included in required_fields list
+            'role_id': int
         }
 
         # Validate the fields in JSON body
@@ -23,21 +23,15 @@ def insert_announcement(db, request):
         title = fields['title']
         description = fields['description']
         author_id = fields['author_id']
-        role_id = fields.get('role_id')  # Will be None if not provided
+        role_id = fields['role_id']
 
         conn = db
         cursor = conn.cursor()
 
-        if role_id is not None: # Handles case WITH assigned role for the announcement
-            cursor.execute("""
-                INSERT INTO announcement (title, description, author_id, role_id)
-                VALUES (%s, %s, %s, %s);
-            """, (title, description, author_id, role_id))
-        else: # Handles case WITHOUT assigned role for the 
-            cursor.execute("""
-                INSERT INTO announcement (title, description, author_id)
-                VALUES (%s, %s, %s);
-            """, (title, description, author_id))
+        cursor.execute("""
+            INSERT INTO announcement (title, description, author_id, role_id)
+            VALUES (%s, %s, %s, %s);
+        """, (title, description, author_id, role_id))
 
         conn.commit()
         cursor.close()

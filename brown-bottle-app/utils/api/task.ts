@@ -2,8 +2,8 @@
 
 import Constants from 'expo-constants';
 
-// Inserts a task into the database with a POST Request
-export async function insertTask(title: string, description: string, author_id: number, assignee_id: number, due_date: string) {
+// Inserts a task into the database with a POST Request - **Wprks**
+export async function insertTask(author_id: number, title: string, description: string, section_id: number, due_date: string) {
   
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -11,21 +11,20 @@ export async function insertTask(title: string, description: string, author_id: 
   const baseURL = API_BASE_URL;
 
   try {
-    // Data you want to send in the request body
     const taskData = {
       title,
       description,
       author_id,   
-      assignee_id,      
+      section_id,      
       due_date,
     };
 
     const response = await fetch(`${baseURL}/task/insert-task`, {
-      method: "POST", // Using POST to send data
+      method: "POST",
       headers: {
-        "Content-Type": "application/json", // Ensure the backend understands the content type
+        "Content-Type": "application/json", 
       },
-      body: JSON.stringify(taskData), // Send the task data in the request body as JSON
+      body: JSON.stringify(taskData),
     });
 
     if (!response.ok) {
@@ -33,19 +32,19 @@ export async function insertTask(title: string, description: string, author_id: 
     }
 
     const data = await response.json();
-    console.log(data); // Log the response data (including task_id)
-    return data; // This will be the JSON response from Flask, containing the task ID
+    
+    return data;
 
   } catch (error) {
     console.error("Failed to insert task:", error);
-    throw error; // Optional: Rethrow the error if you want to handle it elsewhere
+    throw error;
   }
 
 }
   
 
-// Gets a particular user's tasks with a GET Request
-export async function getUserTasks(assignee_id: number) {
+// Gets a particular section's tasks with a GET Request 
+export async function getSectionTasks(section_id: number) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -53,8 +52,8 @@ export async function getUserTasks(assignee_id: number) {
   const baseURL = API_BASE_URL;
 
   try {
-    // Sending the assignee_id as a query parameter in the URL
-    const response = await fetch(`${baseURL}/task/get-user-tasks?assignee_id=${assignee_id}`, {
+    // Sending the section_id as a query parameter in the URL
+    const response = await fetch(`${baseURL}/task/get-user-tasks?section_id=${section_id}`, {
       method: "GET", // GET is appropriate for fetching data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type

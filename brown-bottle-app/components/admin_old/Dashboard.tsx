@@ -2,11 +2,16 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '@/components/Card';
 import { Colors } from '@/constants/Colors';
-import Announcements from './features/Announcements';
+import Announcements from '@/components/admin_old/features/Announcements';
 import TimeOff from './features/TimeOff';
 import AssignTasks from './features/AssignTasks';
+import { User } from '@/utils/SessionContext'; // Import User type from SessionContext
 
-export default function Dashboard() {
+interface DashboardProps {
+  user: User; // Make sure to define `User` type properly, based on your session data structure
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   return (
     <DefaultScrollView>
       
@@ -14,7 +19,7 @@ export default function Dashboard() {
 
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
-            < Announcements />
+            <Announcements user={user}/>
           </Card>
 
           <Card style={styles.card}>
