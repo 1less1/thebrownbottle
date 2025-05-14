@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Using Ionicons for the checkbox
-import Card from '@/components/Card';
-import AltCard from '@/components/AltCard';
+import Card from '@/components/modular/Card';
+import AltCard from '@/components/modular/AltCard';
 import { Colors } from '@/constants/Colors';
 
 interface CheckBoxCardProps {

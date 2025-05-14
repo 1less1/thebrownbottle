@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import dayjs from 'dayjs';
 
 import { Colors } from '@/constants/Colors';
+import { Ionicons } from '@expo/vector-icons';
 import SectionDropdown from '@/components/SectionDropdown';
 import { User } from '@/utils/SessionContext'; // Import type: User
 import { insertTask } from '@/utils/api/task';
+import HorizontalCheckboxList from '@/components/modular/HorizontalCheckboxList';
+import ModularModal from '@/components/modular/ModularModal';
 
 // Helper function to validate date format (YYYY-MM-DD)
 const isValidDate = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -18,30 +22,44 @@ interface TasksModalProps {
 
 const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [due_date, setDueDate] = useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
+  
+  const [isRecurring, setIsRecurring] = useState(false);
+
+  const dayMappings = {
+    Mon: 'Monday',
+    Tue: 'Tuesday',
+    Wed: 'Wednesday',
+    Thu: 'Thursday',
+    Fri: 'Friday',
+    Sat: 'Saturday',
+    Sun: 'Sunday',
+  };
+
+  const [recurrence_days, setRecurrenceDays] = useState<string[]>([]);
 
   const handleAssign = async () => {
     // Check if all fields are filled and validate date format
-    if (!title.trim() || !description.trim() || !due_date.trim() || selectedRoleId === -1) {
-      alert("Please fill in Title, Description, and Due Date!");
-      return;
+    if (!title.trim() || !description.trim() || !due_date.trim() || selectedSectionId === -1) {
+        alert("Please fill in Title, Description, and Due Date!");
+        return;
     }
 
     if (!isValidDate(due_date)) {
-      alert("Please enter the date in YYYY-MM-DD format.");
-      return;
+        alert("Please enter the date in YYYY-MM-DD format.");
+        return;
     }
 
     try {
       await insertTask(
-        Number(user.user_id),
-        title,
-        description,
-        selectedRoleId,
-        due_date
+      Number(user.user_id),
+      title,
+      description,
+      selectedSectionId,
+      due_date
       );
       alert("Task Posted Successfully!");
 
@@ -49,103 +67,85 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       setTitle('');
       setDescription('');
       setDueDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-      setSelectedRoleId(1);
+      setSelectedSectionId(1);
 
       onClose();
     } catch (error) {
       console.error("Error posting task:", error);
       alert("Error: Failed to assign task. Please try again.");
     }
-  };
+    };
 
-  const handleClose = () => {
-    setTitle('');
-    setDescription('');
-    setDueDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-    setSelectedRoleId(1);
-    onClose();
-  };
+    const handleClose = () => {
+      setTitle('');
+      setDescription('');
+      setDueDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
+      setSelectedSectionId(1);
+      onClose();
+    };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      transparent
-      onRequestClose={onClose}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>New Task</Text>
 
-          <TextInput
-            placeholder="Title"
-            value={title}
-            onChangeText={setTitle}
-            style={styles.input}
+    <ModularModal visible={visible} onClose={onClose}>
+
+      <Text style={styles.modalTitle}>New Task</Text>
+      
+      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={styles.input} />
+      
+      <TextInput
+        placeholder="Description"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        numberOfLines={4}
+        style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+      />
+      
+      <TextInput placeholder="Due Date" value={due_date} onChangeText={setDueDate} style={styles.input} />
+      <Text style={{ fontSize: 12, color: 'gray', marginBottom: 5 }}>Example: YYYY-MM-DD</Text>
+
+      <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={setSelectedSectionId} labelText="Assign To:" />
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+        <Pressable onPress={() => setIsRecurring(!isRecurring)} style={{ marginRight: 10 }}>
+          <Ionicons
+            name={isRecurring ? 'checkbox' : 'square-outline'}
+            size={24}
+            color={isRecurring ? Colors.selectedBox : Colors.unselectedBox}
           />
-
-          <TextInput
-            placeholder="Description"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-          />
-
-          {/* Due Date Input */}
-          <TextInput
-            placeholder="Due Date"
-            value={due_date}
-            onChangeText={setDueDate}
-            style={styles.input}
-          />
-          <Text style={{ fontSize: 12, color: 'gray', marginBottom: 10 }}>
-            Example: YYYY-MM-DD
-          </Text>
-
-          <View style={styles.ddContainer}>
-            <SectionDropdown
-              selectedRoleId={selectedRoleId}
-              onRoleSelect={setSelectedRoleId}
-              labelText="Assign To:"
-            />
-          </View>
-
-          <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.button} onPress={handleAssign}>
-              <Text style={styles.buttonText}>Assign</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.button, styles.cancelButton]}
-              onPress={handleClose}
-            >
-              <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        </Pressable>
+        <Text style={{ fontSize: 16 }}>Recurring Task</Text>
       </View>
-    </Modal>
+
+      {isRecurring && (
+        <View style={{ marginVertical: 5}}>
+          <HorizontalCheckboxList
+            labelText="Select Days:"
+            optionMap={dayMappings}
+            onChange={(recurrenceDays) => setRecurrenceDays(recurrenceDays)}
+          />
+        </View>
+      )}
+
+      <View style={styles.buttonRowContainer}>
+        <TouchableOpacity style={styles.button} onPress={handleAssign}>
+          <Text style={styles.buttonText}>Assign</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleClose}>
+          <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+
+      
+
+    </ModularModal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   ddContainer: {
     marginBottom: 5,
-  },
-  modalContainer: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    elevation: 10,
   },
   modalTitle: {
     fontSize: 20,
@@ -155,29 +155,29 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: Colors.borderColor,
     borderRadius: 6,
     padding: 10,
     fontSize: 16,
     marginBottom: 15,
-    backgroundColor: '#fafafa',
+    backgroundColor: Colors.inputBG,
   },
-  buttonRow: {
+  buttonRowContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: Colors.buttonBG,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 6,
   },
   cancelButton: {
-    backgroundColor: '#eee',
+    backgroundColor: Colors.cancelButtonBG,
   },
   buttonText: {
-    color: '#fff',
+    color: Colors.white,
     fontWeight: 'bold',
   },
 });

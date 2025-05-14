@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { View, Text } from 'react-native';
-import Card from '@/components/Card';
+import Card from '@/components/modular/Card';
 import { Ionicons } from '@expo/vector-icons';  
 
 export default function TimeOff() {

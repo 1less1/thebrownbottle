@@ -25,7 +25,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: 'white', // Static background color -> White
           borderTopWidth: 0.5,
-          borderColor: Colors.borderColor, // Border color
+          borderColor: Colors.altBorderColor, // Border color
           elevation: 5, // Shadow for Android
           shadowOpacity: 0.1, // Shadow for iOS
           shadowRadius: 3,

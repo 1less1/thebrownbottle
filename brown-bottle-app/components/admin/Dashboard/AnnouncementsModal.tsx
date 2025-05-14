@@ -5,7 +5,11 @@ import { Colors } from '@/constants/Colors';
 import RoleDropdown from '@/components/RoleDropdown';
 import { User } from '@/utils/SessionContext'; // Import type: User
 
+import ModularButton from '@/components/modular/ModularButton';
+
 import { insertAnnouncement } from '@/utils/api/announcement';
+import ModularModal from '@/components/modular/ModularModal';
+
 
 interface AnnouncementModalProps {
   visible: boolean;
@@ -15,117 +19,93 @@ interface AnnouncementModalProps {
 
 const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose, user }) => {
 
-    const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
 
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
 
-    const handlePost = async () => {
-        if (!title.trim() || !description.trim() || selectedRoleId === -1) {
-            alert("Please fill in both Title and Description!");
-            return;
-        }
+  const handlePost = async () => {
+    if (!title.trim() || !description.trim() || selectedRoleId === -1) {
+        alert("Please fill in both Title and Description!");
+        return;
+    }
 
-        try {
-            await insertAnnouncement(
-            Number(user.user_id),
-            title,
-            description,
-            selectedRoleId
-            );
-            alert("Announcement Posted Successfully!")
+    try {
+        await insertAnnouncement(
+        Number(user.user_id),
+        title,
+        description,
+        selectedRoleId
+        );
+        alert("Announcement Posted Successfully!")
 
-            // Clear Form
-            setTitle('');
-            setDescription('');
-            setSelectedRoleId(1);
-
-            onClose();
-        } catch (error) {
-            console.error("Error posting announcement:", error);
-            alert("Error: Failed to post announcement. Please try again.");
-        }
-    };
-
-    const handleClose = () => {
+        // Clear Form
         setTitle('');
         setDescription('');
         setSelectedRoleId(1);
+
         onClose();
-    };
+    } catch (error) {
+        console.error("Error posting announcement:", error);
+        alert("Error: Failed to post announcement. Please try again.");
+    }
+  };
 
-    return (
-        
-        <Modal
-        visible={visible}
-        animationType="fade"
-        transparent
-        onRequestClose={onClose}>
+  const handleClose = () => {
+      setTitle('');
+      setDescription('');
+      setSelectedRoleId(1);
+      onClose();
+  };
 
-            <View style={styles.overlay}>
-                
-                <View style={styles.modalContainer}>
-                    <Text style={styles.modalTitle}>New Announcement</Text>
+  return (
+    
+    <ModularModal visible={visible} onClose={onClose}>
 
-                    <TextInput
-                        placeholder="Title"
-                        value={title}
-                        onChangeText={setTitle}
-                        style={styles.input}
-                    />
+      <Text style={styles.modalTitle}>New Announcement</Text>
 
-                    <TextInput
-                        placeholder="Description"
-                        value={description}
-                        onChangeText={setDescription}
-                        multiline
-                        numberOfLines={4}
-                        style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-                    />
+      <TextInput
+          placeholder="Title"
+          value={title}
+          onChangeText={setTitle}
+          style={styles.input}
+      />
 
-                    <View style={styles.ddContainer}>
-                        <RoleDropdown
-                        selectedRoleId={selectedRoleId}
-                        onRoleSelect={setSelectedRoleId}
-                        labelText="Assign To:"
-                        />
-                    </View>
+      <TextInput
+          placeholder="Description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          numberOfLines={4}
+          style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+      />
 
-                    <View style={styles.buttonRow}>
-                        <TouchableOpacity style={styles.button} onPress={handlePost}>
-                        <Text style={styles.buttonText}>Post</Text>
-                        </TouchableOpacity>
+      <View style={styles.ddContainer}>
+          <RoleDropdown
+          selectedRoleId={selectedRoleId}
+          onRoleSelect={setSelectedRoleId}
+          labelText="Assign To:"
+          />
+      </View>
 
-                        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleClose}>
-                        <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+      <View style={styles.buttonRowContainer }>
+          <TouchableOpacity style={styles.button} onPress={handlePost}>
+          <Text style={styles.buttonText}>Post</Text>
+          </TouchableOpacity>
 
-            </View>
+          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleClose}>
+          <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
+          </TouchableOpacity>
+      </View>
 
-        </Modal>
-
-    );
+    </ModularModal>
+  );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   ddContainer: {
-    marginBottom: 5
-  },
-  modalContainer: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    elevation: 10,
+    marginBottom: 5,
   },
   modalTitle: {
     fontSize: 20,
@@ -135,29 +115,29 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: Colors.borderColor,
     borderRadius: 6,
     padding: 10,
     fontSize: 16,
     marginBottom: 15,
-    backgroundColor: '#fafafa',
+    backgroundColor: Colors.inputBG,
   },
-  buttonRow: {
+  buttonRowContainer : {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: Colors.buttonBG,
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 6,
   },
   cancelButton: {
-    backgroundColor: '#eee',
+    backgroundColor: Colors.cancelButtonBG,
   },
   buttonText: {
-    color: '#fff',
+    color: Colors.white,
     fontWeight: 'bold',
   },
 });

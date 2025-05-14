@@ -3,21 +3,26 @@ import { useEffect, useState } from 'react';
 import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 
-import Card from "@/components/Card";
-import AltCard from '@/components/AltCard';
+import Card from "@/components/modular/Card";
+import AltCard from '@/components/modular/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/RoleDropdown';
 
 import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
 import { Announcement } from '@/types/api';
+import ModularButton from '../modular/ModularButton';
+import ModularModal from '../modular/ModularModal';
+import LoadingCard from '../modular/LoadingCard';
 
 const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
-  const [loading, setLoading] = useState(true);
   
-    useEffect(() => {
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
     const fetchAnnouncements = async () => {
       setLoading(true);
 
@@ -40,25 +45,39 @@ const Announcements = () => {
     };
 
     fetchAnnouncements();
-  }, [selectedRoleId]); 
+  }, [selectedRoleId]); // Only trigger the fetch when the role ID changes
 
   return (
+    
     <Card style={styles.container}>
       
       <View style={styles.scrollContainer}>
-        
-        <View style={styles.ddContainer}>
+
+        <ModularButton 
+          text="Filter" 
+          onPress={() => setModalVisible(true)}
+          style={{marginVertical: 5}} 
+        />
+
+       <ModularModal visible={modalVisible} onClose={() => setModalVisible(false)}>
           <RoleDropdown
             selectedRoleId={selectedRoleId}
-            onRoleSelect={setSelectedRoleId}
+            onRoleSelect={setSelectedRoleId} // Only update role on dropdown selection
           />
-        </View>
+          <ModularButton 
+            text="Close" 
+            onPress={() => setModalVisible(false)} // Close modal without triggering fetch
+            style={{ marginVertical: 5 }}
+          />
+        </ModularModal>
 
         <DefaultScrollView>
 
           {loading ? (
-            <Text style={styles.altText}>Loading announcements...</Text>
-          
+            <LoadingCard
+              loadingText="Loading Announcements..."
+              containerStyle={{ height: 400 }}
+            />
           ) : (
             
             announcements.map((announcement) => (
@@ -102,10 +121,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   scrollContainer: {
-    maxHeight: 400,
+    height: 400,
     width: '100%',
     flexDirection: 'column',
-  },  
+    justifyContent: 'flex-start',
+  },
   ddContainer: {
     marginBottom: 5
   },
@@ -145,11 +165,6 @@ const styles = StyleSheet.create({
   text: {
     color: Colors.black,
     fontSize: 14,
-  },
-  altText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: Colors.gray,
   },
   dateText: {
     color: Colors.gray,

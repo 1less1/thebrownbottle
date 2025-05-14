@@ -9,12 +9,12 @@ import { Section } from '@/types/api'
 
 
 interface SectionDropdownProps {
-    selectedRoleId: number;
-    onRoleSelect: (roleId: number) => void; 
+    selectedSectionId: number;
+    onSectionSelect: (sectionId: number) => void; 
     labelText?: string; // Optional Prop
 }
 
-const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedRoleId, onRoleSelect, labelText = "Filter:" }) => {
+const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, onSectionSelect, labelText = "Filter:" }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +34,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedRoleId, onRol
   }, []);
 
   if (loading) {
-    return <Text style={styles.altText}>Loading sections...</Text>;
+    return <Text style={styles.loadingText}>Loading sections...</Text>;
   }
 
   return (
@@ -42,8 +42,14 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedRoleId, onRol
     <View style={styles.container}>
 
       <Text style={styles.label}>{labelText}</Text>
+      
       <Picker
-          onValueChange={(value: number) => onRoleSelect(value)}
+        selectedValue={selectedSectionId}
+          onValueChange={(value: number) => {
+            if (value !== selectedSectionId) {
+              onSectionSelect(value);
+            }
+          }}
           style={styles.picker}
           >
           {sections.map((section) => (
@@ -63,17 +69,18 @@ const styles = StyleSheet.create({
       alignContent: 'center'
   },
   label: {
-      fontSize: 16,
-      marginRight: 5,
+    fontSize: 16,
+    marginRight: 5,
   },
   picker: {
-      flexGrow: 1,
-      padding: 5,
+    flexGrow: 1,
+    padding: 5,
   },
-  altText: {
+  loadingText: {
     fontSize: 14,
     fontStyle: 'italic',
     color: Colors.gray,
+    alignSelf: 'center',
   },
 });
 

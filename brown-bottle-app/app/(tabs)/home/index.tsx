@@ -10,8 +10,8 @@ import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
 
-import Card from '@/components/Card';
-import AltCard from '@/components/AltCard';
+import Card from '@/components/modular/Card';
+import AltCard from '@/components/modular/AltCard';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';

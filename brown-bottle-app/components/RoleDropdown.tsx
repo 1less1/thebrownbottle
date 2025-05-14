@@ -33,23 +33,29 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
   }, []);
 
   if (loading) {
-    return <Text style={styles.altText}>Loading roles...</Text>;
+    return <Text style={styles.loadingText}>Loading roles...</Text>;
   }
 
   return (
 
     <View style={styles.container}>
-
+      
       <Text style={styles.label}>{labelText}</Text>
-      <Picker
-          onValueChange={(value: number) => onRoleSelect(value)}
+      
+        <Picker
+          selectedValue={selectedRoleId}
+          onValueChange={(value: number) => {
+            if (value !== selectedRoleId) {
+              onRoleSelect(value);
+            }
+          }}
           style={styles.picker}
-          >
+        >
           {roles.map((role) => (
-          <Picker.Item key={role.role_id} label={role.role_name} value={role.role_id} />
+            <Picker.Item key={role.role_id} label={role.role_name} value={role.role_id} />
           ))}
-      </Picker>
-
+        </Picker>
+      
     </View>
 
   );
@@ -57,22 +63,23 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
 
 const styles = StyleSheet.create({
   container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      alignContent: 'center'
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignContent: 'center'
   },
   label: {
-      fontSize: 16,
-      marginRight: 5,
+    fontSize: 16,
+    marginRight: 5,
   },
   picker: {
-      flexGrow: 1,
-      padding: 5,
+    flexGrow: 1,
+    padding: 5,
   },
-  altText: {
+  loadingText: {
     fontSize: 14,
     fontStyle: 'italic',
     color: Colors.gray,
+    alignSelf: 'center',
   },
 });
 

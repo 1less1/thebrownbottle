@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 
-import Card from "@/components/Card";
-import AltCard from '@/components/AltCard';
+import Card from "@/components/modular/Card";
+import AltCard from '@/components/modular/AltCard';
 
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';

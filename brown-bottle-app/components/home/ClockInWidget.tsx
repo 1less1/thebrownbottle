@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
 
-import Card from "@/components/Card";
+import Card from "@/components/modular/Card";
 
 const ClockInWidget = () => {
 

@@ -4,9 +4,8 @@ SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
--- -----------------------------------------------------
--- Schema thebrownbottle
--- -----------------------------------------------------
+-- Enable the event scheduler
+SET GLOBAL event_scheduler = ON;
 
 -- -----------------------------------------------------
 -- Schema thebrownbottle
@@ -85,9 +84,11 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `section_id` INT UNSIGNED NOT NULL,
   `due_date` DATE NOT NULL,
   `complete` TINYINT(1) NOT NULL DEFAULT 0,  -- 0 = false, 1 = true
+  `recurring_task_id` INT UNSIGNED DEFAULT NULL,  -- Foreign key to the recurring_task table, nullable for non-recurring tasks
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`task_id`),
-  INDEX `fk_task_author_idx` (`author_id`),
+  INDEX `fk_task_author_idx` (`author_id`), -- Indexes improves query performance
+  INDEX `fk_task_recurring_task_idx` (`recurring_task_id`), -- Indexes improves query performance
   CONSTRAINT `fk_task_author`
     FOREIGN KEY (`author_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
@@ -97,10 +98,45 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
     FOREIGN KEY (`section_id`)
     REFERENCES `thebrownbottle`.`section` (`section_id`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_task_recurring_task`
+    FOREIGN KEY (`recurring_task_id`)
+    REFERENCES `thebrownbottle`.`recurring_task` (`task_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`recurring_task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
+  `task_id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(250) NOT NULL,
+  `description` VARCHAR(250) NOT NULL,
+  `author_id` INT UNSIGNED NOT NULL,
+  `section_id` INT UNSIGNED NOT NULL,
+  `recurrence_day` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NULL, -- Day of the week for weekly recurrence
+  `start_date` DATE NOT NULL,  -- The start date for the task
+  `end_date` DATE NULL,  -- Optional: the end date for recurring tasks
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`task_id`),
+  INDEX `fk_recurring_task_author_idx` (`author_id`), -- Indexes improves query performance
+  CONSTRAINT `fk_recurring_task_author`
+    FOREIGN KEY (`author_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_recurring_task_section`
+    FOREIGN KEY (`section_id`)
+    REFERENCES `thebrownbottle`.`section` (`section_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`announcement`

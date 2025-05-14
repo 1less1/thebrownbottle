@@ -6,7 +6,7 @@ export const Colors = {
     text: '#11181C',
     background: '#FBF7F7',
     tint: tintColorLight,
-    icon: '#687076', // for the chevron icon, can be deleted later
+    icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
   },
@@ -27,8 +27,17 @@ export const Colors = {
   brown: '#7C580D',
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
-  borderColor: '#D4CABE',
+
+  /* Component Colors */
+  borderColor: '#ccc',
+  altBorderColor: '#D4CABE',
+  inputBG: '#fafafa',
   tabBG: '#FDFBFB',
+  buttonBG: '#000',
+  cancelButtonBG: '#eee',
+  selectedBoxBG: '#e6f0ff',
+  selectedBox: '#2e86de',
+  unselectedBox: '#666',
   
   /* General Colors */
   black: '#000000',

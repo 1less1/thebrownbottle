@@ -6,10 +6,10 @@ import { Ionicons } from '@expo/vector-icons';
 
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import Card from '@/components/Card';
+import Card from '@/components/modular/Card';
 import CircularImage from '@/components/CircularImage';
 
-import HandleLogout from '@/components/HandleLogout';
+import HandleLogout from '@/components/auth/HandleLogout';
 
 
 export default function Profile() {
@@ -28,9 +28,10 @@ export default function Profile() {
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor }}>
+        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
             <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
               {/* No Text Here - Keeps Same Spacing for Top Bar as other Screens! */}
+              Profile
             </Text>
         </View>
 

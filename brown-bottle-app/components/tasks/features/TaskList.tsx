@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, View } from 'react-native';
-import Card from "@/components/Card";
+import Card from "@/components/modular/Card";
 import { Colors } from '@/constants/Colors'; 
 
 import CheckBoxCard from '@/components/tasks/features/CheckBoxCard';

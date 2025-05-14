@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
-import Card from '@/components/Card';
+import Card from '@/components/modular/Card';
 import {Colors} from '@/constants/Colors';
 
 // Define the structure of shift details

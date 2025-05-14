@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
-import AltCard from '@/components/AltCard';
+import AltCard from '@/components/modular/AltCard';
 
 interface CalendarModalProps {
   visible: boolean,

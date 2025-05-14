@@ -2,8 +2,9 @@
 
 import Constants from 'expo-constants';
 
-// Inserts a task into the database with a POST Request - **Wprks**
-export async function insertTask(author_id: number, title: string, description: string, section_id: number, due_date: string) {
+// Inserts a task into the database with a POST Request - **Works**
+export async function insertTask(author_id: number, title: string, description: string, 
+  section_id: number, due_date: string) {
   
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -19,7 +20,51 @@ export async function insertTask(author_id: number, title: string, description: 
       due_date,
     };
 
-    const response = await fetch(`${baseURL}/task/insert-task`, {
+    const response = await fetch(`${baseURL}/task/new-task`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+      body: JSON.stringify(taskData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to insert task:", error);
+    throw error;
+  }
+
+}
+
+
+// Inserts a recurring task into the database with a POST Request
+export async function insertrecurringask(author_id: number, title: string, description: string, 
+  section_id: number, recurrence_day: string, start_date: string, end_date: string) {
+  
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    const taskData = {
+      title,
+      description,
+      author_id,   
+      section_id,      
+      recurrence_day,
+      start_date,
+      end_date
+    };
+
+    const response = await fetch(`${baseURL}/task/new-task`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json", 

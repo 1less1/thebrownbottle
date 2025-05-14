@@ -8,7 +8,7 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 
-import HandleLogin from '@/components/HandleLogin'
+import HandleLogin from '@/components/auth/HandleLogin'
 
 const styles = StyleSheet.create({
   button: {

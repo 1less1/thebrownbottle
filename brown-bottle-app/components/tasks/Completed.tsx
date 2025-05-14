@@ -1,7 +1,7 @@
 import {View, Text, StyleSheet} from 'react-native';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import { Colors } from '@/constants/Colors';
-import Card from "@/components/Card";
+import Card from "@/components/modular/Card";
 
 export default function Completed() {
 

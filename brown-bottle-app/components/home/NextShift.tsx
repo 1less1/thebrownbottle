@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
-import Card from "@/components/Card";
-import AltCard from '@/components/AltCard';
+import Card from "@/components/modular/Card";
+import AltCard from '@/components/modular/AltCard';
 
 import { getUserShifts } from '@/utils/api/shift';
 import { Shift }  from '@/types/api'

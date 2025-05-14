@@ -31,9 +31,12 @@ const Admin = () => {
   ];
 
   return (
-    <DefaultView backgroundColor={Colors.white}>
+
+    <DefaultView>
+      
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-        <View style={{ flex: 1, backgroundColor: Colors.white }}>
+        
+        <View style={{backgroundColor: Colors.white }}>
           <Text style={styles.header}>Admin</Text>
 
           {/* Tab Bar */}
@@ -51,14 +54,17 @@ const Admin = () => {
               </TouchableOpacity>
             ))}
           </View>
-
-          {/* Render content based on selected tab */}
-          <View style={styles.tabContent}>
-            {tabs[activeTab]?.component} {/* Render the component of the active tab */}
-          </View>
         </View>
+
+        {/* Render content based on selected tab */}
+        <View style={styles.tabContent}>
+          {tabs[activeTab]?.component} {/* Render the component of the active tab */}
+        </View>
+
       </View>
+      
     </DefaultView>
+
   );
 };
 
@@ -87,7 +93,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'black',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 16,
     color: 'black',
   },
   tabContent: {

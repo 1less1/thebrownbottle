@@ -5,11 +5,11 @@ import request_helper
 
 def get_all_sections(db, requests):
     try:
-        
+
         conn = db
         cursor = conn.cursor()
 
-        # SQL Script - Selects announcements from the last 14 days (2 weeks)
+        # SQL Script - Selects all sections
         cursor.execute("""
             SELECT * FROM section;
         """)

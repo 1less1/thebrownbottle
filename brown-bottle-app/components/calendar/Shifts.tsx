@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
-import Card from "@/components/Card";
-import AltCard from '../AltCard';
+import Card from "@/components/modular/Card";
+import AltCard from '../modular/AltCard';
 
 import { ShiftData } from '@/types/shift';
 

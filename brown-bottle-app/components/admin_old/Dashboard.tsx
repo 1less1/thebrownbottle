@@ -1,6 +1,6 @@
 import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
-import Card from '@/components/Card';
+import Card from '@/components/modular/Card';
 import { Colors } from '@/constants/Colors';
 import Announcements from '@/components/admin_old/features/Announcements';
 import TimeOff from './features/TimeOff';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Text, StyleSheet, TextInput, View, FlatList } from 'react-native';
-import AltCard from '@/components/AltCard';
+import AltCard from '@/components/modular/AltCard';
 import { Colors } from '@/constants/Colors';
 
 // Sample employee shift data

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import TimeOffModal from './TimeOffModal'; // Adjust the path if needed
 import { Colors } from '@/constants/Colors'; 
-import Card from '@/components/Card'; 
+import Card from '@/components/modular/Card'; 
 
 const TimeOff = () => {
   const [modalVisible, setModalVisible] = useState(false);

@@ -1,6 +1,6 @@
 import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
-import Card from '@/components/Card';
+import Card from '@/components/modular/Card';
 import { Colors } from '@/constants/Colors';
 import { User } from '@/utils/SessionContext'; // Import User type from SessionContext
 import Announcements from '@/components/admin/Dashboard/Announcements';
@@ -12,9 +12,9 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   return (
-    <DefaultScrollView>
+    <DefaultScrollView >
       
-      <View style={{ marginTop: 10, width: '85%' }}>
+      <View style={{ marginTop: 10, width: '85%'}}>
 
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
@@ -24,13 +24,20 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           <Card style={styles.card}>
             <Tasks user={user} />
           </Card>
+
         </View>
       </View>
 
     <View style={{ marginTop: 10, width: '85%' }}>
-    <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: 'bold' }}>
-     Time Off Requests
+
+    <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: '500', marginVertical: 5, }}>
+      Announcement Feed - Will be able to edit and delete announcments here
     </Text>
+
+    <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: '500', marginVertical: 5, }}>
+      Task Feed - Will be able to edit and delete announcements here
+    </Text>
+
 
     </View>
 
@@ -41,13 +48,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row', // Align cards side by side
-    justifyContent: 'space-between', // Distribute space evenly between cards
-    flexWrap: 'wrap', // Allow wrapping if the screen is small
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
     paddingBottom: 25,
     paddingTop: 10,
   },
   card: {
-    width: '48%', // Cards take up 48% of the width, leaving 2% for spacing
+    width: '48%',
     backgroundColor: Colors.white,
     alignItems: 'center',
     paddingVertical: 5,
