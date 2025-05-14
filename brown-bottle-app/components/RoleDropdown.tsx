@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+
 import { Colors } from '@/constants/Colors'; 
+import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getAllRoles } from "@/utils/api/role";
 import { Role } from '@/types/api'
@@ -16,6 +18,7 @@ interface RoleDropdownProps {
 const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelect, labelText = "Filter:" }) => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false); 
 
   useEffect(() => {
     const fetchRoles = async () => {
@@ -24,7 +27,9 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
         setRoles(data);
       } catch (error) {
         console.error("Error fetching roles:", error);
+        setError(true);
       } finally {
+        console.log("Successfully fetched roles!")
         setLoading(false);
       }
     };
@@ -33,7 +38,11 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
   }, []);
 
   if (loading) {
-    return <Text style={styles.loadingText}>Loading roles...</Text>;
+    return <Text style={GlobalStyles.loadingText}>Loading roles...</Text>;
+  }
+
+  if (error) {
+    return <Text style={GlobalStyles.errorText}>Unable to fetch roles!</Text>;
   }
 
   return (
@@ -74,12 +83,6 @@ const styles = StyleSheet.create({
   picker: {
     flexGrow: 1,
     padding: 5,
-  },
-  loadingText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: Colors.gray,
-    alignSelf: 'center',
   },
 });
 

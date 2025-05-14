@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
 import { User } from '@/utils/SessionContext'; 
 import TasksModal from '@/components/admin/Dashboard/TasksModal';
 
@@ -21,7 +25,7 @@ const Tasks: React.FC<TasksProps> = ({ user }) => {
         {/* Touchable content */}
         <TouchableOpacity onPress={toggleModal} style={styles.content}>
         <Ionicons name="create" size={30} color="black" style={styles.icon} />
-        <Text style={styles.title}>Assign Task</Text>
+        <Text style={GlobalStyles.boldText}>Assign Task</Text>
         </TouchableOpacity>
 
         {/* Modal component that appears when the content is clicked */}
@@ -48,11 +52,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginBottom: 8, 
-  },
-  title: {
-    fontSize: 14,  
-    fontWeight: 'bold',
-    color: 'black',
   },
 });
 

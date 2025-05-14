@@ -2,6 +2,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
 import Card from '@/components/modular/Card';
 import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { User } from '@/utils/SessionContext'; // Import User type from SessionContext
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
@@ -11,7 +12,9 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+  
   return (
+
     <DefaultScrollView >
       
       <View style={{ marginTop: 10, width: '85%'}}>
@@ -28,26 +31,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </View>
       </View>
 
-    <View style={{ marginTop: 10, width: '85%' }}>
+      <View style={{ marginTop: 10, width: '85%' }}>
 
-    <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: '500', marginVertical: 5, }}>
-      Announcement Feed - Will be able to edit and delete announcments here
-    </Text>
+        <Text style={GlobalStyles.floatingHeaderText}>
+          Announcement Feed - Will be able to edit and delete announcments here
+        </Text>
 
-    <Text style={{textAlign:'left', fontSize: 20, color: 'black', fontWeight: '500', marginVertical: 5, }}>
-      Task Feed - Will be able to edit and delete announcements here
-    </Text>
+        <Text style={GlobalStyles.floatingHeaderText}>
+          Task Feed - Will be able to edit and delete announcements here
+        </Text>
 
-
-    </View>
+      </View>
 
     </DefaultScrollView>
+
   );
 }
 
 const styles = StyleSheet.create({
   cardContainer: {
-    flexDirection: 'row', // Align cards side by side
+    flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
     paddingBottom: 25,

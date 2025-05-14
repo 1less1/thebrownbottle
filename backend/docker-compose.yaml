@@ -19,6 +19,7 @@ services:
       # Mounting the local .sql dump file into the docker container as 'read only'
       - ./database/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
       - ./database/sample.sql:/docker-entrypoint-initdb.d/02-sample.sql:ro
+    command: --default-time-zone='America/Chicago'
     networks:
      - internal # The mysql container operates on the internal docker network 
   

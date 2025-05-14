@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
 import { User } from '@/utils/SessionContext'; 
 import AnnouncementsModal from '@/components/admin/Dashboard/AnnouncementsModal';
 
@@ -22,7 +26,7 @@ const Announcements: React.FC<AnnouncementProps> = ({ user }) => {
       {/* This is the clickable content */}
       <TouchableOpacity onPress={toggleModal} style={styles.content}>
           <Ionicons name="notifications" size={30} color="black" style={styles.icon} />
-          <Text style={styles.title}>Announcement</Text>
+          <Text style={GlobalStyles.boldText}>Announcement</Text>
       </TouchableOpacity>
 
       {/* Modal component that appears when the content is clicked */}
@@ -50,11 +54,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginBottom: 8, 
-  },
-  title: {
-    fontSize: 14,  
-    fontWeight: 'bold',
-    color: 'black',
   },
 });
 

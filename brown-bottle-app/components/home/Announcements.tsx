@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/Colors'; 
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
@@ -20,6 +21,7 @@ const Announcements = () => {
   const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
   
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false); 
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
@@ -39,7 +41,9 @@ const Announcements = () => {
         setAnnouncements(sortedData);
       } catch (error) {
         console.error("Error fetching announcements:", error);
+        setError(true);
       } finally {
+        console.log("Successfully fetched announcements!")
         setLoading(false);
       }
     };
@@ -48,7 +52,7 @@ const Announcements = () => {
   }, [selectedRoleId]); // Only trigger the fetch when the role ID changes
 
   return (
-    
+
     <Card style={styles.container}>
       
       <View style={styles.scrollContainer}>
@@ -75,11 +79,19 @@ const Announcements = () => {
 
           {loading ? (
             <LoadingCard
-              loadingText="Loading Announcements..."
+              loadingText="Loading announcements..."
+              textStyle={GlobalStyles.loadingText}
               containerStyle={{ height: 400 }}
             />
+
+          ) : error ? (
+            <LoadingCard
+              loadingText="Unable to load announcements!"
+              textStyle= {GlobalStyles.errorText}
+              containerStyle={{ height: 400 }}
+            />
+
           ) : (
-            
             announcements.map((announcement) => (
               
               <AltCard
@@ -87,14 +99,14 @@ const Announcements = () => {
                 style={styles.announcementContainer}>
 
                 <View style={styles.headerContainer}>
-                  <Text style={styles.headerText}>{announcement.title}</Text>
+                  <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
                   <AltCard style={styles.roleContainer}>
-                    <Text style={styles.roleText}>{announcement.role_name}</Text>
+                    <Text style={GlobalStyles.boldText}>{announcement.role_name}</Text>
                   </AltCard>
                 </View>
-                <Text style={styles.text}>{announcement.description}</Text>
-                <Text style={styles.text}>- {announcement.author}</Text>
-                <Text style={styles.dateText}>
+                <Text style={GlobalStyles.text}>{announcement.description}</Text>
+                <Text style={GlobalStyles.text}>- {announcement.author}</Text>
+                <Text style={[GlobalStyles.altText, { marginVertical: 5 }]}>
                   Date: {announcement.date}{"\n"}
                   Time: {announcement.time}
                 </Text>
@@ -126,9 +138,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
   },
-  ddContainer: {
-    marginBottom: 5
-  },
   announcementContainer: {
     width: '100%',
     backgroundColor: Colors.lightTan,
@@ -152,25 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  headerText: {
-    color: Colors.black,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  roleText: {
-    color: Colors.black,
-    fontSize: 14,
-    fontWeight: 'bold'
-  },
-  text: {
-    color: Colors.black,
-    fontSize: 14,
-  },
-  dateText: {
-    color: Colors.gray,
-    fontSize: 14,
-    marginVertical: 4
-  }
 });
 
 export default Announcements;

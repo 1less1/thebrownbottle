@@ -3,6 +3,7 @@ import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
@@ -61,21 +62,21 @@ export default function HomeScreen() {
             <Text style={{ textAlign: 'center', fontSize: 35, color: 'black', fontWeight: 'bold' }}>
               Hi, {user?.first_name ?? 'Guest'}!
             </Text>
-            <Text style={{ textAlign: 'center', fontSize: 15, color: 'black' }}>
+            <Text style={GlobalStyles.mediumText}>
               Here's What's Happening...
             </Text>
           </View>
 
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Your Next Shift</Text>
+            <Text style={GlobalStyles.floatingHeaderText}>Your Next Shift</Text>
             <NextShift employee_id={Number(user?.user_id) || 0} />
           </View>
 
 
           {/* Announcements View */}
           <View style={{ width: '85%', marginTop: 25, marginBottom: 60 }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Announcements</Text>
+            <Text style={GlobalStyles.floatingHeaderText}>Announcements</Text>
             <Announcements />
           </View>
           

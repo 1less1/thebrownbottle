@@ -25,8 +25,8 @@ const HorizontalCheckboxList: React.FC<HorizontalCheckboxListProps> = ({
   );
 
   useEffect(() => {
-    setSelected(selectedValues.map(valueToDisplay));
-  }, [selectedValues]);
+  setSelected(selectedValues.map(valueToDisplay));
+  }, []);
 
   const toggleSelection = (item: string) => {
     const updated = selected.includes(item)

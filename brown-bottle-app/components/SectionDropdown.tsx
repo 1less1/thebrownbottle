@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+
 import { Colors } from '@/constants/Colors'; 
+import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getAllSections } from "@/utils/api/section";
 
@@ -17,6 +19,7 @@ interface SectionDropdownProps {
 const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, onSectionSelect, labelText = "Filter:" }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false); 
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -25,7 +28,9 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, on
         setSections(data);
       } catch (error) {
         console.error("Error fetching sections:", error);
+        setError(true);
       } finally {
+        console.log("Successfully fetched sections!")
         setLoading(false);
       }
     };
@@ -34,7 +39,11 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, on
   }, []);
 
   if (loading) {
-    return <Text style={styles.loadingText}>Loading sections...</Text>;
+    return <Text style={GlobalStyles.loadingText}>Loading sections...</Text>;
+  }
+
+  if (error) {
+    return <Text style={GlobalStyles.errorText}>Unable to fetch sections!</Text>;
   }
 
   return (
@@ -45,16 +54,16 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, on
       
       <Picker
         selectedValue={selectedSectionId}
-          onValueChange={(value: number) => {
-            if (value !== selectedSectionId) {
-              onSectionSelect(value);
-            }
-          }}
-          style={styles.picker}
-          >
-          {sections.map((section) => (
-          <Picker.Item key={section.section_id} label={section.section_name} value={section.section_id} />
-          ))}
+        onValueChange={(value: number) => {
+          if (value !== selectedSectionId) {
+            onSectionSelect(value);
+          }
+        }}
+        style={styles.picker}
+      >
+        {sections.map((section) => (
+        <Picker.Item key={section.section_id} label={section.section_name} value={section.section_id} />
+        ))}
       </Picker>
 
     </View>
@@ -75,12 +84,6 @@ const styles = StyleSheet.create({
   picker: {
     flexGrow: 1,
     padding: 5,
-  },
-  loadingText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: Colors.gray,
-    alignSelf: 'center',
   },
 });
 

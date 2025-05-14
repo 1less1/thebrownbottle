@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 
 import { Colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
 import SectionDropdown from '@/components/SectionDropdown';
-import { User } from '@/utils/SessionContext'; // Import type: User
-import { insertTask } from '@/utils/api/task';
 import HorizontalCheckboxList from '@/components/modular/HorizontalCheckboxList';
 import ModularModal from '@/components/modular/ModularModal';
+import ModularButton from '@/components/modular/ModularButton';
+
+import { User } from '@/utils/SessionContext'; // Import type: User
+import { insertTask } from '@/utils/api/task';
 
 // Helper function to validate date format (YYYY-MM-DD)
 const isValidDate = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -62,6 +66,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       due_date
       );
       alert("Task Posted Successfully!");
+      console.log("Task Posted Succeddully!")
 
       // Clear Form
       setTitle('');
@@ -71,7 +76,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
       onClose();
     } catch (error) {
-      console.error("Error posting task:", error);
+      console.error("Error assigning task:", error);
       alert("Error: Failed to assign task. Please try again.");
     }
     };
@@ -88,9 +93,10 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
     <ModularModal visible={visible} onClose={onClose}>
 
-      <Text style={styles.modalTitle}>New Task</Text>
+
+      <Text style={GlobalStyles.modalTitle}>New Task</Text>
       
-      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={styles.input} />
+      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, {marginBottom: 15}]}  />
       
       <TextInput
         placeholder="Description"
@@ -98,15 +104,17 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         onChangeText={setDescription}
         multiline
         numberOfLines={4}
-        style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+        style={[GlobalStyles.input, { marginBottom: 15, height: 100, textAlignVertical: 'top' }]}
       />
       
-      <TextInput placeholder="Due Date" value={due_date} onChangeText={setDueDate} style={styles.input} />
-      <Text style={{ fontSize: 12, color: 'gray', marginBottom: 5 }}>Example: YYYY-MM-DD</Text>
+      <TextInput placeholder="Due Date" value={due_date} onChangeText={setDueDate} style={[GlobalStyles.input, {marginBottom: 5}]} />
+      <Text style={{ fontSize: 12, color: 'gray', marginBottom: 15 }}>Example: YYYY-MM-DD</Text>
 
-      <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={setSelectedSectionId} labelText="Assign To:" />
+      <View style={{ marginBottom: 15}}>
+        <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={setSelectedSectionId} labelText="Assign To:" />
+      </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
         <Pressable onPress={() => setIsRecurring(!isRecurring)} style={{ marginRight: 10 }}>
           <Ionicons
             name={isRecurring ? 'checkbox' : 'square-outline'}
@@ -114,11 +122,11 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
             color={isRecurring ? Colors.selectedBox : Colors.unselectedBox}
           />
         </Pressable>
-        <Text style={{ fontSize: 16 }}>Recurring Task</Text>
+        <Text style={GlobalStyles.mediumText}>Recurring Task</Text>
       </View>
 
       {isRecurring && (
-        <View style={{ marginVertical: 5}}>
+        <View style={{ marginBottom: 10}}>
           <HorizontalCheckboxList
             labelText="Select Days:"
             optionMap={dayMappings}
@@ -127,58 +135,33 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         </View>
       )}
 
-      <View style={styles.buttonRowContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleAssign}>
-          <Text style={styles.buttonText}>Assign</Text>
-        </TouchableOpacity>
+      <View style={styles.buttonRowContainer }>
+          <ModularButton
+            text="Assign"
+            textStyle={{ color: 'white'}}
+            style={GlobalStyles.submitButton}
+            onPress={handleAssign}
+          />
 
-        <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleClose}>
-          <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
-        </TouchableOpacity>
+          <ModularButton
+            text="Cancel"
+            textStyle={{ color: 'gray'}}
+            style={GlobalStyles.cancelButton}
+            onPress={handleClose}
+          />
       </View>
 
-      
 
     </ModularModal>
+
   );
 };
 
 const styles = StyleSheet.create({
-  ddContainer: {
-    marginBottom: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.darkGray,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 6,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: Colors.inputBG,
-  },
   buttonRowContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
-  },
-  button: {
-    backgroundColor: Colors.buttonBG,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-  },
-  cancelButton: {
-    backgroundColor: Colors.cancelButtonBG,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontWeight: 'bold',
   },
 });
 

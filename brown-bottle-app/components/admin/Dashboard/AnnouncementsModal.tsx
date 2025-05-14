@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet} from 'react-native';
 
 import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
 import RoleDropdown from '@/components/RoleDropdown';
 import { User } from '@/utils/SessionContext'; // Import type: User
 
@@ -63,13 +65,13 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
     
     <ModularModal visible={visible} onClose={onClose}>
 
-      <Text style={styles.modalTitle}>New Announcement</Text>
+      <Text style={GlobalStyles.modalTitle}>New Announcement</Text>
 
       <TextInput
           placeholder="Title"
           value={title}
           onChangeText={setTitle}
-          style={styles.input}
+          style={[GlobalStyles.input, { marginBottom: 15}]}
       />
 
       <TextInput
@@ -78,10 +80,10 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
           onChangeText={setDescription}
           multiline
           numberOfLines={4}
-          style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+          style={[GlobalStyles.input, { marginBottom: 15, height: 100, textAlignVertical: 'top' }]}
       />
 
-      <View style={styles.ddContainer}>
+      <View style={{ marginBottom: 10 }}>
           <RoleDropdown
           selectedRoleId={selectedRoleId}
           onRoleSelect={setSelectedRoleId}
@@ -90,13 +92,19 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
       </View>
 
       <View style={styles.buttonRowContainer }>
-          <TouchableOpacity style={styles.button} onPress={handlePost}>
-          <Text style={styles.buttonText}>Post</Text>
-          </TouchableOpacity>
+          <ModularButton
+            text="Post"
+            textStyle={{ color: 'white'}}
+            style={GlobalStyles.submitButton}
+            onPress={handlePost}
+          />
 
-          <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleClose}>
-          <Text style={[styles.buttonText, { color: 'gray' }]}>Cancel</Text>
-          </TouchableOpacity>
+          <ModularButton
+            text="Cancel"
+            textStyle={{ color: 'gray'}}
+            style={GlobalStyles.cancelButton}
+            onPress={handleClose}
+          />
       </View>
 
     </ModularModal>
@@ -104,41 +112,10 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
 };
 
 const styles = StyleSheet.create({
-  ddContainer: {
-    marginBottom: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: Colors.darkGray,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 6,
-    padding: 10,
-    fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: Colors.inputBG,
-  },
   buttonRowContainer : {
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
-  },
-  button: {
-    backgroundColor: Colors.buttonBG,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 6,
-  },
-  cancelButton: {
-    backgroundColor: Colors.cancelButtonBG,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontWeight: 'bold',
   },
 });
 

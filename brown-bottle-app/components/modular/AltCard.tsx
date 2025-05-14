@@ -21,9 +21,9 @@ const AltCard: React.FC<AltCardProps> = ({ children, style }) => {
 const styles = StyleSheet.create({
   card: {
     alignItems: undefined,
-    backgroundColor: Colors.yellowTan, // Default background, can be overridden
-    paddingVertical: 20,
-    paddingHorizontal: 40,
+    backgroundColor: Colors.lightTan, // Default background, can be overridden
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: 15,
 
     // These Remove the default Shadow Aspect

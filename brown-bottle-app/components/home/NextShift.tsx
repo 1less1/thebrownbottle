@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
@@ -15,6 +16,7 @@ interface Props {
 const NextShift: React.FC<Props> = ({ employee_id }) => {
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false); 
 
   useEffect(() => {
     const fetchShifts = async () => {
@@ -23,7 +25,9 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
         setShifts(data);
       } catch (error) {
         console.error('Error fetching user shifts:', error);
+        setError(true);
       } finally {
+        console.log('Successfully fetched user shifts!')
         setLoading(false);
       }
     };
@@ -55,7 +59,15 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
   if (loading) {
     return (
       <Card style={styles.container}>
-        <Text style={styles.altText}>Loading next shift...</Text>
+        <Text style={GlobalStyles.loadingText}>Loading next shift...</Text>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card style={styles.container}>
+        <Text style={GlobalStyles.errorText}>Unable fetch next shift!</Text>
       </Card>
     );
   }
@@ -63,30 +75,29 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
   if (!nextShift) {
     return (
       <Card style={styles.container}>
-        <Text style={styles.altText}>No Upcoming Shift...</Text>
+        <Text style={GlobalStyles.loadingText}>No upcoming shifts...</Text>
       </Card>
     );
   }
 
   return (
+
     <Card style={styles.container}>
       <AltCard style={styles.shiftCard}>
-        <Text style={styles.dateText}>Date: {nextShift.date}</Text>
-        <Text style={styles.text}>
+        <Text style={GlobalStyles.headerText}>Date: {nextShift.date}</Text>
+        <Text style={[GlobalStyles.text, { marginVertical: 5}]}>
           Time: {nextShift.start_time} - {nextShift.end_time}
         </Text>
-        <Text style={styles.text}>Section: {nextShift.section_name}</Text>
+        <Text style={GlobalStyles.altText}>Section: {nextShift.section_name}</Text>
       </AltCard>
     </Card>
+
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.white,
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
   },
   shiftCard: {
     width: '100%',
@@ -97,20 +108,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     margin: 6,
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.black,
-  },
-  text: {
-    fontSize: 14,
-    color: Colors.black,
-  },
-  altText: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: Colors.gray,
   },
 });
 

@@ -1,22 +1,24 @@
 import React from 'react';
-import { Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import AltCard from './AltCard'; // Adjust the path if needed
 
 interface LoadingCardProps {
   loadingText?: string;
+  textStyle?: StyleProp<TextStyle>;
   containerStyle?: StyleProp<ViewStyle>;
 }
 
 const LoadingCard: React.FC<LoadingCardProps> = ({
-loadingText = 'Loading...',
+  loadingText = 'Loading...',
+  textStyle,
   containerStyle,
 }) => {
   
     return (
         
     <AltCard style={[styles.loadingContainer, containerStyle]}>
-      <Text style={styles.loadingText}>{loadingText}</Text>
+      <Text style={[styles.loadingText, textStyle]}>{loadingText}</Text>
     </AltCard>
 
   );
@@ -32,8 +34,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    fontStyle: 'italic',
     color: Colors.gray,
+    fontStyle: 'italic',
   },
 });
 
