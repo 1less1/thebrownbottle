@@ -10,23 +10,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 
 import HandleLogin from '@/components/auth/HandleLogin'
 
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: 5,
-    backgroundColor: Colors.darkTan, // Dark Tan Button
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    width: 300,
-  },
-  buttonText: {
-      color: 'black', 
-      fontSize: 16, 
-      fontWeight: 'bold'
-  }
-});
-
-export default function LandingScreen() {
+const LandingScreen = () => {
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
@@ -61,3 +45,8 @@ export default function LandingScreen() {
   );
   
 }
+
+export default LandingScreen;
+
+const styles = StyleSheet.create({
+});

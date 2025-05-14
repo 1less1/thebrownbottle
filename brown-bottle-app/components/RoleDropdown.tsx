@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   picker: {
     flexGrow: 1,
     padding: 5,
+    fontSize: 16,
   },
 });
 
