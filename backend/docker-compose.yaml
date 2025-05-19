@@ -10,6 +10,8 @@ services:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Chicago
+    command: --event_scheduler=ON
     ports:
       - "3306:3306" # Maps localhost 3306 to container port 3306 
     volumes:
@@ -19,7 +21,8 @@ services:
       # Mounting the local .sql dump file into the docker container as 'read only'
       - ./database/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
       - ./database/sample.sql:/docker-entrypoint-initdb.d/02-sample.sql:ro
-    command: --default-time-zone='America/Chicago'
+      - ./database/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql:ro
+      - ./database/events.sql:/docker-entrypoint-initdb.d/04-events.sql:ro
     networks:
      - internal # The mysql container operates on the internal docker network 
   

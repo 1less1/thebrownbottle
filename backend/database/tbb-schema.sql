@@ -74,10 +74,40 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
+-- Table `thebrownbottle`.`recurring_task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
+  `task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(250) NOT NULL,
+  `description` VARCHAR(250) NOT NULL,
+  `author_id` INT UNSIGNED NOT NULL,
+  `section_id` INT UNSIGNED NOT NULL,
+  `recurrence_day` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NULL, -- Day of the week for weekly recurrence
+  `start_date` DATE NOT NULL,  -- The start date for the task
+  `end_date` DATE NULL,  -- Optional: the end date for recurring tasks
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`task_id`),
+  INDEX `fk_recurring_task_author_idx` (`author_id`), -- Indexes improves query performance
+  CONSTRAINT `fk_recurring_task_author`
+    FOREIGN KEY (`author_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_recurring_task_section`
+    FOREIGN KEY (`section_id`)
+    REFERENCES `thebrownbottle`.`section` (`section_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
 -- Table `thebrownbottle`.`task`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
-  `task_id` INT NOT NULL AUTO_INCREMENT,
+  `task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
   `description` VARCHAR(250) NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
@@ -108,35 +138,6 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
-
--- -----------------------------------------------------
--- Table `thebrownbottle`.`recurring_task`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
-  `task_id` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` VARCHAR(250) NOT NULL,
-  `author_id` INT UNSIGNED NOT NULL,
-  `section_id` INT UNSIGNED NOT NULL,
-  `recurrence_day` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NULL, -- Day of the week for weekly recurrence
-  `start_date` DATE NOT NULL,  -- The start date for the task
-  `end_date` DATE NULL,  -- Optional: the end date for recurring tasks
-  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`task_id`),
-  INDEX `fk_recurring_task_author_idx` (`author_id`), -- Indexes improves query performance
-  CONSTRAINT `fk_recurring_task_author`
-    FOREIGN KEY (`author_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_recurring_task_section`
-    FOREIGN KEY (`section_id`)
-    REFERENCES `thebrownbottle`.`section` (`section_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE
-)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`announcement`

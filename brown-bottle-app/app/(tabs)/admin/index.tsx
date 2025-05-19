@@ -14,9 +14,6 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 import { useSession } from '@/utils/SessionContext';
 
 const Admin = () => {
-  const { user } = useSession();
-  const [activeTab, setActiveTab] = useState(0);
-
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
@@ -24,6 +21,9 @@ const Admin = () => {
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
+
+  const { user } = useSession();
+  const [activeTab, setActiveTab] = useState(0);
 
   // Define available tabs and corresponding components
   const tabs = [

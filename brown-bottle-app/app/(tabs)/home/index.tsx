@@ -18,7 +18,7 @@ import AltCard from '@/components/modular/AltCard';
 import { useSession } from '@/utils/SessionContext';
 
 export default function HomeScreen() {
-  // Dynamic Status Bar (Android Only)
+  // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.mediumTan);

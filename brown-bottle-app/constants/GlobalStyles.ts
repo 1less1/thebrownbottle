@@ -17,6 +17,11 @@ export const GlobalStyles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 8 
     },
+    smallText: {
+        color: 'black',
+        fontSize: 12,
+        fontStyle: 'normal',
+    },
     boldText: {
         color: 'black',
         fontSize: 14,
@@ -27,6 +32,13 @@ export const GlobalStyles = StyleSheet.create({
         color: 'black',
         fontSize: 14,
         fontStyle: 'normal',
+    },
+    inputLabelText: {
+        color: 'black',
+        fontSize: 16,
+        marginRight: 5,
+        fontStyle: 'normal',
+        alignSelf: 'center',
     },
     boldMediumText: {
         color: 'black',
@@ -48,6 +60,11 @@ export const GlobalStyles = StyleSheet.create({
     largeText: {
         color: 'black',
         fontSize: 18,
+        fontStyle: 'normal',
+    },
+    smallAltText: {
+        color: 'gray',
+        fontSize: 12,
         fontStyle: 'normal',
     },
     altText: {

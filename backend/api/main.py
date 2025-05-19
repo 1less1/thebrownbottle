@@ -2,6 +2,7 @@ import mysql.connector
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import threading
 
 # Import the name of the python file for the different routes
 import login
@@ -23,6 +24,9 @@ BACKEND_PORT = os.environ["BACKEND_PORT"]
 # Initialize the App
 app = Flask(__name__)
 CORS(app)
+
+# Create a global lock
+request_lock = threading.Lock()
 
 
 # Function which creates a MySQL connection
@@ -65,7 +69,10 @@ def get_user_data():
 
 @app.route('/task/new-task', methods=['POST'])
 def handle_new_task():
-    return task.handle_new_task(get_db_connection(), request)
+    # Serialize concurrent requests to be processed in order for multiple task
+    # inserts from different clients
+    with request_lock:
+        return task.handle_new_task(get_db_connection(), request)
 
 @app.route('/task/get-role-tasks', methods=['GET'])
 def get_role_tasks():
@@ -80,7 +87,8 @@ def get_role_tasks():
 
 @app.route('/announcement/insert-announcement', methods=['POST'])
 def insert_announcement():
-    return announcement.insert_announcement(get_db_connection(), request)
+    with request_lock:
+        return announcement.insert_announcement(get_db_connection(), request)
 
 @app.route('/announcement/get-user-announcements', methods=['GET'])
 def get_user_announcements():

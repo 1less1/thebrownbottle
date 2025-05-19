@@ -69,9 +69,9 @@ def insert_recurring_task(db, request):
             'description': str,
             'author_id': int,
             'section_id': int,
-            'recurrence_day': (str),
+            'recurrence_day': str,
             'start_date': str,
-            'end_date': (str, type(None)),  # Optional
+            'end_date': str,  # Optional
         }
 
         # Validate the fields in JSON body
@@ -84,9 +84,11 @@ def insert_recurring_task(db, request):
         description = fields['description']
         author_id = fields['author_id']
         section_id = fields['section_id']
-        recurrence_day = fields.get('recurrence_day')
+        recurrence_day = fields['recurrence_day']
         start_date = fields['start_date']
         end_date = fields.get('end_date')
+        if end_date in (None, '', 'none', 'None'):
+            end_date = None
 
         conn = db
         cursor = conn.cursor()
@@ -99,9 +101,15 @@ def insert_recurring_task(db, request):
             
 
         result = {"inserted_id": cursor.lastrowid}
-
         conn.commit()
         cursor.close()
+
+        # Call the Stored Procedure
+        proc_cursor = conn.cursor()
+        proc_cursor.callproc("insert_recurring_tasks")
+        conn.commit()
+        proc_cursor.close()
+        
         conn.close()
 
         return jsonify({"status": "success", "row id": result}), 200
