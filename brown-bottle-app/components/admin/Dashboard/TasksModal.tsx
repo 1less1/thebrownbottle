@@ -38,13 +38,13 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   const [noEndDate, setNoEndDate] = useState(false);
 
   const dayMappings = {
-    Mon: 'Monday',
-    Tue: 'Tuesday',
-    Wed: 'Wednesday',
-    Thu: 'Thursday',
-    Fri: 'Friday',
-    Sat: 'Saturday',
-    Sun: 'Sunday',
+    Mon: 'mon',
+    Tue: 'tue',
+    Wed: 'wed',
+    Thu: 'thu',
+    Fri: 'fri',
+    Sat: 'sat',
+    Sun: 'sun',
   };
 
   const [recurrence_days, setRecurrenceDays] = useState<string[]>([]);

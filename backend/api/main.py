@@ -8,6 +8,7 @@ import threading
 import login
 import user
 import task
+import recurring_task
 import announcement
 import role
 import section
@@ -67,16 +68,48 @@ def get_user_data():
 # Task Routes - /task ------------------------------------
 # --------------------------------------------------------
 
+# All routes below query the 'task' table
+
 @app.route('/task/new-task', methods=['POST'])
 def handle_new_task():
     # Serialize concurrent requests to be processed in order for multiple task
     # inserts from different clients
     with request_lock:
         return task.handle_new_task(get_db_connection(), request)
+    
+@app.route('/task/all', methods=['GET'])
+def t_get_all_tasks():
+    return task.t_get_all_tasks(get_db_connection(), request)
 
-@app.route('/task/get-role-tasks', methods=['GET'])
-def get_role_tasks():
-    return task.get_role_tasks(get_db_connection(), request)
+@app.route('/task/all-recurring', methods=['GET'])
+def t_get_all_recurring_tasks():
+    return task.t_get_all_recurring_tasks(get_db_connection(), request)
+
+@app.route('/task/tasks-by-section', methods=['GET'])
+def t_get_tasks_by_section():
+    return task.t_get_tasks_by_section(get_db_connection(), request)
+
+@app.route('/task/recurring-tasks-by-section', methods=['GET'])
+def t_get_recurring_tasks_by_section():
+    return task.t_get_recurring_tasks_by_section(get_db_connection(), request)
+
+# --------------------------------------------------------
+# --------------------------------------------------------
+
+
+
+# Task Routes - /recurring-task --------------------------
+# --------------------------------------------------------
+
+# All routes below query the 'recurring_task' table
+
+@app.route('/recurring-task/all', methods=['GET'])
+def rt_get_all_recurring_tasks():
+    return recurring_task.rt_get_all_recurring_tasks(get_db_connection(), request)
+
+@app.route('/recurring-task/recurring-tasks-by-section', methods=['GET'])
+def rt_get_recurring_tasks_by_section():
+    return recurring_task.rt_get_recurring_tasks_by_section(get_db_connection(), request)
 
 # --------------------------------------------------------
 # --------------------------------------------------------

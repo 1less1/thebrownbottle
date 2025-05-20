@@ -77,16 +77,22 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- Table `thebrownbottle`.`recurring_task`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
-  `task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `recurring_task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
   `description` VARCHAR(250) NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
   `section_id` INT UNSIGNED NOT NULL,
-  `recurrence_day` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NULL, -- Day of the week for weekly recurrence
+  `mon` TINYINT(1) NOT NULL, -- 1 = true is put into the day the task recurrs
+  `tue` TINYINT(1) NOT NULL,
+  `wed` TINYINT(1) NOT NULL,
+  `thu` TINYINT(1) NOT NULL,
+  `fri` TINYINT(1) NOT NULL,
+  `sat` TINYINT(1) NOT NULL,
+  `sun` TINYINT(1) NOT NULL,
   `start_date` DATE NOT NULL,  -- The start date for the task
   `end_date` DATE NULL,  -- Optional: the end date for recurring tasks
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`task_id`),
+  PRIMARY KEY (`recurring_task_id`),
   INDEX `fk_recurring_task_author_idx` (`author_id`), -- Indexes improves query performance
   CONSTRAINT `fk_recurring_task_author`
     FOREIGN KEY (`author_id`)
@@ -131,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
     ON UPDATE CASCADE,
   CONSTRAINT `fk_task_recurring_task`
     FOREIGN KEY (`recurring_task_id`)
-    REFERENCES `thebrownbottle`.`recurring_task` (`task_id`)
+    REFERENCES `thebrownbottle`.`recurring_task` (`recurring_task_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 )

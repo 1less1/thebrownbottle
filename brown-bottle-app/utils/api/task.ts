@@ -61,44 +61,58 @@ export async function insertRecurringTask(author_id: number, title: string, desc
     throw new Error("Recurrence Days must include at least one day!");
   }
 
-  const results = [];
+  // Initialize all weekdays to 0 (false)
+  type Weekday = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
+  const allDays: Record<Weekday, number> = {
+    mon: 0,
+    tue: 0,
+    wed: 0,
+    thu: 0,
+    fri: 0,
+    sat: 0,
+    sun: 0,
+  };
+
+  recurrence_days.forEach((day) => {
+  const d = day.toLowerCase() as Weekday;
+    if (d in allDays) {
+      allDays[d] = 1;
+    }
+  });
+
+   // Build the final task object
+  const taskData: Record<string, any> = {
+    title,
+    description,
+    author_id,
+    section_id,
+    start_date,
+    ...allDays, // 👈 This spreads the weekday flags (e.g. mon: 1, tue: 0, etc.)
+  };
+
+  if (end_date) {
+    taskData.end_date = end_date;
+  }
 
   try {
-    // Sends the separate post requests in sequential order
-    // The next requests waits until a response is given for the previous request
-    for (const recurrence_day of recurrence_days) {
-      let taskData: Record<string, any> = {
-        title,
-        description,
-        author_id,    
-        section_id,
-        recurrence_day,
-        start_date,
-      };
+    const response = await fetch(`${baseURL}/task/new-task`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(taskData),
+    });
 
-      if (end_date) {
-        taskData.end_date = end_date;
-      }
-
-      const response = await fetch(`${baseURL}/task/new-task`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(taskData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status} on day ${recurrence_day}`);
-      }
-
-      const data = await response.json();
-      results.push(data);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return results; // array of responses for each day, in order
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error("Failed to insert recurring tasks:", error);
+    console.error("Failed to insert recurring task:", error);
     throw error;
   }
+  
 }
