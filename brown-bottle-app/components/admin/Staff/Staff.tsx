@@ -27,8 +27,9 @@ export default function Staff() {
         {/* Temporary Content */}
         <DefaultScrollView>
 
-          <Text>WIP</Text>
-
+          <View>
+            <Text>WIP</Text>
+          </View>
           
         </DefaultScrollView>
 

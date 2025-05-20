@@ -38,8 +38,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </Text>
 
         <Text style={GlobalStyles.floatingHeaderText}>
-          Task Feed - Will be able to edit and delete announcements here
+          Normal Task Feed - Will be able to edit and delete tasks here (sort by Section)
         </Text>
+
+        <Text style={GlobalStyles.floatingHeaderText}>
+          Recurring Task Feed - Will be able to edit and delete tasks here (sort by Section)
+        </Text>
+
 
       </View>
 

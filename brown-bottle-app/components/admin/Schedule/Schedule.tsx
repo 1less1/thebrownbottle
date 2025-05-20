@@ -27,9 +27,10 @@ export default function Schedule() {
         {/* Temporary Content */}
         <DefaultScrollView>
 
-          <Text>WIP</Text>
+          <View>
+            <Text>WIP</Text>
+          </View>
 
-          
         </DefaultScrollView>
 
 

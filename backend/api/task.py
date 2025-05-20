@@ -59,7 +59,9 @@ def insert_task(db, request):
 
 
 
-# Inserts a new record into the "recurring_task" table
+# Inserts a new record into the "recurring_task" table.
+# Then triggers a mysql stored procedure to migrate
+# today's recurring tasks to the normal "task" table.
 def insert_recurring_task(db, request):
     
     try:
@@ -86,8 +88,10 @@ def insert_recurring_task(db, request):
         section_id = fields['section_id']
         recurrence_day = fields['recurrence_day']
         start_date = fields['start_date']
+        
+        # Check optional end_date field
         end_date = fields.get('end_date')
-        if end_date in (None, '', 'none', 'None'):
+        if not end_date or end_date.lower() == 'none':
             end_date = None
 
         conn = db
@@ -143,8 +147,19 @@ def handle_new_task(db, request):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-
-
-
-def get_role_tasks(db, request):
+def get_all_tasks(db,request):
     return
+
+def get_tasks_by_section(db, request):
+    return
+
+def get_recurring_tasks_by_section(db, request):
+    return
+
+def edit_task(db, request):
+    return
+
+def edit_recurring_task(db, request):
+    return
+
+

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, TextComponent } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 
@@ -191,7 +190,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         <>
           <View style= {{ flexDirection: 'row' }}>
             <Text style={[GlobalStyles.inputLabelText, {alignSelf: 'center'}]}>Due Date: </Text>
-            <TextInput placeholder="Enter Date" value={due_date} onChangeText={setDueDate} style={[GlobalStyles.input, {marginBottom: 5, width: '100%'}]} />
+            <TextInput placeholder="Enter Date" value={due_date} onChangeText={setDueDate} style={[GlobalStyles.input, {marginBottom: 5, flex: 1}]} />
           </View>
           <Text style={[GlobalStyles.smallAltText, { marginBottom: 10 }]}>Example: YYYY-MM-DD</Text>
         </>

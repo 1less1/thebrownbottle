@@ -11,7 +11,6 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: America/Chicago
-    command: --event_scheduler=ON
     ports:
       - "3306:3306" # Maps localhost 3306 to container port 3306 
     volumes:
