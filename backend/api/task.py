@@ -166,7 +166,355 @@ def handle_new_task(db, request):
 
 
 
-# GET Requests for 'task' table -------------------------------------------------------------------------
+# GET Requests for App USERS ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+# Normal employee users will use the below functions for app component based requests!
+
+# Fetches ALL daily tasks that are COMPLETE (complete = 1)
+# Filters results by specified section_id
+def t_get_today_tasks_complete(db, request):
+    try:
+
+        required_params = ['section_id']
+        param_types = {'section_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        section_id = params['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # SQL Script - Selects today's COMPLETE tasks for a certain section
+        cursor.execute("""
+            SELECT 
+                t.task_id,
+                t.title,
+                t.description,
+                t.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                t.section_id,
+                s.section_name,
+                t.due_date,
+                t.complete,
+                t.recurring_task_id,
+                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+            FROM task t
+            JOIN employee e ON t.author_id = e.employee_id
+            JOIN section s ON t.section_id = s.section_id
+            WHERE t.section_id = %s
+            AND t.complete = 1
+            AND t.due_date = CURDATE()
+            ORDER BY t.due_date ASC;
+        """, (section_id,))
+
+
+        # Fetch the result
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(result), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+
+# Fetches all daily tasks that are INCOMPLETE (complete = 0)
+# Filters results by specified section_id
+def t_get_today_tasks_incomplete(db, request):
+    try:
+
+        required_params = ['section_id']
+        param_types = {'section_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        section_id = params['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # SQL Script - Selects today's INCOMPLETE tasks for a certain section
+        cursor.execute("""
+            SELECT 
+                t.task_id,
+                t.title,
+                t.description,
+                t.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                t.section_id,
+                s.section_name,
+                t.due_date,
+                t.complete,
+                t.recurring_task_id,
+                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+            FROM task t
+            JOIN employee e ON t.author_id = e.employee_id
+            JOIN section s ON t.section_id = s.section_id
+            WHERE t.section_id = %s
+            AND t.complete = 0
+            AND t.due_date = CURDATE()
+            ORDER BY t.due_date ASC;
+        """, (section_id,))
+
+        # Fetch the result
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(result), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+
+# Fetches ALL tasks that are COMPLETE (complete = 1)
+# Filters results by specified section_id
+def t_get_all_tasks_complete(db, request):
+    try:
+
+        required_params = ['section_id']
+        param_types = {'section_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        section_id = params['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # SQL Script - Selects ALL COMPLETE tasks for a certain section
+        cursor.execute("""
+            SELECT 
+                t.task_id,
+                t.title,
+                t.description,
+                t.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                t.section_id,
+                s.section_name,
+                t.due_date,
+                t.complete,
+                t.recurring_task_id,
+                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+            FROM task t
+            JOIN employee e ON t.author_id = e.employee_id
+            JOIN section s ON t.section_id = s.section_id
+            WHERE t.section_id = %s
+            AND t.complete = 1
+            ORDER BY t.due_date ASC;
+        """, (section_id,))
+
+
+        # Fetch the result
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(result), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+
+# Fetches ALL tasks that are INCOMPLETE (complete = 0)
+# Filters results by specified section_id
+def t_get_all_tasks_incomplete(db, request):
+    try:
+
+        required_params = ['section_id']
+        param_types = {'section_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        section_id = params['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # SQL Script - Selects ALL INCOMPLETE tasks for a certain section
+        cursor.execute("""
+            SELECT 
+                t.task_id,
+                t.title,
+                t.description,
+                t.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                t.section_id,
+                s.section_name,
+                t.due_date,
+                t.complete,
+                t.recurring_task_id,
+                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+            FROM task t
+            JOIN employee e ON t.author_id = e.employee_id
+            JOIN section s ON t.section_id = s.section_id
+            WHERE t.section_id = %s
+            AND t.complete = 0
+            ORDER BY t.due_date ASC;
+        """, (section_id,))
+
+        # Fetch the result
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(result), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
+
+# Fetches ALL nonrecurring tasks
+# Filters results by specified section_id
+def t_get_tasks_by_section(db, request):
+    try:
+
+        required_params = ['section_id']
+        param_types = {'section_id': int}
+
+        # Validate the parameters
+        params, error = request_helper.verify_params(request, required_params, param_types)
+
+        if error:
+            return jsonify(error), 400
+        
+        # Extract validated params
+        section_id = params['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # SQL Script - Selects all tasks for a certain section (section_id)
+        cursor.execute("""
+            SELECT 
+                t.task_id,
+                t.title,
+                t.description,
+                t.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                t.section_id,
+                s.section_name,
+                t.due_date,
+                t.complete,
+                t.recurring_task_id,
+                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+            FROM task t
+            JOIN employee e ON t.author_id = e.employee_id
+            JOIN section s ON t.section_id = s.section_id
+            WHERE t.section_id = %s
+            AND t.recurring_task_id IS NULL
+            ORDER BY t.due_date ASC;
+        """, (section_id,))
+
+        # Fetch the result
+        result = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(result), 200
+
+
+    except mysql.connector.Error as e:
+        # Handle database-specific errors
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+
+    except Exception as e:
+        # Handle general errors
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+
+# Edit (POST) Task Requests -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+# Allows an Admin to EDIT a nonrecurring task's details
+def edit_task(db, request):
+    return
+
+
+# Allows an Admin to DELETE a nonrecurring task's details
+def delete_task(db, request):
+    return
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+
+# Additonal GET Requests --------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -270,67 +618,6 @@ def t_get_all_recurring_tasks(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
 
 
-# Fetches all tasks for a specified section (section_id) from 'task' table
-def t_get_tasks_by_section(db, request):
-    try:
-
-        required_params = ['section_id']
-        param_types = {'section_id': int}
-
-        # Validate the parameters
-        params, error = request_helper.verify_params(request, required_params, param_types)
-
-        if error:
-            return jsonify(error), 400
-        
-        # Extract validated params
-        section_id = params['section_id']
-
-        conn = db
-        cursor = conn.cursor(dictionary=True)
-
-        # SQL Script - Selects all tasks for a certain section (section_id)
-        cursor.execute("""
-            SELECT 
-                t.task_id,
-                t.title,
-                t.description,
-                t.author_id,
-                CONCAT(e.first_name, ' ', e.last_name) AS author,
-                t.section_id,
-                s.section_name,
-                t.due_date,
-                t.complete,
-                t.recurring_task_id,
-                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
-                DATE_FORMAT(t.timestamp, '%H:%i') AS time
-            FROM task t
-            JOIN employee e ON t.author_id = e.employee_id
-            JOIN section s ON t.section_id = s.section_id
-            WHERE t.section_id = %s
-            ORDER BY t.due_date ASC;
-        """, (section_id,))
-
-        # Fetch the result
-        result = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        
-        return jsonify(result), 200
-
-
-    except mysql.connector.Error as e:
-        # Handle database-specific errors
-        print(f"Database error: {e}")
-        return jsonify({"status": "error", "message": "Database error occurred"}), 500
-
-
-    except Exception as e:
-        # Handle general errors
-        print(f"Error occurred: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-
-
 # Fetches all recurring tasks by section (section_id) from 'task' table
 def t_get_recurring_tasks_by_section(db, request):
     try:
@@ -391,36 +678,6 @@ def t_get_recurring_tasks_by_section(db, request):
         # Handle general errors
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-
-
-# Normal employee users will use the below functions for app component based requests!
-
-# Fetches all daily tasks that are complete (complete = 1)
-# Filters results by specified section_id
-def t_get_daily_tasks_complete(db, request):
-    return
-
-# Fetches all daily tasks that are incomplete (complete = 0)
-# Filters results by specified section_id
-def t_get_daily_tasks_incomplete(db, request):
-    return
-
-# Allows user to mark a task (specified by task_id) complete or incomplete
-def t_edit_task_complete(db, request):
-    return
-
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
-
-# Edit (POST) Task Requests -----------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-# Allows user to edit a "normal task's" details (not recurring) from 'task' table
-def edit_task(db, request):
-    return
 
 
 # -------------------------------------------------------------------------------------------------------

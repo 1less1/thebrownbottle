@@ -114,5 +114,137 @@ export async function insertRecurringTask(author_id: number, title: string, desc
     console.error("Failed to insert recurring task:", error);
     throw error;
   }
+
+}
+
+
+// GET Request that fetches today's COMPLETE tasks filtered by section_id
+export async function getTodayTasksComplete(section_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/task/today-complete?section_id=${section_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
+  
+}
+
+
+// GET Request that fetches today's INCOMPLETE tasks filtered by section_id
+export async function getTodayTasksIncomplete(section_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/task/today-incomplete?section_id=${section_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
+  
+}
+
+
+// GET Request that fetches ALL COMPLETE tasks filtered by section_id
+export async function getAllTasksComplete(section_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/task/all-complete?section_id=${section_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
+  
+}
+
+
+// GET Request that fetches ALL INCOMPLETE tasks filtered by section_id
+export async function getAllTasksIncomplete(section_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/task/all-incomplete?section_id=${section_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
   
 }
