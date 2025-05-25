@@ -57,7 +57,7 @@ export default function TabLayout() {
         }}
       />
 
-      
+      {/*
       <Tabs.Screen
         name="chat/index"
         options={{
@@ -65,6 +65,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="bubble.left.fill" color={color} />,
         }}
       />
+      */}
       
 
       <Tabs.Screen

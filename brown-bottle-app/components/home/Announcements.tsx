@@ -9,11 +9,12 @@ import AltCard from '@/components/modular/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/RoleDropdown';
 
-import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
-import { Announcement } from '@/types/api';
 import ModularButton from '../modular/ModularButton';
 import ModularModal from '../modular/ModularModal';
 import LoadingCard from '../modular/LoadingCard';
+
+import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
+import { Announcement } from '@/types/api';
 
 const Announcements = () => {
 
@@ -67,6 +68,7 @@ const Announcements = () => {
           <RoleDropdown
             selectedRoleId={selectedRoleId}
             onRoleSelect={setSelectedRoleId} // Only update role on dropdown selection
+            labelText='Role:'
           />
           <ModularButton 
             text="Close" 
@@ -127,6 +129,7 @@ const Announcements = () => {
 
 const styles = StyleSheet.create({
   container: {
+    width: '100%',
     backgroundColor: Colors.white,
     alignItems: 'center',
     paddingHorizontal: 10,

@@ -122,9 +122,11 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `complete` TINYINT(1) NOT NULL DEFAULT 0,  -- 0 = false, 1 = true
   `recurring_task_id` INT UNSIGNED DEFAULT NULL,  -- Foreign key to the recurring_task table, nullable for non-recurring tasks
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_modified_by` INT UNSIGNED DEFAULT NULL,  -- Tracks the employee who last modified the task
   PRIMARY KEY (`task_id`),
-  INDEX `fk_task_author_idx` (`author_id`), -- Indexes improves query performance
-  INDEX `fk_task_recurring_task_idx` (`recurring_task_id`), -- Indexes improves query performance
+  INDEX `fk_task_author_idx` (`author_id`),
+  INDEX `fk_task_recurring_task_idx` (`recurring_task_id`),
+  INDEX `fk_task_last_modified_by_idx` (`last_modified_by`),
   CONSTRAINT `fk_task_author`
     FOREIGN KEY (`author_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
@@ -139,6 +141,11 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
     FOREIGN KEY (`recurring_task_id`)
     REFERENCES `thebrownbottle`.`recurring_task` (`recurring_task_id`)
     ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_task_last_modified_by`
+    FOREIGN KEY (`last_modified_by`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE SET NULL
     ON UPDATE CASCADE
 )
 ENGINE = InnoDB

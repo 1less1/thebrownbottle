@@ -29,36 +29,36 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
 
   const handlePost = async () => {
     if (!title.trim() || !description.trim() || selectedRoleId === -1) {
-        alert("Please fill in both Title and Description!");
-        return;
+      alert("Please fill in both Title and Description!");
+      return;
     }
 
     try {
-        await insertAnnouncement(
+      await insertAnnouncement(
         Number(user.user_id),
         title,
         description,
         selectedRoleId
-        );
-        alert("Announcement Posted Successfully!")
+      );
+      alert("Announcement Posted Successfully!")
 
-        // Clear Form
-        setTitle('');
-        setDescription('');
-        setSelectedRoleId(1);
+      // Clear Form
+      setTitle('');
+      setDescription('');
+      setSelectedRoleId(1);
 
-        onClose();
+      onClose();
     } catch (error) {
-        console.error("Error posting announcement:", error);
-        alert("Error: Failed to post announcement. Please try again.");
+      console.error("Error posting announcement:", error);
+      alert("Error: Failed to post announcement. Please try again.");
     }
   };
 
   const handleClose = () => {
-      setTitle('');
-      setDescription('');
-      setSelectedRoleId(1);
-      onClose();
+    setTitle('');
+    setDescription('');
+    setSelectedRoleId(1);
+    onClose();
   };
 
   return (
@@ -68,43 +68,43 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
       <Text style={GlobalStyles.modalTitle}>New Announcement</Text>
 
       <TextInput
-          placeholder="Title"
-          value={title}
-          onChangeText={setTitle}
-          style={[GlobalStyles.input, { marginBottom: 15}]}
+        placeholder="Title"
+        value={title}
+        onChangeText={setTitle}
+        style={[GlobalStyles.input, { marginBottom: 15}]}
       />
 
       <TextInput
-          placeholder="Description"
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          style={[GlobalStyles.input, { marginBottom: 15, height: 100, textAlignVertical: 'top' }]}
+        placeholder="Description"
+        value={description}
+        onChangeText={setDescription}
+        multiline
+        numberOfLines={4}
+        style={[GlobalStyles.input, { marginBottom: 15, height: 100, textAlignVertical: 'top' }]}
       />
 
       <View style={{ marginBottom: 10 }}>
-          <RoleDropdown
-          selectedRoleId={selectedRoleId}
-          onRoleSelect={setSelectedRoleId}
-          labelText="Assign To:"
-          />
+        <RoleDropdown
+        selectedRoleId={selectedRoleId}
+        onRoleSelect={setSelectedRoleId}
+        labelText="Assign To:"
+        />
       </View>
 
       <View style={styles.buttonRowContainer }>
-          <ModularButton
-            text="Post"
-            textStyle={{ color: 'white'}}
-            style={GlobalStyles.submitButton}
-            onPress={handlePost}
-          />
+        <ModularButton
+          text="Post"
+          textStyle={{ color: 'white'}}
+          style={GlobalStyles.submitButton}
+          onPress={handlePost}
+        />
 
-          <ModularButton
-            text="Cancel"
-            textStyle={{ color: 'gray'}}
-            style={GlobalStyles.cancelButton}
-            onPress={handleClose}
-          />
+        <ModularButton
+          text="Cancel"
+          textStyle={{ color: 'gray'}}
+          style={GlobalStyles.cancelButton}
+          onPress={handleClose}
+        />
       </View>
 
     </ModularModal>

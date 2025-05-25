@@ -1,8 +1,8 @@
-// This file will send a request to the backend python api to insert and get task info 
-
 import Constants from 'expo-constants';
+import { UpdateTaskFields } from '@/types/api';
 
-// Inserts a task into the database with a POST Request - **Works**
+
+// POST Request that INSERTS a task into the database - **Works**
 export async function insertTask(author_id: number, title: string, description: string, 
   section_id: number, due_date: string) {
   
@@ -46,7 +46,7 @@ export async function insertTask(author_id: number, title: string, description: 
 }
 
 
-// Inserts recurring task(s) into the database with a POST Request - **Works**
+// POST Request that INSERTS recurring task(s) into the database - **Works**
 // Loops through all selected recurrence_days and sends a separate request 
 // for each day with the exact same parameters. 
 // Ex: "Saturday and Sunday" --> Two Separate requests are made with the only 
@@ -116,6 +116,98 @@ export async function insertRecurringTask(author_id: number, title: string, desc
   }
 
 }
+
+
+// Flexible GET Request for task - **Works**
+export async function getTasks(options: {
+  section_id?: number;
+  complete?: 0 | 1;
+  today?: boolean;
+  recurring?: boolean;
+}) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+  const baseURL = API_BASE_URL;
+
+  const params = new URLSearchParams();
+
+  if (options.section_id !== undefined) params.append("section_id", options.section_id.toString());
+  if (options.complete !== undefined) params.append("complete", options.complete.toString());
+  if (options.today !== undefined) params.append("today", options.today.toString());
+  if (options.recurring !== undefined) params.append("recurring", options.recurring.toString());
+
+  try {
+    const response = await fetch(`${baseURL}/task?${params.toString()}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch tasks:", error);
+    throw error;
+  }
+
+}
+
+
+// Flexible PATCH (Update) Request for task
+export async function updateTask(task_id: number, updates: UpdateTaskFields) {
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+  const baseURL = API_BASE_URL;
+
+  try {
+    const response = await fetch(`${baseURL}/task/${task_id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to update task: ${errorData.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data; // The backend success message JSON
+
+  } catch (error) {
+    console.error("Error updating task:", error);
+    throw error;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // GET Request that fetches today's COMPLETE tasks filtered by section_id
@@ -228,6 +320,39 @@ export async function getAllTasksIncomplete(section_id: number) {
   try {
     
     const response = await fetch(`${baseURL}/task/all-incomplete?section_id=${section_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json", 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (error) {
+    console.error("Failed to fetch user announcements:", error);
+    throw error;
+  }
+  
+}
+
+
+// GET Request that fetches nonrecurring tasks filtered by section_id
+export async function getTasksBySection(section_id: number) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const baseURL = API_BASE_URL;
+
+  try {
+    
+    const response = await fetch(`${baseURL}/task/tasks-by-section?section_id=${section_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 

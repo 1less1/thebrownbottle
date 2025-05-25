@@ -9,17 +9,20 @@ import { getAllSections } from "@/utils/api/section";
 
 import { Section } from '@/types/api'
 
-
 interface SectionDropdownProps {
-    selectedSectionId: number;
-    onSectionSelect: (sectionId: number) => void; 
-    labelText?: string; // Optional Prop
+  selectedSectionId: number;
+  onSectionSelect: (sectionId: number, sectionName: string) => void;  // <-- updated here
+  labelText?: string; // Optional Prop
 }
 
-const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, onSectionSelect, labelText = "Filter:" }) => {
+const SectionDropdown: React.FC<SectionDropdownProps> = ({
+  selectedSectionId,
+  onSectionSelect,
+  labelText = "Filter:",
+}) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false); 
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchSections = async () => {
@@ -30,7 +33,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, on
         console.error("Error fetching sections:", error);
         setError(true);
       } finally {
-        console.log("Successfully fetched sections!")
+        console.log("Successfully fetched sections!");
         setLoading(false);
       }
     };
@@ -47,35 +50,42 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({ selectedSectionId, on
   }
 
   return (
-
     <View style={styles.container}>
-
       <Text style={styles.label}>{labelText}</Text>
-      
+
       <Picker
         selectedValue={selectedSectionId}
-        onValueChange={(value: number) => {
-          if (value !== selectedSectionId) {
-            onSectionSelect(value);
+        onValueChange={(value: string | number) => {
+          const sectionId = Number(value); // Ensure type match with selectedSectionId
+
+          if (sectionId !== selectedSectionId) {
+            const selectedSection = sections.find(
+              (section) => section.section_id === sectionId
+            );
+            if (selectedSection) {
+              onSectionSelect(selectedSection.section_id, selectedSection.section_name);
+            }
           }
         }}
         style={styles.picker}
       >
         {sections.map((section) => (
-        <Picker.Item key={section.section_id} label={section.section_name} value={section.section_id} />
+          <Picker.Item
+            key={section.section_id}
+            label={section.section_name}
+            value={section.section_id}
+          />
         ))}
       </Picker>
-
     </View>
-
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      alignContent: 'center'
+    flexDirection: "row",
+    alignItems: "center",
+    alignContent: "center",
   },
   label: {
     fontSize: 16,

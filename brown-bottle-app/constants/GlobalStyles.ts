@@ -3,6 +3,14 @@ import { Colors } from '@/constants/Colors';
 
 export const GlobalStyles = StyleSheet.create({
     // Text Styles
+    pageHeader: {
+        textAlign: 'left', 
+        fontSize: 36, 
+        color: 'black', 
+        fontWeight: 'bold', 
+        marginLeft: 30, 
+        marginBottom:10
+    },
     headerText: {
         color: 'black',
         fontSize: 16,

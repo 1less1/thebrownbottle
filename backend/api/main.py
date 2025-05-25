@@ -7,11 +7,11 @@ import threading
 # Import the name of the python file for the different routes
 import login
 import user
+import role
+import section
 import task
 import recurring_task
 import announcement
-import role
-import section
 import shift
 import shift_cover_request
 import time_off_request
@@ -65,6 +65,31 @@ def get_user_data():
 # -------------------------------------------------------------------------------------------------------
 
 
+
+# Role Routes - /role -----------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route('/role/get-all-roles', methods=['GET'])
+def get_all_roles():
+    return role.get_all_roles(get_db_connection(), request)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+
+# Section Routes - /section -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route('/section/get-all-sections', methods=['GET'])
+def get_all_sections():
+    return section.get_all_sections(get_db_connection(), request)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+
 # Task Routes - /task -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -76,45 +101,23 @@ def handle_new_task():
     # inserts from different clients
     with request_lock:
         return task.handle_new_task(get_db_connection(), request)
+    
+@app.route('/task', methods=['GET'])
+def get_tasks():
+    return task.t_get_tasks(get_db_connection(), request)
 
-# User App Based Routes ('section_id' paramter required):
-@app.route('/task/today-complete', methods=['GET'])
-def t_get_today_tasks_complete():
-    return task.t_get_today_tasks_complete(get_db_connection(), request)
-
-@app.route('/task/today-incomplete', methods=['GET'])
-def t_get_today_tasks_incomplete():
-    return task.t_get_today_tasks_incomplete(get_db_connection(), request)
-
-@app.route('/task/all-complete', methods=['GET'])
-def t_get_all_tasks_complete():
-    return task.t_get_all_tasks_complete(get_db_connection(), request)
-
-@app.route('/task/all-incomplete', methods=['GET'])
-def t_get_all_tasks_incomplete():
-    return task.t_get_all_tasks_incomplete(get_db_connection(), request)
-
-# Admin Based Routes:
-@app.route('/task/tasks-by-section', methods=['GET'])
-def t_get_tasks_by_section():
-    return task.t_get_tasks_by_section(get_db_connection(), request)
-
-@app.route('/task/edit-task', methods=['POST'])
-def edit_task():
+@app.route('/task/<int:task_id>', methods=['PATCH'])
+def update_task(task_id):
     with request_lock:
-        return task.edit_task(get_db_connection(), request)
+        return task.t_update_task(get_db_connection(), request, task_id)
 
-@app.route('/task/delete-task', methods=['POST'])
-def edit_task():
-    with request_lock:
-        return task.edit_task(get_db_connection(), request)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
 
-# Task Routes - /recurring-task -------------------------------------------------------------------------
+# Recurring Task Routes - /recurring-task ---------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 # All routes below query the 'recurring_task' table
@@ -164,30 +167,6 @@ def get_all_announcements():
 @app.route('/time-off-request/BLAH', methods=['GET'])
 def get_time_off_requests():
     return time_off_request.get_time_off_requests(get_db_connection(), request)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
-
-# Role Routes - /role -----------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-@app.route('/role/get-all-roles', methods=['GET'])
-def get_all_roles():
-    return role.get_all_roles(get_db_connection(), request)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
-
-# Section Routes - /section -----------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-@app.route('/section/get-all-sections', methods=['GET'])
-def get_all_sections():
-    return section.get_all_sections(get_db_connection(), request)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
