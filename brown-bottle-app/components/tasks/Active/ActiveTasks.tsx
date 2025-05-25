@@ -21,7 +21,7 @@ interface ActiveTasksProps {
   user: User
 }
 
-const ActiveTasks: React.FC<ActiveTasksProps> = ( user ) => {
+const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
 
     // Need to add a default to the employee's current shift section_id 
     // Default fallback to the section_id=1 if they do not have a shift that day
@@ -57,13 +57,14 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ( user ) => {
     console.log('Checked task IDs:', checkedTasks);
     }, [checkedTasks]);
 
+    // Fetch all Incomplete (complete=0) Active Tasks
     useEffect(() => {
         const fetchTasks = async () => {
         setLoading(true);
         try {
             const data = await getTasks({
             section_id: selectedSectionId,
-            complete: 0, // Only incomplete (active) tasks
+            complete: 0, // Only incomplete tasks
             today: true, // All active tasks up to Today's date
             });
             setTaskData(data);
@@ -79,6 +80,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ( user ) => {
     }, [selectedSectionId]);
 
 
+    // Submit all "Checked" Tasks as Complete (complete=1)
     const handleSubmit = async () => {
         if (checkedTasks.length === 0) {
             alert("Please select at least one task to submit.");

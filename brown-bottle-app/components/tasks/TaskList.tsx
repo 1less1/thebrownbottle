@@ -18,10 +18,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, checkedTasks, onCheckChange 
     <View style={{ width: '100%' }}>
       {tasks.map((task) => (
         <CheckBoxCard
-          title={task.title}
-          description={task.description}
-          dueDate={task.due_date}
-          value={task.task_id}
+          key={task.task_id}
+          task={task}
           checked={checkedTasks.includes(task.task_id)}
           onCheckChange={onCheckChange}
         />
