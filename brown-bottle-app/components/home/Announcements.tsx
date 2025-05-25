@@ -19,7 +19,14 @@ import { Announcement } from '@/types/api';
 const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  
   const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [selectedRoleName, setSelectedRoleName] = useState<string>("");
+  
+  const handleRoleSelect = (roleId: number, roleName: string) => {
+      setSelectedRoleId(roleId);
+      setSelectedRoleName(roleName);
+  };
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false); 
@@ -67,7 +74,7 @@ const Announcements = () => {
        <ModularModal visible={modalVisible} onClose={() => setModalVisible(false)}>
           <RoleDropdown
             selectedRoleId={selectedRoleId}
-            onRoleSelect={setSelectedRoleId} // Only update role on dropdown selection
+            onRoleSelect={handleRoleSelect}
             labelText='Role:'
           />
           <ModularButton 

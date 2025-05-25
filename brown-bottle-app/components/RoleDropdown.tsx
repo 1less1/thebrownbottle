@@ -6,16 +6,20 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getAllRoles } from "@/utils/api/role";
-import { Role } from '@/types/api'
 
+import { Role } from '@/types/api';
 
 interface RoleDropdownProps {
-    selectedRoleId: number;
-    onRoleSelect: (roleId: number) => void; 
-    labelText?: string; // Optional Prop
+  selectedRoleId: number;
+  onRoleSelect: (roleId: number, roleName: string) => void;
+  labelText?: string; // Optional Prop
 }
 
-const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelect, labelText = "Filter:" }) => {
+const RoleDropdown: React.FC<RoleDropdownProps> = ({
+  selectedRoleId,
+  onRoleSelect,
+  labelText = "Filter:",
+}) => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false); 
@@ -29,7 +33,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
         console.error("Error fetching roles:", error);
         setError(true);
       } finally {
-        console.log("Successfully fetched roles!")
+        console.log("Successfully fetched roles!");
         setLoading(false);
       }
     };
@@ -46,25 +50,33 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({ selectedRoleId, onRoleSelec
   }
 
   return (
-
+    
     <View style={styles.container}>
       
       <Text style={styles.label}>{labelText}</Text>
-      
-        <Picker
-          selectedValue={selectedRoleId}
-          onValueChange={(value: number) => {
-            if (value !== selectedRoleId) {
-              onRoleSelect(value);
+
+      <Picker
+        selectedValue={selectedRoleId}
+        onValueChange={(value: string | number) => {
+          const roleId = Number(value);
+          if (roleId !== selectedRoleId) {
+            const selectedRole = roles.find(role => role.role_id === roleId);
+            if (selectedRole) {
+              onRoleSelect(selectedRole.role_id, selectedRole.role_name); // updated
             }
-          }}
-          style={styles.picker}
-        >
-          {roles.map((role) => (
-            <Picker.Item key={role.role_id} label={role.role_name} value={role.role_id} />
-          ))}
-        </Picker>
-      
+          }
+        }}
+        style={styles.picker}
+      >
+        {roles.map((role) => (
+          <Picker.Item
+            key={role.role_id}
+            label={role.role_name}
+            value={role.role_id}
+          />
+        ))}
+      </Picker>
+
     </View>
 
   );
@@ -74,7 +86,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignContent: 'center'
+    alignContent: 'center',
   },
   label: {
     fontSize: 16,

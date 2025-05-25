@@ -11,7 +11,7 @@ import { Section } from '@/types/api'
 
 interface SectionDropdownProps {
   selectedSectionId: number;
-  onSectionSelect: (sectionId: number, sectionName: string) => void;  // <-- updated here
+  onSectionSelect: (sectionId: number, sectionName: string) => void;
   labelText?: string; // Optional Prop
 }
 
@@ -50,7 +50,9 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
   }
 
   return (
+
     <View style={styles.container}>
+      
       <Text style={styles.label}>{labelText}</Text>
 
       <Picker
@@ -77,7 +79,9 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
           />
         ))}
       </Picker>
+      
     </View>
+
   );
 }
 

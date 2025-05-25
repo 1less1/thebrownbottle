@@ -22,6 +22,12 @@ interface AnnouncementModalProps {
 const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose, user }) => {
 
   const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [selectedRoleName, setSelectedRoleName] = useState<string>("");
+  
+  const handleRoleSelect = (roleId: number, roleName: string) => {
+      setSelectedRoleId(roleId);
+      setSelectedRoleName(roleName);
+  };
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -86,7 +92,7 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
       <View style={{ marginBottom: 10 }}>
         <RoleDropdown
         selectedRoleId={selectedRoleId}
-        onRoleSelect={setSelectedRoleId}
+        onRoleSelect={handleRoleSelect}
         labelText="Assign To:"
         />
       </View>

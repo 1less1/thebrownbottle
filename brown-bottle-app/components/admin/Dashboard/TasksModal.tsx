@@ -27,12 +27,20 @@ interface TasksModalProps {
 const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
   const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
+  const [selectedSectionName, setSelectedSectionName] = useState<string>("");
+
+  const handleSectionSelect = (sectionId: number, sectionName: string) => {
+      setSelectedSectionId(sectionId);
+      setSelectedSectionName(sectionName);
+  };
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+
   const [due_date, setDueDate] = useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
-  
   const [isRecurring, setIsRecurring] = useState(false);
   const [start_date, setStartDate] =  useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
+
   // end_date allowed to be NULL!
   const [end_date, setEndDate] = useState<string | null>(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Default to tomorrow's date
   const [noEndDate, setNoEndDate] = useState(false);
@@ -198,7 +206,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
       {/* Section Dropdown */}
       <View style={{ marginBottom: 15}}>
-        <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={setSelectedSectionId} labelText="Assign To:" />
+        <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={handleSectionSelect} labelText="Assign To:" />
       </View>
       
       {/* Recurring Checkbox */}
