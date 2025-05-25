@@ -8,8 +8,6 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import ActiveTasks from '@/components/tasks/Active/ActiveTasks';
 
 import { User } from '@/utils/SessionContext'; 
-import { Task } from '@/types/api';
-import { getTasks } from '@/utils/api/task';
 
 interface ActiveProps {
   user: User;
@@ -19,7 +17,7 @@ const Active: React.FC<ActiveProps> = ({ user }) => {
 
     return (
 
-        <DefaultScrollView refreshing={false}>
+        <DefaultScrollView>
             
             <View style={{marginVertical: 20, width: "100%"}}>
                 <ActiveTasks user={user} />

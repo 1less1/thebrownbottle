@@ -5,58 +5,48 @@ import { Colors } from '@/constants/Colors'; // Assuming you have Colors set up
 
 
 // Define the type of props the DefaultView will receive
+
 interface DefaultScrollViewProps {
   children: React.ReactNode;
   style?: object;
   refreshing?: boolean;
-  onRefresh?: () => void;
+  onRefresh?: () => void; // Optional: if not provided, no refresh control is shown
   topSafeAreaColor?: string;
   bottomSafeAreaColor?: string;
   scrollViewColor?: string;
 }
 
 
-const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({
-  children,
-}) => {
-  const [refreshing, setRefreshing] = useState(false);
-
-  // Handle the refresh action
-  const onRefresh = () => {
-    setRefreshing(true); // Start refreshing
-    // Simulate an API call or some other action
-    setTimeout(() => {
-      setRefreshing(false); // Stop refreshing after 2 seconds (simulate refresh)
-    }, 2000);
-  };
-
+const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, onRefresh, refreshing = false }) => {
+  
   return (
-    <>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-        bounces={true} // iOS, dictates bounce effect (this causes the weird "overscrolling")
-        overScrollMode="always"
-        nestedScrollEnabled={true}
-        keyboardShouldPersistTaps="handled"
-        //scrollEventThrottle={16} // Smooth scrolling performance
-        refreshControl={
-          onRefresh ? (
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.brown} />
-          ) : undefined
-        }
-      >
-      
-        <View style={styles.childrenContainer}>{children}</View>
+    <ScrollView
+      style={[styles.scrollView, style]}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={true}
+      bounces={true}
+      overScrollMode="always"
+      nestedScrollEnabled={true}
+      keyboardShouldPersistTaps="handled"
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.brown}
+            progressViewOffset={200}
+          />
+        ) : undefined
+      }
+    >
 
-      </ScrollView>
-      
-    </>
+      <View style={styles.childrenContainer}>{children}</View>
+
+    </ScrollView>
 
   );
-};
+};``
 
 const styles = StyleSheet.create({
   scrollView: {

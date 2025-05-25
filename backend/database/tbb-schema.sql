@@ -41,9 +41,9 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`employee` (
   `employee_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `first_name` VARCHAR(50) NOT NULL,
-  `last_name` VARCHAR(50) NOT NULL,
-  `email` VARCHAR(128) NOT NULL,
+  `first_name` VARCHAR(250) NOT NULL,
+  `last_name` VARCHAR(250) NOT NULL,
+  `email` VARCHAR(250) NOT NULL,
   `phone_number` VARCHAR(20) NOT NULL,
   `wage` DECIMAL(10,2) NOT NULL,
   `admin` TINYINT UNSIGNED NOT NULL DEFAULT '0',
@@ -78,8 +78,8 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
   `recurring_task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` VARCHAR(250) NOT NULL,
+  `title` VARCHAR(500) NOT NULL,
+  `description` TEXT NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
   `section_id` INT UNSIGNED NOT NULL,
   `mon` TINYINT(1) NOT NULL, -- 1 = true is put into the day the task recurrs
@@ -114,8 +114,8 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` VARCHAR(250) NOT NULL,
+  `title` VARCHAR(500) NOT NULL,
+  `description` TEXT NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
   `section_id` INT UNSIGNED NOT NULL,
   `due_date` DATE NOT NULL,
@@ -158,7 +158,7 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
   `announcement_id` INT NOT NULL AUTO_INCREMENT,
   `author_id` INT UNSIGNED NOT NULL,
-  `title` VARCHAR(100) NOT NULL,
+  `title` VARCHAR(500) NOT NULL,
   `description` TEXT NOT NULL,
   `role_id` INT UNSIGNED NOT NULL DEFAULT 1,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

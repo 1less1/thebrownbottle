@@ -1,5 +1,6 @@
 -- Sample Data to be inserted into the MySQL Database when Docker containers are created
 
+
 -- Sample section data ---------------------------------------------------------------------------------------------------------------------------
 INSERT INTO `thebrownbottle`.`section` (`section_name`)
 VALUES
@@ -10,6 +11,7 @@ VALUES
 ('Patio'),
 ('Lounge'),
 ('Upstairs');
+
 
 -- Sample role data ---------------------------------------------------------------------------------------------------------------------------
 INSERT INTO `thebrownbottle`.`role` (`role_name`)
@@ -22,6 +24,7 @@ VALUES
 ('Kitchen'),
 ('Dish');
 
+
 -- Sample employee data --------------------------------------------------------------------------------------------------------------------------
 INSERT INTO `thebrownbottle`.`employee` 
 (`first_name`, `last_name`, `email`, `phone_number`, `wage`, `admin`, `primary_role`, `secondary_role`, `tertiary_role`)
@@ -31,6 +34,37 @@ VALUES
 ('Jenna', 'Klein', 'jenna.klein@example.com', '555-345-6789', 15.25, 0, 3, 4, NULL),  -- Host (also Server)
 ('Tyler', 'Nguyen', 'tyler.nguyen@example.com', '555-456-7890', 16.00, 0, 4, 5, NULL),  -- Server (also Bartender)
 ('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 6, 7, NULL);  -- Kitchen (also Dish)
+
+
+-- Sample recurring_task data ------------------------------------------------------------------------------------------------------------------------------
+-- Insert recurring task that recurs EVERY DAY starting today, no end date
+INSERT INTO recurring_task
+(title, description, author_id, section_id, mon, tue, wed, thu, fri, sat, sun, start_date, end_date)
+VALUES
+(
+  'Everyday Recurring Task ',
+  'This task recurs all 7 weekdays.',
+  1,       -- Replace with actual author_id
+  1,       -- Replace with actual section_id
+  1, 1, 1, 1, 1, 1, 1,
+  CURDATE(),
+  NULL
+);
+
+-- Insert recurring task that recurs ONLY on WEEKDAYS (Mon-Fri), no end date
+INSERT INTO recurring_task
+(title, description, author_id, section_id, mon, tue, wed, thu, fri, sat, sun, start_date, end_date)
+VALUES
+(
+  'Weekday Recurring Task',
+  'This task recurs every weekday (Mon-Fri).',
+  1,       -- Replace with actual author_id
+  1,       -- Replace with actual section_id
+  1, 1, 1, 1, 1,
+  0, 0,
+  CURDATE(),
+  NULL
+);
 
 
 -- Sample task data ------------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +98,6 @@ VALUES
 (1, 'Bartender Training', 'Bartenders, please review the new cocktail recipes added to the menu.', 5),   -- Bartender
 (2, 'Server Scheduling', 'Servers, be aware that your schedule for next week has been updated. Check the board.', 4),   -- Server
 (1, 'Dishwashing Protocols', 'Dish staff, please adhere to the new cleaning and sanitizing guidelines effective today.', 6);   -- Dish
-
 
 
 -- Sample shift data -----------------------------------------------------------------------------------------------------------------------------

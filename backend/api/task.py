@@ -215,11 +215,14 @@ def t_get_tasks(db, request):
                 t.due_date,
                 t.complete,
                 t.recurring_task_id,
+                t.last_modified_by,
+                CONCAT(lm.first_name, ' ', lm.last_name) AS last_modified_name,
                 DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
                 DATE_FORMAT(t.timestamp, '%H:%i') AS time
             FROM task t
             JOIN employee e ON t.author_id = e.employee_id
             JOIN section s ON t.section_id = s.section_id
+            LEFT JOIN employee lm ON t.last_modified_by = lm.employee_id
             WHERE 1 = 1
         """
 
@@ -297,7 +300,8 @@ def t_update_task(db, request, task_id):
             'section_id': int,
             'due_date': str,  # YYYY-MM-DD
             'complete': int, # 1 or 0
-            'recurring_task_id': int # Foreign Key
+            'recurring_task_id': int, # Foreign Key
+            'last_modified_by': int, # Employee ID
         }
 
         # Validate required and optional fields

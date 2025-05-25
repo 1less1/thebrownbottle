@@ -50,9 +50,8 @@ export default function Tasks() {
 
         { /* Tasks Header */ }
         <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor}}>
-          <Text style={GlobalStyles.pageHeader}>
-            Tasks
-          </Text>
+          
+          <Text style={GlobalStyles.pageHeader}>Tasks</Text>
 
           {/* Tab Bar */}
           <View style={styles.tabBar}>

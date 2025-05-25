@@ -156,7 +156,7 @@ export async function getTasks(options: {
     throw error;
   }
 
-}
+};
 
 
 // Flexible PATCH (Update) Request for task

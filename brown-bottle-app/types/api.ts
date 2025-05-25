@@ -31,8 +31,10 @@ export interface Task {
   complete: number,
   recurring_task_id: number | null,
   due_date: string,
-  date: string,
-  time: string,
+  date: string; // MM/DD/YYYY format
+  time: string; // HH:MM format
+  last_modified_by: number; // employee_id
+  last_modified_name: string;
 }
 
 export type UpdateTaskFields = Partial<{
@@ -43,6 +45,7 @@ export type UpdateTaskFields = Partial<{
   due_date: string;    // 'YYYY-MM-DD'
   complete: 0 | 1;
   recurring_task_id: number;
+  last_modified_by: number; // employee_id
 }>;
 
 

@@ -13,33 +13,63 @@ interface RoleDropdownProps {
   selectedRoleId: number;
   onRoleSelect: (roleId: number, roleName: string) => void;
   labelText?: string; // Optional Prop
+
+  // Optional: If parent passes roles, use them instead of fetching
+  roles?: Role[];
+
+  // Option to disable internal fetching (default true)
+  fetchRoles?: boolean;
 }
 
 const RoleDropdown: React.FC<RoleDropdownProps> = ({
   selectedRoleId,
   onRoleSelect,
   labelText = "Filter:",
+  roles: parentRoles,
+  fetchRoles = true,
 }) => {
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false); 
+  const [roles, setRoles] = useState<Role[]>(parentRoles ?? []);
+  const [loading, setLoading] = useState<boolean>(fetchRoles && !parentRoles);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    const fetchRoles = async () => {
+    // If parent passed roles, just set them
+    if (parentRoles && parentRoles.length > 0) {
+      setRoles(parentRoles);
+      setLoading(false);
+      return; // Skip fetch
+    }
+
+    if (!fetchRoles) {
+      // Disabled fetch and no roles passed -> empty list
+      setRoles([]);
+      setLoading(false);
+      return;
+    }
+
+    // Fetch roles internally if allowed and no parent data
+    const fetchData = async () => {
       try {
         const data = await getAllRoles();
         setRoles(data);
+
+        // Notify parent of the current selectedRoleId's name after loading
+        const currentRole = data.find(
+          (role: Role) => role.role_id === selectedRoleId
+        );
+        if (currentRole) {
+          onRoleSelect(currentRole.role_id, currentRole.role_name);
+        }
       } catch (error) {
         console.error("Error fetching roles:", error);
         setError(true);
       } finally {
-        console.log("Successfully fetched roles!");
         setLoading(false);
       }
     };
 
-    fetchRoles();
-  }, []);
+    fetchData();
+  }, [parentRoles, fetchRoles, selectedRoleId, onRoleSelect]);
 
   if (loading) {
     return <Text style={GlobalStyles.loadingText}>Loading roles...</Text>;
@@ -50,19 +80,20 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
   }
 
   return (
-    
     <View style={styles.container}>
-      
       <Text style={styles.label}>{labelText}</Text>
 
       <Picker
         selectedValue={selectedRoleId}
         onValueChange={(value: string | number) => {
           const roleId = Number(value);
+
           if (roleId !== selectedRoleId) {
-            const selectedRole = roles.find(role => role.role_id === roleId);
+            const selectedRole = roles.find(
+              (role) => role.role_id === roleId
+            );
             if (selectedRole) {
-              onRoleSelect(selectedRole.role_id, selectedRole.role_name); // updated
+              onRoleSelect(selectedRole.role_id, selectedRole.role_name);
             }
           }
         }}
@@ -76,17 +107,15 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
           />
         ))}
       </Picker>
-
     </View>
-
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    alignContent: "center",
   },
   label: {
     fontSize: 16,
