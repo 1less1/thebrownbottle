@@ -75,25 +75,26 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
 
     const [taskData, setTaskData] = useState<Task[]>([]);
     // Fetch all Incomplete (complete=0) Active Tasks when sectionId changes
-    useEffect(() => {
-        const fetchTasks = async () => {
+    const fetchIncompleteTasks = async () => {
         setLoading(true);
+        setError(false);
         try {
             const data = await getTasks({
             section_id: selectedSectionId,
-            complete: 0, // Only incomplete tasks
-            today: true, // All active tasks up to Today's date
+            complete: 0,
+            today: true,
             });
             setTaskData(data);
-            setCheckedTasks([]); // Clear checked tasks list
-        } catch (error) {
-            console.error("Error fetching tasks:", error);
+            setCheckedTasks([]);
+        } catch {
             setError(true);
         } finally {
             setLoading(false);
         }
     };
-        fetchTasks();
+    
+    useEffect(() => {
+        fetchIncompleteTasks();
     }, [selectedSectionId]);
 
     // ------------------------------------------------------------------------------
@@ -119,14 +120,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
             setCheckedTasks([]); // Clear checked tasks
 
             // Refetch tasks for current section
-            setLoading(true);
-            const data = await getTasks({
-            section_id: selectedSectionId,
-            complete: 0, // still incomplete tasks only
-            today: true,
-            });
-            setTaskData(data);
-            setLoading(false);
+            fetchIncompleteTasks();
 
         } catch (error) {
             console.error("Error Submitting Task(s):", error);

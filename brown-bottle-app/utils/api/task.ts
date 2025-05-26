@@ -124,6 +124,7 @@ export async function getTasks(options: {
   complete?: 0 | 1;
   today?: boolean;
   recurring?: boolean;
+  due_date?: string;
 }) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -135,6 +136,7 @@ export async function getTasks(options: {
   if (options.complete !== undefined) params.append("complete", options.complete.toString());
   if (options.today !== undefined) params.append("today", options.today.toString());
   if (options.recurring !== undefined) params.append("recurring", options.recurring.toString());
+  if (options.due_date !== undefined) params.append("due_date", options.due_date.toString())
 
   try {
     const response = await fetch(`${baseURL}/task?${params.toString()}`, {

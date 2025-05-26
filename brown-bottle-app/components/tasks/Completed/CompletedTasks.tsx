@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Platform} from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { format, startOfDay } from 'date-fns';
+import { parseLocalDate } from '@/utils/Helper';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -12,6 +12,7 @@ import AltCard from '@/components/modular/AltCard';
 import LoadingCard from '@/components/modular/LoadingCard';
 import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
+import UniversalDateTimePicker from '@/components/modular/UniversalDateTimePicker';
 import SectionDropdown from '@/components/SectionDropdown';
 import TaskList from '@/components/tasks/TaskList';
 
@@ -31,6 +32,9 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
     const [error, setError] = useState(false);
 
     const [filterModalVisible, setFilterModalVisible] = useState(false);
+    const closeFilterModal = () => {
+        setFilterModalVisible(false);
+    };
     const [submitModalVisible, setSubmitModalVisible] = useState(false);
 
 
@@ -55,19 +59,47 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
     // ------------------------------------------------------------------------------
 
 
+    // Date Time Handling -----------------------------------------------------------
+    
+    const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
+
+    // Handler receives a formatted date string
+    // When setting selectedDate, normalize:
+   const handleDateChange = (formattedDate: string) => {
+        const newDate = parseLocalDate(formattedDate);
+        console.log('Formatted Date Input:', formattedDate);
+        console.log('Parsed Date:', newDate.toString());
+        setSelectedDate(newDate);
+    };
+
+    // When calling API, convert to formatted string:
+    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+
+    const [DTPModalVisible, setDTPModalVisible] = useState(false);
+    const openDTPModal = () => {
+        setDTPModalVisible(true);
+    }
+    const closeDTPModal = () => {
+        setDTPModalVisible(false);
+    }
+
+
+    // ------------------------------------------------------------------------------
+
+
     // Checked Task Tracking --------------------------------------------------------
 
     const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
     const handleCheckChange = (taskId: number, isChecked: boolean) => {
-    setCheckedTasks(prev => {
-        if (isChecked) return [...prev, taskId];
-        return prev.filter(id => id !== taskId);
-    });
+        setCheckedTasks(prev => {
+            if (isChecked) return [...prev, taskId];
+            return prev.filter(id => id !== taskId);
+        });
     };
 
     // Log when checkedTasks changes - **DEBUGGING**
     useEffect(() => {
-    console.log('Checked task IDs:', checkedTasks);
+        console.log('Checked task IDs:', checkedTasks);
     }, [checkedTasks]);
 
     // ------------------------------------------------------------------------------
@@ -77,26 +109,28 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
 
     const [taskData, setTaskData] = useState<Task[]>([]);
     // Fetch all Incomplete (complete=1) Active Tasks when sectionId changes
-    useEffect(() => {
-        const fetchTasks = async () => {
+    const fetchCompleteTasks = async () => {
         setLoading(true);
+        setError(false);
         try {
             const data = await getTasks({
             section_id: selectedSectionId,
-            complete: 1, // Only complete tasks
-            today: true, // All completed tasks up to Today's date
+            complete: 1,
+            due_date: formattedDate,
             });
             setTaskData(data);
-            setCheckedTasks([]); // Clear checked tasks list
-        } catch (error) {
-            console.error("Error fetching tasks:", error);
+            setCheckedTasks([]);
+        } catch {
             setError(true);
         } finally {
             setLoading(false);
         }
     };
-        fetchTasks();
-    }, [selectedSectionId]);
+
+    useEffect(() => {
+        fetchCompleteTasks();
+    }, [selectedSectionId, selectedDate]);
+
 
     // ------------------------------------------------------------------------------
 
@@ -121,14 +155,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
             setCheckedTasks([]); // Clear checked tasks
 
             // Refetch tasks for current section
-            setLoading(true);
-            const data = await getTasks({
-            section_id: selectedSectionId,
-            complete: 1, // still complete tasks only
-            today: true,
-            });
-            setTaskData(data);
-            setLoading(false);
+            await fetchCompleteTasks();;
 
         } catch (error) {
             console.error('Error marking Task(s) as Incomplete:', error);
@@ -139,31 +166,16 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
     // ------------------------------------------------------------------------------
 
 
-    // Date Time Handling -----------------------------------------------------------
-    
-    const [date, setDate] = useState(new Date());
-    const [DTPVisible, setDTPVisible] = useState(false);
-
-    
-    const toggleDTP = () => {
-        setDTPVisible(prev => !prev);
-    };
-
-    const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
-        const currentDate = selectedDate || date;
-        setDTPVisible(Platform.OS === 'ios');
-        setDate(currentDate);
-    };
-
-    // ------------------------------------------------------------------------------
-
-
     return (
         
         <View style={{flex: 1, width: '100%'}}>
 
             <Text style={GlobalStyles.floatingHeaderText}>
                 {selectedSectionName ? selectedSectionName : "Loading..."}
+            </Text>
+
+            <Text style={{ marginVertical: 10 }}>
+                Selected Date: {format(selectedDate, 'yyyy-MM-dd')}
             </Text>                
             
             <Card style={styles.container}>
@@ -185,6 +197,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                             labelText="Section:"
                         />
 
+                        
                         <ModularButton
                             text="Choose Date"
                             textStyle={{ color: 'black'}}
@@ -192,14 +205,29 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                                 GlobalStyles.submitButton, 
                                 {backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, marginVertical: 10}
                             ]}
-                            onPress={toggleDTP} // Gotta Change this to open the Date Time Picker!!!
+                            onPress={openDTPModal} // Gotta Change this to open the Date Time Picker!!!
                         />
                         
+                        <ModularModal visible={DTPModalVisible} onClose={closeDTPModal}>
+                            <View style={{ marginVertical: 10 }}>
+                                <UniversalDateTimePicker
+                                value={selectedDate}
+                                mode="date"
+                                onChange={handleDateChange}
+                                />
+                            </View>
+                            <ModularButton
+                                text="Close"
+                                onPress={closeDTPModal}
+                                style={{ marginBottom: 5 }}
+                            />
+                        </ModularModal>
+                    
 
                         <ModularButton
-                        text="Close"
-                        onPress={() => setFilterModalVisible(false)}
-                        style={{ marginBottom: 5 }}
+                            text="Close"
+                            onPress={closeFilterModal}
+                            style={{ marginBottom: 5 }}
                         />
                     </ModularModal>
 

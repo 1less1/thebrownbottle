@@ -1,4 +1,4 @@
-import { format, isValid } from 'date-fns';
+import { format, isValid, startOfDay, set, parse } from 'date-fns';
 
 // Accepts dateStr in the format YYYY-MM-DD
 export const formatDATE = (dateStr: string | null | undefined, type?: string) => {
@@ -30,4 +30,9 @@ export const formatDATE = (dateStr: string | null | undefined, type?: string) =>
       return format(date, 'MM-dd-yyyy');
   }
 
+};
+
+export const parseLocalDate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
 };
