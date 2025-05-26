@@ -171,13 +171,11 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
                             <LoadingCard
                                 loadingText="Loading tasks..."
                                 textStyle={GlobalStyles.loadingText}
-                                containerStyle={{ height: 380 }}
                             />
                         ) : error ? (
                             <LoadingCard
                                 loadingText="Unable to load tasks!"
                                 textStyle={GlobalStyles.errorText}
-                                containerStyle={{ height: 380 }}
                             />
                         ) : (
                             <TaskList

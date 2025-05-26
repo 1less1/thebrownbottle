@@ -212,13 +212,12 @@ def t_get_tasks(db, request):
                 CONCAT(e.first_name, ' ', e.last_name) AS author,
                 t.section_id,
                 s.section_name,
-                t.due_date,
+                DATE_FORMAT(t.due_date, '%Y-%m-%d') AS due_date,
                 t.complete,
                 t.recurring_task_id,
                 t.last_modified_by,
                 CONCAT(lm.first_name, ' ', lm.last_name) AS last_modified_name,
-                DATE_FORMAT(t.timestamp, '%m/%d/%Y') AS date,
-                DATE_FORMAT(t.timestamp, '%H:%i') AS time
+                t.timestamp
             FROM task t
             JOIN employee e ON t.author_id = e.employee_id
             JOIN section s ON t.section_id = s.section_id

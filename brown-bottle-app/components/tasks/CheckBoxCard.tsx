@@ -103,7 +103,7 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
             <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
               Due Date:{' '}
             </Text>
-            {formatDATE(task.due_date, 'weekday')}
+              {formatDATE(task.due_date, 'weekday')}
           </Text>
 
           <Text style={[GlobalStyles.text, { marginTop: 5 }]}>

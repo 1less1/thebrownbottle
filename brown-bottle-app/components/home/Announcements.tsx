@@ -9,9 +9,9 @@ import AltCard from '@/components/modular/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/RoleDropdown';
 
-import ModularButton from '../modular/ModularButton';
-import ModularModal from '../modular/ModularModal';
-import LoadingCard from '../modular/LoadingCard';
+import ModularButton from '@/components/modular/ModularButton';
+import ModularModal from '@/components/modular/ModularModal';
+import LoadingCard from '@/components/modular/LoadingCard';
 
 import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
 import { Announcement } from '@/types/api';

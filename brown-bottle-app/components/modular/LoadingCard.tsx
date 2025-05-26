@@ -26,7 +26,6 @@ const LoadingCard: React.FC<LoadingCardProps> = ({
 
 const styles = StyleSheet.create({
   loadingContainer: {
-    height: 200,
     width: '100%',
     backgroundColor: Colors.white,
     alignItems: 'center',
@@ -36,6 +35,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.gray,
     fontStyle: 'italic',
+    alignSelf: 'center',
   },
 });
 
