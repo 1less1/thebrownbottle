@@ -14,7 +14,9 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, checkedTasks, onCheckChange }) => {
+  
   return (
+    
     <View style={{ width: '100%' }}>
       {tasks.map((task) => (
         <CheckBoxCard
@@ -25,6 +27,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, checkedTasks, onCheckChange 
         />
       ))}
     </View>
+
   );
 };
 

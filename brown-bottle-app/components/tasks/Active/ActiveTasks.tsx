@@ -20,11 +20,10 @@ import { Task, Section } from '@/types/api';
 
 interface ActiveTasksProps {
   user: User
+  sections: Section[]
 }
 
-const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
-
-    const [taskData, setTaskData] = useState<Task[]>([]);
+const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -33,8 +32,30 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
     const [submitModalVisible, setSubmitModalVisible] = useState(false);
 
 
-    const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
+    // Section Handling -------------------------------------------------------------
 
+    // Need to add a default to the employee's current shift section_id 
+    // Default fallback to the section_id=1 if they do not have a shift that day
+    const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
+    const [selectedSectionName, setSelectedSectionName] = useState<string>("Loading...");
+
+    useEffect(() => {
+        if (sections && sections.length > 0 && sections[0].section_name) {
+            setSelectedSectionName(sections[0].section_name)
+        }
+    }, [sections]);
+
+    const handleSectionSelect = (sectionId: number, sectionName: string) => {
+        setSelectedSectionId(sectionId);
+        setSelectedSectionName(sectionName);
+    };
+    
+    // ------------------------------------------------------------------------------
+
+
+    // Checked Task Tracking --------------------------------------------------------
+
+    const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
     const handleCheckChange = (taskId: number, isChecked: boolean) => {
     setCheckedTasks(prev => {
         if (isChecked) return [...prev, taskId];
@@ -42,23 +63,18 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
     });
     };
 
-    // Log when checkedTasks changes
+    // Log when checkedTasks changes - **DEBUGGING**
     useEffect(() => {
     console.log('Checked task IDs:', checkedTasks);
     }, [checkedTasks]);
 
+    // ------------------------------------------------------------------------------
 
-    // Need to add a default to the employee's current shift section_id 
-    // Default fallback to the section_id=1 if they do not have a shift that day
-    const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
-    const [selectedSectionName, setSelectedSectionName] = useState<string>("");
 
-    const handleSectionSelect = (sectionId: number, sectionName: string) => {
-        setSelectedSectionId(sectionId);
-        setSelectedSectionName(sectionName);
-    };
+    // Task Fetching ----------------------------------------------------------------
 
-    // Fetch all Incomplete (complete=0) Active Tasks
+    const [taskData, setTaskData] = useState<Task[]>([]);
+    // Fetch all Incomplete (complete=0) Active Tasks when sectionId changes
     useEffect(() => {
         const fetchTasks = async () => {
         setLoading(true);
@@ -69,6 +85,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
             today: true, // All active tasks up to Today's date
             });
             setTaskData(data);
+            setCheckedTasks([]); // Clear checked tasks list
         } catch (error) {
             console.error("Error fetching tasks:", error);
             setError(true);
@@ -79,18 +96,10 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
         fetchTasks();
     }, [selectedSectionId]);
 
-    const [sections, setSections] = useState<Section[]>([]);
+    // ------------------------------------------------------------------------------
 
-    // Fetch Sections
-    useEffect(() => {
-        async function loadSections() {
-            const data = await getAllSections();
-            setSections(data);
-            setSelectedSectionName(data[0].section_name);
-        }
-        loadSections();
-    }, []);
 
+    // Task Submitting --------------------------------------------------------------
 
     // Submit all "Checked" Tasks as Complete (complete=1)
     const handleSubmit = async () => {
@@ -125,6 +134,9 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
         }
     };
 
+    // ------------------------------------------------------------------------------
+
+
     return (
 
         <View style={{flex: 1, width: '100%'}}>
@@ -147,7 +159,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
                         <SectionDropdown
                             selectedSectionId={selectedSectionId}
                             onSectionSelect={handleSectionSelect}
-                            sections={sections} // Pass sections from parent
+                            sections={sections} // Pass sections data from Parent
                             fetchSections={false}  
                             labelText="Section:"
                         />
@@ -189,7 +201,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
 
                     <ModularModal visible={submitModalVisible} onClose={() => setSubmitModalVisible(false)}>
                         
-                        <Text style={GlobalStyles.text}>Are you sure you want to submit the task(s)?</Text>
+                        <Text style={GlobalStyles.text}>Are you sure you want to submit the selected task(s) as complete?</Text>
                         <View style={styles.buttonRowContainer }>
                             <ModularButton
                                 text="Yes"

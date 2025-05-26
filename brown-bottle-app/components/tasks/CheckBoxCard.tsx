@@ -20,11 +20,8 @@ interface CheckBoxCardProps {
 
 const LONG_PRESS_DURATION = 500; // ms, match delayLongPress
 
-const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
-  task,
-  checked,
-  onCheckChange,
-}) => {
+const CheckBoxCard: React.FC<CheckBoxCardProps> = ({ task, checked, onCheckChange }) => {
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const fillAnim = useRef(new Animated.Value(0)).current;
@@ -54,8 +51,10 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
   };
 
   return (
+
     <>
-      {/* Touchable Container */}
+
+      {/* CheckBoxCard */}
       <TouchableOpacity
         onPress={openModal}
         onLongPress={toggleCheck}
@@ -65,7 +64,9 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
         onPressOut={handlePressOut}
         style={{ width: '100%' }}
       >
+
         <AltCard style={styles.checkBoxCard}>
+
           {/* Animated Fill Bar */}
           <Animated.View
             pointerEvents="none"
@@ -84,19 +85,23 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
               {task.title}
             </Text>
           </View>
-
+          
           <Ionicons
             name={checked ? 'checkbox' : 'square-outline'}
             size={24}
             color="black"
             style={{ marginLeft: 10, zIndex: 1 }}
           />
+
         </AltCard>
+
       </TouchableOpacity>
 
       {/* Modal */}
       <ModularModal visible={modalVisible} onClose={closeModal}>
+
         <View>
+
           <Text style={GlobalStyles.headerText}>Task Information</Text>
 
           <Text style={[GlobalStyles.text, { marginTop: 5 }]}>
@@ -119,10 +124,13 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({
           <Text style={[GlobalStyles.smallAltText, { marginTop: 5 }]}>
             Last Modified By: {task.last_modified_name}
           </Text>
+
         </View>
 
         <ModularButton text="Close" onPress={closeModal} style={{ marginVertical: 5 }} />
+
       </ModularModal>
+      
     </>
     
   );

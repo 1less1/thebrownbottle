@@ -8,19 +8,21 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import CompletedTasks from '@/components/tasks/Completed/CompletedTasks';
 
 import { User } from '@/utils/SessionContext'; 
+import { Section } from '@/types/api';
 
 interface CompletedProps {
   user: User;
+  sections: Section[]
 }
 
-const Completed: React.FC<CompletedProps> = ({ user }) => {
+const Completed: React.FC<CompletedProps> = ({ user, sections }) => {
 
     return (
 
         <DefaultScrollView>
             
             <View style={{marginVertical: 20, width: "100%"}}>
-                <CompletedTasks user={user} />
+                <CompletedTasks user={user} sections={sections} />
             </View>
 
         </DefaultScrollView>

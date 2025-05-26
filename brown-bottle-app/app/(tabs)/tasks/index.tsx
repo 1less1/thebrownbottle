@@ -1,5 +1,5 @@
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useEffect, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
@@ -14,6 +14,8 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
+import { Task, Section } from '@/types/api';
+import { getAllSections } from '@/utils/api/section';
 
 export default function Tasks() {
   // Dynamic Status Bar
@@ -27,20 +29,34 @@ export default function Tasks() {
   const { user } = useSession();
   const [activeTab, setActiveTab] = useState(0);
 
+
+  const [sections, setSections] = useState<Section[]>([]);
+  // Fetch Sections
+  useEffect(() => {
+      async function loadSections() {
+          const data = await getAllSections();
+          setSections(data);
+          //setSelectedSectionName(data[0].section_name);
+      }
+      loadSections();
+  }, []);
+
+
   // Define available tabs and corresponding components
   const tabs = [
-    { key: 'active', title: 'Active', component: user ? <Active user={user} /> : 
+    { key: 'active', title: 'Active', component: user && sections ? <Active user={user} sections={sections} /> : 
     <LoadingCircle
       size="large"
       style={{ marginTop: 40, alignSelf: 'center' }}
     /> },
 
-    { key: 'completed', title: 'Completed', component: user ? <Completed user={user}/> : 
+    { key: 'completed', title: 'Completed', component: user && sections ? <Completed user={user} sections={sections}/> : 
     <LoadingCircle
       size="large"
       style={{ marginTop: 40, alignSelf: 'center' }}
     /> },
   ];
+
 
   return (
 
@@ -73,14 +89,14 @@ export default function Tasks() {
         
         {/* Render content based on selected tab */}
         <View style={styles.tabContent}>
-          {tabs[activeTab]?.component} {/* Render the component of the active tab */}
+          {tabs[activeTab]?.component}
         </View>
               
       </View>
       
     </DefaultView>
 
-  )
+  );
 };
 
 const styles = StyleSheet.create ({

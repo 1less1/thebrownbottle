@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView, Button, Platform} from 'react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -20,11 +22,10 @@ import { Task, Section} from '@/types/api';
 
 interface CompletedTasksProps {
   user: User
+  sections: Section[]
 }
 
-const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
-    
-    const [taskData, setTaskData] = useState<Task[]>([]);
+const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -33,8 +34,30 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
     const [submitModalVisible, setSubmitModalVisible] = useState(false);
 
 
-    const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
+    // Section Handling -------------------------------------------------------------
 
+    // Need to add a default to the employee's current shift section_id 
+    // Default fallback to the section_id=1 if they do not have a shift that day
+    const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
+    const [selectedSectionName, setSelectedSectionName] = useState<string>("Loading...");
+
+    useEffect(() => {
+        if (sections && sections.length > 0 && sections[0].section_name) {
+            setSelectedSectionName(sections[0].section_name)
+        }
+    }, [sections]);
+
+    const handleSectionSelect = (sectionId: number, sectionName: string) => {
+        setSelectedSectionId(sectionId);
+        setSelectedSectionName(sectionName);
+    };
+    
+    // ------------------------------------------------------------------------------
+
+
+    // Checked Task Tracking --------------------------------------------------------
+
+    const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
     const handleCheckChange = (taskId: number, isChecked: boolean) => {
     setCheckedTasks(prev => {
         if (isChecked) return [...prev, taskId];
@@ -42,22 +65,18 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
     });
     };
 
-    // Log when checkedTasks changes
+    // Log when checkedTasks changes - **DEBUGGING**
     useEffect(() => {
     console.log('Checked task IDs:', checkedTasks);
     }, [checkedTasks]);
 
-     // Need to add a default to the employee's current shift section_id 
-    // Default fallback to the section_id=1 if they do not have a shift that day
-    const [selectedSectionId, setSelectedSectionId] = useState<number>(1);
-    const [selectedSectionName, setSelectedSectionName] = useState<string>("");
+    // ------------------------------------------------------------------------------
 
-    const handleSectionSelect = (sectionId: number, sectionName: string) => {
-        setSelectedSectionId(sectionId);
-        setSelectedSectionName(sectionName);
-    };
 
-    // Fetch Completed Tasks
+    // Task Fetching ----------------------------------------------------------------
+
+    const [taskData, setTaskData] = useState<Task[]>([]);
+    // Fetch all Incomplete (complete=1) Active Tasks when sectionId changes
     useEffect(() => {
         const fetchTasks = async () => {
         setLoading(true);
@@ -65,9 +84,10 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
             const data = await getTasks({
             section_id: selectedSectionId,
             complete: 1, // Only complete tasks
-            today: true, // All active tasks up to Today's date
+            today: true, // All completed tasks up to Today's date
             });
             setTaskData(data);
+            setCheckedTasks([]); // Clear checked tasks list
         } catch (error) {
             console.error("Error fetching tasks:", error);
             setError(true);
@@ -75,26 +95,18 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
             setLoading(false);
         }
     };
-
         fetchTasks();
     }, [selectedSectionId]);
 
-    const [sections, setSections] = useState<Section[]>([]);
-    
-    // Fetch Sections
-    useEffect(() => {
-        async function loadSections() {
-            const data = await getAllSections();
-            setSections(data);
-            setSelectedSectionName(data[0].section_name);
-        }
-        loadSections();
-    }, []);
-    
+    // ------------------------------------------------------------------------------
 
+
+    // Task Submitting --------------------------------------------------------------
+
+    // Submit all "Checked" Tasks as Incomplete (complete=0)
     const handleSubmit = async () => {
         if (checkedTasks.length === 0) {
-            alert('Please select at least one task to "uncheck".');
+            alert('Please select at least one task to mark as incomplete.');
             return;
         }
 
@@ -104,7 +116,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
                 checkedTasks.map(taskId => updateTask(taskId, { complete: 0, last_modified_by: Number(user.user_id)}))
             );
 
-            alert('Task(s) "Unchecked" Successfully!');
+            alert('Task(s) marked as Incomplete Successfully!');
             setSubmitModalVisible(false);
             setCheckedTasks([]); // Clear checked tasks
 
@@ -119,10 +131,32 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
             setLoading(false);
 
         } catch (error) {
-            console.error('Error "Unchecking" Task(s):', error);
-            alert('Error: Failed to "Uncheck" Task(s). Please try again.');
+            console.error('Error marking Task(s) as Incomplete:', error);
+            alert('Error: Failed to mark Task(s) as Incomplete. Please try again.');
         }
     };
+    
+    // ------------------------------------------------------------------------------
+
+
+    // Date Time Handling -----------------------------------------------------------
+    
+    const [date, setDate] = useState(new Date());
+    const [DTPVisible, setDTPVisible] = useState(false);
+
+    
+    const toggleDTP = () => {
+        setDTPVisible(prev => !prev);
+    };
+
+    const onChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+        const currentDate = selectedDate || date;
+        setDTPVisible(Platform.OS === 'ios');
+        setDate(currentDate);
+    };
+
+    // ------------------------------------------------------------------------------
+
 
     return (
         
@@ -150,6 +184,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
                             fetchSections={false}  
                             labelText="Section:"
                         />
+
                         <ModularButton
                             text="Choose Date"
                             textStyle={{ color: 'black'}}
@@ -157,8 +192,10 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
                                 GlobalStyles.submitButton, 
                                 {backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, marginVertical: 10}
                             ]}
-                            onPress={handleSubmit} // Gotta Change this to open the Date Time Picker!!!
+                            onPress={toggleDTP} // Gotta Change this to open the Date Time Picker!!!
                         />
+                        
+
                         <ModularButton
                         text="Close"
                         onPress={() => setFilterModalVisible(false)}
@@ -197,7 +234,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user }) => {
 
                     <ModularModal visible={submitModalVisible} onClose={() => setSubmitModalVisible(false)}>
                         
-                        <Text style={GlobalStyles.text}>Are you sure you want to "uncheck" the task(s)?</Text>
+                        <Text style={GlobalStyles.text}>Are you sure you want mark the following task(s) as incomplete?</Text>
                         <View style={styles.buttonRowContainer }>
                             <ModularButton
                                 text="Yes"
