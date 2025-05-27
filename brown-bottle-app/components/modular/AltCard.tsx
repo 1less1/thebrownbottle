@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightTan, // Default background, can be overridden
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderRadius: 15,
+    borderRadius: 10,
 
     // These Remove the default Shadow Aspect
     shadowColor: 'transparent',  // Remove shadow color (iOS)

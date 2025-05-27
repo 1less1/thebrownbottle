@@ -121,7 +121,8 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `due_date` DATE NOT NULL,
   `complete` TINYINT(1) NOT NULL DEFAULT 0,  -- 0 = false, 1 = true
   `recurring_task_id` INT UNSIGNED DEFAULT NULL,  -- Foreign key to the recurring_task table, nullable for non-recurring tasks
-  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- creation time
+  `last_modified_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP, -- last updated time
   `last_modified_by` INT UNSIGNED DEFAULT NULL,  -- Tracks the employee who last modified the task
   PRIMARY KEY (`task_id`),
   INDEX `fk_task_author_idx` (`author_id`),

@@ -5,12 +5,11 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import RoleDropdown from '@/components/RoleDropdown';
-import { User } from '@/utils/SessionContext'; // Import type: User
-
+import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
+import { User } from '@/utils/SessionContext';
 import { insertAnnouncement } from '@/utils/api/announcement';
-import ModularModal from '@/components/modular/ModularModal';
 
 
 interface AnnouncementModalProps {
@@ -32,6 +31,13 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setSelectedRoleId(1);
+    setSelectedRoleName('');
+  };
+
 
   const handlePost = async () => {
     if (!title.trim() || !description.trim() || selectedRoleId === -1) {
@@ -48,10 +54,7 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
       );
       alert("Announcement Posted Successfully!")
 
-      // Clear Form
-      setTitle('');
-      setDescription('');
-      setSelectedRoleId(1);
+      resetForm();
 
       onClose();
     } catch (error) {
@@ -61,9 +64,7 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
   };
 
   const handleClose = () => {
-    setTitle('');
-    setDescription('');
-    setSelectedRoleId(1);
+    resetForm();
     onClose();
   };
 
@@ -114,6 +115,7 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
       </View>
 
     </ModularModal>
+    
   );
 };
 

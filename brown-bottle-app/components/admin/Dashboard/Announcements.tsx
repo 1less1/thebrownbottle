@@ -23,10 +23,10 @@ const Announcements: React.FC<AnnouncementProps> = ({ user }) => {
   return (
 
     <View style={styles.container}>
-      {/* This is the clickable content */}
+      {/* Clickable Content */}
       <TouchableOpacity onPress={toggleModal} style={styles.content}>
-          <Ionicons name="notifications" size={30} color="black" style={styles.icon} />
-          <Text style={GlobalStyles.boldText}>Announcement</Text>
+        <Ionicons name="notifications" size={30} color="black" style={styles.icon} />
+        <Text style={GlobalStyles.boldText}>Announcement</Text>
       </TouchableOpacity>
 
       {/* Modal component that appears when the content is clicked */}
@@ -38,7 +38,7 @@ const Announcements: React.FC<AnnouncementProps> = ({ user }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexShrink: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',  
     padding: 15,  
-    width: 150,  
     height: 150,  
     justifyContent: 'center',  
   },

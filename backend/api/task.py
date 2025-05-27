@@ -216,6 +216,7 @@ def t_get_tasks(db, request):
                 t.complete,
                 t.recurring_task_id,
                 t.last_modified_by,
+                t.last_modified_at,
                 CONCAT(lm.first_name, ' ', lm.last_name) AS last_modified_name,
                 t.timestamp
             FROM task t

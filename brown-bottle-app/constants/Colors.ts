@@ -24,7 +24,8 @@ export const Colors = {
   mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
   yellowTan: '#FFDEAB',
-  brown: '#7C580D',
+  lightBrown: '#7C580D',
+  brown: '#5D3A00',
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
 

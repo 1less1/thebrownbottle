@@ -21,22 +21,23 @@ const Tasks: React.FC<TasksProps> = ({ user }) => {
   };
 
   return (
+
     <View style={styles.container}>
-        {/* Touchable content */}
-        <TouchableOpacity onPress={toggleModal} style={styles.content}>
+      {/* Clickable Content */}
+      <TouchableOpacity onPress={toggleModal} style={styles.content}>
         <Ionicons name="create" size={30} color="black" style={styles.icon} />
         <Text style={GlobalStyles.boldText}>Assign Task</Text>
-        </TouchableOpacity>
+      </TouchableOpacity>
 
-        {/* Modal component that appears when the content is clicked */}
-        <TasksModal visible={modalVisible} onClose={toggleModal} user={user} />
+      {/* Modal component that appears when the content is clicked */}
+      <TasksModal visible={modalVisible} onClose={toggleModal} user={user} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexShrink: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -45,8 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     flexDirection: 'column',  
-    padding: 15,  
-    width: 150,  
+    padding: 15, 
     height: 150,  
     justifyContent: 'center',  
   },

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { format, startOfDay } from 'date-fns';
+import dayjs from 'dayjs';
 import { parseLocalDate } from '@/utils/Helper';
 
 import { Colors } from '@/constants/Colors';
@@ -12,7 +12,7 @@ import AltCard from '@/components/modular/AltCard';
 import LoadingCard from '@/components/modular/LoadingCard';
 import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
-import UniversalDateTimePicker from '@/components/modular/UniversalDateTimePicker';
+import UniversalDatePicker from '@/components/modular/UniversalDatePicker';
 import SectionDropdown from '@/components/SectionDropdown';
 import TaskList from '@/components/tasks/TaskList';
 
@@ -20,6 +20,7 @@ import { getTasks, updateTask } from '@/utils/api/task';
 import { getAllSections } from '@/utils/api/section';
 import { User } from '@/utils/SessionContext';
 import { Task, Section} from '@/types/api';
+
 
 interface CompletedTasksProps {
   user: User
@@ -61,28 +62,23 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
 
     // Date Time Handling -----------------------------------------------------------
     
-    const [selectedDate, setSelectedDate] = useState<Date>(startOfDay(new Date()));
+    const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
 
-    // Handler receives a formatted date string
-    // When setting selectedDate, normalize:
-   const handleDateChange = (formattedDate: string) => {
-        const newDate = parseLocalDate(formattedDate);
-        console.log('Formatted Date Input:', formattedDate);
-        console.log('Parsed Date:', newDate.toString());
-        setSelectedDate(newDate);
+    // Handler receives a formatted date string (YYYY-MM-DD)
+    const handleDateChange = (formattedDate: string) => {
+    const parsed = dayjs(formattedDate, 'YYYY-MM-DD', true); // strict parsing
+    if (parsed.isValid()) {
+        // Normalize to start of day and format back to string
+        setSelectedDate(parsed.startOf('day').format('YYYY-MM-DD'));
+    } else {
+        console.warn('Invalid date string:', formattedDate);
+        }
     };
-
-    // When calling API, convert to formatted string:
-    const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-
-    const [DTPModalVisible, setDTPModalVisible] = useState(false);
-    const openDTPModal = () => {
-        setDTPModalVisible(true);
-    }
-    const closeDTPModal = () => {
-        setDTPModalVisible(false);
-    }
-
+    
+    const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const toggleDatePicker = () => {
+        setDatePickerVisible((prev) => !prev);
+    };
 
     // ------------------------------------------------------------------------------
 
@@ -116,7 +112,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
             const data = await getTasks({
             section_id: selectedSectionId,
             complete: 1,
-            due_date: formattedDate,
+            due_date: selectedDate,
             });
             setTaskData(data);
             setCheckedTasks([]);
@@ -130,7 +126,6 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
     useEffect(() => {
         fetchCompleteTasks();
     }, [selectedSectionId, selectedDate]);
-
 
     // ------------------------------------------------------------------------------
 
@@ -172,21 +167,25 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
 
             <Text style={GlobalStyles.floatingHeaderText}>
                 {selectedSectionName ? selectedSectionName : "Loading..."}
-            </Text>
-
-            <Text style={{ marginVertical: 10 }}>
-                Selected Date: {format(selectedDate, 'yyyy-MM-dd')}
-            </Text>                
+            </Text>             
             
             <Card style={styles.container}>
             
                 <View style={styles.scrollContainer}>
 
-                    <ModularButton
-                        text="Filter"
-                        onPress={() => setFilterModalVisible(true)}
-                        style={{ marginTop: 5, marginBottom: 10 }}
-                    />
+                    <View style={styles.filterRowContainer}>
+                        <ModularButton
+                            text="Filter"
+                            onPress={() => setFilterModalVisible(true)}
+                            style={{ flexGrow: 1, flexShrink: 1, }}
+                        />
+                        <View style={{ paddingRight: 5}}>
+                            <Text style={GlobalStyles.altText}>
+                                <Text style={GlobalStyles.boldText}>Selected Date: </Text>
+                                {selectedDate}
+                            </Text>
+                        </View>
+                    </View>
 
                     <ModularModal visible={filterModalVisible} onClose={() => setFilterModalVisible(false)}>
                         <SectionDropdown
@@ -205,23 +204,21 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                                 GlobalStyles.submitButton, 
                                 {backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, marginVertical: 10}
                             ]}
-                            onPress={openDTPModal} // Gotta Change this to open the Date Time Picker!!!
+                            onPress={toggleDatePicker}
                         />
                         
-                        <ModularModal visible={DTPModalVisible} onClose={closeDTPModal}>
-                            <View style={{ marginVertical: 10 }}>
-                                <UniversalDateTimePicker
-                                value={selectedDate}
-                                mode="date"
-                                onChange={handleDateChange}
+                        
+                        {datePickerVisible && (
+                            <View style={{ marginBottom: 10 }}>
+                                <UniversalDatePicker
+                                    dateString={selectedDate}
+                                    onChange={(dateString) => {
+                                        handleDateChange(dateString);
+                                    }}
                                 />
                             </View>
-                            <ModularButton
-                                text="Close"
-                                onPress={closeDTPModal}
-                                style={{ marginBottom: 5 }}
-                            />
-                        </ModularModal>
+                        )}
+
                     
 
                         <ModularButton
@@ -308,6 +305,14 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         flexDirection: 'row',
         justifyContent: 'flex-end',
+        gap: 10,
+    },
+    filterRowContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center',
+        marginTop: 5, 
+        marginBottom: 10,
         gap: 10,
     },
 });

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable, TextComponent } from 'react-native';
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 
@@ -10,12 +10,11 @@ import SectionDropdown from '@/components/SectionDropdown';
 import HorizontalCheckboxList from '@/components/modular/HorizontalCheckboxList';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
+import DatePickerModal from '@/components/modular/DatePickerModal';
 
-import { User } from '@/utils/SessionContext'; // Import type: User
+import { User } from '@/utils/SessionContext';
 import { insertRecurringTask, insertTask } from '@/utils/api/task';
-
-// Helper function to validate date format (YYYY-MM-DD)
-const isValidDate = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date);
+import { isValidDate } from '@/utils/Helper';
 
 
 interface TasksModalProps {
@@ -31,7 +30,6 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
   const handleSectionSelect = (sectionId: number, sectionName: string) => {
       setSelectedSectionId(sectionId);
-      setSelectedSectionName(sectionName);
   };
 
   const [title, setTitle] = useState('');
@@ -45,6 +43,10 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   const [end_date, setEndDate] = useState<string | null>(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Default to tomorrow's date
   const [noEndDate, setNoEndDate] = useState(false);
 
+  const [DPVisibleOne, setDPVisibleOne] = useState(false);
+  const [DPVisibleTwo, setDPVisibleTwo] = useState(false);
+  const [DPVisibleThree, setDPVisibleThree] = useState(false);
+
   const dayMappings = {
     Mon: 'mon',
     Tue: 'tue',
@@ -56,6 +58,22 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   };
 
   const [recurrence_days, setRecurrenceDays] = useState<string[]>([]);
+
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setDueDate(dayjs().format('YYYY-MM-DD'));
+    setSelectedSectionId(1);
+    setSelectedSectionName('');
+    setRecurrenceDays([]);
+    setStartDate(dayjs().format('YYYY-MM-DD'));
+    setEndDate(dayjs().add(1, 'day').format('YYYY-MM-DD'));
+    setIsRecurring(false);
+    setNoEndDate(false);
+    setDPVisibleOne(false);
+    setDPVisibleTwo(false);
+    setDPVisibleThree(false);
+  };
 
   const handleAssign = async () => {
     // Common checks for title, description, and section
@@ -135,16 +153,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       alert("Task Posted Successfully!");
       console.log("Task Posted Successfully!");
 
-      // Clear Form
-      setTitle('');
-      setDescription('');
-      setDueDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-      setSelectedSectionId(1);
-      setRecurrenceDays([]);
-      setStartDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-      setEndDate(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Reset to tomorrow's date
-      setIsRecurring(false);
-      setNoEndDate(false); // Reset checkbox
+      resetForm();
 
       onClose();
 
@@ -155,17 +164,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   };
 
   const handleClose = () => {
-    // Clear Form
-    setTitle('');
-    setDescription('');
-    setDueDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-    setSelectedSectionId(1);
-    setRecurrenceDays([]);
-    setStartDate(dayjs().format('YYYY-MM-DD')); // Reset to today's date
-    setEndDate(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Reset to tomorrow's date
-    setIsRecurring(false);
-
-
+    resetForm();
     onClose();
   };
 
@@ -181,7 +180,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       <Text style={GlobalStyles.modalTitle}>New Task</Text>
       
       {/* Title Input */}
-      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, {marginBottom: 15}]}  />
+      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, { marginBottom: 15 }]}  />
       
       {/* Description Input */}
       <TextInput
@@ -196,21 +195,40 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       {/* Due Date Input */}
       {!isRecurring && (
         <>
-          <View style= {{ flexDirection: 'row' }}>
-            <Text style={[GlobalStyles.inputLabelText, {alignSelf: 'center'}]}>Due Date: </Text>
-            <TextInput placeholder="Enter Date" value={due_date} onChangeText={setDueDate} style={[GlobalStyles.input, {marginBottom: 5, flex: 1}]} />
+          <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
+            <ModularButton 
+              text='Choose Date'
+              textStyle={{ color: 'black' }}
+              style={[
+                { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
+              ]} 
+              onPress={() => setDPVisibleOne(true)}
+            />
+            <View style={styles.dateContainer}>     
+              <Text style={GlobalStyles.text}>Due Date: </Text>
+              <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{due_date}</Text>
+            </View>
           </View>
-          <Text style={[GlobalStyles.smallAltText, { marginBottom: 10 }]}>Example: YYYY-MM-DD</Text>
+
+          <DatePickerModal
+            visible={DPVisibleOne}
+            onClose={() => setDPVisibleOne(false)}
+            dateString={due_date}
+            onChange={(newDate) => {
+              setDueDate(newDate);
+              setDPVisibleOne(false);
+            }}
+          />
         </>
       )}
 
       {/* Section Dropdown */}
-      <View style={{ marginBottom: 15}}>
+      <View style={{ marginBottom: 15 }}>
         <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={handleSectionSelect} labelText="Assign To:" />
       </View>
       
       {/* Recurring Checkbox */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15, }}>
         <Pressable onPress={() => setIsRecurring(!isRecurring)} style={{ marginRight: 5 }}>
           <Ionicons
             name={isRecurring ? 'checkbox' : 'square-outline'}
@@ -221,9 +239,13 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         <Text style={GlobalStyles.mediumText}>Recurring Task</Text>
       </View>
 
+
+      {/* Recurring Task Components */}
       {isRecurring && (
+        
         <>
-          <View style={{ marginBottom: 15}}>
+          {/* Day Checkboxes */}
+          <View style={{ marginBottom: 15 }}>
             <HorizontalCheckboxList
               labelText="Select Days:"
               optionMap={dayMappings}
@@ -231,39 +253,91 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
             />
           </View>
 
-          <View style={{ marginBottom: 15 }}>
+          <>
             {/* Start Date Input */}
-            <>
-              <View style= {{ flexDirection: 'row' }}>
-                <Text style={[GlobalStyles.inputLabelText, { width: 75}]}>Start Date: </Text>
-                <TextInput placeholder="Enter Date" value={start_date} onChangeText={setStartDate} style={[GlobalStyles.input, {marginBottom: 5, flex: 1}]} />
+            <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
+              <ModularButton 
+                text='Choose Date'
+                textStyle={{ color: 'black' }}
+                style={[
+                  { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
+                ]} 
+                onPress={() => setDPVisibleTwo(true)}
+              />
+              <View style={styles.dateContainer}>     
+                <Text style={GlobalStyles.text}>Start Date: </Text>
+                <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{start_date}</Text>
               </View>
-              <Text style={[GlobalStyles.smallAltText, { marginBottom: 10 }]}>Example: YYYY-MM-DD</Text>
-            </>
-
-            {!noEndDate && (          
-              <>
-                <View style= {{ flexDirection: 'row' }}>
-                  <Text style={[GlobalStyles.inputLabelText, {width: 75}]}>End Date: </Text>
-                  <TextInput placeholder="Enter Date" value={end_date ?? ''} onChangeText={setEndDate} style={[GlobalStyles.input, {marginBottom: 5, flex: 1}]} />
-                </View>
-                <Text style={[GlobalStyles.smallAltText, { marginBottom: 10 }]}>Example: YYYY-MM-DD</Text>
-              </>
-            )}
-
-            {/* No End Date Checkbox */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-              <Pressable onPress={() => { setNoEndDate(!noEndDate); setEndDate(null); }} style={{ marginRight: 5 }}>
-                <Ionicons
-                  name={noEndDate ? 'checkbox' : 'square-outline'}
-                  size={24}
-                  color={noEndDate ? Colors.selectedBox : Colors.unselectedBox}
-                />
-              </Pressable>
-              <Text style={GlobalStyles.mediumText}>No End Date</Text>
             </View>
 
+            <DatePickerModal
+              visible={DPVisibleTwo}
+              onClose={() => setDPVisibleTwo(false)}
+              dateString={start_date}
+              onChange={(newDate) => {
+                setStartDate(newDate);
+                setDPVisibleTwo(false);
+              }}
+            />
+          </>
           
+        
+
+          {!noEndDate && (        
+            <>
+              {/* End Date Input */}  
+              <View style= {{ flexDirection: 'row', alignItems: 'center',  gap: 5, marginBottom: 15, }}>
+                <ModularButton 
+                  text='Choose Date'
+                  textStyle={{ color: 'black' }}
+                  style={[
+                    { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, } 
+                  ]} 
+                  onPress={() => setDPVisibleThree(true)}
+                />
+                <View style={styles.dateContainer}>     
+                  <Text style={GlobalStyles.text}>End Date: </Text>
+                  <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{end_date}</Text>
+                </View>
+              </View>
+
+              {end_date && (
+                <DatePickerModal
+                  visible={DPVisibleThree}
+                  onClose={() => setDPVisibleThree(false)}
+                  dateString={end_date}
+                  onChange={(newDate) => {
+                    setEndDate(newDate);
+                    setDPVisibleThree(false);
+                  }}
+                />
+              )}
+            </>
+          )}
+
+          {/* No End Date Checkbox */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15, }}>
+            <Pressable
+              onPress={() => {
+                setNoEndDate(!noEndDate);
+                if (!noEndDate) {
+                  // Going from false → true, so we are disabling end date
+                  setEndDate(null);
+                  setDPVisibleThree(false);
+                } else {
+                  // Going from true → false, re-enable with default date
+                  setEndDate(dayjs().add(1, 'day').format('YYYY-MM-DD'));
+                }
+              }}
+              style={{ marginRight: 5 }}
+            >
+              <Ionicons
+                name={noEndDate ? 'checkbox' : 'square-outline'}
+                size={24}
+                color={noEndDate ? Colors.selectedBox : Colors.unselectedBox}
+            />
+            </Pressable>
+            <Text style={GlobalStyles.mediumText}>No End Date</Text>
           </View>
         </>
       )}
@@ -297,6 +371,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 10,
+  },
+  dateContainer: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderRadius: 5,
+    backgroundColor: 'white', 
+    borderColor: Colors.borderColor, 
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    textAlignVertical: 'center',
   },
 });
 

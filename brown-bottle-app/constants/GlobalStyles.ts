@@ -107,9 +107,10 @@ export const GlobalStyles = StyleSheet.create({
 
     // Component Styles
     input: {
+        flexShrink: 1,
         borderWidth: 1,
         borderColor: Colors.borderColor,
-        borderRadius: 6,
+        borderRadius: 5,
         padding: 10,
         fontSize: 16,
         backgroundColor: Colors.inputBG,

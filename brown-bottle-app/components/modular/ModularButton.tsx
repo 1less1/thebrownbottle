@@ -29,11 +29,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: 'black',
     fontSize: 14,
     fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });
 

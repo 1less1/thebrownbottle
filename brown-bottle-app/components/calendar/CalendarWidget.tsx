@@ -59,7 +59,7 @@ const CalendarWidget: React.FC<Props> = ({ shifts }) => {
           textSectionTitleColor: Colors.darkBrown,
           selectedDayBackgroundColor: Colors.darkBrown,
           selectedDayTextColor: Colors.white,
-          todayTextColor: Colors.brown,
+          todayTextColor: Colors.lightBrown,
           dayTextColor: 'black',
           arrowColor: Colors.darkBrown,
           monthTextColor: Colors.darkBrown,

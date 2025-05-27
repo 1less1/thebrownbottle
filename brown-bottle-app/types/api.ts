@@ -32,6 +32,7 @@ export interface Task {
   recurring_task_id: number | null,
   due_date: string, // YYYY-MM-DD
   last_modified_by: number; // employee_id
+  last_modified_at: string;
   last_modified_name: string;
   timestamp: string,
 }
