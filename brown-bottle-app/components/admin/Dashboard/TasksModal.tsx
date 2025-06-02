@@ -197,7 +197,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         <>
           <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
             <ModularButton 
-              text='Choose Date'
+              text='Choose Due Date'
               textStyle={{ color: 'black' }}
               style={[
                 { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
@@ -205,7 +205,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               onPress={() => setDPVisibleOne(true)}
             />
             <View style={styles.dateContainer}>     
-              <Text style={GlobalStyles.text}>Due Date: </Text>
+              <Text style={GlobalStyles.text}>Date: </Text>
               <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{due_date}</Text>
             </View>
           </View>
@@ -257,7 +257,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
             {/* Start Date Input */}
             <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
               <ModularButton 
-                text='Choose Date'
+                text='Choose Start Date'
                 textStyle={{ color: 'black' }}
                 style={[
                   { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
@@ -265,7 +265,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                 onPress={() => setDPVisibleTwo(true)}
               />
               <View style={styles.dateContainer}>     
-                <Text style={GlobalStyles.text}>Start Date: </Text>
+                <Text style={GlobalStyles.text}>Date: </Text>
                 <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{start_date}</Text>
               </View>
             </View>
@@ -288,7 +288,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               {/* End Date Input */}  
               <View style= {{ flexDirection: 'row', alignItems: 'center',  gap: 5, marginBottom: 15, }}>
                 <ModularButton 
-                  text='Choose Date'
+                  text='Choose End Date'
                   textStyle={{ color: 'black' }}
                   style={[
                     { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, } 
@@ -296,7 +296,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                   onPress={() => setDPVisibleThree(true)}
                 />
                 <View style={styles.dateContainer}>     
-                  <Text style={GlobalStyles.text}>End Date: </Text>
+                  <Text style={GlobalStyles.text}>Date: </Text>
                   <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{end_date}</Text>
                 </View>
               </View>
