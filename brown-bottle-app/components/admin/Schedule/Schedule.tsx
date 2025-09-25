@@ -6,37 +6,24 @@ import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
+import Spreadsheet from './SpreadSheet';
+import HeaderView from './HeaderView';
+import ExSpread from './ExSpread';
 
 export default function Schedule() {
 
   return (
 
     <DefaultView backgroundColor={Colors.white}>
+      <View style={{ flex: 1, backgroundColor: Colors.greyWhite, justifyContent:'center', alignItems:'center' }}>
+        <HeaderView />
 
-
-      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-
-
-        { /* Chat Header */ }
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor }}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
-            Schedule
-          </Text>
-        </View>
-        
-        {/* Temporary Content */}
-        <DefaultScrollView>
-
-          <View>
-            <Text>WIP</Text>
-          </View>
-
+      <DefaultScrollView>
+            <Spreadsheet />
+            {/* <ExSpread /> */}
         </DefaultScrollView>
 
-
       </View>
-
-
     </DefaultView>
 
   )
