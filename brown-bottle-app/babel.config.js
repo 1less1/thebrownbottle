@@ -1,8 +1,9 @@
 module.exports = function (api) {
-  api.cache(true); // Caches the result of the configuration function
-
+  api.cache(true);
   return {
-    presets: ["babel-preset-expo"], // The default preset for Expo projects
-    plugins: ["react-native-worklets/plugin"],
+    presets: ['babel-preset-expo'],
+    plugins: [
+      'react-native-reanimated/plugin',
+    ],
   };
 };
