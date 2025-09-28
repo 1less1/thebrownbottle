@@ -7,8 +7,10 @@ from datetime import datetime
 # Insert (POST) New Task Logic --------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# Inserts a new record into the "task" table
 def insert_task(db, request):
+    """
+    Inserts a new record into the "task" table
+    """
     
     try:
         required_fields = ['title', 'description', 'author_id', 'section_id', 'due_date']
@@ -21,7 +23,7 @@ def insert_task(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_fields(request, required_fields, field_types)
+        fields, error = request_helper.verify_body(request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -35,6 +37,7 @@ def insert_task(db, request):
         conn = db
         cursor = conn.cursor(dictionary=True)
 
+        # Execute Query
         cursor.execute("""
             INSERT INTO task (title, description, author_id, section_id, due_date)
             VALUES (%s, %s, %s, %s, %s);
@@ -46,7 +49,7 @@ def insert_task(db, request):
         cursor.close()
         conn.close()
 
-        return jsonify({"status": "success", "row id": result}), 200
+        return jsonify({"status": "success", "inserted_id": result}), 200
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
@@ -57,17 +60,20 @@ def insert_task(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
 
 
-
-# Inserts a new record into the "recurring_task" table.
-# Then triggers a mysql stored procedure to migrate
-# today's recurring tasks to the normal "task" table.
 def insert_recurring_task(db, request):
+    """
+    Inserts a new record into the "recurring_task" table.
+    Then triggers a mysql stored procedure to migrate
+    today's recurring tasks to the normal "task" table.
+    """
     
     try:
+        # Define Required Fields
         required_fields = [
             'title', 'description', 'author_id', 'section_id',
             'start_date', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
         ]
+        # Define Expected Field Types
         field_types = {
             'title': str,
             'description': str,
@@ -80,7 +86,7 @@ def insert_recurring_task(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_fields(request, required_fields, field_types)
+        fields, error = request_helper.verify_body(request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -108,6 +114,7 @@ def insert_recurring_task(db, request):
         conn = db
         cursor = conn.cursor(dictionary=True)
 
+        # Execute Query
         cursor.execute("""
             INSERT INTO recurring_task 
             (title, description, author_id, section_id, start_date, end_date,
@@ -132,7 +139,7 @@ def insert_recurring_task(db, request):
         
         conn.close()
 
-        return jsonify({"status": "success", "row id": result}), 200
+        return jsonify({"status": "success", "inserted_id": result}), 200
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
@@ -143,10 +150,12 @@ def insert_recurring_task(db, request):
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
     
 
-# Handles incoming task POST request
-# If the request is a recurring task, insert into the 'recurring_task' table
-# If the request is not recurring, insert immediately into the 'task' table
 def handle_new_task(db, request):
+    """
+    Handles incoming task POST request:
+    If the request is a recurring task, insert into the 'recurring_task' table
+    If the request is not recurring, insert immediately into the 'task' table
+    """
 
     if request.is_json:
         data = request.get_json()
@@ -165,7 +174,7 @@ def handle_new_task(db, request):
 
 
 
-# NEW GET Requests for App USERS ------------------------------------------------------------------------
+# GET Requests ------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 def t_get_tasks(db, request):
@@ -174,12 +183,12 @@ def t_get_tasks(db, request):
     If no parameters are provided, returns all tasks (equivalent to SELECT * FROM task)
     Expects parameters in the URL. 
     """
+
     try:
-       
-       # Expected Parameters
-        required_params = []
-        # Optional Parameters listed below
+       # Expected Parameter Types
         param_types = {
+            'task_id': int,
+            'author_id': int,
             'section_id': int, 
             'complete': int,  # 0 or 1
             'today': bool,
@@ -187,12 +196,14 @@ def t_get_tasks(db, request):
             'due_date': str,
         }
 
-        # Validate required and optional params
-        params, error = request_helper.verify_params(request, required_params, param_types, allow_optional=True)
+        # Validate and parsw paramaters
+        params, error = request_helper.verify_params(request, param_types)
         if error:
             return jsonify(error), 400
 
         # Extract parameters
+        task_id = params.get('task_id')
+        author_id = params.get('author_id')
         section_id = params.get('section_id')
         complete = params.get('complete')
         today = params.get('today', False)
@@ -228,25 +239,29 @@ def t_get_tasks(db, request):
 
         query_params = []
 
+        # Build Dynamic Query 
+        if task_id is not None:
+            query += " AND t.task_id = %s"
+            query_params.append(task_id)
+
+        if author_id is not None:
+            query += " AND t.author_id = %s"
+            query_params.append(author_id)
+
         if section_id is not None:
             query += " AND t.section_id = %s"
             query_params.append(section_id)
 
-        # Complete Filter
         if complete is not None and complete in (0,1):
             query += " AND t.complete = %s"
             query_params.append(complete)
 
-        # Today Filter
         if today:
-            #query += " AND t.due_date = CURDATE()"
             query += " AND t.due_date <= CURDATE()"
 
-        # Recurring Filter
         if recurring:
             query += " AND t.recurring_task_id IS NOT NULL"
 
-        # Due Date Filter
         if due_date:
             # Validate date format -> 'YYYY-MM-DD'
             try:
@@ -260,7 +275,7 @@ def t_get_tasks(db, request):
         # Last Query Line
         query += " ORDER BY t.due_date ASC;"
 
-        # Execute query
+        # Execute Query
         cursor.execute(query, tuple(query_params))
         result = cursor.fetchall()
 
@@ -290,9 +305,9 @@ def t_update_task(db, request, task_id):
     Only provided fields will be updated (PATCH behavior).
     Expects JSON fields in the request body.
     """
-    try:
 
-        required_fields=[]
+    try:
+        # Define Expected Field Types
         field_types = {
             'title': str,
             'description': str,
@@ -305,7 +320,7 @@ def t_update_task(db, request, task_id):
         }
 
         # Validate required and optional fields
-        fields, error = request_helper.verify_fields(request, required_fields, field_types, allow_optional=True)
+        fields, error = request_helper.verify_fields(request, field_types)
         if error:
             return jsonify(error), 400
 

@@ -2,64 +2,120 @@ from flask import jsonify
 import mysql.connector
 import os
 import request_helper
+from datetime import datetime
 
+# GET Shifts --------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
 
-def get_user_shifts(db, request):
+def get_shifts(db, request):
+    """
+    Fetches shift records based on optional URL query parameters.
+    If no parameters are provided, returns all shifts (equivalent to SELECT * FROM shift).
+    """
     try:
+        # Expected Parameter Types
+        param_types = {
+            'shift_id': int,
+            'employee_id': int,
+            'date': str,
+            'section_id': int
+        }
 
-        required_params = ['employee_id']
-        param_types = {'employee_id': int}
-
-        # Validate the parameters
-        params, error = request_helper.verify_params(request, required_params, param_types)
-
+        # Validate and parse parameters
+        params, error = request_helper.verify_params(request, param_types)
         if error:
             return jsonify(error), 400
-        
-        # Extract validated params
-        employee_id = params['employee_id']
+
+        # Extract Parameters
+        shift_id = params.get('shift_id')
+        employee_id = params.get('employee_id')
+        date = params.get('date')
+        section_id = params.get('section_id')
 
         conn = db
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
 
-        # SQL Script - %s are placeholders for variables
-        cursor.execute("""
-            SELECT 
-                s.shift_id,
-                s.employee_id,
-                DATE_FORMAT(s.date, '%m/%d/%Y') AS date, 
-                CAST(TIME_FORMAT(s.start_time, '%H:%i') AS CHAR) AS start_time,
-                CAST(TIME_FORMAT(s.end_time, '%H:%i') AS CHAR) AS end_time,
-                sec.section_name
-            FROM shift s
-            JOIN section sec ON s.section_id = sec.section_id
-            WHERE s.employee_id = %s;
-        """, (employee_id,))
+        # Base Query
+        query = """
+            SELECT
+                sh.shift_id,
+                sh.employee_id,
+                e.first_name,
+                e.last_name,
+                TIME_FORMAT(sh.start_time, '%H:%i') AS start_time,
+                TIME_FORMAT(sh.end_time, '%H:%i') AS end_time,
+                DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
+                sh.section_id,
+                se.section_name
+            FROM shift sh
+            JOIN employee e ON sh.employee_id = e.employee_id
+            JOIN section se ON se.section_id = sh.section_id
+            WHERE 1 = 1
+        """
 
-        # Fetch the result
-        columns = [col[0] for col in cursor.description]
+        query_params = []
+
+        # Build Dynamic Query 
+        if shift_id is not None:
+            query += " AND sh.shift_id = %s"
+            query_params.append(shift_id)
+
+        if employee_id is not None:
+            query += " AND sh.employee_id = %s"
+            query_params.append(employee_id)
+
+        if date:
+            try:
+                datetime.strptime(date, '%Y-%m-%d')
+            except ValueError:
+                return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
+            query += " AND sh.date = %s"
+            query_params.append(date)
+
+        if section_id is not None:
+            query += " AND sh.section_id = %s"
+            query_params.append(section_id)
+
+        # Last Query Line
+        query += " ORDER BY sh.date ASC;"
+
+        # Execute Query
+        cursor.execute(query, tuple(query_params))
         result = cursor.fetchall()
 
         cursor.close()
         conn.close()
-        
-        # Format data to be entries with "column_name": value
-        data = [dict(zip(columns, row)) for row in result]
-        
-        return jsonify(data), 200
 
+        return jsonify(result), 200
 
     except mysql.connector.Error as e:
-        # Handle database-specific errors
         print(f"Database error: {e}")
         return jsonify({"status": "error", "message": "Database error occurred"}), 500
 
-
     except Exception as e:
-        # Handle general errors
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+    
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
     
 
-def insert_shifts(db, request):
+#  POST Shift -------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+def insert_shift(db, request):
     return
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+# PATCH Shift -------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+def update_shift(db, request):
+    return
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
