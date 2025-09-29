@@ -9,10 +9,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   scheme: 'myapp',
-  userInterfaceStyle: 'automatic',
+  
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
+    userInterfaceStyle: 'light',
   },
   android: {
     adaptiveIcon: {

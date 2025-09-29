@@ -207,9 +207,9 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
   `shift_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `employee_id` INT UNSIGNED NOT NULL,
-  `start_time` TIME NOT NULL,
-  `end_time` TIME NOT NULL,
-  `date` DATE DEFAULT NULL,
+  `start_time` TIME NULL DEFAULT NULL,
+  `end_time` TIME NULL DEFAULT NULL,
+  `date` DATE NULL DEFAULT NULL,
   `section_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`shift_id`),
   UNIQUE INDEX `employee_date_section_idx` (`employee_id`, `date`, `section_id`),
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   `shift_id` INT UNSIGNED NOT NULL,
   `accepted_employee_id` INT UNSIGNED DEFAULT NULL,
   `requested_employee_id` INT UNSIGNED NOT NULL,
-  `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL,
+  `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL DEFAULT 'Pending',
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cover_request_id`),
   INDEX `fk_shift_cover_request_shift1_idx` (`shift_id` ASC),
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   CONSTRAINT `fk_cover_accepted_employee`
     FOREIGN KEY (`accepted_employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
@@ -267,15 +267,16 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`time_off_request` (
   `start_date` DATE NOT NULL,
   `end_date` DATE NOT NULL,
   `reason` TEXT NOT NULL,
-  `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL,
+  `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL DEFAULT 'Pending',
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`request_id`),
-  UNIQUE INDEX `request_id_UNIQUE` (`request_id` ASC) VISIBLE,
   CONSTRAINT `fk_employee_id`
     FOREIGN KEY (`employee_id`)
     REFERENCES `thebrownbottle`.`employee` (`employee_id`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE,
+  CONSTRAINT `chk_dates` CHECK (`end_date` >= `start_date`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
