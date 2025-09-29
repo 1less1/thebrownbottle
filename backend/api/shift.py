@@ -96,6 +96,11 @@ def get_shifts(db, request):
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
 
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
     
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -105,8 +110,70 @@ def get_shifts(db, request):
 # -------------------------------------------------------------------------------------------------------
 
 def insert_shift(db, request):
-    return
+    """
+    Inserts a new record into the "shift" table.
+    """
+    
+    try:
+        # Define Required Fields
+        required_fields = [
+            'employee_id', 'start_time', 'end_time', 'date', 'section_id'
+        ]
 
+        # Define Expected Field Types
+        field_types = {
+            'employee_id': int,
+            'start_time': str, # HH:MM:SS
+            'end_time': str, # HH:MM:SS
+            'date': str, # YYYY-MM-DD
+            'section_id': int,
+        }
+
+        # Validate the fields in JSON body
+        fields, error = request_helper.verify_body(request, field_types, required_fields)
+
+        if error:
+            return jsonify(error), 400
+
+        # Extract Parameters
+        employee_id = fields['employee_id']
+        start_time = fields['start_time']
+        end_time = fields['end_time']
+        date = fields['date']
+        section_id = fields['section_id']
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # Execute Query
+        cursor.execute("""
+            INSERT INTO shift 
+            (employee_id, start_time, end_time, date, section_id)
+            VALUES (%s, %s, %s, %s, %s);
+        """, (employee_id, start_time, end_time, date, section_id))
+        
+        inserted_id = cursor.lastrowid
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+
+    except mysql.connector.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -114,8 +181,67 @@ def insert_shift(db, request):
 # PATCH Shift -------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-def update_shift(db, request):
-    return
+def update_shift(db, request, shift_id):
+    """
+    Updates an existing shift record (partial update).
+    shift_id comes from the URL.
+    Other fields (employee_id, start_time, end_time, date, section_id) are optional.
+    """
+    try:
+
+        # Define Expected Field Types
+        field_types = {
+            'employee_id': int,
+            'start_time': str,   # HH:MM or HH:MM:SS
+            'end_time': str,
+            'date': str,         # YYYY-MM-DD
+            'section_id': int,
+        }
+
+        # Validate the fields in JSON body (only optional fields here)
+        fields, error = request_helper.verify_body(request, field_types, [])
+        if error:
+            return jsonify(error), 400
+        if not fields:
+            return jsonify({"status": "error", "message": "No fields provided to update"}), 400
+
+        # Build dynamic SET clause
+        set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
+        values = list(fields.values())
+        values.append(shift_id)  # WHERE parameter at the end -> WHERE shift_id = %s
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        query = f"""
+            UPDATE shift
+            SET {set_clause}
+            WHERE shift_id = %s;
+        """
+        cursor.execute(query, tuple(values))
+        conn.commit()
+        rowcount = cursor.rowcount
+        cursor.close()
+        conn.close()
+
+        if rowcount == 0:
+            return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+
+        return jsonify({"status": "success", "updated_rows": rowcount}), 200
+
+    except mysql.connector.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------

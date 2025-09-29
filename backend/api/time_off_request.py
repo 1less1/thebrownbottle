@@ -9,5 +9,5 @@ def get_tor(db, request):
 def insert_tor(db, request):
     return
 
-def update_tor(db, request):
+def update_tor(db, request, request_id):
     return

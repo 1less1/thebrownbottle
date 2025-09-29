@@ -73,6 +73,7 @@ def insert_recurring_task(db, request):
             'title', 'description', 'author_id', 'section_id',
             'start_date', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
         ]
+        
         # Define Expected Field Types
         field_types = {
             'title': str,

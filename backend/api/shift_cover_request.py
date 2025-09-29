@@ -9,5 +9,5 @@ def get_scr(db, request):
 def insert_scr(db, request):
     return
 
-def update_scr(db, request):
+def update_scr(db, request, cover_request_id):
     return
