@@ -104,6 +104,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
             key={role.role_id}
             label={role.role_name}
             value={role.role_id}
+            color='black'
           />
         ))}
       </Picker>

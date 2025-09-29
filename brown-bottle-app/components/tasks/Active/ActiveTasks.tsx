@@ -160,7 +160,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
                         <ModularButton
                             text="Close"
                             onPress={() => setFilterModalVisible(false)}
-                            style={{ marginVertical: 5 }}
+                            style={{ marginTop: 5, marginBottom: 10 }}
                         />
                     </ModularModal>
 
