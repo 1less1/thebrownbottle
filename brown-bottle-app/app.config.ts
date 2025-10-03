@@ -1,4 +1,4 @@
-import 'dotenv/config';  // Load the .env file
+import 'dotenv/config';
 import { ExpoConfig, ConfigContext } from '@expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
@@ -16,6 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     userInterfaceStyle: 'light',
   },
   android: {
+    package: 'com.brownbottle.app',
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon.png',
       backgroundColor: '#ffffff',
@@ -44,8 +45,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   extra: {
-    // Access environment variables from the .env file
-    API_BASE_URL: process.env.API_BASE_URL
+    API_BASE_URL: process.env.API_BASE_URL,
   },
 });
-
