@@ -10,7 +10,7 @@ export async function getAllRoles() {
 
   try {
     
-    const response = await fetch(`${baseURL}/role/get-all-roles`, {
+    const response = await fetch(`${baseURL}/role`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 

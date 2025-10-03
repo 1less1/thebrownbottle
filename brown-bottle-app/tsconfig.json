@@ -5,7 +5,8 @@
     "jsx": "react-native",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": []
   },
   "include": [
     "**/*.ts",
@@ -14,4 +15,3 @@
     "expo-env.d.ts"
   ]
 }
-

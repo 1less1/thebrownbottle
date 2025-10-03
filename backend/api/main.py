@@ -48,7 +48,7 @@ def health_check():
 # Employee Routes - /employee ---------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/employee', methods=['GET'])
+@app.route('/employee', methods=['GET'], strict_slashes=False)
 def get_employees():
     """
     GET employees by building a modular query
@@ -79,7 +79,7 @@ def update_employee(employee_id):
 # Role Routes - /role -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/role', methods=['GET'])
+@app.route('/role', methods=['GET'], strict_slashes=False)
 def get_roles():
     """
     GET roles by building a modular query
@@ -110,7 +110,7 @@ def update_role(role_id):
 # Section Routes - /section -----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/section', methods=['GET'])
+@app.route('/section', methods=['GET'], strict_slashes=False)
 def get_sections():
     """
     GET sections by building a modular query
@@ -141,7 +141,7 @@ def update_section(section_id):
 # Task Routes - /task -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/task', methods=['GET'])
+@app.route('/task', methods=['GET'], strict_slashes=False)
 def get_tasks():
     """
     GET tasks by building a modular query
@@ -173,7 +173,7 @@ def update_task(task_id):
 # -------------------------------------------------------------------------------------------------------
 
 # Admin Based Routes:
-@app.route('/recurring-task', methods=['GET'])
+@app.route('/recurring-task', methods=['GET'], strict_slashes=False)
 def get_recurring_tasks():
     """
     GET recurring tasks by building a modular query
@@ -204,7 +204,7 @@ def update_recurring_task(recurring_task_id):
 # Announcement Routes - /announcement -------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/announcement', methods=['GET'])
+@app.route('/announcement', methods=['GET'], strict_slashes=False)
 def get_announcements():
     """
     GET announcements by building a modular query
@@ -235,7 +235,7 @@ def update_announcement(announcement_id):
 # Shift Routes - /shift ---------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/shift', methods=['GET'])
+@app.route('/shift', methods=['GET'], strict_slashes=False)
 def get_shifts():
     """
     GET shifts by building a modular query
@@ -266,7 +266,7 @@ def update_shift(shift_id):
 # Time Off Request Routes - /tor ------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/tor', methods=['GET'])
+@app.route('/tor', methods=['GET'], strict_slashes=False)
 def get_time_off_requests():
     """
     GET time off requests by building a modular query
@@ -297,7 +297,7 @@ def update_time_off_request(request_id):
 # Shift Cover Request Routes - /scr ---------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-@app.route('/scr', methods=['GET'])
+@app.route('/scr', methods=['GET'], strict_slashes=False)
 def get_shift_cover_requests():
     """
     GET shift cover requests by building a modular query
@@ -323,6 +323,8 @@ def update_shft_cover_request(cover_request_id):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
+for rule in app.url_map.iter_rules():
+    print(rule)
 
 
 # App will be available on current host IP using port 5000

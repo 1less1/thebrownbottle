@@ -22,7 +22,7 @@ export async function insertTask(author_id: number, title: string, description: 
     };
     
 
-    const response = await fetch(`${baseURL}/task/new-task`, {
+    const response = await fetch(`${baseURL}/task/insert`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json", 
@@ -96,7 +96,7 @@ export async function insertRecurringTask(author_id: number, title: string, desc
   }
 
   try {
-    const response = await fetch(`${baseURL}/task/new-task`, {
+    const response = await fetch(`${baseURL}/recurring-task/insert`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -167,7 +167,7 @@ export async function updateTask(task_id: number, updates: UpdateTaskFields) {
   const baseURL = API_BASE_URL;
 
   try {
-    const response = await fetch(`${baseURL}/task/${task_id}`, {
+    const response = await fetch(`${baseURL}/task/update/${task_id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

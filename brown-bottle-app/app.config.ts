@@ -9,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/images/icon.png',
   scheme: 'myapp',
-  
+
   newArchEnabled: true,
   ios: {
     supportsTablet: true,
@@ -38,6 +38,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     'expo-secure-store',
+    'expo-web-browser',
   ],
   experiments: {
     typedRoutes: true,

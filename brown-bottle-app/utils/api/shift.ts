@@ -9,7 +9,7 @@ export async function getUserShifts(employee_id: number) {
 
   try {
     console.log(base_url);
-    const response = await fetch(`${base_url}/shift/get-user-shifts?employee_id=${employee_id}`);
+    const response = await fetch(`${base_url}/shift?employee_id=${employee_id}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

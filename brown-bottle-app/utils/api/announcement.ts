@@ -16,7 +16,7 @@ export async function insertAnnouncement(author_id: number, title: string, descr
       role_id,
     };
 
-    const response = await fetch(`${baseURL}/announcement/insert-announcement`, {
+    const response = await fetch(`${baseURL}/announcement/insert`, {
       method: "POST",
       headers: {
           "Content-Type": "application/json",
@@ -49,7 +49,7 @@ export async function getUserAnnouncements(author_id: number) {
 
   try {
     
-    const response = await fetch(`${baseURL}/announcement/get-user-announcements?employee_id=${author_id}`, {
+    const response = await fetch(`${baseURL}/announcement?employee_id=${author_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 
@@ -81,7 +81,7 @@ export async function getAllAnnouncements() {
 
   try {
     
-    const response = await fetch(`${baseURL}/announcement/get-all-announcements`, {
+    const response = await fetch(`${baseURL}/announcement`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 
@@ -113,7 +113,7 @@ export async function getAnnouncementsByRole(role_id: number) {
 
   try {
     
-    const response = await fetch(`${baseURL}/announcement/get-announcements-by-role?role_id=${role_id}`, {
+    const response = await fetch(`${baseURL}/announcement?role_id=${role_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 

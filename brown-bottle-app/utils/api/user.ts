@@ -10,7 +10,7 @@ export async function getUserData(employee_id: number) {
 
   try {
     // Sending the assignee_id as a query parameter in the URL
-    const response = await fetch(`${baseURL}/user/get-user-data?employee_id=${employee_id}`, {
+    const response = await fetch(`${baseURL}/employee?employee_id=${employee_id}`, {
       method: "GET", // GET is appropriate for fetching data
       headers: {
         "Content-Type": "application/json", // Ensure the backend understands the content type

@@ -38,14 +38,19 @@ def get_announcements(db, request):
 
         # Base Query
         query = """
-            SELECT
-                announcement_id,
-                author_id,
-                title,
-                description,
-                role_id,
-                timestamp
-            FROM announcement 
+            SELECT 
+                a.announcement_id,
+                a.author_id,
+                CONCAT(e.first_name, ' ', e.last_name) AS author,
+                a.role_id,
+                r.role_name,
+                a.title,
+                a.description,
+                DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
+                DATE_FORMAT(a.timestamp, '%H:%i') AS time
+            FROM announcement a
+            JOIN employee e ON a.author_id = e.employee_id
+            JOIN role r ON a.role_id = r.role_id
             WHERE 1 = 1
         """
 
@@ -53,23 +58,23 @@ def get_announcements(db, request):
 
         # Build Dynamic Query 
         if announcement_id is not None:
-            query += " AND announcement_id = %s"
+            query += " AND a.announcement_id = %s"
             query_params.append(announcement_id)
 
         if author_id is not None:
-            query += " AND author_id = %s"
+            query += " AND a.author_id = %s"
             query_params.append(author_id)
 
         if role_id is not None:
-            query += " AND role_id = %s"
+            query += " AND a.role_id = %s"
             query_params.append(role_id)
 
         if title is not None:
-            query += " AND title = %s"
+            query += " AND a.title = %s"
             query_params.append(title)
 
         # Last Query Line
-        query += ";"
+        query += " AND a.timestamp >= NOW() - INTERVAL 14 DAY ORDER BY a.timestamp DESC;"
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

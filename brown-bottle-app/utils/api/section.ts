@@ -10,7 +10,7 @@ export async function getAllSections() {
 
   try {
     
-    const response = await fetch(`${baseURL}/section/get-all-sections`, {
+    const response = await fetch(`${baseURL}/section`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json", 
