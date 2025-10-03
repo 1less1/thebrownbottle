@@ -3,26 +3,29 @@ import mysql.connector
 import os
 import request_helper
 
-from datetime import datetime
-
-# GET Recurring Tasks -----------------------------------------------------------------------------------
+# GET Employees -----------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-def get_recurring_tasks(db, request):
+def get_employees(db, request):
     """
-    Fetches recurring_task records based on optional URL query parameters.
-    If no parameters are provided, returns all recurring tasks (equivalent to SELECT * FROM recurring_task).
+    Fetches employee records based on optional URL query parameters.
+    If no parameters are provided, returns all employees (equivalent to SELECT * FROM employee).
     """
     conn = None
     cursor = None
     try:
         # Expected Parameter Types
         param_types = {
-            'recurring_task_id': int,
-            'author_id': int,
-            'section_id': int,
-            'start_date': str,
-            'end_date': str
+            'employee_id': int,
+            'first_name': str,
+            'last_name': str,
+            'email': str,
+            'phone_number': str,
+            'wage': float,
+            'admin': int,
+            'primary_role': str,
+            'secondary_role': str,
+            'tertiary_role': str
         }
 
         # Validate and parse parameters
@@ -31,59 +34,68 @@ def get_recurring_tasks(db, request):
             return jsonify(error), 400
 
         # Extract Parameters
-        recurring_task_id = params.get('recurring_task_id')
-        author_id = params.get('author_id')
-        section_id = params.get('section_id')
-        start_date = params.get('start_date')
-        end_date = params.get('end_date')
+        employee_id = params.get('employee_id')
+        first_name = params.get('first_name')
+        last_name = params.get('last_name')
+        email = params.get('email')
+        phone_number = params.get('phone_number')
+        wage = params.get('wage')
+        admin = params.get('admin')
+        primary_role = params.get('primary_role')
+        secondary_role = params.get('secondary_role')
+        tertiary_role = params.get('tertiary_role')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
 
         # Base Query
         query = """
-            SELECT
-                recurring_task_id,
-                title,
-                description,
-                author_id,
-                section_id,
-                mon,
-                tue,
-                wed,
-                thu,
-                fri,
-                sat,
-                sun,
-                start_date,
-                end_date,
-                timestamp
-            FROM recurring_task 
+            SELECT *
+            FROM employee 
             WHERE 1 = 1
         """
 
         query_params = []
 
         # Build Dynamic Query 
-        if recurring_task_id is not None:
-            query += " AND recurring_task_id = %s"
-            query_params.append(recurring_task_id)
+        if employee_id is not None:
+            query += " AND employee_id = %s"
+            query_params.append(employee_id)
 
-        if author_id is not None:
-            query += " AND author_id = %s"
-            query_params.append(author_id)
+        if first_name is not None:
+            query += " AND first_name = %s"
+            query_params.append(first_name)
+        
+        if last_name is not None:
+            query += " AND last_name = %s"
+            query_params.append(last_name)
 
-        if section_id is not None:
-            query += " AND section_id = %s"
-            query_params.append(section_id)
+        if email is not None:
+            query += " AND email = %s"
+            query_params.append(email)
 
-        if start_date is not None:
-            query += " AND start_date = %s"
-            query_params.append(start_date)
+        if phone_number is not None:
+            query += " AND phone_number = %s"
+            query_params.append(phone_number)
 
-        if end_date is not None:
-            query += " AND end_date = %s"
-            query_params.append(end_date)
+        if wage is not None:
+            query += " AND wage = %s"
+            query_params.append(wage)
+
+        if admin is not None:
+            query += " AND admin = %s"
+            query_params.append(admin)
+
+        if primary_role is not None:
+            query += " AND primary_role = %s"
+            query_params.append(primary_role)
+
+        if secondary_role is not None:
+            query += " AND secondary_role = %s"
+            query_params.append(secondary_role)
+
+        if tertiary_role is not None:
+            query += " AND tertiary_role = %s"
 
         # Last Query Line
         query += ";"
@@ -112,32 +124,33 @@ def get_recurring_tasks(db, request):
 # -------------------------------------------------------------------------------------------------------
 
 
-#  POST Recurring Task ----------------------------------------------------------------------------------
+#  POST Employee ----------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-def insert_recurring_task(db, request):
+def insert_employee(db, request):
     """
-    Inserts a new record into the "recurring_task" table.
+    Inserts a new record into the "employee" table.
     """
     conn = None
     cursor = None
     try:
         # Define Required Fields
         required_fields = [
-            'title', 'description', 'author_id', 'section_id',
-            'start_date', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
+            'first_name', 'last_name', 'email', 'phone_number', 
+            'wage', 'admin', 'primary_role'
         ]
 
         # Define Expected Field Types
         field_types = {
-            'title': str,
-            'description': str,
-            'author_id': int,
-            'section_id': int,
-            'start_date': str,
-            'mon': int, 'tue': int, 'wed': int,
-            'thu': int, 'fri': int, 'sat': int, 'sun': int,
-            'end_date': str  # Optional
+            'first_name': str,
+            'last_name': str,
+            'email': str,
+            'phone_number': str, # 'XXX-XXX-XXXX'
+            'wage': float,
+            'admin': int,
+            'primary_role': int, # role_id
+            'secondary_role': int, # optional
+            'tertiary_role': int # optional
         }
 
         # Validate the fields in JSON body
@@ -147,33 +160,35 @@ def insert_recurring_task(db, request):
             return jsonify(error), 400
 
         # Extract Parameters
-        title = fields['title']
-        description = fields['description']
-        author_id = fields['author_id']
-        section_id = fields['section_id']
-        start_date = fields['start_date']
-        mon = fields['mon']
-        tue = fields['tue']
-        wed = fields['wed']
-        thu = fields['thu']
-        fri = fields['fri']
-        sat = fields['sat']
-        sun = fields['sun']
-        end_date = fields.get('end_date')
+        first_name      = fields['first_name']
+        last_name       = fields['last_name']
+        email           = fields['email']
+        phone_number    = fields['phone_number']
+        wage            = fields['wage']
+        admin           = fields['admin']
+        primary_role    = fields['primary_role']
+        secondary_role  = fields.get('secondary_role')  # optional
+        tertiary_role   = fields.get('tertiary_role')   # optional
 
         conn = db
         cursor = conn.cursor(dictionary=True)
 
         # Execute Query
         cursor.execute("""
-            INSERT INTO recurring_task 
-            (title, description, author_id, section_id, start_date, end_date,
-             mon, tue, wed, thu, fri, sat, sun)
-            VALUES (%s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s);
+            INSERT INTO employee (
+                first_name,
+                last_name,
+                email,
+                phone_number,
+                wage,
+                admin,
+                primary_role,
+                secondary_role,
+                tertiary_role
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, (
-            title, description, author_id, section_id, start_date, end_date,
-            mon, tue, wed, thu, fri, sat, sun
+            first_name, last_name, email, phone_number, 
+            wage, admin, primary_role, secondary_role, tertiary_role
         ))
         
         inserted_id = cursor.lastrowid
@@ -195,32 +210,33 @@ def insert_recurring_task(db, request):
             cursor.close()
         if conn:
             conn.close()
-
+    
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
-# PATCH Recurring Task ----------------------------------------------------------------------------------
+# PATCH Employee ----------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-def update_recurring_task(db, request, recurring_task_id):
+def update_employee(db, request, employee_id):
     """
-    Updates an existing recurring_task record (partial update).
-    recurring_task_id comes from the URL.
+    Updates an existing employee_id record (partial update).
+    employee_id comes from the URL.
     """
     conn = None
     cursor = None
     try:
         # Define Expected Field Types
         field_types = {
-            'title': str,
-            'description': str,
-            'author_id': int,
-            'section_id': int,
-            'start_date': str,
-            'end_date': str,
-            'mon': int, 'tue': int, 'wed': int,
-            'thu': int, 'fri': int, 'sat': int, 'sun': int
+            'first_name': str,
+            'last_name': str,
+            'email': str,
+            'phone_number': str,
+            'wage': float,
+            'admin': int,
+            'primary_role': int,
+            'secondary_role': int,
+            'tertiary_role': int
         }
 
         # Validate the fields in JSON body (only optional fields here)
@@ -233,15 +249,15 @@ def update_recurring_task(db, request, recurring_task_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(recurring_task_id)  # WHERE parameter at the end -> WHERE recurring_task_id = %s
+        values.append(employee_id)  # WHERE parameter at the end -> WHERE employee_id = %s
 
         conn = db
         cursor = conn.cursor(dictionary=True)
 
         query = f"""
-            UPDATE recurring_task
+            UPDATE employee
             SET {set_clause}
-            WHERE recurring_task_id = %s;
+            WHERE employee_id = %s;
         """
         
         cursor.execute(query, tuple(values))
@@ -249,7 +265,7 @@ def update_recurring_task(db, request, recurring_task_id):
         rowcount = cursor.rowcount
 
         if rowcount == 0:
-            return jsonify({"status": "error", "message": "No recurring task found with given ID"}), 404
+            return jsonify({"status": "error", "message": "No employee found with given ID"}), 404
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 
@@ -269,5 +285,3 @@ def update_recurring_task(db, request, recurring_task_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-
-

@@ -12,6 +12,8 @@ def get_shifts(db, request):
     Fetches shift records based on optional URL query parameters.
     If no parameters are provided, returns all shifts (equivalent to SELECT * FROM shift).
     """
+    conn = None
+    cursor = None
     try:
         # Expected Parameter Types
         param_types = {
@@ -83,9 +85,6 @@ def get_shifts(db, request):
         cursor.execute(query, tuple(query_params))
         result = cursor.fetchall()
 
-        cursor.close()
-        conn.close()
-
         return jsonify(result), 200
 
     except mysql.connector.Error as e:
@@ -113,7 +112,8 @@ def insert_shift(db, request):
     """
     Inserts a new record into the "shift" table.
     """
-    
+    conn = None
+    cursor = None
     try:
         # Define Required Fields
         required_fields = [
@@ -155,8 +155,6 @@ def insert_shift(db, request):
         inserted_id = cursor.lastrowid
 
         conn.commit()
-        cursor.close()
-        conn.close()
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 200
 
@@ -187,8 +185,9 @@ def update_shift(db, request, shift_id):
     shift_id comes from the URL.
     Other fields (employee_id, start_time, end_time, date, section_id) are optional.
     """
+    conn = None
+    cursor = None
     try:
-
         # Define Expected Field Types
         field_types = {
             'employee_id': int,
@@ -218,11 +217,10 @@ def update_shift(db, request, shift_id):
             SET {set_clause}
             WHERE shift_id = %s;
         """
+        
         cursor.execute(query, tuple(values))
         conn.commit()
         rowcount = cursor.rowcount
-        cursor.close()
-        conn.close()
 
         if rowcount == 0:
             return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
