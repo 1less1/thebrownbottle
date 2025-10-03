@@ -104,6 +104,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
             key={section.section_id}
             label={section.section_name}
             value={section.section_id}
+            color='black'
           />
         ))}
       </Picker>
