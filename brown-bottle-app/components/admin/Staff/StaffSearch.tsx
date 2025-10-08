@@ -1,146 +1,147 @@
-import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  ActivityIndicator,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import React, { useState, useCallback, useEffect } from "react";
+import { View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet } from "react-native";
 import { debounce } from "lodash";
+
+import { GlobalStyles } from "@/constants/GlobalStyles";
+import { Colors } from "@/constants/Colors";
+
+import Card from "@/components/modular/Card";
+import AltCard from "@/components/modular/AltCard";
+
 import { Employee } from "@/types/api";
 import { getEmployee } from "@/utils/api/employee";
 
-const columns = ["ID", "Name", "Email", "Phone", "Primary", "Secondary"] as const;
+const columns = [
+    { key: "full_name", label: "Name", flex: 2 },
+    { key: "email", label: "Email", flex: 3.75 },
+    { key: "phone_number", label: "Phone", flex: 2.25 },
+    { key: "primary_role_name", label: "Primary", flex: 2 },
+];
 
-const columnStyles: Record<string, object> = {
-  ID: { minWidth: 50 },
-  Name: { minWidth: 130 },
-  Email: { minWidth: 200 },
-  Phone: { minWidth: 140 },
-  Primary: { minWidth: 120 },
-  Secondary: { minWidth: 120 },
-};
+const renderHeader = () => (
+    <View style={styles.row}>
+        {columns.map((col) => (
+            <View key={col.key} style={[styles.cell, { backgroundColor: Colors.lightBorderColor, flex: col.flex ?? 1 }]}>
+                <Text style={GlobalStyles.boldText}>{col.label}</Text>
+            </View>
+        ))}
+    </View>
+);
+
+const renderItem = ({ item }: { item: Employee }) => (
+    <View style={styles.row}>
+        {columns.map((col) => (
+            <View key={col.key} style={[styles.cell, { flex: col.flex ?? 1 }]}>
+                <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.text}>{item[col.key as keyof Employee]?.toString() ?? ""}</Text>
+            </View>
+        ))}
+    </View>
+);
+
+
+
+
 
 export default function StaffSearch() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(false);
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<Employee[]>([]);
+    const [loading, setLoading] = useState(false);
 
-  const fetchEmployees = async (searchTerm: string) => {
-    const trimmed = searchTerm.trim();
-    if (!trimmed) {
-      setResults([]);
-      return;
-    }
+    const handleChange = (text: string) => {
+        setQuery(text);
+        debouncedSearch(text);
+    };
 
-    setLoading(true);
-    try {
-      const wildcardTerm = `%${trimmed}%`;
-      const response = await getEmployee({ full_name: wildcardTerm });
-      setResults(response);
-    } catch (err) {
-      console.error("Search failed:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+        fetchEmployees(""); // blank search term on mount
+    }, []);
 
-  const debouncedSearch = useCallback(debounce(fetchEmployees, 500), []);
 
-  const handleChange = (text: string) => {
-    setQuery(text);
-    debouncedSearch(text);
-  };
+    const fetchEmployees = async (searchTerm: string) => {
+        const trimmed = searchTerm.trim();
 
-  const renderHeader = () => (
-    <View style={[styles.row, styles.headerRow]}>
-      {columns.map((col) => (
-        <Text key={col} style={[styles.cell, styles.headerText, columnStyles[col]]}>
-          {col}
-        </Text>
-      ))}
-    </View>
-  );
+        setLoading(true);
+        try {
+            const wildcardTerm = `%${trimmed}%`;
+            const response = await getEmployee({ full_name: wildcardTerm });
+            setResults(response);
+        } catch (err) {
+            console.error("Search failed:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const renderItem = ({ item }: { item: Employee }) => (
-    <View style={styles.row}>
-      <Text style={[styles.cell, columnStyles.ID]}>{item.employee_id ?? "-"}</Text>
-      <Text style={[styles.cell, columnStyles.Name]}>
-        {`${item.first_name ?? ""} ${item.last_name ?? ""}`.trim() || "-"}
-      </Text>
-      <Text style={[styles.cell, columnStyles.Email]}>{item.email ?? "-"}</Text>
-      <Text style={[styles.cell, columnStyles.Phone]}>{item.phone_number ?? "-"}</Text>
-      <Text style={[styles.cell, columnStyles.Primary]}>
-        {item.primary_role_name ?? item.primary_role ?? "-"}
-      </Text>
-      <Text style={[styles.cell, columnStyles.Secondary]}>
-        {item.secondary_role_name ?? item.secondary_role ?? "-"}
-      </Text>
-    </View>
-  );
+    const debouncedSearch = useCallback(debounce(fetchEmployees, 500), []);
 
-  return (
-    <View style={styles.container}>
-      <TextInput
-        value={query}
-        onChangeText={handleChange}
-        placeholder="Search staff by name"
-        style={styles.input}
-      />
+    return (
 
-      {loading && <ActivityIndicator style={{ marginVertical: 10 }} />}
+        <AltCard style={{ backgroundColor: Colors.white}}>
 
-      <ScrollView horizontal>
-        <FlatList
-          data={results}
-          keyExtractor={(item, index) => item.employee_id?.toString() ?? index.toString()}
-          ListHeaderComponent={renderHeader}
-          renderItem={renderItem}
-          ListEmptyComponent={
-            !loading && query !== "" ? (
-              <Text style={styles.noResults}>No results found</Text>
-            ) : null
-          }
-          showsVerticalScrollIndicator={false}
-        />
-      </ScrollView>
-    </View>
-  );
-}
+            <TextInput
+                value={query}
+                onChangeText={handleChange}
+                placeholder="Search Staff by Name"
+                style={styles.input}
+            />
+
+            {loading && <ActivityIndicator style={{ marginVertical: 10 }} />}
+
+            <View>
+                <ScrollView horizontal style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={styles.tableContainer}>
+                        {renderHeader()}
+                        <FlatList
+                            data={results}
+                            keyExtractor={(item) => item.employee_id?.toString() ?? Math.random().toString()}
+                            renderItem={renderItem}
+                            scrollEnabled={false}
+                        />
+                    </View>
+                </ScrollView >
+            </View >
+
+
+
+            {/* Fallback */}
+            {!loading && results.length === 0 && query.length > 0 && (
+                <Text style={{ marginTop: 20, textAlign: "center" }}>No staff found.</Text>
+            )}
+
+        </AltCard>
+
+    );
+
+};
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  row: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
-  headerRow: {
-    backgroundColor: "#f5f5f5",
-    borderBottomWidth: 2,
-    borderColor: "#ccc",
-  },
-  cell: {
-    padding: 8,
-    borderRightWidth: 1,
-    borderColor: "#eee",
-    fontSize: 13,
-  },
-  headerText: {
-    fontWeight: "bold",
-  },
-  noResults: {
-    textAlign: "center",
-    color: "#888",
-    padding: 12,
-  },
+    searchContainer: {
+        flex: 1,
+        backgroundColor: Colors.white,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: Colors.borderColor,
+        padding: 8,
+        marginBottom: 12,
+        borderRadius: 4,
+    },
+    row: {
+        flexDirection: "row",
+        borderColor: Colors.lightBorderColor,
+    },
+    cell: {
+        padding: 8,
+        borderWidth: 1,
+        borderColor: Colors.lightBorderColor,
+    },
+    tableContainer: {
+        flex: 1,            // expands horizontally within the ScrollView
+        width: "100%",      // explicitly matches parent width
+        alignSelf: "stretch"
+    },
+    headerText: {
+        fontWeight: "bold",
+        textAlign: "left",
+    },
 });

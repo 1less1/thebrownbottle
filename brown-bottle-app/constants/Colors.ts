@@ -32,6 +32,7 @@ export const Colors = {
 
   /* Component Colors */
   borderColor: '#ccc',
+  lightBorderColor: '#eee',
   altBorderColor: '#D4CABE',
   inputBG: '#fafafa',
   tabBG: '#FDFBFB',
