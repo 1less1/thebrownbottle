@@ -89,6 +89,10 @@ def get_employees(db, request):
             query += " AND last_name = %s"
             query_params.append(last_name)
 
+        if full_name is not None:
+            query += " AND CONCAT(e.first_name, ' ', e.last_name) COLLATE utf8_general_ci LIKE %s"
+            query_params.append(f"%{full_name}%")
+
         if email is not None:
             query += " AND email = %s"
             query_params.append(email)
@@ -105,20 +109,25 @@ def get_employees(db, request):
             query += " AND admin = %s"
             query_params.append(admin)
 
+        # Handle multiple Role Clauses
+        role_clauses = []
+        role_values = []
+
         if primary_role is not None:
-            query += " AND primary_role = %s"
-            query_params.append(primary_role)
+            role_clauses.append("primary_role = %s")
+            role_values.append(primary_role)
 
         if secondary_role is not None:
-            query += " AND secondary_role = %s"
-            query_params.append(secondary_role)
+            role_clauses.append("secondary_role = %s")
+            role_values.append(secondary_role)
 
         if tertiary_role is not None:
-            query += " AND tertiary_role = %s"
+            role_clauses.append("tertiary_role = %s")
+            role_values.append(tertiary_role)
 
-        if full_name is not None:
-            query += " AND CONCAT(e.first_name, ' ', e.last_name) COLLATE utf8_general_ci LIKE %s"
-            query_params.append(f"%{full_name}%")
+        if role_clauses:
+            query += " AND (" + " OR ".join(role_clauses) + ")"
+            query_params.extend(role_values)
 
         # Last Query Line
         query += ";"

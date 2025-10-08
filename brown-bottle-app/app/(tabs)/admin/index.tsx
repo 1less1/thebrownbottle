@@ -1,6 +1,8 @@
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
@@ -24,31 +26,60 @@ const Admin = () => {
 
   const { user } = useSession();
   const [activeTab, setActiveTab] = useState(0);
+  const TAB_STORAGE_KEY = 'adminActiveTab';
+
+  // Save tab index on change
+  const handleTabChange = async (index: number) => {
+    setActiveTab(index);
+    await AsyncStorage.setItem(TAB_STORAGE_KEY, index.toString());
+  };
 
   // Define available tabs and corresponding components
   const tabs = [
-    { key: 'dashboard', title: 'Dashboard', component: user ? <Dashboard user={user} /> : 
-    <LoadingCircle
-      size="large"
-      style={{ marginTop: 40, alignSelf: 'center' }}
-    /> },
+    {
+      key: 'dashboard', title: 'Dashboard', component: user ? <Dashboard user={user} /> :
+        <LoadingCircle
+          size="large"
+          style={{ marginTop: 40, alignSelf: 'center' }}
+        />
+    },
 
-    { key: 'schedule', title: 'Schedule', component: <Schedule/> },
+    { key: 'schedule', title: 'Schedule', component: <Schedule /> },
 
-    { key: 'staff', title: 'Staff', component: user ? <Staff/> : 
-    <LoadingCircle
-      size="large"
-      style={{ marginTop: 40, alignSelf: 'center' }}
-    /> },
+    {
+      key: 'staff', title: 'Staff', component: user ? <Staff /> :
+        <LoadingCircle
+          size="large"
+          style={{ marginTop: 40, alignSelf: 'center' }}
+        />
+    },
   ];
+
+  // Load Saved Tab If it Exists, otherwise load tab index 0
+  useEffect(() => {
+    const loadSavedTab = async () => {
+      try {
+        const savedTabIndex = await AsyncStorage.getItem(TAB_STORAGE_KEY);
+        const tabIndex = Number(savedTabIndex);
+        if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < tabs.length) {
+          setActiveTab(tabIndex);
+        } else {
+          setActiveTab(0);
+        }
+      } catch (error) {
+        console.warn('Failed to load saved tab index:', error);
+      }
+    };
+    loadSavedTab();
+  }, []);
 
   return (
 
     <DefaultView>
-      
+
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-        
-        <View style={{backgroundColor: Colors.white }}>
+
+        <View style={{ backgroundColor: Colors.white }}>
           <Text style={styles.header}>Admin</Text>
 
           {/* Tab Bar */}
@@ -60,7 +91,7 @@ const Admin = () => {
                   styles.tabButton,
                   activeTab === index && styles.activeTabButton, // Style the active tab
                 ]}
-                onPress={() => setActiveTab(index)} // Set active tab on click
+                onPress={() => handleTabChange(index)} // Set active tab on click
               >
                 <Text style={styles.tabText}>{tab.title}</Text>
               </TouchableOpacity>
@@ -74,7 +105,7 @@ const Admin = () => {
         </View>
 
       </View>
-      
+
     </DefaultView>
 
   );

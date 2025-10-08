@@ -16,7 +16,6 @@ VALUES
 -- Sample role data ---------------------------------------------------------------------------------------------------------------------------
 INSERT INTO `thebrownbottle`.`role` (`role_name`)
 VALUES
-('All Staff'),
 ('Manager'),
 ('Host'),
 ('Server'),
@@ -29,11 +28,11 @@ VALUES
 INSERT INTO `thebrownbottle`.`employee` 
 (`first_name`, `last_name`, `email`, `phone_number`, `wage`, `admin`, `primary_role`, `secondary_role`, `tertiary_role`)
 VALUES 
-('Emily', 'Turner', 'emily.turner@example.com', '555-123-4567', 18.50, 1, 2, NULL, NULL),  -- Manager (just Manager)
-('Marcus', 'Reed', 'marcus.reed@example.com', '555-234-5678', 19.75, 1, 2, NULL, NULL),  -- Manager (just Manager)
-('Jenna', 'Klein', 'jenna.klein@example.com', '555-345-6789', 15.25, 0, 3, 4, NULL),  -- Host (also Server)
-('Tyler', 'Nguyen', 'tyler.nguyen@example.com', '555-456-7890', 16.00, 0, 4, 5, NULL),  -- Server (also Bartender)
-('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 6, 7, NULL);  -- Kitchen (also Dish)
+('Emily', 'Turner', 'emily.turner@example.com', '555-123-4567', 18.50, 1, 1, NULL, NULL),  -- Manager (just Manager)
+('Marcus', 'Reed', 'marcus.reed@example.com', '555-234-5678', 19.75, 1, 1, NULL, NULL),  -- Manager (just Manager)
+('Jenna', 'Klein', 'jenna.klein@example.com', '555-345-6789', 15.25, 0, 2, 3, NULL),  -- Host (also Server)
+('Tyler', 'Nguyen', 'tyler.nguyen@example.com', '555-456-7890', 16.00, 0, 3, 4, NULL),  -- Server (also Bartender)
+('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 5, 6, NULL);  -- Kitchen (also Dish)
 
 
 -- Sample recurring_task data ------------------------------------------------------------------------------------------------------------------------------

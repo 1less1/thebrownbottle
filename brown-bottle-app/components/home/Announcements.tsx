@@ -20,7 +20,7 @@ const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(1);
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
   const [selectedRoleName, setSelectedRoleName] = useState<string>("");
   
   const handleRoleSelect = (roleId: number, roleName: string) => {
@@ -38,7 +38,7 @@ const Announcements = () => {
 
       try {
         const data =
-          selectedRoleId == 1
+          selectedRoleId == -1
             ? await getAllAnnouncements()
             : await getAnnouncementsByRole(selectedRoleId);
 

@@ -70,7 +70,7 @@ export default function HomeScreen() {
           {/* Next Shift View */}
           <View style={{ marginVertical: 25, width: '85%' }}>
             <Text style={GlobalStyles.floatingHeaderText}>Your Next Shift</Text>
-            <NextShift employee_id={Number(user?.user_id) || 0} />
+            <NextShift employee_id={Number(user?.employee_id) || 0} />
           </View>
 
 
