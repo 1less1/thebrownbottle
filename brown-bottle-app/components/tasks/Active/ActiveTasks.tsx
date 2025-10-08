@@ -112,7 +112,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
         try {
             // Update all checked tasks to complete = 1
             await Promise.all(
-            checkedTasks.map(taskId => updateTask(taskId, { complete: 1, last_modified_by: Number(user.user_id) }))
+            checkedTasks.map(taskId => updateTask(taskId, { complete: 1, last_modified_by: Number(user.employee_id) }))
             );
 
             alert("Task(s) Submitted Successfully!");

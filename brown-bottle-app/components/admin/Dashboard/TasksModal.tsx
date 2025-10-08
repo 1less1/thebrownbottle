@@ -132,7 +132,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
     try {
       if (isRecurring) {
         await insertRecurringTask(
-          Number(user.user_id),
+          Number(user.employee_id),
           title,
           description,
           selectedSectionId,
@@ -142,7 +142,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         );
       } else {
         await insertTask(
-          Number(user.user_id),
+          Number(user.employee_id),
           title,
           description,
           selectedSectionId,

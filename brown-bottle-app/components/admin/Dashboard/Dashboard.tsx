@@ -1,14 +1,19 @@
-import DefaultScrollView from '@/components/DefaultScrollView';
 import { View, Text, StyleSheet } from 'react-native';
-import Card from '@/components/modular/Card';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { User } from '@/utils/SessionContext'; // Import User type from SessionContext
+import { User } from '@/utils/SessionContext';
+
+import DefaultView from '@/components/DefaultView'
+import DefaultScrollView from '@/components/DefaultScrollView';
+import Card from '@/components/modular/Card';
+import AltCard from '@/components/modular/AltCard';
+
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
 
+
 interface DashboardProps {
-  user: User; // Make sure to define `User` type properly, based on your session data structure
+  user: User;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user }) => {

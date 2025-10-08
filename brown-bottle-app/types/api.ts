@@ -1,3 +1,24 @@
+// API Types for Requests and Responses
+
+export interface Employee {
+  employee_id?: number;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone_number?: string;
+  wage?: number;
+  admin?: number;
+  primary_role?: number;
+  secondary_role?: number;
+  tertiary_role?: number;
+  full_name?: string;
+
+  // Only Used for JSON Responses:
+  primary_role_name?: string;
+  secondary_role_name?: string;
+  tertiary_role_name?: string;
+}
+
 export interface Role {
   role_id: number;
   role_name: string;

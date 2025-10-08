@@ -1,43 +1,42 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import { View, Text, StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+import { useSession } from '@/utils/SessionContext';
 
 import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
+import Card from '@/components/modular/Card';
 
-export default function Staff() {
+import StaffSearch from '@/components/admin/Staff/StaffSearch';
+
+const Staff = () => {
+
+  const { user } = useSession();
+
 
   return (
 
-    <DefaultView backgroundColor={Colors.white}>
+    <DefaultScrollView>
 
-
-      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-
-
-        { /* Chat Header */ }
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.borderColor }}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
-            Staff
-          </Text>
-        </View>
-        
-        {/* Temporary Content */}
-        <DefaultScrollView>
-
-          <View>
-            <Text>WIP</Text>
-          </View>
-          
-        </DefaultScrollView>
-
-
+      <View style={{ marginTop: 10, width: '90%'}}>
+        <StaffSearch/>
       </View>
 
+    </DefaultScrollView>
 
-    </DefaultView>
+  );
 
-  )
 };
+
+const styles = StyleSheet.create({
+  card: {
+    width: '100%',
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+});
+
+export default Staff;

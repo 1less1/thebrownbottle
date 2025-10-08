@@ -1,64 +1,58 @@
+// Session Functions
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-export type User = {
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string;
-  wage: string;
-  is_admin: number;
-  primary_role: number;
-  secondary_role: number;
-  tertiary_role: number;
-};
+import { Employee } from '@/types/api';
+
+export type User = Employee;
 
 type SessionContextType = {
   user: User | null;
   setUser: (user: User | null) => Promise<void>;
-  clearSession: () => Promise<void>;  // Add clearSession function type
+  clearSession: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextType>({
   user: null,
   setUser: async () => {},
-  clearSession: async () => {}  // Default empty function
+  clearSession: async () => {},
 });
 
 const USER_KEY = 'user_session';
 
-// Helper function to get from storage
-const getUserFromStorage = async () => {
+// Helper: Get user from storage
+const getUserFromStorage = async (): Promise<User | null> => {
   if (Platform.OS === 'web') {
     const storedUser = localStorage.getItem(USER_KEY);
     return storedUser ? JSON.parse(storedUser) : null;
   } else {
-    return await SecureStore.getItemAsync(USER_KEY).then((storedUser) =>
-      storedUser ? JSON.parse(storedUser) : null
-    );
+    const storedUser = await SecureStore.getItemAsync(USER_KEY);
+    return storedUser ? JSON.parse(storedUser) : null;
   }
 };
 
-// Helper function to save to storage
+// Helper: Save user to storage
 const saveUserToStorage = async (user: User | null) => {
+  const serialized = user ? JSON.stringify(user) : null;
+
   if (Platform.OS === 'web') {
-    if (user) {
-      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    if (serialized) {
+      localStorage.setItem(USER_KEY, serialized);
     } else {
       localStorage.removeItem(USER_KEY);
     }
   } else {
-    if (user) {
-      await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
+    if (serialized) {
+      await SecureStore.setItemAsync(USER_KEY, serialized);
     } else {
       await SecureStore.deleteItemAsync(USER_KEY);
     }
   }
 };
 
-// Clear the session
+// Helper: Clear session storage
 const clearSessionStorage = async () => {
   if (Platform.OS === 'web') {
     localStorage.removeItem(USER_KEY);
@@ -78,7 +72,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           setUserState(storedUser);
         }
       } catch (e) {
-        console.error("Error loading user from storage:", e);
+        console.error('Error loading user from storage:', e);
       }
     };
     loadUser();
@@ -89,16 +83,16 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       await saveUserToStorage(newUser);
       setUserState(newUser);
     } catch (e) {
-      console.error("Error saving user to storage:", e);
+      console.error('Error saving user to storage:', e);
     }
   };
 
   const clearSession = async () => {
     try {
       await clearSessionStorage();
-      setUserState(null); // Clear the user state as well
+      setUserState(null);
     } catch (e) {
-      console.error("Error clearing session:", e);
+      console.error('Error clearing session:', e);
     }
   };
 
