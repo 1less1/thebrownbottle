@@ -20,7 +20,6 @@ export default function Schedule() {
 
       <DefaultScrollView>
             <Spreadsheet />
-            {/* <ExSpread /> */}
         </DefaultScrollView>
 
       </View>

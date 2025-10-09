@@ -24,6 +24,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white', // Default background, can be overridden
     paddingVertical: 10,
     paddingHorizontal: 10,
+
+    //Border
+    borderWidth: 1,
+    borderColor: 'lightgrey',
     borderRadius: 10,
 
     // Shadow for iOS
