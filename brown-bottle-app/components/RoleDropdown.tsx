@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getAllRoles } from "@/utils/api/role";
@@ -88,6 +88,11 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
         onValueChange={(value: string | number) => {
           const roleId = Number(value);
 
+          if (roleId === -1) {
+            onRoleSelect(-1, ""); // or "Select a role..." if you want to show that
+            return;
+          }
+
           if (roleId !== selectedRoleId) {
             const selectedRole = roles.find(
               (role) => role.role_id === roleId
@@ -99,6 +104,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
         }}
         style={styles.picker}
       >
+        <Picker.Item label="Select a role..." value={-1}/>
         {roles.map((role) => (
           <Picker.Item
             key={role.role_id}

@@ -24,6 +24,7 @@ export const Colors = {
   mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
   yellowTan: '#FFDEAB',
+  greyBrown: '#5c533f',
   lightBrown: '#7C580D',
   brown: '#5D3A00',
   darkBrown: '#4A3508',
@@ -31,6 +32,7 @@ export const Colors = {
 
   /* Component Colors */
   borderColor: '#ccc',
+  lightBorderColor: '#eee',
   altBorderColor: '#D4CABE',
   inputBG: '#fafafa',
   tabBG: '#FDFBFB',

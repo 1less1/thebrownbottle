@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 
 import ModularButton from '../modular/ModularButton';
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';
-import { getUserData } from '@/utils/api/user';
+import { getEmployee } from '@/utils/api/employee';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 const HandleLogin = () => {
@@ -28,25 +28,25 @@ const HandleLogin = () => {
     setErrorText('');
 
     try {
-      const response = await getUserData(Number(employeeIdInput));
+      const response = await getEmployee({ employee_id: Number(employeeIdInput) });
 
       if (!response || response.length === 0) {
-        setErrorText('No user found with this Employee ID.');
+        setErrorText('Login Failed');
         return;
       }
 
-      const user = response[0];
+      const currentUser = response[0];
       setUser({
-        user_id: user.employee_id.toString(),
-        first_name: user.first_name.toString(),
-        last_name: user.last_name.toString(),
-        email: user.email.toString(),
-        phone_number: user.phone_number.toString(),
-        wage: user.wage.toString(),
-        is_admin: Number(user.admin),
-        primary_role: Number(user.primary_role),
-        secondary_role: Number(user.secondary_role),
-        tertiary_role: Number(user.tertiary_role),
+        employee_id: currentUser.employee_id.toString(),
+        first_name: currentUser.first_name.toString(),
+        last_name: currentUser.last_name.toString(),
+        email: currentUser.email.toString(),
+        phone_number: currentUser.phone_number.toString(),
+        wage: currentUser.wage.toString(),
+        admin: Number(currentUser.admin),
+        primary_role: Number(currentUser.primary_role),
+        secondary_role: Number(currentUser.secondary_role),
+        tertiary_role: Number(currentUser.tertiary_role),
       });
 
       router.push({ pathname: '/(tabs)/home' });

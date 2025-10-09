@@ -142,7 +142,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
         try {
             // Update all checked tasks to complete = 0
             await Promise.all(
-                checkedTasks.map(taskId => updateTask(taskId, { complete: 0, last_modified_by: Number(user.user_id)}))
+                checkedTasks.map(taskId => updateTask(taskId, { complete: 0, last_modified_by: Number(user.employee_id)}))
             );
 
             alert('Task(s) marked as Incomplete Successfully!');

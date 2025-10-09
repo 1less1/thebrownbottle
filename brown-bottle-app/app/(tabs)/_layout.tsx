@@ -18,7 +18,7 @@ export default function TabLayout() {
     // New Navbar Theme!
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.darkBrown,
+        tabBarActiveTintColor: Colors.greyBrown,
         tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,
@@ -77,7 +77,7 @@ export default function TabLayout() {
       />
 
       {/* Completely exclude the Admin tab if isAdmin is false (0) -> We need to put some sort of SERVER SIDE CHECK to redirect users if they uncover the Admin tab (Auth Token?) */}
-      {user?.is_admin === 1 ? (
+      {user?.admin === 1 ? (
         <Tabs.Screen
           name="admin/index"
           options={{

@@ -47,7 +47,7 @@ const AnnouncementsModal: React.FC<AnnouncementModalProps> = ({ visible, onClose
 
     try {
       await insertAnnouncement(
-        Number(user.user_id),
+        Number(user.employee_id),
         title,
         description,
         selectedRoleId

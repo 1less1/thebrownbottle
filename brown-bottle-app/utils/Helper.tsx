@@ -1,3 +1,5 @@
+// Universal App Helper Functions
+
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -42,3 +44,12 @@ export const isValidDate = (dateStr: string): boolean => {
   const parsed = dayjs(dateStr, 'YYYY-MM-DD', true);
   return parsed.isValid() && parsed.format('YYYY-MM-DD') === dateStr;
 };
+
+// Input: Array of [key, value] pairs
+// Output: Query String: employee_id=1&name=John...
+export function buildQueryString(params: Record<string, any>) {
+  return Object.entries(params)
+    .filter(([_, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+    .join("&");
+}

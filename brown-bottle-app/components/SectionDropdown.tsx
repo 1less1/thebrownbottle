@@ -88,6 +88,11 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
         onValueChange={(value: string | number) => {
           const sectionId = Number(value);
 
+          if (sectionId === -1) {
+            onSectionSelect(-1, ""); // or "Select a role..." if you want to show that
+            return;
+          }
+
           if (sectionId !== selectedSectionId) {
             const selectedSection = sections.find(
               (section) => section.section_id === sectionId
@@ -99,6 +104,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
         }}
         style={styles.picker}
       >
+        <Picker.Item label="Select a section..." value={-1}/>
         {sections.map((section) => (
           <Picker.Item
             key={section.section_id}
