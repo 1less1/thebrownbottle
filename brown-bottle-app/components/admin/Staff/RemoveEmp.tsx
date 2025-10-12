@@ -20,7 +20,7 @@ const RemoveEmp = () => {
             {/* Clickable Content */}
             <TouchableOpacity onPress={toggleModal} style={styles.content}>
                 <Ionicons name="person-remove" size={30} color="black" style={styles.icon} />
-                <Text style={GlobalStyles.boldText}>Remove Employee</Text>
+                <Text style={[GlobalStyles.boldText, styles.iconText]}>Remove Employee</Text>
             </TouchableOpacity>
 
             {/* Insert Modal Code Here */}
@@ -46,6 +46,10 @@ const styles = StyleSheet.create({
     icon: {
         marginBottom: 8,
     },
+    iconText: {
+        textAlign: 'center',
+        flexWrap: 'wrap',
+    }
 });
 
 export default RemoveEmp;

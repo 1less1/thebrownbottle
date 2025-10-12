@@ -47,11 +47,7 @@ const Admin = () => {
     { key: 'schedule', title: 'Schedule', component: <Schedule /> },
 
     {
-      key: 'staff', title: 'Staff', component: user ? <Staff /> :
-        <LoadingCircle
-          size="large"
-          style={{ marginTop: 40, alignSelf: 'center' }}
-        />
+      key: 'staff', title: 'Staff', component: <Staff />
     },
   ];
 
