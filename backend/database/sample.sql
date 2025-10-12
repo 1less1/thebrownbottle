@@ -137,3 +137,21 @@ VALUES
 (5, '16:00:00', '20:00:00', '2025-05-31', 2);
 
 
+INSERT INTO `thebrownbottle`.`shift_cover_request` 
+(`shift_id`, `accepted_employee_id`, `requested_employee_id`, `status`) 
+VALUES
+(1, 3, 1, 'Accepted'),     -- Jenna covers Emily's shift
+(4, NULL, 2, 'Pending'),   -- Marcus requests coverage, no one accepted yet
+(7, 5, 3, 'Accepted'),     -- Sophia covers Jenna's shift
+(10, NULL, 4, 'Pending'),  -- Tyler requests coverage
+(13, NULL, 5, 'Denied');   -- Sophia's request was denied
+
+
+INSERT INTO `thebrownbottle`.`time_off_request` 
+(`employee_id`, `start_date`, `end_date`, `reason`, `status`) 
+VALUES
+(1, '2025-06-01', '2025-06-03', 'Family vacation', 'Accepted'),
+(2, '2025-06-05', '2025-06-05', 'Doctor appointment', 'Pending'),
+(3, '2025-06-10', '2025-06-12', 'Traveling for wedding', 'Accepted'),
+(4, '2025-06-15', '2025-06-16', 'Personal reasons', 'Denied'),
+(5, '2025-06-20', '2025-06-22', 'Attending conference', 'Pending');
