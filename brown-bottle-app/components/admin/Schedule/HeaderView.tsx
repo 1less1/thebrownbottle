@@ -34,9 +34,6 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 15,
     width: '80%',
-    borderColor: 'lightgrey',
-    borderWidth: 1,
-    borderRadius: 9,
   },
   card: {
     

@@ -96,9 +96,7 @@ const styles = StyleSheet.create({
     maxWidth:"95%",
     marginTop: 15,
     marginHorizontal:"2.5%",
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: 'lightgrey',
+
     overflow: 'hidden',
   },
   row: {
