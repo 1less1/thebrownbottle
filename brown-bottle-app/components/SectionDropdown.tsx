@@ -5,7 +5,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Colors } from '@/constants/Colors'; 
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getAllSections } from "@/utils/api/section";
+import { getSection } from "@/utils/api/section";
 
 import { Section } from '@/types/api'
 
@@ -19,6 +19,8 @@ interface SectionDropdownProps {
 
   // Option to disable internal fetching (default true)
   fetchSections?: boolean;
+  containerStyle?: object; // optional custom container styles
+  pickerStyle?: object;    // optional custom picker styles
 }
 
 const SectionDropdown: React.FC<SectionDropdownProps> = ({
@@ -27,6 +29,8 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
   labelText = "Filter:",
   sections: parentSections,
   fetchSections = true,
+  containerStyle,
+  pickerStyle,
 }) => {
   const [sections, setSections] = useState<Section[]>(parentSections ?? []);
   const [loading, setLoading] = useState<boolean>(fetchSections && !parentSections);
@@ -50,7 +54,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
     // Fetch sections internally if allowed and no parent data
     const fetchData = async () => {
       try {
-        const data = await getAllSections();
+        const data = await getSection();
         setSections(data);
 
         // Notify parent of the current selectedSectionId's name after loading
@@ -80,7 +84,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{labelText}</Text>
 
       <Picker
@@ -102,9 +106,9 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
             }
           }
         }}
-        style={styles.picker}
+        style={[styles.picker, pickerStyle]}
       >
-        <Picker.Item label="Select a section..." value={-1}/>
+        <Picker.Item label="Select a section..." value={-1} color="black"/>
         {sections.map((section) => (
           <Picker.Item
             key={section.section_id}

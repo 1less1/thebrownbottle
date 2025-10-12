@@ -5,28 +5,38 @@ import { debounce } from "lodash";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
 
+import Card from "@/components/modular/Card";
 import AltCard from "@/components/modular/AltCard";
-import RoleDropdown from "@/components/RoleDropdown";
+
+import RoleDropdown from "@/components/modular/RoleDropdown";
 import ModularDropdown from "@/components/modular/ModularDropdown";
+
 import ModularButton from "@/components/modular/ModularButton";
+import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import { Employee } from "@/types/api";
 import { getEmployee } from "@/utils/api/employee";
 
 
 const adminDropdownOptions = [
-    { value: 1, label: "Yes" },
-    { value: 0, label: "No" },
+    { value: 1, key: "Yes" },
+    { value: 0, key: "No" },
 ];
 
 const columns = [
-    { key: "full_name", label: "Name", flex: 2 },
-    { key: "email", label: "Email", flex: 3.75 },
-    { key: "phone_number", label: "Phone", flex: 2.25 },
-    { key: "primary_role_name", label: "Primary", flex: 2 },
+    { key: "full_name", label: "Name", width: 120 },
+    { key: "email", label: "Email", width: 200 },
+    { key: "phone_number", label: "Phone", width: 140 },
+    { key: "primary_role_name", label: "Primary", width: 120 },
 ];
 
-const StaffSearch = () => {
+interface StaffSearchProps {
+    refreshTrigger?: number;
+    onRefreshDone?: () => void;
+}
+
+
+const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(false);
@@ -62,6 +72,7 @@ const StaffSearch = () => {
             console.error("Search failed:", err);
         } finally {
             setLoading(false);
+            onRefreshDone?.(); // Notify parent refresh is complete
         }
     };
 
@@ -73,45 +84,45 @@ const StaffSearch = () => {
     };
 
     const handleReset = () => {
-        setQuery("");
-        setSelectedRoleId(-1);
-        setSelectedAdminOption(-1);
-        fetchEmployees("");
+        if (query !== "" || selectedRoleId !== -1 || selectedAdminOption !== -1) {
+            setQuery(""); // Set Query to empty
+            setSelectedRoleId(-1);
+            setSelectedAdminOption(-1);
+        }
+
     };
 
-    // Fetch Employees on Initialization
+    // Fetch Employees on Initialization and State Update
     useEffect(() => {
         fetchEmployees(query);
-    }, [selectedRoleId, selectedAdminOption]);
-
+    }, [selectedRoleId, selectedAdminOption, refreshTrigger]);
 
     const renderHeader = useCallback(() => (
         <View style={styles.row}>
             {columns.map((col) => (
-                <View key={col.key} style={[styles.cell, { backgroundColor: Colors.lightBorderColor, flex: col.flex }]}>   
+                <View key={col.key} style={[styles.cell, { flex: 1, width: col.width, backgroundColor: Colors.lightBorderColor }]}>
                     <Text style={GlobalStyles.boldText}>{col.label}</Text>
                 </View>
             ))}
         </View>
-    ), [columns]);
+    ), []);
 
-
-    const renderItem = useCallback(({ item }: { item: Employee }) => (
+    const renderCell = useCallback(({ item }: { item: Employee }) => (
         <View style={styles.row}>
             {columns.map((col) => (
-                <View key={col.key} style={[styles.cell, { flex: col.flex }]}>
+                <View key={col.key} style={[styles.cell, { flex: 1, width: col.width, }]}>
                     <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.text}>
                         {item[col.key as keyof Employee]?.toString() ?? ""}
                     </Text>
                 </View>
             ))}
         </View>
-    ), [columns]);
+    ), []);
 
 
     return (
 
-        <AltCard style={{ backgroundColor: Colors.white, height: 350 }}>
+        <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: 500 }}>
 
             {/* Search Bar + Reset Button */}
             <View style={styles.searchContainer}>
@@ -119,6 +130,7 @@ const StaffSearch = () => {
                     value={query}
                     onChangeText={handleSearchChange}
                     placeholder="Search Staff by Name"
+                    placeholderTextColor={Colors.gray}
                     style={styles.input}
                 />
                 <ModularButton onPress={handleReset} text="Reset" />
@@ -126,43 +138,53 @@ const StaffSearch = () => {
 
             {/* Dropdowns */}
             <View style={styles.filterContainer}>
-                <RoleDropdown selectedRoleId={selectedRoleId} onRoleSelect={setSelectedRoleId} labelText="" />
+                <RoleDropdown
+                    selectedRoleId={selectedRoleId}
+                    onRoleSelect={(value) => setSelectedRoleId(value)}
+                    labelText=""
+                    containerStyle={styles.dropdownButton}
+                />
                 <ModularDropdown
                     selectedValue={selectedAdminOption}
-                    onSelect={(value) => setSelectedAdminOption(Number(value))}
-                    options={adminDropdownOptions}
+                    // Declare value being selected is a number
+                    onSelect={(value) =>setSelectedAdminOption(value as number)}
                     labelText=""
-                    placeholder="Select Admin..."
+                    containerStyle={styles.dropdownButton}
+                    placeholder="Select admin..."
+                    placeholderValue={-1}
+                    options={adminDropdownOptions}
                 />
             </View>
 
-            {loading && <ActivityIndicator style={{ marginVertical: 10 }} />}
+            {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
 
             {/* Data Table */}
-            {/* Vertical Scroll */}
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-                {/* Horizontal Scroll */}
-                <ScrollView horizontal style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            {/* Horizontal Scroll only */}
+            <View style={{ flex: 1 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>
                     <View style={styles.tableContainer}>
                         {renderHeader()}
                         <FlatList
                             data={results}
                             keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
-                            renderItem={renderItem}
-                            scrollEnabled={false}
+                            renderItem={renderCell}
+                            style={{ maxHeight: 350 }}
+                            scrollEnabled={true}
+                            nestedScrollEnabled={true}
+                            showsVerticalScrollIndicator={true}
                         />
                     </View>
                 </ScrollView>
-            </ScrollView>
+            </View>
 
             {/* Fallback */}
             {!loading && results.length === 0 && query.length > 0 && (
-                <Text style={[GlobalStyles.text, { marginVertical: 10, textAlign: "center" }]}>
-                    No staff found...
+                <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
+                    No results found...
                 </Text>
             )}
 
-        </AltCard>
+        </Card>
 
     );
 };
@@ -171,11 +193,13 @@ const StaffSearch = () => {
 const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: "row",
+        paddingVertical: 6,
         gap: 6,
         marginBottom: 12,
     },
     filterContainer: {
         flexDirection: "row",
+        flexWrap: "wrap", // allows wrapping on small screens
         justifyContent: "flex-start",
         gap: 12,
         marginBottom: 12,
@@ -187,6 +211,10 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 4,
     },
+    dropdownButton: {
+        minWidth: 0,      // let it shrink as much as content allows
+        alignSelf: "flex-start", // size to content rather than container
+    },
     row: {
         flexDirection: "row",
         borderColor: Colors.lightBorderColor,
@@ -195,10 +223,11 @@ const styles = StyleSheet.create({
         padding: 8,
         borderWidth: 1,
         borderColor: Colors.lightBorderColor,
+        flexShrink: 1,
     },
     tableContainer: {
         flex: 1,
-        width: "100%",
+        maxWidth: "100%",
         alignSelf: "stretch",
     },
     headerText: {

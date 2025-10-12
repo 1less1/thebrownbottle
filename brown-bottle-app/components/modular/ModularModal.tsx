@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
-    elevation: 10,
+    elevation: 5,
     maxHeight: '85%',
   },
   scrollView: {

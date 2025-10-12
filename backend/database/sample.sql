@@ -32,7 +32,15 @@ VALUES
 ('Marcus', 'Reed', 'marcus.reed@example.com', '555-234-5678', 19.75, 1, 1, NULL, NULL),  -- Manager (just Manager)
 ('Jenna', 'Klein', 'jenna.klein@example.com', '555-345-6789', 15.25, 0, 2, 3, NULL),  -- Host (also Server)
 ('Tyler', 'Nguyen', 'tyler.nguyen@example.com', '555-456-7890', 16.00, 0, 3, 4, NULL),  -- Server (also Bartender)
-('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 5, 6, NULL);  -- Kitchen (also Dish)
+('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 5, 6, NULL),  -- Kitchen (also Dish)
+('Devin', 'Biggs', 'devin.biggs@example.com', '555-444-8998', 14.75, 1, 5, 6, NULL),  -- Kitchen (also Dish)
+('Jodi', 'Brown', 'jodi.brown@example.com', '555-333-4327', 15.25, 0, 2, 3, NULL), -- Host (also Server)
+('Avery', 'Hughes', 'avery.hughes@example.com', '555-678-9012', 16.25, 0, 3, 4, NULL),  -- Server (also Bartender)
+('Liam', 'Foster', 'liam.foster@example.com', '555-789-0123', 14.50, 0, 6, NULL, NULL),  -- Dish (just Dish)
+('Nina', 'Choi', 'nina.choi@example.com', '555-890-1234', 15.00, 0, 2, NULL, NULL),  -- Host (just Host)
+('Caleb', 'Morris', 'caleb.morris@example.com', '555-901-2345', 17.00, 0, 4, 3, NULL),  -- Bartender (also Server)
+('Zoe', 'Ramirez', 'zoe.ramirez@example.com', '555-012-3456', 15.75, 0, 5, NULL, NULL),  -- Kitchen (just Kitchen)
+('Ethan', 'Bishop', 'ethan.bishop@example.com', '555-123-9876', 18.00, 1, 1, 2, NULL);  -- Manager (also Server)
 
 
 -- Sample recurring_task data ------------------------------------------------------------------------------------------------------------------------------

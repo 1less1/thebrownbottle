@@ -18,7 +18,7 @@ interface DefaultScrollViewProps {
 
 
 const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, onRefresh, refreshing = false }) => {
-  
+
   return (
 
     <ScrollView
@@ -35,7 +35,7 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, 
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={Colors.lightBrown}
-            progressViewOffset={200}
+            progressViewOffset={50}
           />
         ) : undefined
       }
@@ -46,7 +46,7 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, 
     </ScrollView>
 
   );
-};``
+};
 
 const styles = StyleSheet.create({
   scrollView: {

@@ -1,19 +1,24 @@
-import Constants from "expo-constants";
+import Constants from 'expo-constants';
 
-// GET Request that fetches ALL roles
-export async function getAllRoles() {
+import { buildQueryString } from "@/utils/Helper";
+
+import { Role } from '@/types/api';
+
+// Fetches data from the role table
+export async function getRole(params?: Partial<Role>) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const baseURL = API_BASE_URL;
+  // Build Query String
+  const queryString = buildQueryString(params || {})
 
+  const url = `${API_BASE_URL}/role?${queryString}`;
   try {
-    
-    const response = await fetch(`${baseURL}/role`, {
+    const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json", 
+        "Content-Type": "application/json",
       },
     });
 
@@ -23,13 +28,11 @@ export async function getAllRoles() {
 
     const data = await response.json();
 
-    return data;
+    return data; // JSON Response
 
   } catch (error) {
-    console.error("Failed to fetch roles:", error);
+    console.error("Failed to fetch user data:", error);
     throw error;
   }
-  
+
 }
-    
-    

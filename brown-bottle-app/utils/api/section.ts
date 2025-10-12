@@ -1,19 +1,24 @@
 import Constants from 'expo-constants';
 
-// GET Request that fetches ALL sections
-export async function getAllSections() {
+import { buildQueryString } from "@/utils/Helper";
+
+import { Section } from '@/types/api';
+
+// Fetches data from the section table
+export async function getSection(params?: Partial<Section>) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const baseURL = API_BASE_URL;
+  // Build Query String
+  const queryString = buildQueryString(params || {})
 
+  const url = `${API_BASE_URL}/section?${queryString}`;
   try {
-    
-    const response = await fetch(`${baseURL}/section`, {
+    const response = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json", 
+        "Content-Type": "application/json",
       },
     });
 
@@ -23,10 +28,10 @@ export async function getAllSections() {
 
     const data = await response.json();
 
-    return data;
+    return data; // JSON Response
 
   } catch (error) {
-    console.error("Failed to fetch sections:", error);
+    console.error("Failed to fetch user data:", error);
     throw error;
   }
 

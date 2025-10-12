@@ -1,3 +1,4 @@
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
@@ -10,17 +11,47 @@ import Card from '@/components/modular/Card';
 
 import StaffSearch from '@/components/admin/Staff/StaffSearch';
 
-const Staff = () => {
+import AddEmp from "@/components/admin/Staff/AddEmp";
+import RemoveEmp from "@/components/admin/Staff/RemoveEmp";
 
+
+const Staff = () => {
   const { user } = useSession();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1); // triggers StaffSearch to refetch
+
+    // Simulate async refresh delay
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
 
   return (
 
-    <DefaultScrollView>
+    <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <View style={{ marginTop: 10, width: '90%'}}>
-        <StaffSearch/>
+      <View style={{ marginTop: 16, width: '85%' }}>
+        <StaffSearch refreshTrigger={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+      </View>
+
+      <View style={[styles.moduleContainer, { margin: 16, width: '85%' }]}>
+        <Card style={styles.moduleCard}>
+          <AddEmp/>
+        </Card>
+        <Card style={styles.moduleCard}>
+          <RemoveEmp/>
+        </Card>
+      </View>
+
+      <View style={{ margin: 16, width: '85%' }}>
+        <Card>
+          <Text>Temporary Card</Text>
+        </Card>
       </View>
 
     </DefaultScrollView>
@@ -30,12 +61,18 @@ const Staff = () => {
 };
 
 const styles = StyleSheet.create({
-  card: {
-    width: '100%',
+  moduleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+    flexWrap: 'wrap',
+  },
+  moduleCard: {
+    flex: 1,
     backgroundColor: Colors.white,
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
 });
 

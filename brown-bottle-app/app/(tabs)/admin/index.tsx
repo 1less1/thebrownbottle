@@ -75,7 +75,7 @@ const Admin = () => {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
-    borderBottomColor: 'gray',
+    borderBottomColor: Colors.altBorderColor,
   },
   tabButton: {
     flex: 1,

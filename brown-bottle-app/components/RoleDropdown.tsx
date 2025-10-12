@@ -5,7 +5,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getAllRoles } from "@/utils/api/role";
+import { getRole } from "@/utils/api/role";
 
 import { Role } from '@/types/api';
 
@@ -19,6 +19,8 @@ interface RoleDropdownProps {
 
   // Option to disable internal fetching (default true)
   fetchRoles?: boolean;
+  containerStyle?: object; // optional custom container styles
+  pickerStyle?: object;    // optional custom picker styles
 }
 
 const RoleDropdown: React.FC<RoleDropdownProps> = ({
@@ -27,6 +29,8 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
   labelText = "Filter:",
   roles: parentRoles,
   fetchRoles = true,
+  containerStyle,
+  pickerStyle,
 }) => {
   const [roles, setRoles] = useState<Role[]>(parentRoles ?? []);
   const [loading, setLoading] = useState<boolean>(fetchRoles && !parentRoles);
@@ -50,7 +54,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
     // Fetch roles internally if allowed and no parent data
     const fetchData = async () => {
       try {
-        const data = await getAllRoles();
+        const data = await getRole();
         setRoles(data);
 
         // Notify parent of the current selectedRoleId's name after loading
@@ -76,11 +80,11 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
   }
 
   if (error) {
-    return <Text style={GlobalStyles.errorText}>Unable to fetch roles!</Text>;
+    return <Text style={GlobalStyles.loadingText}>Unable to fetch roles!</Text>;
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{labelText}</Text>
 
       <Picker
@@ -102,9 +106,9 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
             }
           }
         }}
-        style={styles.picker}
+        style={[styles.picker, pickerStyle]}
       >
-        <Picker.Item label="Select a role..." value={-1}/>
+        <Picker.Item label="Select a role..." value={-1} color="black"/>
         {roles.map((role) => (
           <Picker.Item
             key={role.role_id}
