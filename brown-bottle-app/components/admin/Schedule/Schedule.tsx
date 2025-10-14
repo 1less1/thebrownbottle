@@ -8,7 +8,6 @@ import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Spreadsheet from './SpreadSheet';
 import HeaderView from './HeaderView';
-import ExSpread from './ExSpread';
 
 export default function Schedule() {
 

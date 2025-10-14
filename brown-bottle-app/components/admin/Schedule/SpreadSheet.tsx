@@ -31,12 +31,7 @@ const spreadsheet = () => {
   { name: "Laura Thomas", shifts: ["8-5", "8-5", "8-5", "", "3-9", "", ""] },
   { name: "Michael Harris", shifts: ["", "", "9-3", "9-3", "8-5", "", "8-5"] },
   { name: "Nina Rodriguez", shifts: ["3-9", "3-9", "8-5", "8-5", "", "9-3", ""] },
-  { name: "Oscar Lewis", shifts: ["", "9-3", "", "", "8-5", "8-5", "8-5"] },
-  { name: "Priya Patel", shifts: ["8-5", "", "9-3", "8-5", "", "", "9-3"] },
-  { name: "Quinn Walker", shifts: ["3-9", "8-5", "8-5", "3-9", "", "9-3", ""] },
-  { name: "Riley Hall", shifts: ["", "", "9-3", "9-3", "", "8-5", "8-5"] },
-  { name: "Sophia Young", shifts: ["8-5", "3-9", "", "", "8-5", "3-9", "8-5"] },
-  { name: "Tommy Evans", shifts: ["9-3", "", "9-3", "8-5", "9-3", "", ""] },
+
 ]
 
 //  Dynamic widths: 25% for name column, 75% split between days
@@ -46,7 +41,7 @@ const spreadsheet = () => {
   return (
     <View style={styles.container}>
       <Card>
-        <ScrollView horizontal>
+        <ScrollView horizontal> 
           <View>
 
             {/* Header row */}
