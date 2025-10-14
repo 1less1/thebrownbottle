@@ -5,13 +5,13 @@ import { buildQueryString } from "@/utils/Helper";
 import { Employee } from "@/types/api";
 
 // Fetches data from the employee table
-export async function getEmployee(params: Employee) {
+export async function getEmployee(params?: Partial<Employee>) {
   
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
   // Build Query String
-  const queryString = buildQueryString(params)
+  const queryString = buildQueryString(params || {})
 
   const url = `${API_BASE_URL}/employee?${queryString}`;
   try {

@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
 
     //Border
     borderWidth: 1,
-    borderColor: 'lightgrey',
+    borderColor: Colors.lightGray,
     borderRadius: 10,
 
     // Shadow for iOS

@@ -7,7 +7,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import RoleDropdown from '@/components/RoleDropdown';
+import RoleDropdown from '@/components/modular/RoleDropdown';
 
 import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
@@ -30,7 +30,6 @@ const Announcements = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false); 
-  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -65,24 +64,11 @@ const Announcements = () => {
       
       <View style={styles.scrollContainer}>
 
-        <ModularButton 
-          text="Filter" 
-          onPress={() => setModalVisible(true)}
-          style={{marginVertical: 5}} 
-        />
-
-       <ModularModal visible={modalVisible} onClose={() => setModalVisible(false)}>
-          <RoleDropdown
+        <RoleDropdown
             selectedRoleId={selectedRoleId}
             onRoleSelect={handleRoleSelect}
-            labelText='Role:'
+            labelText='Filter by Role:'
           />
-          <ModularButton 
-            text="Close" 
-            onPress={() => setModalVisible(false)} // Close modal without triggering fetch
-            style={{ marginVertical: 5 }}
-          />
-        </ModularModal>
 
         <DefaultScrollView>
 

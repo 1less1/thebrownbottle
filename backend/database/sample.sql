@@ -32,7 +32,15 @@ VALUES
 ('Marcus', 'Reed', 'marcus.reed@example.com', '555-234-5678', 19.75, 1, 1, NULL, NULL),  -- Manager (just Manager)
 ('Jenna', 'Klein', 'jenna.klein@example.com', '555-345-6789', 15.25, 0, 2, 3, NULL),  -- Host (also Server)
 ('Tyler', 'Nguyen', 'tyler.nguyen@example.com', '555-456-7890', 16.00, 0, 3, 4, NULL),  -- Server (also Bartender)
-('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 5, 6, NULL);  -- Kitchen (also Dish)
+('Sophia', 'Martinez', 'sophia.martinez@example.com', '555-567-8901', 14.75, 0, 5, 6, NULL),  -- Kitchen (also Dish)
+('Devin', 'Biggs', 'devin.biggs@example.com', '555-444-8998', 14.75, 1, 5, 6, NULL),  -- Kitchen (also Dish)
+('Jodi', 'Brown', 'jodi.brown@example.com', '555-333-4327', 15.25, 0, 2, 3, NULL), -- Host (also Server)
+('Avery', 'Hughes', 'avery.hughes@example.com', '555-678-9012', 16.25, 0, 3, 4, NULL),  -- Server (also Bartender)
+('Liam', 'Foster', 'liam.foster@example.com', '555-789-0123', 14.50, 0, 6, NULL, NULL),  -- Dish (just Dish)
+('Nina', 'Choi', 'nina.choi@example.com', '555-890-1234', 15.00, 0, 2, NULL, NULL),  -- Host (just Host)
+('Caleb', 'Morris', 'caleb.morris@example.com', '555-901-2345', 17.00, 0, 4, 3, NULL),  -- Bartender (also Server)
+('Zoe', 'Ramirez', 'zoe.ramirez@example.com', '555-012-3456', 15.75, 0, 5, NULL, NULL),  -- Kitchen (just Kitchen)
+('Ethan', 'Bishop', 'ethan.bishop@example.com', '555-123-9876', 18.00, 1, 1, 2, NULL);  -- Manager (also Server)
 
 
 -- Sample recurring_task data ------------------------------------------------------------------------------------------------------------------------------
@@ -129,3 +137,21 @@ VALUES
 (5, '16:00:00', '20:00:00', '2025-05-31', 2);
 
 
+INSERT INTO `thebrownbottle`.`shift_cover_request` 
+(`shift_id`, `accepted_employee_id`, `requested_employee_id`, `status`) 
+VALUES
+(1, 3, 1, 'Accepted'),     -- Jenna covers Emily's shift
+(4, NULL, 2, 'Pending'),   -- Marcus requests coverage, no one accepted yet
+(7, 5, 3, 'Accepted'),     -- Sophia covers Jenna's shift
+(10, NULL, 4, 'Pending'),  -- Tyler requests coverage
+(13, NULL, 5, 'Denied');   -- Sophia's request was denied
+
+
+INSERT INTO `thebrownbottle`.`time_off_request` 
+(`employee_id`, `start_date`, `end_date`, `reason`, `status`) 
+VALUES
+(1, '2025-06-01', '2025-06-03', 'Family vacation', 'Accepted'),
+(2, '2025-06-05', '2025-06-05', 'Doctor appointment', 'Pending'),
+(3, '2025-06-10', '2025-06-12', 'Traveling for wedding', 'Accepted'),
+(4, '2025-06-15', '2025-06-16', 'Personal reasons', 'Denied'),
+(5, '2025-06-20', '2025-06-22', 'Attending conference', 'Pending');

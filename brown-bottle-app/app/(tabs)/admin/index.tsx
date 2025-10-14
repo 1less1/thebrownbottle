@@ -47,11 +47,7 @@ const Admin = () => {
     { key: 'schedule', title: 'Schedule', component: <Schedule /> },
 
     {
-      key: 'staff', title: 'Staff', component: user ? <Staff /> :
-        <LoadingCircle
-          size="large"
-          style={{ marginTop: 40, alignSelf: 'center' }}
-        />
+      key: 'staff', title: 'Staff', component: <Staff />
     },
   ];
 
@@ -75,7 +71,7 @@ const Admin = () => {
 
   return (
 
-    <DefaultView>
+    <DefaultView backgroundColor={Colors.white}>
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
@@ -123,7 +119,7 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     borderBottomWidth: 0.5,
-    borderBottomColor: 'gray',
+    borderBottomColor: Colors.altBorderColor,
   },
   tabButton: {
     flex: 1,
