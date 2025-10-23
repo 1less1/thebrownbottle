@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { debounce } from "lodash";
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
@@ -14,8 +14,11 @@ import ModularDropdown from "@/components/modular/ModularDropdown";
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
+import EditEmp from "@/components/admin/Staff/EditEmp";
+
 import { Employee } from "@/types/api";
 import { getEmployee } from "@/utils/api/employee";
+
 
 
 const adminDropdownOptions = [
@@ -39,17 +42,19 @@ interface StaffSearchProps {
 const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Employee[]>([]);
+
+    const [refreshKey, setRefreshKey] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
+    const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
     const [selectedAdminOption, setSelectedAdminOption] = useState<number>(-1);
 
 
     const buildParams = (searchTerm: string) => {
         const wildcardTerm = `%${searchTerm.trim()}%`;
-        const params: Record<string, any> = { full_name: wildcardTerm };
+        const params: Record<string, any> = { full_name: wildcardTerm, is_active: 1 };
 
-        if (selectedRoleId !== -1) {
+        if (selectedRoleId !== null) {
             params.primary_role = selectedRoleId;
             params.secondary_role = selectedRoleId;
             params.tertiary_role = selectedRoleId;
@@ -84,10 +89,11 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
     };
 
     const handleReset = () => {
-        if (query !== "" || selectedRoleId !== -1 || selectedAdminOption !== -1) {
+        if (query !== "" || selectedRoleId !== null || selectedAdminOption !== -1) {
             setQuery(""); // Set Query to empty
-            setSelectedRoleId(-1);
+            setSelectedRoleId(null);
             setSelectedAdminOption(-1);
+            debouncedSearch("");
         }
 
     };
@@ -95,7 +101,8 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
     // Fetch Employees on Initialization and State Update
     useEffect(() => {
         fetchEmployees(query);
-    }, [selectedRoleId, selectedAdminOption, refreshTrigger]);
+    }, [selectedRoleId, selectedAdminOption, refreshTrigger, refreshKey]);
+
 
     const renderHeader = useCallback(() => (
         <View style={styles.row}>
@@ -109,82 +116,119 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
 
     const renderCell = useCallback(({ item }: { item: Employee }) => (
         <View style={styles.row}>
-            {columns.map((col) => (
-                <View key={col.key} style={[styles.cell, { flex: 1, width: col.width, }]}>
-                    <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.text}>
-                        {item[col.key as keyof Employee]?.toString() ?? ""}
-                    </Text>
-                </View>
-            ))}
+            {columns.map((col) => {
+                const cellContent = item[col.key as keyof Employee]?.toString() ?? "";
+
+                const isNameColumn = col.key === "full_name";
+
+                return (
+                    <View key={col.key} style={[styles.cell, { flex: 1, width: col.width }]}>
+                        {isNameColumn ? (
+                            <TouchableOpacity onPress={() => {
+                                setSelectedEmployee(item);
+                                setEditEmpVisible(true);
+                            }}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={[GlobalStyles.text, { color: Colors.blue, textDecorationLine: 'underline' }]}>
+                                    {cellContent}
+                                </Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.text}>
+                                {cellContent}
+                            </Text>
+                        )}
+                    </View>
+                );
+            })}
         </View>
     ), []);
 
 
+
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+    const [editEmpVisible, setEditEmpVisible] = useState(false);
+    const toggleEditEmp = () => {
+        setEditEmpVisible(!editEmpVisible);
+    }
+
+
     return (
 
-        <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: 500 }}>
+        <>
 
-            {/* Search Bar + Reset Button */}
-            <View style={styles.searchContainer}>
-                <TextInput
-                    value={query}
-                    onChangeText={handleSearchChange}
-                    placeholder="Search Staff by Name"
-                    placeholderTextColor={Colors.gray}
-                    style={styles.input}
-                />
-                <ModularButton onPress={handleReset} text="Reset" />
-            </View>
+            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: 500 }}>
 
-            {/* Dropdowns */}
-            <View style={styles.filterContainer}>
-                <RoleDropdown
-                    selectedRoleId={selectedRoleId}
-                    onRoleSelect={(value) => setSelectedRoleId(value)}
-                    labelText=""
-                    containerStyle={styles.dropdownButton}
-                />
-                <ModularDropdown
-                    selectedValue={selectedAdminOption}
-                    // Declare value being selected is a number
-                    onSelect={(value) =>setSelectedAdminOption(value as number)}
-                    labelText=""
-                    containerStyle={styles.dropdownButton}
-                    placeholder="Select admin..."
-                    placeholderValue={-1}
-                    options={adminDropdownOptions}
-                />
-            </View>
+                {/* Search Bar + Reset Button */}
+                <View style={styles.searchContainer}>
+                    <TextInput
+                        value={query}
+                        onChangeText={handleSearchChange}
+                        placeholder="Search Staff by Name"
+                        placeholderTextColor={Colors.gray}
+                        style={styles.input}
+                    />
+                    <ModularButton onPress={handleReset} text="Reset" />
+                </View>
 
-            {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
+                {/* Dropdowns */}
+                <View style={styles.filterContainer}>
+                    <RoleDropdown
+                        selectedRoleId={selectedRoleId}
+                        onRoleSelect={(value) => setSelectedRoleId(value)}
+                        labelText=""
+                        containerStyle={styles.dropdownButton}
+                    />
+                    <ModularDropdown
+                        selectedValue={selectedAdminOption}
+                        // Declare value being selected is a number
+                        onSelect={(value) => setSelectedAdminOption(value as number)}
+                        labelText=""
+                        containerStyle={styles.dropdownButton}
+                        placeholder="Select admin..."
+                        placeholderValue={-1}
+                        options={adminDropdownOptions}
+                    />
+                </View>
 
-            {/* Data Table */}
-            {/* Horizontal Scroll only */}
-            <View style={{ flex: 1 }}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>
-                    <View style={styles.tableContainer}>
-                        {renderHeader()}
-                        <FlatList
-                            data={results}
-                            keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
-                            renderItem={renderCell}
-                            style={{ maxHeight: 350 }}
-                            scrollEnabled={true}
-                            nestedScrollEnabled={true}
-                            showsVerticalScrollIndicator={true}
-                        />
-                    </View>
-                </ScrollView>
-            </View>
+                {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
 
-            {/* Fallback */}
-            {!loading && results.length === 0 && query.length > 0 && (
-                <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-                    No results found...
-                </Text>
-            )}
+                {/* Data Table */}
+                {/* Horizontal Scroll only */}
+                <View style={{ flex: 1 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>
+                        <View style={styles.tableContainer}>
+                            {renderHeader()}
+                            <FlatList
+                                data={results}
+                                keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
+                                renderItem={renderCell}
+                                style={{ maxHeight: 350 }}
+                                scrollEnabled={true}
+                                nestedScrollEnabled={true}
+                                showsVerticalScrollIndicator={true}
+                            />
+                        </View>
+                    </ScrollView>
+                </View>
 
-        </Card>
+                {/* Fallback */}
+                {!loading && results.length === 0 && query.length > 0 && (
+                    <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
+                        No results found...
+                    </Text>
+                )}
+
+            </Card>
+
+            <EditEmp
+                visible={editEmpVisible}
+                onClose={toggleEditEmp}
+                empData={selectedEmployee as Employee}
+                onUpdate={() => setRefreshKey((prev) => prev + 1)}
+            />
+
+
+        </>
 
     );
 };

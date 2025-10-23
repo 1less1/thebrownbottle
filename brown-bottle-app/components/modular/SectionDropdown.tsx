@@ -24,6 +24,7 @@ interface DropdownProps {
     onSectionSelect: (value: number, key: string) => void;
     labelText?: string;
     placeholder?: string;
+    editable?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     buttonStyle?: StyleProp<ViewStyle>;
 }
@@ -33,6 +34,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
     onSectionSelect,
     labelText = "Filter:",
     placeholder = "Select a role...",
+    editable = true,
     containerStyle,
     buttonStyle,
 }) => {
@@ -80,7 +82,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
             <TouchableOpacity
                 style={[styles.button, buttonStyle]}
                 onPress={() => setVisible(true)}
-                disabled={loading}
+                disabled={!editable || loading}
             >
                 <View style={styles.buttonContent}>
                     <Text style={[styles.optionText, { color: selectedSectionName ? Colors.black : Colors.gray, marginRight: 5 }]}>

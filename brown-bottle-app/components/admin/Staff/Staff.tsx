@@ -48,12 +48,6 @@ const Staff = () => {
         </Card>
       </View>
 
-      <View style={{ margin: 16, width: '85%' }}>
-        <Card>
-          <Text>Temporary Card</Text>
-        </Card>
-      </View>
-
     </DefaultScrollView>
 
   );

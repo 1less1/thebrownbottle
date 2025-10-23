@@ -5,19 +5,25 @@ export interface Employee {
   first_name: string;
   last_name: string;
   email: string;
-  phone_number?: string;
+  phone_number: string;
   wage: number;
   admin: number;
-  primary_role: number;
-  secondary_role: number;
-  tertiary_role: number;
-  full_name: string;
+  primary_role: number | null;
+  secondary_role: number | null;
+  tertiary_role: number | null;
+  is_active: number;
 
   // Only Used for JSON Responses:
-  primary_role_name: string;
-  secondary_role_name: string;
-  tertiary_role_name: string;
-}
+  full_name?: string;
+  primary_role_name?: string;
+  secondary_role_name?: string;
+  tertiary_role_name?: string;
+};
+
+export type EmployeeForm = Omit<Employee, "wage"> & {
+  wage: string;
+};
+
 
 export interface Role {
   role_id: number;

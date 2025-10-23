@@ -12,15 +12,16 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 
 export interface DropdownOption {
   key: string;
-  value: number | string;
+  value: number | string | null;
 }
 
 interface ModularDropdownProps {
-  selectedValue: number | string;
-  onSelect: (value: number | string, key: string) => void;
+  selectedValue: number | string | null;
+  onSelect: (value: number | string | null, key: string) => void;
   labelText?: string;
   placeholder?: string;
   placeholderValue?: number | string;
+  editable?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
   buttonStyle?: StyleProp<ViewStyle>;
   options: DropdownOption[]; // List of (key, value) pairs
@@ -32,6 +33,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
   labelText = "Filter:",
   placeholder = "Select an option...",
   placeholderValue = -1,
+  editable = true,
   containerStyle,
   buttonStyle,
   options,
@@ -50,13 +52,14 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
   return (
     <View style={[styles.container, containerStyle]}>
 
-      {/* Label */}
+      {/* Filter Label */}
       {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
 
-      {/* Button */}
+      {/* Dropdown Button */}
       <TouchableOpacity
         style={[styles.button, buttonStyle]}
         onPress={() => setVisible(true)}
+        disabled={!editable}
       >
         <View style={styles.buttonContent}>
           <Text
@@ -75,7 +78,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
         </View>
       </TouchableOpacity>
 
-      {/* Dropdown Modal */}
+      {/* Modal dropdown */}
       <Modal
         transparent
         visible={visible}
@@ -92,7 +95,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
                 <FlatList
                   style={{ flexGrow: 0 }}
                   data={[{ key: placeholder, value: placeholderValue }, ...options]}
-                  keyExtractor={(item) => item.value.toString()}
+                  keyExtractor={(item) => item.value !== null? item.value.toString() : 'null'}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.option}

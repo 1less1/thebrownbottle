@@ -58,8 +58,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   background: {
-  ...StyleSheet.absoluteFillObject,
-},
+    ...StyleSheet.absoluteFillObject,
+  },
 });
 
 export default ModularModal;

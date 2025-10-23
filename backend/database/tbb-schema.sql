@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`employee` (
   `primary_role` INT UNSIGNED NOT NULL,
   `secondary_role` INT UNSIGNED DEFAULT NULL,
   `tertiary_role` INT UNSIGNED DEFAULT NULL,
+  `is_active` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`employee_id`),
   CONSTRAINT `fk_primary_role`
     FOREIGN KEY (`primary_role`)

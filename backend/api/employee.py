@@ -26,7 +26,8 @@ def get_employees(db, request):
             'primary_role': int,
             'secondary_role': int,
             'tertiary_role': int,
-            'full_name': str
+            'full_name': str,
+            'is_active': int
         }
 
         # Validate and parse parameters
@@ -46,6 +47,7 @@ def get_employees(db, request):
         secondary_role = params.get('secondary_role')
         tertiary_role = params.get('tertiary_role')
         full_name = params.get('full_name')
+        is_active = params.get('is_active')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -66,7 +68,8 @@ def get_employees(db, request):
                 e.secondary_role,
                 sr.role_name AS secondary_role_name,
                 e.tertiary_role,
-                tr.role_name AS tertiary_role_name
+                tr.role_name AS tertiary_role_name,
+                e.is_active
             FROM employee e
             LEFT JOIN role pr ON e.primary_role = pr.role_id
             LEFT JOIN role sr ON e.secondary_role = sr.role_id
@@ -108,6 +111,10 @@ def get_employees(db, request):
         if admin is not None:
             query += " AND admin = %s"
             query_params.append(admin)
+        
+        if is_active is not None:
+            query += " AND is_active = %s"
+            query_params.append(is_active)
 
         # Handle multiple Role Clauses
         role_clauses = []

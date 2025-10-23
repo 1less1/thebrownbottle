@@ -16,14 +16,15 @@ import { Role } from '@/types/api';
 
 interface DropdownOption {
     key: string;
-    value: number;
+    value: number | null;
 }
 
 interface DropdownProps {
-    selectedRoleId: number;
-    onRoleSelect: (value: number, key: string) => void;
+    selectedRoleId: number | null;
+    onRoleSelect: (value: number | null, key: string) => void;
     labelText?: string;
     placeholder?: string;
+    editable?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     buttonStyle?: StyleProp<ViewStyle>;
 }
@@ -33,6 +34,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
     onRoleSelect,
     labelText = "Filter:",
     placeholder = "Select a role...",
+    editable = true,
     containerStyle,
     buttonStyle,
 }) => {
@@ -80,7 +82,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
             <TouchableOpacity
                 style={[styles.button, buttonStyle]}
                 onPress={() => setVisible(true)}
-                disabled={loading}
+                disabled={!editable || loading}
             >
                 <View style={styles.buttonContent}>
                     <Text style={[styles.optionText, { color: selectedRoleName ? Colors.black : Colors.gray, marginRight: 5 }]}>
@@ -117,9 +119,9 @@ const RoleDropdown: React.FC<DropdownProps> = ({
                                     // Dropdown List
                                     <FlatList
                                         style={{flexGrow: 0}}
-                                        // Add placeholder as first item listed with an id (index) of -1
-                                        data={[{ role_id: -1, role_name: placeholder }, ...data]}
-                                        keyExtractor={(item) => item.role_id.toString()}
+                                        // Add placeholder as first item listed with an id=null
+                                        data={[{ role_id: null, role_name: placeholder }, ...data]}
+                                        keyExtractor={(item) => (item.role_id !== null ? item.role_id.toString() : 'null')}
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 style={styles.option}
@@ -129,7 +131,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
                                                     style={[
                                                         styles.optionText,
                                                         item.role_id === selectedRoleId && styles.selectedOption,
-                                                        item.role_id === -1 && item.role_id !== selectedRoleId && { color: Colors.gray },
+                                                        item.role_id === null && selectedRoleId !== null && { color: Colors.gray },
                                                     ]}
                                                 >
                                                     {item.role_name}
