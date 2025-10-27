@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { debounce } from "lodash";
 
@@ -26,6 +26,11 @@ const adminDropdownOptions = [
     { value: 0, key: "No" },
 ];
 
+const isActiveDropdownOptions = [
+    { value: 1, key: "Yes" },
+    { value: 0, key: "No" },
+]
+
 const columns = [
     { key: "full_name", label: "Name", width: 120 },
     { key: "email", label: "Email", width: 200 },
@@ -34,74 +39,110 @@ const columns = [
 ];
 
 interface StaffSearchProps {
-    refreshTrigger?: number;
+    parentRefresh?: number;
     onRefreshDone?: () => void;
 }
 
 
-const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone }) => {
+const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone }) => {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Employee[]>([]);
 
-    const [refreshKey, setRefreshKey] = useState(0);
+    const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-    const [selectedAdminOption, setSelectedAdminOption] = useState<number>(-1);
+    const [selectedAdminOption, setSelectedAdminOption] = useState<number | null>(null);
+    const [selectedIsActiveOption, setSelectedIsActiveOption] = useState<number>(1); // Default value is_active=1 (True)
 
 
-    const buildParams = (searchTerm: string) => {
+    const buildParams = (
+        searchTerm: string, 
+        isActive: number | null, 
+        roleId: number | null, 
+        admin: number | null
+    ) => {
         const wildcardTerm = `%${searchTerm.trim()}%`;
-        const params: Record<string, any> = { full_name: wildcardTerm, is_active: 1 };
+        const params: Record<string, any> = { full_name: wildcardTerm };
 
-        if (selectedRoleId !== null) {
-            params.primary_role = selectedRoleId;
-            params.secondary_role = selectedRoleId;
-            params.tertiary_role = selectedRoleId;
+        if (isActive !== null) {
+            params.is_active = isActive;
+        }
+        if (roleId !== null) {
+            params.primary_role = roleId;
+            params.secondary_role = roleId;
+            params.tertiary_role = roleId;
         }
 
-        if (selectedAdminOption !== -1) {
-            params.admin = selectedAdminOption;
+        if (admin !== null) {
+            params.admin = admin;
         }
 
         return params;
     };
 
 
-    const fetchEmployees = async (searchTerm: string) => {
+    const fetchEmployees = async (
+        searchTerm: string, 
+        isActive: number | null, 
+        roleId: number | null, 
+        admin: number | null
+    ) => {
         setLoading(true);
         try {
-            const response = await getEmployee(buildParams(searchTerm));
+            const response = await getEmployee(buildParams(searchTerm, isActive, roleId, admin));
             setResults(response);
-        } catch (err) {
-            console.error("Search failed:", err);
+        } catch (error: any) {
+            console.error("Search failed:", error.message);
         } finally {
             setLoading(false);
             onRefreshDone?.(); // Notify parent refresh is complete
         }
     };
 
-    const debouncedSearch = useCallback(debounce(fetchEmployees, 500), []);
 
-    const handleSearchChange = (text: string) => {
-        setQuery(text);
-        debouncedSearch(text);
+    const debouncedSearch = useCallback(
+        debounce((searchTerm: string) => {
+            fetchEmployees(searchTerm, selectedIsActiveOption, selectedRoleId, selectedAdminOption);
+        }, 500),
+        [selectedIsActiveOption, selectedRoleId, selectedAdminOption]
+    );
+
+
+    const handleSearchChange = (searchTerm: string) => {
+        setQuery(searchTerm);
+        debouncedSearch(searchTerm);
+    };
+
+    const triggerRefresh = (searchTerm: string) => {
+        fetchEmployees(searchTerm, selectedIsActiveOption, selectedRoleId, selectedAdminOption);
     };
 
     const handleReset = () => {
-        if (query !== "" || selectedRoleId !== null || selectedAdminOption !== -1) {
-            setQuery(""); // Set Query to empty
+        if (query !== "" || selectedRoleId !== null || selectedAdminOption !== null || selectedIsActiveOption !== 1) {
+            debouncedSearch.cancel();
+            setQuery("");
             setSelectedRoleId(null);
-            setSelectedAdminOption(-1);
-            debouncedSearch("");
+            setSelectedAdminOption(null);
+            setSelectedIsActiveOption(1);
+            setLocalRefresh((prev) => prev + 1); // triggers refresh
         }
-
     };
+
 
     // Fetch Employees on Initialization and State Update
     useEffect(() => {
-        fetchEmployees(query);
-    }, [selectedRoleId, selectedAdminOption, refreshTrigger, refreshKey]);
+        triggerRefresh(query);
+    }, [selectedRoleId, selectedAdminOption, selectedIsActiveOption, parentRefresh, localRefresh]);
+
+
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+    const [editEmpVisible, setEditEmpVisible] = useState(false);
+
+    const closeEditEmp = () => {
+        setEditEmpVisible(!editEmpVisible);
+        setSelectedEmployee(null);
+    }
 
 
     const renderHeader = useCallback(() => (
@@ -144,14 +185,6 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
     ), []);
 
 
-
-    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [editEmpVisible, setEditEmpVisible] = useState(false);
-    const toggleEditEmp = () => {
-        setEditEmpVisible(!editEmpVisible);
-    }
-
-
     return (
 
         <>
@@ -177,6 +210,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
                         onRoleSelect={(value) => setSelectedRoleId(value)}
                         labelText=""
                         containerStyle={styles.dropdownButton}
+                        editable={!loading}
                     />
                     <ModularDropdown
                         selectedValue={selectedAdminOption}
@@ -185,8 +219,18 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
                         labelText=""
                         containerStyle={styles.dropdownButton}
                         placeholder="Select admin..."
-                        placeholderValue={-1}
                         options={adminDropdownOptions}
+                        editable={!loading}
+                    />
+                    <ModularDropdown
+                        selectedValue={selectedIsActiveOption}
+                        // Declare value being selected is a number
+                        onSelect={(value) => setSelectedIsActiveOption(value as number)}
+                        labelText="Active:"
+                        containerStyle={styles.dropdownButton}
+                        options={isActiveDropdownOptions}
+                        usePlaceholder={false}
+                        editable={!loading}
                     />
                 </View>
 
@@ -222,9 +266,9 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
 
             <EditEmp
                 visible={editEmpVisible}
-                onClose={toggleEditEmp}
+                onClose={closeEditEmp}
                 empData={selectedEmployee as Employee}
-                onUpdate={() => setRefreshKey((prev) => prev + 1)}
+                onUpdate={() => setLocalRefresh((prev) => prev + 1)}
             />
 
 

@@ -275,7 +275,8 @@ def update_employee(db, request, employee_id):
             'admin': int,
             'primary_role': int,
             'secondary_role': int,
-            'tertiary_role': int
+            'tertiary_role': int,
+            'is_active': int
         }
 
         # Validate the fields in JSON body (only optional fields here)

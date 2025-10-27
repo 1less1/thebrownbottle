@@ -6,7 +6,7 @@ export interface Employee {
   last_name: string;
   email: string;
   phone_number: string;
-  wage: number;
+  wage: string; // DECIMAL MySQL types are formatted as strings in JSON
   admin: number;
   primary_role: number | null;
   secondary_role: number | null;
@@ -19,11 +19,6 @@ export interface Employee {
   secondary_role_name?: string;
   tertiary_role_name?: string;
 };
-
-export type EmployeeForm = Omit<Employee, "wage"> & {
-  wage: string;
-};
-
 
 export interface Role {
   role_id: number;

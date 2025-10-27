@@ -7,6 +7,7 @@ interface ModularButtonProps {
   onPress: () => void;
   style?: StyleProp<ViewStyle>;     // Optional override for button
   textStyle?: StyleProp<TextStyle>; // Optional override for button text
+  enabled?: boolean;
 }
 
 const ModularButton: React.FC<ModularButtonProps> = ({
@@ -14,12 +15,25 @@ const ModularButton: React.FC<ModularButtonProps> = ({
   onPress,
   style,
   textStyle,
+  enabled = true,
 }) => {
+
   return (
-    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
+
+    <TouchableOpacity
+      style={[
+        styles.button,
+        !enabled && styles.disabledButton,
+        style,
+      ]}
+      onPress={onPress}
+      disabled={!enabled}
+    >
       <Text style={[styles.buttonText, textStyle]}>{text}</Text>
     </TouchableOpacity>
+
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -37,6 +51,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     textAlignVertical: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
 });
 

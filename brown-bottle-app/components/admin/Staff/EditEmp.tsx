@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 
-import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-
-import { Employee, EmployeeForm } from "@/types/api";
 import RoleDropdown from '@/components/modular/RoleDropdown';
-
 import ModularDropdown from '@/components/modular/ModularDropdown';
 
+import { Employee } from "@/types/api";
 import { updateEmployee } from '@/utils/api/employee';
+import { isValidEmail, isValidPhone, formatPhone, formatWage, buildPatchData } from '@/utils/helper';
+
 
 interface EditEmpProps {
   visible: boolean;
@@ -26,128 +24,169 @@ const adminDropdownOptions = [
   { value: 0, key: "No" },
 ];
 
-// Only for updates / patching
-type EmployeePATCH = {
-  [k in keyof Employee]?: Employee[k] | null;
-};
+const isActiveDropdownOptions = [
+  { value: 1, key: "Yes" },
+  { value: 0, key: "No" },
+]
 
 
 const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }) => {
-
   const [loading, setLoading] = useState(false);
-
   const [edit, setEdit] = useState(false);
 
   const [originalEmpData, setOriginalEmpData] = useState<Employee | null>(null);
-  const [formData, setFormData] = useState<Employee | null>(null);
 
+  const [employeeId, setEmployeeId] = useState(0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [wage, setWage] = useState("");
+  const [admin, setAdmin] = useState(0);
+  const [primaryRole, setPrimaryRole] = useState<number | null>(null);
+  const [secondaryRole, setSecondaryRole] = useState<number | null>(null);
+  const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
+  const [isActive, setIsActive] = useState<number>(1); // Default is_active=1 (True)
 
-  const handleEdit = () => setEdit(!edit);
+  // Map local variables to an Employee object
+  const buildFormData = (): Employee => ({
+    employee_id: employeeId,
+    first_name: firstName,
+    last_name: lastName,
+    email: email,
+    phone_number: phoneNumber,
+    wage: wage,
+    admin: admin,
+    primary_role: primaryRole,
+    secondary_role: secondaryRole,
+    tertiary_role: tertiaryRole,
+    is_active: isActive,
+  });
 
-  const handleInputChange = (key: keyof Employee, value: string | number) => {
-    if (!formData) return;
-    setFormData({
-      ...formData,
-      [key]: value,
-    });
-  };
-
-
-
-  const resetForm = () => {
-    setFormData(null);
-    setOriginalEmpData(null);
-    setEdit(false);
-  };
-
-  const loadForm = () => {
-    if (empData) {
-      setFormData(empData);
-      setOriginalEmpData(empData); // keep a copy to compare changes later
-    }
-
-  };
-
-  // Sync local state when empData changes
+  // Set form data on empData input change
   useEffect(() => {
-    loadForm();
+    if (empData) {
+      setOriginalEmpData(empData);
+      setEmployeeId(empData.employee_id);
+      setFirstName(empData.first_name);
+      setLastName(empData.last_name);
+      setEmail(empData.email);
+      setPhoneNumber(empData.phone_number);
+      setWage(empData.wage.toString());
+      setAdmin(empData.admin);
+      setPrimaryRole(empData.primary_role);
+      setSecondaryRole(empData.secondary_role);
+      setTertiaryRole(empData.tertiary_role);
+      setIsActive(empData.is_active);
+    }
   }, [empData]);
 
-
-
-  // Clear Form on Modal Close
+  // Reset form on visbility change
   useEffect(() => {
     if (!visible) {
-      resetForm();
+      setEdit(false);
+      setOriginalEmpData(null);
     }
   }, [visible]);
 
+  const handleEdit = () => setEdit(!edit);
 
+  // List of keys that can be included in a PATCH request
+  const patchableKeys: (keyof Employee)[] = [
+    "first_name", "last_name", "email", "phone_number", "wage",
+    "admin", "primary_role", "secondary_role", "tertiary_role", "is_active"
+  ];
+
+  // Update Employee Logic
   const handleUpdate = async () => {
-    if (!formData || !originalEmpData) return;
+    if (!originalEmpData) return;
 
-    // EmployeePATCH allows optional fields + nulls
-    const updates: EmployeePATCH = {};
+    const formData = buildFormData();
 
-    // Map over keys of Employee for full type safety
-    (Object.keys(formData) as (keyof Employee)[]).forEach((key) => {
-      const newValue = formData[key];
-      const oldValue = originalEmpData[key];
+    // Builds patchData by comparing originalEmpData and formData
+    // Returns a record of fields that have been changed
+    const patchData = buildPatchData(originalEmpData, formData, patchableKeys);
+    console.log("Patch Data:", patchData);
 
-      // Only include changed fields
-      if (newValue !== oldValue) {
-        updates[key] = newValue; // TypeScript is happy
-      }
-    });
-
-    // If no changes, just close modal
-    if (Object.keys(updates).length === 0) {
-      return onClose();
+    if (Object.keys(patchData).length === 0) {
+      alert("No changes detected!");
+      return;
     }
 
     setLoading(true);
+
     try {
-      await updateEmployee(formData.employee_id, updates);
+
+      // Validate Required Fields
+      if (!firstName.trim() || !lastName.trim() || !email.trim() || !phoneNumber.trim() || !wage.trim()) {
+        alert("Please fill out all required fields!");
+        setLoading(false);
+        return;
+      }
+
+      if (primaryRole == null) {
+        alert("Please assign a primary role!");
+        setLoading(false);
+        return;
+      }
+
+      // Validate Phone Number
+      if (!isValidPhone(phoneNumber)) {
+        alert("Please enter a valid phone number in the format XXX-XXX-XXXX.");
+        setLoading(false);
+        return;
+      }
+
+      // Validate Email
+      if (!isValidEmail(email)) {
+        alert("Please enter a valid email address.");
+        setLoading(false);
+        return;
+      }
+
+      await updateEmployee(originalEmpData.employee_id, patchData);
+      alert("Employee successfully updated!");
       onUpdate?.();
       onClose();
-    } catch (err) {
-      console.error(err);
+    } catch (error: any) {
+      alert("Unable to update Employee: " + error.message);
     } finally {
       setLoading(false);
     }
+
   };
 
 
-
-
-
   return (
+
     <ModularModal visible={visible} onClose={onClose}>
+      {/* Title */}
       <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
 
-      {empData ? (
+      {/* Employee Form */}
+      {originalEmpData ? (
         <View style={styles.formContainer}>
           <Text style={GlobalStyles.mediumText}>First Name</Text>
           <TextInput
             style={GlobalStyles.input}
-            value={formData?.first_name}
-            onChangeText={(userInput) => handleInputChange('first_name', userInput)}
+            value={firstName}
+            onChangeText={setFirstName}
             editable={edit}
           />
 
           <Text style={GlobalStyles.mediumText}>Last Name</Text>
           <TextInput
             style={GlobalStyles.input}
-            value={formData?.last_name}
-            onChangeText={((userInput) => handleInputChange('last_name', userInput))}
+            value={lastName}
+            onChangeText={setLastName}
             editable={edit}
           />
 
           <Text style={GlobalStyles.mediumText}>Email</Text>
           <TextInput
             style={GlobalStyles.input}
-            value={formData?.email}
-            onChangeText={(userInput) => handleInputChange('email', userInput)}
+            value={email}
+            onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
             editable={edit}
@@ -156,8 +195,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
           <Text style={GlobalStyles.mediumText}>Phone</Text>
           <TextInput
             style={GlobalStyles.input}
-            value={formData?.phone_number}
-            onChangeText={(userInput) => handleInputChange('phone_number', userInput)}
+            value={phoneNumber}
+            onChangeText={(text) => setPhoneNumber(formatPhone(text))}
             keyboardType="phone-pad"
             editable={edit}
           />
@@ -165,17 +204,17 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
           <Text style={GlobalStyles.mediumText}>Wage</Text>
           <TextInput
             style={GlobalStyles.input}
-            value={formData?.wage?.toString() || '0.00'}
-            onChangeText={(userInput) => handleInputChange('wage', parseFloat(userInput) || 0)}
-            keyboardType="numeric"
+            value={wage}
+            onChangeText={((text) => setWage(formatWage(text)))}
+            keyboardType="decimal-pad"
             editable={edit}
           />
 
           <Text style={GlobalStyles.mediumText}>Admin</Text>
           <ModularDropdown
             options={adminDropdownOptions}
-            selectedValue={formData?.admin || 0}
-            onSelect={(value) => handleInputChange('admin', value as number)}
+            selectedValue={admin}
+            onSelect={(value) => setAdmin(value as number)}
             labelText=""
             editable={edit}
             containerStyle={styles.dropdownButton}
@@ -183,8 +222,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
           <Text style={GlobalStyles.mediumText}>Primary Role</Text>
           <RoleDropdown
-            selectedRoleId={formData?.primary_role || null}
-            onRoleSelect={(value) => handleInputChange('primary_role', value as number)}
+            selectedRoleId={primaryRole}
+            onRoleSelect={setPrimaryRole}
             labelText=""
             placeholder="None"
             editable={edit}
@@ -193,8 +232,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
           <Text style={GlobalStyles.mediumText}>Secondary Role</Text>
           <RoleDropdown
-            selectedRoleId={formData?.secondary_role || null}
-            onRoleSelect={(value) => handleInputChange('secondary_role', value as number)}
+            selectedRoleId={secondaryRole}
+            onRoleSelect={setSecondaryRole}
             labelText=""
             placeholder="None"
             editable={edit}
@@ -203,44 +242,59 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
           <Text style={GlobalStyles.mediumText}>Tertiary Role</Text>
           <RoleDropdown
-            selectedRoleId={formData?.tertiary_role || null}
-            onRoleSelect={(value) => handleInputChange('tertiary_role', value as number)}
+            selectedRoleId={tertiaryRole}
+            onRoleSelect={setTertiaryRole}
             labelText=""
             placeholder="None"
             editable={edit}
             containerStyle={styles.dropdownButton}
           />
 
+          <Text style={GlobalStyles.mediumText}>Active</Text>
+          <ModularDropdown
+            options={isActiveDropdownOptions}
+            selectedValue={isActive}
+            onSelect={(value) => setIsActive(value as number)}
+            labelText=""
+            usePlaceholder={false}
+            editable={edit}
+            containerStyle={styles.dropdownButton}
+          />
 
-
-
+          {/* Buttons */}
           <View style={styles.buttonRowContainer}>
-
             {edit ? (
               <ModularButton
                 text="Update"
                 textStyle={{ color: 'white' }}
                 style={GlobalStyles.submitButton}
-                onPress={handleUpdate} />
+                onPress={handleUpdate}
+                enabled={!loading}
+              />
             ) : (
               <ModularButton
                 text="Edit"
-                onPress={handleEdit} />
-            )
-            }
-
+                onPress={handleEdit}
+              />
+            )}
             <ModularButton
               text="Cancel"
               textStyle={{ color: 'gray' }}
               style={GlobalStyles.cancelButton}
-              onPress={onClose} />
+              onPress={onClose}
+            />
           </View>
+
         </View>
+
       ) : (
         <Text style={GlobalStyles.loadingText}>Loading employee data...</Text>
       )}
+
     </ModularModal>
+
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -255,8 +309,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   dropdownButton: {
-    minWidth: 0,      // let it shrink as much as content allows
-    alignSelf: "flex-start", // size to content rather than container
+    minWidth: 0,
+    alignSelf: "flex-start",
   },
 });
 

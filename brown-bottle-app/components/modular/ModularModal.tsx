@@ -1,15 +1,16 @@
 import React from 'react';
-import { Modal, View, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
+import { Modal, View, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 interface ModularModalProps {
   visible: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  scroll?: boolean;
 }
 
-const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children }) => {
-  
+const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children, scroll = true }) => {
+
   return (
 
     <Modal
@@ -18,8 +19,8 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children 
       transparent
       onRequestClose={onClose}
     >
+
       <View style={styles.overlay}>
-        {/* Only dismiss keyboard when tapping outside modal content */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.background} />
         </TouchableWithoutFeedback>
@@ -28,15 +29,22 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children 
           style={styles.modalContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <ScrollView contentContainerStyle={styles.scrollView}>
-            {children}
-          </ScrollView>
+          {scroll ? (
+            <ScrollView contentContainerStyle={styles.scrollView}>
+              {children}
+            </ScrollView>
+          ) : (
+            <View style={styles.scrollView}>
+              {children}
+            </View>
+          )}
         </KeyboardAvoidingView>
       </View>
+
     </Modal>
 
-
   );
+
 };
 
 const styles = StyleSheet.create({

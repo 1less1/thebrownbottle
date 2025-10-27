@@ -22,30 +22,30 @@ const Staff = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleRefresh = () => {
+    if (refreshing) return;
     setRefreshing(true);
-    setRefreshTrigger(prev => prev + 1); // triggers StaffSearch to refetch
-
-    // Simulate async refresh delay
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    setRefreshTrigger(prev => prev + 1);
   };
+
 
   return (
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
       <View style={{ marginTop: 16, width: '85%' }}>
-        <StaffSearch refreshTrigger={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+        <StaffSearch parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
       <View style={[styles.moduleContainer, { margin: 16, width: '85%' }]}>
+        
         <Card style={styles.moduleCard}>
-          <AddEmp/>
+          <AddEmp onInsert={handleRefresh}/>
         </Card>
+
         <Card style={styles.moduleCard}>
-          <RemoveEmp/>
+          <RemoveEmp onRemove={handleRefresh}/>
         </Card>
+
       </View>
 
     </DefaultScrollView>

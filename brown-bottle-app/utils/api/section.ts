@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-import { buildQueryString } from "@/utils/Helper";
+import { buildQueryString } from "@/utils/helper";
 
 import { Section } from '@/types/api';
 

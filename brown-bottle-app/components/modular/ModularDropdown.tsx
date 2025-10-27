@@ -19,8 +19,9 @@ interface ModularDropdownProps {
   selectedValue: number | string | null;
   onSelect: (value: number | string | null, key: string) => void;
   labelText?: string;
+  usePlaceholder?: boolean;
   placeholder?: string;
-  placeholderValue?: number | string;
+  placeholderValue?: number | string | null;
   editable?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
   buttonStyle?: StyleProp<ViewStyle>;
@@ -31,8 +32,9 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
   selectedValue,
   onSelect,
   labelText = "Filter:",
+  usePlaceholder = true,
   placeholder = "Select an option...",
-  placeholderValue = -1,
+  placeholderValue = null,
   editable = true,
   containerStyle,
   buttonStyle,
@@ -48,6 +50,10 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
     onSelect(option.value, option.key);
     setVisible(false);
   };
+
+  const dropdownOptions = usePlaceholder
+    ? [{ key: placeholder, value: placeholderValue }, ...options]
+    : options;
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -94,8 +100,8 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
                 {/* "Dropdown" Option List */}
                 <FlatList
                   style={{ flexGrow: 0 }}
-                  data={[{ key: placeholder, value: placeholderValue }, ...options]}
-                  keyExtractor={(item) => item.value !== null? item.value.toString() : 'null'}
+                  data={dropdownOptions}
+                  keyExtractor={(item) => item.value !== null ? item.value.toString() : 'null'}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       style={styles.option}

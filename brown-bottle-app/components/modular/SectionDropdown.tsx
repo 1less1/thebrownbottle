@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, Text, TouchableOpacity, StyleSheet, Modal, 
-  FlatList, TouchableWithoutFeedback, StyleProp, 
-  ViewStyle, TextStyle
+import {
+    View, Text, TouchableOpacity, StyleSheet, Modal,
+    FlatList, TouchableWithoutFeedback, StyleProp,
+    ViewStyle, TextStyle
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -16,12 +16,12 @@ import { Section } from '@/types/api';
 
 interface DropdownOption {
     key: string;
-    value: number;
+    value: number | null;
 }
 
 interface DropdownProps {
-    selectedSectionId: number;
-    onSectionSelect: (value: number, key: string) => void;
+    selectedSectionId: number | null;
+    onSectionSelect: (value: number | null, key: string) => void;
     labelText?: string;
     placeholder?: string;
     editable?: boolean;
@@ -105,7 +105,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
             >
                 <TouchableWithoutFeedback onPress={() => setVisible(false)}>
                     <View style={styles.overlay}>
-                        
+
                         {/* "Dropdown" Modal Content */}
                         <TouchableWithoutFeedback>
                             <View style={styles.dropdown}>
@@ -118,10 +118,10 @@ const SectionDropdown: React.FC<DropdownProps> = ({
                                 ) : (
                                     // Dropdown List
                                     <FlatList
-                                        style={{flexGrow: 0}}
-                                        // Add placeholder as first item listed with an id (index) of -1
-                                        data={[{ section_id: -1, section_name: placeholder }, ...data]}
-                                        keyExtractor={(item) => item.section_id.toString()}
+                                        style={{ flexGrow: 0 }}
+                                        // Add placeholder as first item listed with an id=null
+                                        data={[{ section_id: null, section_name: placeholder }, ...data]}
+                                        keyExtractor={(item) => (item.section_id !== null ? item.section_id.toString() : 'null')}
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 style={styles.option}
@@ -131,7 +131,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
                                                     style={[
                                                         styles.optionText,
                                                         item.section_id === selectedSectionId && styles.selectedOption,
-                                                        item.section_id === -1 && item.section_id !== selectedSectionId && { color: Colors.gray },
+                                                        item.section_id === null && selectedSectionId !== null && { color: Colors.gray },
                                                     ]}
                                                 >
                                                     {item.section_name}
