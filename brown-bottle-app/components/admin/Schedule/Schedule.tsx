@@ -1,28 +1,36 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-
-import { Colors } from '@/constants/Colors';
-
-import DefaultView from '@/components/DefaultView'
+import React, { useState } from "react";
+import { View } from 'react-native';
+import { useSession } from '@/utils/SessionContext';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import Spreadsheet from './SpreadSheet';
-import HeaderView from './HeaderView';
+import SpreadSheet from "@/components/admin/Schedule/SpreadSheet";
 
-export default function Schedule() {
+const Schedule = () => {
+  const { user } = useSession();
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
 
   return (
 
-    <DefaultView backgroundColor={Colors.white}>
-      <View style={{ flex: 1, backgroundColor: Colors.greyWhite, justifyContent:'center', alignItems:'center' }}>
-        <HeaderView />
+    <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <DefaultScrollView>
-            <Spreadsheet />
-        </DefaultScrollView>
-
+      <View style={{ marginTop: 16, width: '85%' }}>
+        <SpreadSheet refreshTrigger={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
-    </DefaultView>
 
-  )
+    </DefaultScrollView>
+
+  );
+
 };
+
+export default Schedule;

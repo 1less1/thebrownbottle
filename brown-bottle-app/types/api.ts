@@ -79,3 +79,40 @@ export interface Shift {
   section_name: string;
   shiftDateTime?: Date;
 }
+
+// Raw shift data from the schedule API
+export interface ScheduleShift {
+  shift_id: number;
+  employee_id: number;
+  employee_name: string;          // "Alice Johnson"
+  start_time: string;             // "08:00"
+  end_time: string;               // "17:00"
+  date: string;                   // "2025-10-14"
+  section_id: number;
+  section_name: string;           // "Kitchen"
+  primary_role: number;
+  primary_role_name: string;      // "Server"
+}
+
+// Processed shift data for a single cell in the spreadsheet
+export interface ShiftDisplay {
+  shift_id?: number;
+  time: string;                   // "8:00-17:00"
+  section: string;                // "Kitchen"
+  section_id: number;
+}
+
+// Single employee row in the schedule spreadsheet
+export interface ScheduleEmployee {
+  employee_id: number;
+  employee_name: string;          // "Alice Johnson"
+  primary_role_name: string;      // "Server"
+  shifts: (ShiftDisplay | null)[]; // Array with one entry per day
+}
+
+// Complete schedule data structure
+export interface ScheduleData {
+  dates: string[];                // ["10/14", "10/15", "10/16", ...]
+  dayNames: string[];             // ["Mon", "Tue", "Wed", ...]
+  employees: ScheduleEmployee[];
+}

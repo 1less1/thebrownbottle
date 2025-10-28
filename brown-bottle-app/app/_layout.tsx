@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import Toast from "react-native-toast-message";
 
 import { Colors } from '@/constants/Colors';
 import { SessionProvider } from '@/utils/SessionContext';
@@ -30,7 +31,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={DefaultTheme}> {/* Force Light Theme */}
+    <ThemeProvider value={DefaultTheme}>
       <SessionProvider>
         <StatusBar style="dark" />
         <Stack
@@ -44,6 +45,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>
+        <Toast />
       </SessionProvider>
     </ThemeProvider>
   );
