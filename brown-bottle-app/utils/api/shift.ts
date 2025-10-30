@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import { buildQueryString } from "@/utils/Helper";
+import { buildQueryString } from "@/utils/helper";
 
 export async function getUserShifts(employee_id: number) {
   // Retrieve Environment Variables

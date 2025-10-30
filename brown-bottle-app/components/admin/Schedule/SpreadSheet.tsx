@@ -34,8 +34,8 @@ const SpreadSheet: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
 
   // Search and filter state
   const [query, setQuery] = useState("");
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
-  const [selectedSectionId, setSelectedSectionId] = useState<number>(-1);
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
@@ -125,9 +125,9 @@ const SpreadSheet: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
   }, [selectedRoleId, selectedSectionId, currentWeekStart, refreshTrigger]);
 
   const handleReset = () => {
-    if (query !== "" || selectedRoleId !== -1) {
+    if (query !== "" || selectedRoleId !== null) {
       setQuery(""); // Set Query to empty
-      setSelectedRoleId(-1);
+      setSelectedRoleId(null);
       fetchScheduleData(query);
     }
 
@@ -383,13 +383,13 @@ const handleDeleteShift = async (shiftId: number) => {
       <View style={styles.filterContainer}>
         <RoleDropdown
           selectedRoleId={selectedRoleId}
-          onRoleSelect={(value) => setSelectedRoleId(value)}
+          onRoleSelect={(value) => setSelectedRoleId(value as number)}
           labelText=""
           containerStyle={styles.dropdownButton}
         />
         <SectionDropdown
           selectedSectionId={selectedSectionId}
-          onSectionSelect={(value) => setSelectedSectionId(value)}
+          onSectionSelect={(value) => setSelectedSectionId(value as number)}
           labelText=""
           containerStyle={styles.dropdownButton}
         />
