@@ -15,7 +15,7 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children,
 
     <Modal
       visible={visible}
-      animationType="fade"
+      animationType="none"
       transparent
       onRequestClose={onClose}
     >
@@ -50,12 +50,12 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children,
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
-    width: '90%',
+    width: '85%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,

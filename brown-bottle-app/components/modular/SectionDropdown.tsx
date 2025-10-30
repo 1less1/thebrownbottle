@@ -33,7 +33,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
     selectedSectionId,
     onSectionSelect,
     labelText = "Filter:",
-    placeholder = "Select a role...",
+    placeholder = "Select a section...",
     editable = true,
     containerStyle,
     buttonStyle,

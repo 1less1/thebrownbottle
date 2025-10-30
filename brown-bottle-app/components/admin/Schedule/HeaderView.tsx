@@ -5,11 +5,12 @@ import { Colors } from '@/constants/Colors';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/modular/Card';
 import ModularButton from '@/components/modular/ModularButton';
-import Spreadsheet from './SpreadSheet';
+import { useState } from 'react';
+import ShiftCalendar from './ShiftCalendar';
 
 const HeaderView = () => {
 
-
+  const [showCalendar, setShowCalendar] = useState(false);
 
   return (
 
@@ -17,7 +18,15 @@ const HeaderView = () => {
     <Card style={styles.card}>
         <View style={styles.cardContent}>
           <View style={styles.leftSection}>
-            <ModularButton text="Dropdown Here" onPress={() => {}} />
+
+            <ModularButton text="Dropdown Here" 
+              onPress={() => setShowCalendar(!showCalendar)}/>
+            {showCalendar && (
+              <View style={{ marginTop: 20 }}>
+                <ShiftCalendar />
+              </View>
+            )}
+
           </View>
         <View style={styles.rightSection}>
           <Text style={styles.rightText}>Week of</Text>
