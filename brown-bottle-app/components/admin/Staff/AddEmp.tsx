@@ -216,7 +216,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                     {/* Buttons */}
                     <View style={styles.buttonRowContainer}>
                         <ModularButton
-                            text="Add Employee"
+                            text="Add"
                             textStyle={{ color: 'white' }}
                             style={GlobalStyles.submitButton}
                             onPress={handleInsert}
