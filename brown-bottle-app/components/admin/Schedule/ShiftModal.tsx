@@ -48,7 +48,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
   const [endInput, setEndInput] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [selectedSectionId, setSelectedSectionId] = useState<number>(shift?.section_id ?? -1);
+  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(shift?.section_id ?? null);
 
 
   // Initialize values when modal opens
@@ -63,7 +63,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
     } else {
       setStartInput('');
       setEndInput('');
-      setSelectedSectionId(-1);
+      setSelectedSectionId(null);
     }
 
 
@@ -102,13 +102,13 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
       }
 
 
-      const sectionToUse = selectedSectionId;
-
-      if (selectedSectionId === -1) {
+      if (!selectedSectionId) {
         setError("Please select a section.");
         setLoading(false);
         return;
       }
+
+      const sectionToUse = selectedSectionId;
 
       if (shift?.shift_id && onEditShift) {
         // Edit existing shift (PATCH)
@@ -220,7 +220,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
           <Text style={styles.label}>Section</Text>
           <SectionDropdown
             selectedSectionId={selectedSectionId}
-            onSectionSelect={(value) => setSelectedSectionId(value)}
+            onSectionSelect={(value, key) => setSelectedSectionId(value)}
             labelText=""
             containerStyle={{ marginBottom: 10 }}
           />
