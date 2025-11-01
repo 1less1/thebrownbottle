@@ -345,7 +345,7 @@ const handleDeleteShift = async (shiftId: number) => {
 
 
   return (
-    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.7 }}>
+    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.67 }}>
 
       {/* Week Navigation */}
       <View style={styles.navigationHeader}>

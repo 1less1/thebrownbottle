@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginLeft: 20,
-    marginTop: 40,
+    marginTop: 25,
     marginBottom: 20,
   },
   tabBar: {
