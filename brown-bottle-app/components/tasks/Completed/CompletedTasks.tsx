@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import dayjs from 'dayjs';
-import { parseLocalDate } from '@/utils/helper';
+import { parseLocalDate } from '@/utils/Helper';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';

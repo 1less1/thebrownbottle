@@ -22,15 +22,6 @@ interface ShiftModalProps {
   employee: ScheduleEmployee | null;
   date: Date | null;
   shift: ShiftDisplay | any | null;
-
-  onAddShift: (startTime: string, endTime: string, sectionId: number) => Promise<void>;
-  onEditShift?: (
-    shiftId: number,
-    startTime: string,
-    endTime: string,
-    sectionId: number
-  ) => Promise<void>;
-  onDeleteShift?: (shiftId: number) => Promise<void>;
 }
 
 
@@ -40,9 +31,6 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
   employee,
   date,
   shift,
-  onAddShift,
-  onEditShift,
-  onDeleteShift,
 }) => {
   const [startInput, setStartInput] = useState('');
   const [endInput, setEndInput] = useState('');
@@ -70,115 +58,16 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
     setError(null);
   }, [visible, shift, date]);
 
-  if (!employee || !date) return null;
-
-  const handleSave = async () => {
-    if (loading) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      if (!startInput || !endInput) {
-        setError('Please provide both start and end times.');
-        setLoading(false);
-        return;
-      }
-
-      const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
-      if (!timeRegex.test(startInput) || !timeRegex.test(endInput)) {
-        setError('Invalid time format. Use 24-hour time (e.g. 09:00 or 09:00:00).');
-        setLoading(false);
-        return;
-      }
-
-      // ensure end > start
-      const start = startInput.slice(0, 5);
-      const end = endInput.slice(0, 5);
-      if (end <= start) {
-        setError('End time must be later than start time.');
-        setLoading(false);
-        return;
-      }
-
-
-      const sectionToUse = selectedSectionId;
-
-      if (selectedSectionId === -1) {
-        setError("Please select a section.");
-        setLoading(false);
-        return;
-      }
-
-      if (shift?.shift_id && onEditShift) {
-        // Edit existing shift (PATCH)
-        await onEditShift(shift.shift_id, startInput, endInput, sectionToUse);
-
-        Toast.show({
-          type: "success",
-          text1: "Shift Updated",
-          text2: `${date.toLocaleDateString()} (${startInput}–${endInput})`,
-          position: "bottom",
-        });
-
-
-      } else {
-        // Add new shift (POST)
-        await onAddShift(startInput, endInput, sectionToUse);
-
-        Toast.show({
-          type: "success",
-          text1: "Shift Created",
-          text2: `${date.toLocaleDateString()} (${startInput}–${endInput})`,
-          position: "bottom",
-        });
-      }
-
-      setTimeout(onClose, 300);
-
-    } catch (err: any) {
-      console.error('Shift save failed:', err);
-      Alert.alert('Error', err.message || 'Failed to save shift.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDelete = () => {
-    if (!shift?.shift_id) {
-      Alert.alert("Error", "Shift ID is missing or invalid.");
-      return;
-    }
+    return;
+  }
 
-    if (!onDeleteShift) {
-      Alert.alert("Error", "Delete handler not provided.");
-      return;
-    }
+  const handleSave = () => {
+    return;
+  }
 
-    // We define the async logic outside the Alert callback
-    const confirmDelete = async () => {
-      try {
-        console.log("Deleting shift:", shift.shift_id);
-        await onDeleteShift(shift.shift_id);
-
-        Toast.show({
-          type: "success",
-          text1: "Shift deleted",
-          text2: `Removed for ${employee?.employee_name || "Employee"}`,
-          position: "bottom",
-        });
-
-        // Delay modal close slightly to let Toast display cleanly
-        setTimeout(onClose, 300);
-      } catch (err: any) {
-        console.error("Shift deletion failed:", err);
-        Alert.alert("Error", err.message || "Failed to delete shift.");
-      }
-    };
-
-    confirmDelete();
-
-  };
+  if (!employee || !date) return null;
 
 
 
@@ -220,7 +109,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({
           <Text style={styles.label}>Section</Text>
           <SectionDropdown
             selectedSectionId={selectedSectionId}
-            onSectionSelect={(value) => setSelectedSectionId(value)}
+            onSectionSelect={(value) => setSelectedSectionId(value as number)}
             labelText=""
             containerStyle={{ marginBottom: 10 }}
           />

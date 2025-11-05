@@ -9,7 +9,7 @@ import ModularDropdown from '@/components/modular/ModularDropdown';
 
 import { Employee } from "@/types/api";
 import { updateEmployee } from '@/utils/api/employee';
-import { isValidEmail, isValidPhone, formatPhone, formatWage, buildPatchData } from '@/utils/helper';
+import { isValidEmail, isValidPhone, formatPhone, formatWage, buildPatchData } from '@/utils/Helper';
 
 
 interface EditEmpProps {

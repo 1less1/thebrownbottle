@@ -213,6 +213,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
   `end_time` TIME NULL DEFAULT NULL,
   `date` DATE NULL DEFAULT NULL,
   `section_id` INT UNSIGNED NOT NULL,
+  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`shift_id`),
   UNIQUE INDEX `employee_date_section_idx` (`employee_id`, `date`, `section_id`),
   INDEX `section_id_idx` (`section_id`),

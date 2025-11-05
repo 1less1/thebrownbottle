@@ -19,8 +19,15 @@ def get_shifts(db, request):
         param_types = {
             'shift_id': int,
             'employee_id': int,
+            'primary_role': int,
+            'secondary_role': int,
+            'tertiary_role': int,
+            'section_id': int,
             'date': str,
-            'section_id': int
+            'start_date': str,
+            'end_date': str,
+            'full_name': str,
+            'is_today': int
         }
 
         # Validate and parse parameters
@@ -31,8 +38,15 @@ def get_shifts(db, request):
         # Extract Parameters
         shift_id = params.get('shift_id')
         employee_id = params.get('employee_id')
-        date = params.get('date')
+        primary_role = params.get('primary_role')
+        secondary_role = params.get('secondary_role')
+        tertiary_role = params.get('tertiary_role')
         section_id = params.get('section_id')
+        date = params.get('date')
+        start_date = params.get('start_date')
+        end_date = params.get('end_date')
+        full_name = params.get('full_name')
+        is_today = params.get('is_today')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -44,16 +58,22 @@ def get_shifts(db, request):
                 sh.employee_id,
                 e.first_name,
                 e.last_name,
-                TIME_FORMAT(sh.start_time, '%H:%i') AS start_time,
-                TIME_FORMAT(sh.end_time, '%H:%i') AS end_time,
-                DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
+                e.primary_role,
+                pr.role_name AS primary_role_name,
                 sh.section_id,
-                se.section_name
+                se.section_name,
+                CONCAT(e.first_name, ' ', e.last_name) AS full_name,
+                TIME_FORMAT(sh.start_time, '%h:%i %p') AS start_time,
+                TIME_FORMAT(sh.end_time, '%h:%i %p') AS end_time,
+                DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
+                sh.timestamp
             FROM shift sh
             JOIN employee e ON sh.employee_id = e.employee_id
+            LEFT JOIN role pr ON e.primary_role = pr.role_id
             JOIN section se ON se.section_id = sh.section_id
             WHERE 1 = 1
         """
+
 
         query_params = []
 
@@ -66,20 +86,63 @@ def get_shifts(db, request):
             query += " AND sh.employee_id = %s"
             query_params.append(employee_id)
 
-        if date:
-            try:
-                datetime.strptime(date, '%Y-%m-%d')
-            except ValueError:
-                return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
-            query += " AND sh.date = %s"
-            query_params.append(date)
+        if full_name is not None:
+            query += " AND CONCAT(e.first_name, ' ', e.last_name) COLLATE utf8_general_ci LIKE %s"
+            query_params.append(f"%{full_name}%")
 
         if section_id is not None:
             query += " AND sh.section_id = %s"
             query_params.append(section_id)
+        
+        # Handle multiple Role Clauses
+        role_clauses = []
+        role_values = []
+
+        if primary_role is not None:
+            role_clauses.append("e.primary_role = %s")
+            role_values.append(primary_role)
+
+        if secondary_role is not None:
+            role_clauses.append("e.secondary_role = %s")
+            role_values.append(secondary_role)
+
+        if tertiary_role is not None:
+            role_clauses.append("e.tertiary_role = %s")
+            role_values.append(tertiary_role)
+
+        if role_clauses:
+            query += " AND (" + " OR ".join(role_clauses) + ")"
+            query_params.extend(role_values)
+
+        # If filtering by today's date, skip all date logic
+        if is_today in (1, True, "1"):
+            query += " AND sh.date = CURDATE()"
+
+        else:
+            # Date range: both start and end
+            if start_date and end_date:
+                try:
+                    datetime.strptime(start_date, '%Y-%m-%d')
+                    datetime.strptime(end_date, '%Y-%m-%d')
+                except ValueError:
+                    return jsonify({"error": "Invalid date range format. Expected YYYY-MM-DD."}), 400
+                
+                query += " AND sh.date BETWEEN %s AND %s"
+                query_params.append(start_date)
+                query_params.append(end_date)
+
+            # Single exact date (only used if not using range and not using is_today)
+            elif date:
+                try:
+                    datetime.strptime(date, '%Y-%m-%d')
+                except ValueError:
+                    return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
+                
+                query += " AND sh.date = %s"
+                query_params.append(date)
 
         # Last Query Line
-        query += " ORDER BY sh.date ASC;"
+        query += " ORDER BY sh.date, sh.start_time;"
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

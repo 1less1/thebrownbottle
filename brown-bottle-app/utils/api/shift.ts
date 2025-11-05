@@ -1,5 +1,42 @@
 import Constants from "expo-constants";
-import { buildQueryString } from "@/utils/helper";
+
+import { buildQueryString } from "@/utils/Helper";
+
+import { Shift, ShiftAPI } from "@/types/api";
+
+// GET: Fetches data from the shift table
+export async function getShift(params?: Partial<ShiftAPI>) {
+
+  // Retrieve Environment Variables
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  // Build Query String
+  const queryString = buildQueryString(params || {})
+
+  const url = `${API_BASE_URL}/shift?${queryString}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`[Shift API] Failed to GET: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    return data; // JSON Response
+
+  } catch (error) {
+    console.error("Failed to fetch shift data:", error);
+    throw error;
+  }
+
+}
 
 export async function getUserShifts(employee_id: number) {
   // Retrieve Environment Variables

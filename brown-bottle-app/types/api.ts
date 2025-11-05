@@ -74,11 +74,33 @@ export type UpdateTaskFields = Partial<{
 export interface Shift {
   shift_id: number;
   employee_id: number;
+  first_name: string;
+  last_name: string;
+  primary_role: number | null;
+  section_id: number;
   date: string;       // 'YYYY-MM-DD'
   start_time: string; // 'HH:MM'
   end_time: string;   // 'HH:MM'
-  section_name: string;
-  shiftDateTime?: Date;
+  timestamp: string;
+
+  // Only appear in JSON responses
+  full_name?: string;
+  primary_role_name?: string;
+  section_name?: string;
+}
+
+export interface ShiftAPI {
+  shift_id?: number;
+  employee_id?: number;
+  primary_role?: number;
+  secondary_role?: number;
+  tertiary_role?: number;
+  section_id?: number;
+  full_name?: string;
+  date?: string; // Exact date filtering
+  start_date?: string; // Date Range 
+  end_date?: string; // Date Range
+  is_today?: 1 | 0; // Shift's only Today?
 }
 
 // Raw shift data from the schedule API

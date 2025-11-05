@@ -14,7 +14,7 @@ import DatePickerModal from '@/components/modular/DatePickerModal';
 
 import { User } from '@/utils/SessionContext';
 import { insertRecurringTask, insertTask } from '@/utils/api/task';
-import { isValidDate } from '@/utils/helper';
+import { isValidDate } from '@/utils/Helper';
 
 
 interface TasksModalProps {

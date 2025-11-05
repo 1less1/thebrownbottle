@@ -10,7 +10,7 @@ import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
 import { Task } from '@/types/api';
-import { formatDATE } from '@/utils/helper';
+import { formatDATE } from '@/utils/Helper';
 
 interface CheckBoxCardProps {
   task: Task;

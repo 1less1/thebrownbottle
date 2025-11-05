@@ -24,7 +24,7 @@ const Schedule = () => {
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
       <View style={{ marginTop: 16, width: '85%' }}>
-        <SpreadSheet refreshTrigger={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+        <SpreadSheet parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
     </DefaultScrollView>
