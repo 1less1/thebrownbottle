@@ -74,9 +74,6 @@ export type UpdateTaskFields = Partial<{
 export interface Shift {
   shift_id: number;
   employee_id: number;
-  first_name: string;
-  last_name: string;
-  primary_role: number | null;
   section_id: number;
   date: string;       // 'YYYY-MM-DD'
   start_time: string; // 'HH:MM'
@@ -84,9 +81,13 @@ export interface Shift {
   timestamp: string;
 
   // Only appear in JSON responses
-  full_name?: string;
+  first_name?: string;
+  last_name?: string;
+  primary_role?: number | null;
   primary_role_name?: string;
   section_name?: string;
+  day_name?: string; // String representing weekday (Monday, Tuesday, etc.)
+  day_index?: number; // Integer from 1–7 representing weekday (1 = Sunday to 7 = Saturday)
 }
 
 export interface ShiftAPI {
@@ -96,46 +97,35 @@ export interface ShiftAPI {
   secondary_role?: number;
   tertiary_role?: number;
   section_id?: number;
-  full_name?: string;
   date?: string; // Exact date filtering
   start_date?: string; // Date Range 
   end_date?: string; // Date Range
   is_today?: 1 | 0; // Shift's only Today?
 }
 
-// Raw shift data from the schedule API
+export interface ScheduleAPI {
+  role_id?: number;
+  section_id?: number;
+  start_date?: string;
+  end_date?: string;
+  full_name?: string;
+}
+
 export interface ScheduleShift {
   shift_id: number;
-  employee_id: number;
-  employee_name: string;          // "Alice Johnson"
-  start_time: string;             // "08:00"
-  end_time: string;               // "17:00"
-  date: string;                   // "2025-10-14"
-  section_id: number;
-  section_name: string;           // "Kitchen"
-  primary_role: number;
-  primary_role_name: string;      // "Server"
+  date: string;
+  start_time: string;   // e.g., "10:00 AM" (matches TIME_FORMAT '%h:%i %p')
+  end_time: string;     // e.g., "06:00 PM"
+  section_id: number;   // matches s.section_id
+  section_name: string; // matches sec.section_name
+  day_name: string;     // e.g., "Monday"
+  day_index: number;    // 1–7 (Sunday=1)
 }
 
-// Processed shift data for a single cell in the spreadsheet
-export interface ShiftDisplay {
-  shift_id?: number;
-  time: string;                   // "8:00-17:00"
-  section: string;                // "Kitchen"
-  section_id: number;
-}
-
-// Single employee row in the schedule spreadsheet
 export interface ScheduleEmployee {
   employee_id: number;
-  employee_name: string;          // "Alice Johnson"
-  primary_role_name: string;      // "Server"
-  shifts: (ShiftDisplay | null)[]; // Array with one entry per day
-}
-
-// Complete schedule data structure
-export interface ScheduleData {
-  dates: string[];                // ["10/14", "10/15", "10/16", ...]
-  dayNames: string[];             // ["Mon", "Tue", "Wed", ...]
-  employees: ScheduleEmployee[];
+  full_name: string;
+  primary_role: number | null;
+  primary_role_name: string;
+  shifts: (ScheduleShift | null)[]; // 7 Entries: Sunday (1)... to Saturday (7)
 }

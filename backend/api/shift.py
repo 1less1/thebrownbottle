@@ -26,7 +26,6 @@ def get_shifts(db, request):
             'date': str,
             'start_date': str,
             'end_date': str,
-            'full_name': str,
             'is_today': int
         }
 
@@ -45,7 +44,6 @@ def get_shifts(db, request):
         date = params.get('date')
         start_date = params.get('start_date')
         end_date = params.get('end_date')
-        full_name = params.get('full_name')
         is_today = params.get('is_today')
 
         conn = db
@@ -62,10 +60,11 @@ def get_shifts(db, request):
                 pr.role_name AS primary_role_name,
                 sh.section_id,
                 se.section_name,
-                CONCAT(e.first_name, ' ', e.last_name) AS full_name,
                 TIME_FORMAT(sh.start_time, '%h:%i %p') AS start_time,
                 TIME_FORMAT(sh.end_time, '%h:%i %p') AS end_time,
                 DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
+                DATE_FORMAT(sh.date, '%W') AS day_name,
+                DAYOFWEEK(sh.date) AS day_index,
                 sh.timestamp
             FROM shift sh
             JOIN employee e ON sh.employee_id = e.employee_id
@@ -73,7 +72,8 @@ def get_shifts(db, request):
             JOIN section se ON se.section_id = sh.section_id
             WHERE 1 = 1
         """
-
+        # day_name = Sunday, Monday, Tuesday, etc.
+        # day_index = 1 (Sun)... to 7 (Sat)
 
         query_params = []
 
@@ -86,9 +86,6 @@ def get_shifts(db, request):
             query += " AND sh.employee_id = %s"
             query_params.append(employee_id)
 
-        if full_name is not None:
-            query += " AND CONCAT(e.first_name, ' ', e.last_name) COLLATE utf8_general_ci LIKE %s"
-            query_params.append(f"%{full_name}%")
 
         if section_id is not None:
             query += " AND sh.section_id = %s"
@@ -115,7 +112,7 @@ def get_shifts(db, request):
             query_params.extend(role_values)
 
         # If filtering by today's date, skip all date logic
-        if is_today in (1, True, "1"):
+        if str(is_today) == "1":
             query += " AND sh.date = CURDATE()"
 
         else:
@@ -303,6 +300,12 @@ def update_shift(db, request, shift_id):
             cursor.close()
         if conn:
             conn.close()
+
+# --------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
+
+
+
 # DELETE Shift -------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 
@@ -342,171 +345,6 @@ def delete_shift(db, shift_id):
             cursor.close()
         if conn:
             conn.close()
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-# GET Shedule Data --------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-def get_schedule_data(db, request):
-    """
-    Fetches shifts with employee and section info for schedule display
-    Supports filtering by section_id, role_id, date range
-    
-    NEW: Supports include_all_employees parameter to show all employees with LEFT JOIN
-    """
-    conn = None
-    cursor = None
-    try:
-        # 1. PARAMETER VALIDATION
-        param_types = {
-            'start_date': str,              # Format: '2025-10-14'
-            'end_date': str,                # Format: '2025-10-20'
-            'section_id': int,              # Filter by specific section
-            'role_id': int,                 # Filter by employee's primary role
-            'employee_name': str,           # Wildcard search for employee name
-            'include_all_employees': str    # NEW: 'true' or 'false'
-        }
-
-        # Validate parameters
-        params, error = request_helper.verify_params(request, param_types)
-        if error:
-            return jsonify(error), 400
-
-        # Extract parameters
-        start_date = params.get('start_date')
-        end_date = params.get('end_date')
-        section_id = params.get('section_id')
-        role_id = params.get('role_id')
-        employee_name = params.get('employee_name')
-        include_all = params.get('include_all_employees', 'false').lower() == 'true'
-
-        # 2. DATABASE CONNECTION
-        conn = db
-        cursor = conn.cursor(dictionary=True)
-
-        # 3. BUILD THE SQL QUERY BASED ON include_all_employees
-        if include_all:
-            # LEFT JOIN - Returns ALL employees, with NULL for shifts if they don't have any
-            query = """
-                SELECT 
-                    e.employee_id,
-                    CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-                    e.primary_role,
-                    r.role_name as primary_role_name,
-                    s.shift_id,
-                    TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
-                    TIME_FORMAT(s.end_time, '%H:%i') AS end_time,
-                    DATE_FORMAT(s.date, '%Y-%m-%d') AS date,
-                    s.section_id,
-                    sec.section_name
-                FROM employee e
-                INNER JOIN role r ON e.primary_role = r.role_id
-                LEFT JOIN shift s ON e.employee_id = s.employee_id
-            """
-            
-            # Add date range condition to LEFT JOIN if provided
-            if start_date and end_date:
-                query = """
-                    SELECT 
-                        e.employee_id,
-                        CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-                        e.primary_role,
-                        r.role_name as primary_role_name,
-                        s.shift_id,
-                        TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
-                        TIME_FORMAT(s.end_time, '%H:%i') AS end_time,
-                        DATE_FORMAT(s.date, '%Y-%m-%d') AS date,
-                        s.section_id,
-                        sec.section_name
-                    FROM employee e
-                    INNER JOIN role r ON e.primary_role = r.role_id
-                    LEFT JOIN shift s ON e.employee_id = s.employee_id 
-                        AND s.date >= %s AND s.date <= %s
-                """
-            
-            query += " LEFT JOIN section sec ON s.section_id = sec.section_id WHERE 1=1"
-            
-        else:
-            # INNER JOIN - Returns only employees with shifts (original behavior)
-            query = """
-                SELECT 
-                    s.shift_id,
-                    s.employee_id,
-                    TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
-                    TIME_FORMAT(s.end_time, '%H:%i') AS end_time,
-                    DATE_FORMAT(s.date, '%Y-%m-%d') AS date,
-                    s.section_id,
-                    CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-                    e.primary_role,
-                    sec.section_name,
-                    r.role_name as primary_role_name
-                FROM shift s
-                INNER JOIN employee e ON s.employee_id = e.employee_id
-                INNER JOIN section sec ON s.section_id = sec.section_id
-                INNER JOIN role r ON e.primary_role = r.role_id
-                WHERE 1=1
-            """
-
-        query_params = []
-
-        # 4. ADD DYNAMIC FILTERS
-        # Date range filter (only for INNER JOIN mode, already in LEFT JOIN condition)
-        if not include_all:
-            if start_date:
-                query += " AND s.date >= %s"
-                query_params.append(start_date)
-
-            if end_date:
-                query += " AND s.date <= %s"
-                query_params.append(end_date)
-        else:
-            # For LEFT JOIN, dates are in the JOIN condition, just add to params
-            if start_date and end_date:
-                query_params.extend([start_date, end_date])
-
-        # Section filter (only filter shifts, not employees)
-        if section_id is not None:
-            if include_all:
-                # For LEFT JOIN, allow employees without shifts in this section
-                query += " AND (s.section_id = %s OR s.section_id IS NULL)"
-            else:
-                query += " AND s.section_id = %s"
-            query_params.append(section_id)
-
-        # Role filter (filter employees by role)
-        if role_id is not None:
-            query += " AND e.primary_role = %s"
-            query_params.append(role_id)
-
-        # Employee name search (wildcard)
-        if employee_name:
-            query += " AND CONCAT(e.first_name, ' ', e.last_name) LIKE %s"
-            query_params.append(employee_name)
-
-        # Order by employee name and date
-        query += " ORDER BY e.last_name ASC, e.first_name ASC, s.date ASC;"
-
-        # 5. EXECUTE QUERY
-        cursor.execute(query, tuple(query_params))
-        result = cursor.fetchall()
-
-        # 6. RETURN RESULTS
-        return jsonify(result), 200
-
-    except mysql.connector.Error as e:
-        print(f"Database error: {e}")
-        return jsonify({"status": "error", "message": "Database error occurred"}), 500
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------

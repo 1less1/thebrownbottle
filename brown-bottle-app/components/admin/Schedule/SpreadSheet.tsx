@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable } from "react-native";
 import { debounce } from "lodash";
 
@@ -6,90 +6,85 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
 
 import Card from "@/components/modular/Card";
-
 import RoleDropdown from "@/components/modular/RoleDropdown";
-import SectionDropdown from "@/components/modular/SectionDropdown"
-
+import SectionDropdown from "@/components/modular/SectionDropdown";
+import ModularDropdown from "@/components/modular/ModularDropdown";
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
-
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
-import { Section } from "@/types/api";
-import { getSection } from "@/utils/api/section";
-
-import { ScheduleData, ScheduleEmployee, ShiftDisplay } from "@/types/api";
-import { getScheduleData, processScheduleForSpreadsheet } from "@/utils/api/shift";
-
-import { Shift, ShiftAPI } from "@/types/api";
-
-import { getShift, createShift, updateShift, deleteShift } from "@/utils/api/shift";
+import { formatSQLDate } from "@/utils/Helper";
+import { ScheduleEmployee, ScheduleShift, Shift } from "@/types/api";
+import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/utils/api/schedule";
 
 import Toast from "react-native-toast-message";
-
-
-
-const shiftTodayOptions = [
-  { value: 1, key: "Yes" },
-  { value: 0, key: "No" },
-];
 
 interface SpreadSheetProps {
   parentRefresh?: number;
   onRefreshDone?: () => void;
 }
 
+const isTodayOptions = [
+  { value: 1, key: "Yes" },
+  { value: 0, key: "No" },
+];
 
-const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone }) => {
-  const { width: screenWidth } = useWindowDimensions();
-  const { height } = useWindowDimensions();
+const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
+  const { width: screenWidth, height } = useWindowDimensions();
+
+  const [query, setQuery] = useState("");
 
   const [localRefresh, setLocalRefresh] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Search and filter state
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Shift[]>([]);
+  const [scheduleData, setScheduleData] = useState<ScheduleEmployee[]>([]);
+  const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
 
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
-  const [selectedTodayOption, setSelectedTodayOption] = useState<number>(0) // Default value is_today=0 (False)
+  const [isToday, setIsToday] = useState<number>(0);
 
-  const fetchShifts = async (searchTerm: string) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getSunday(new Date()));
+
+  const fetchSchedule = async (searchTerm: string) => {
     setLoading(true);
-
     try {
       const weekStartStr = currentWeekStart.toISOString().split("T")[0];
-      const weekEnd = new Date(currentWeekStart);
-      weekEnd.setDate(currentWeekStart.getDate() + 6);
-      const weekEndStr = weekEnd.toISOString().split("T")[0];
+      const weekEndStr = new Date(currentWeekStart.getTime() + 6 * 86400000)
+        .toISOString()
+        .split("T")[0];
 
-      const params: Partial<ShiftAPI> = {
-        start_date: weekStartStr,
-        end_date: weekEndStr,
+      const params: Record<string, any> = {
         full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
+        is_today: isToday,
+        role_id: selectedRoleId ?? undefined,
         section_id: selectedSectionId ?? undefined,
-        primary_role: selectedRoleId ?? undefined,
-        secondary_role: selectedRoleId ?? undefined,
-        tertiary_role: selectedRoleId ?? undefined,
       };
 
-      const rawShifts: Shift[] = await getShift(params);
-      setResults(rawShifts);
+      if (isToday === 0) {
+        params.start_date = weekStartStr;
+        params.end_date = weekEndStr;
+      }
 
+      const schedule: ScheduleEmployee[] = await getSchedule(params);
+      setScheduleData(schedule);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching schedule:", err);
+      alert("Error fetcching schedule!")
     } finally {
       setLoading(false);
     }
   };
 
-
   const debouncedSearch = useCallback(
     debounce((searchTerm: string) => {
-      fetchShifts(searchTerm);
+      fetchSchedule(searchTerm);
     }, 500),
-    [selectedSectionId, selectedRoleId, selectedTodayOption]
+    [selectedSectionId, selectedRoleId, isToday, currentWeekStart]
   );
 
   const handleSearchChange = (searchTerm: string) => {
@@ -98,126 +93,67 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone 
   };
 
   const triggerRefresh = (searchTerm: string) => {
-    fetchShifts(searchTerm);
-  };
+    setQuery(searchTerm);
+    debouncedSearch.cancel();
+    debouncedSearch(searchTerm);
+  }
 
   const handleReset = () => {
-    if (query !== "" || selectedSectionId !== null || selectedRoleId !== null || selectedTodayOption !== 0) {
+    if (query != "" || selectedSectionId !== null || selectedRoleId != null || isToday != 0) {
       debouncedSearch.cancel();
       setQuery("");
       setSelectedSectionId(null);
       setSelectedRoleId(null);
-      setSelectedTodayOption(0);
-      setLocalRefresh((prev) => prev + 1); // triggers refresh
+      setIsToday(0);
+      setLocalRefresh((prev) => prev + 1);
     }
   };
 
-  // ------- Dom Edits Above -------------------------------------------------------------------------------------------------------------------------------------
-
-  // Modal and selection state
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [selectedShift, setSelectedShift] = useState<ShiftDisplay | null>(null);
-
-  // Helper to get Monday of a given date
-  const getMonday = (date: Date) => {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // if Sunday, go back 6 days
-    d.setDate(d.getDate() + diff);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  };
-
-  // Initialize current week start
-  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getMonday(new Date()));
-
-  // Navigate weeks
-  const navigateWeek = (direction: "prev" | "next") => {
-    setCurrentWeekStart(prev => {
-      const newWeek = new Date(prev);
-      newWeek.setDate(prev.getDate() + (direction === "next" ? 7 : -7));
-      return newWeek;
-    });
-  };
-
-  // Format week range for display
-  const getWeekDateRange = (start: Date) => {
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-
-    const formatDate = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
-
-    return `${formatDate(start)} - ${formatDate(end)}, ${start.getFullYear()}`;
-  };
-
-  const scheduleData = useMemo(() => {
-    return processScheduleForSpreadsheet(results, currentWeekStart, 7);
-  }, [results, currentWeekStart]);
-
-
-  // Fetch Shifts on Initialization and State Update
+  // Fetch Schedule Data on Initialization and State Update
   useEffect(() => {
-    triggerRefresh(query);
-  }, [selectedSectionId, selectedRoleId, selectedTodayOption, currentWeekStart, parentRefresh, localRefresh]);
+    triggerRefresh(query)
+  }, [selectedSectionId, selectedRoleId, isToday, currentWeekStart, parentRefresh, localRefresh]);
 
-
-
-
-  // Responsive column widths
-  // Mobile: use fixed widths (150px for name, 120px per day)
-  // Tablet/Desktop: use percentage-based widths but with minimums
+  // Layout Calculations
   const isMobile = screenWidth < 768;
-
-  const NAME_COL_WIDTH = isMobile
-    ? 135
-    : Math.max(135, screenWidth * 0.12);
-
-  const DAY_COL_WIDTH = isMobile
-    ? 120
-    : scheduleData
-      ? Math.max(120, (screenWidth * 0.70) / scheduleData.dates.length)
-      : 120;
-
+  const NAME_COL_WIDTH = isMobile ? 135 : Math.max(135, screenWidth * 0.12);
+  const weekDays = getWeekDates(currentWeekStart, 7);
+  const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (screenWidth * 0.70) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
 
-  // Header with dates
-  const renderHeader = () => {
-    if (!scheduleData) return null;
-
-    return (
-      <View style={[styles.row, styles.headerRow]}>
-        {/* Employee name column */}
-        <View style={[styles.headerCell, { width: NAME_COL_WIDTH, height: HEADER_HEIGHT }]}>
-          <Text style={styles.headerText}>Employee</Text>
-        </View>
-
-        {/* Date columns */}
-        {scheduleData.dates.map((date, i) => (
-          <View
-            key={i}
-            style={[styles.headerCell, { width: DAY_COL_WIDTH, height: HEADER_HEIGHT }]}
-          >
-            <Text style={styles.headerText}>{scheduleData.dayNames[i]}</Text>
-            <Text style={styles.subHeaderText}>{date}</Text>
-          </View>
-        ))}
-      </View>
-    );
+  const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
+    const clickedDate = new Date(currentWeekStart);
+    clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
+    setSelectedEmployee(employee);
+    setSelectedShift(shift);
+    const sqlDate = formatSQLDate(clickedDate); // "2025-11-06"
+    setSelectedDate(sqlDate);
+    setModalVisible(true);
   };
 
-  // Employee row with shifts
+
+  const renderHeader = () => (
+    <View style={[styles.row, styles.headerRow]}>
+      <View style={[styles.headerCell, { width: NAME_COL_WIDTH, height: HEADER_HEIGHT }]}>
+        <Text style={styles.headerText}>Employee</Text>
+      </View>
+      {weekDays.map((d, i) => (
+        <View key={i} style={[styles.headerCell, { width: DAY_COL_WIDTH, height: HEADER_HEIGHT }]}>
+          <Text style={styles.headerText}>{d.dayName}</Text>
+          <Text style={styles.subHeaderText}>{d.date}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
   const renderEmployeeRow = (employee: ScheduleEmployee) => (
     <View key={employee.employee_id} style={styles.row}>
-      {/* Employee name cell */}
       <View style={[styles.nameCell, { width: NAME_COL_WIDTH, height: ROW_HEIGHT }]}>
-        <Text style={styles.employeeName}>{employee.employee_name}</Text>
+        <Text style={styles.employeeName}>{employee.full_name}</Text>
         <Text style={styles.employeeRole}>({employee.primary_role_name})</Text>
       </View>
 
-      {/* Shift cells */}
       {employee.shifts.map((shift, dayIndex) => (
         <Pressable
           key={dayIndex}
@@ -230,8 +166,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone 
         >
           {shift ? (
             <View style={styles.shiftContent}>
-              <Text style={styles.shiftTime}>{shift.time}</Text>
-              <Text style={styles.shiftSection}>{shift.section}</Text>
+              <Text style={styles.shiftTime}>{shift.start_time}-{shift.end_time}</Text>
+              <Text style={styles.shiftSection}>{shift.section_name}</Text>
             </View>
           ) : (
             <Text style={styles.noShift}>-</Text>
@@ -241,45 +177,37 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone 
     </View>
   );
 
-  const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ShiftDisplay | null) => {
-    const clickedDate = new Date(currentWeekStart);
-    clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
-
-    setSelectedEmployee(employee);
-    setSelectedShift(shift);
-
-    setSelectedDate(clickedDate);  // <-- add this
-    setModalVisible(true);
-  };
-
-
-
   return (
     <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.7 }}>
 
-      {/* Week Navigation */}
+      {/* Navigation Header */}
       <View style={styles.navigationHeader}>
+        {/* Previous Button */}
         <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigateWeek('prev')}
+          style={[styles.navButton, isToday === 1 && styles.navButtonDisabled]}
+          onPress={() => setCurrentWeekStart(prev => navigateWeek(prev, "prev"))}
+          disabled={isToday === 1}
         >
           <Text style={styles.navButtonText}>← Previous</Text>
         </TouchableOpacity>
 
         <View style={styles.weekDisplay}>
-          <Text style={styles.weekText}>{getWeekDateRange(currentWeekStart)}</Text>
-
+          <Text style={styles.weekText}>
+            {isToday === 1 ? "Today" : getWeekDateRange(currentWeekStart)}
+          </Text>
         </View>
 
+        {/* Next Button */}
         <TouchableOpacity
-          style={styles.navButton}
-          onPress={() => navigateWeek('next')}
+          style={[styles.navButton, isToday === 1 && styles.navButtonDisabled]}
+          onPress={() => setCurrentWeekStart(prev => navigateWeek(prev, "next"))}
+          disabled={isToday === 1}
         >
           <Text style={styles.navButtonText}>Next →</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Search and Filters */}
+      {/* Search Container */}
       <View style={styles.searchContainer}>
         <TextInput
           value={query}
@@ -291,6 +219,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone 
         <ModularButton onPress={handleReset} text="Reset" />
       </View>
 
+      {/* Filter Container */}
       <View style={styles.filterContainer}>
         <RoleDropdown
           selectedRoleId={selectedRoleId}
@@ -304,51 +233,52 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh, onRefreshDone 
           labelText=""
           containerStyle={styles.dropdownButton}
         />
+        <ModularDropdown
+          selectedValue={isToday}
+          // Declare value being selected is a number
+          onSelect={(value) => setIsToday(value as number)}
+          labelText="Today:"
+          containerStyle={styles.dropdownButton}
+          options={isTodayOptions}
+          usePlaceholder={false}
+          editable={!loading}
+        />
       </View>
 
-      {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
-
+      {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: "center" }} />}
+      
       {/* Schedule Spreadsheet */}
-      {scheduleData && (
-        <View style={{ flex: 1 }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={true} keyboardShouldPersistTaps="handled">
-            <View>
-              {/* Header */}
-              {renderHeader()}
-
-              {/* Employee Rows */}
-              <ScrollView style={{ maxHeight: height * 0.7 }} keyboardShouldPersistTaps="handled">
-                {scheduleData.employees.length > 0 ? (
-                  scheduleData.employees.map(renderEmployeeRow)
-                ) : (
-                  <View style={styles.emptyState}>
-                    <Text style={styles.emptyText}>No schedule data found</Text>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </ScrollView>
-        </View>
-      )}
-
-      {/* Fallback for no data */}
-      {!loading && scheduleData && scheduleData.employees.length === 0 && (
-        <Text style={[GlobalStyles.text, { marginTop: 20, textAlign: "center" }]}>
-          No shifts scheduled for this week
-        </Text>
-      )}
-
+      <View style={{ flex: 1 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator keyboardShouldPersistTaps="handled">
+          <View>
+            {renderHeader()}
+            <ScrollView style={{ maxHeight: height * 0.7 }} keyboardShouldPersistTaps="handled">
+              {scheduleData.length > 0 ? scheduleData.map(renderEmployeeRow) : (
+                <View style={styles.emptyState}>
+                  <Text style={styles.emptyText}>No schedule data found</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </ScrollView>
+      </View>
+      
+      {/* Shuft Modal - Add, Update, Delete */}
       <ShiftModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        employee={selectedEmployee}
-        date={selectedDate}
-        shift={selectedShift}
+        shiftData={selectedShift}
+        employeeData={selectedEmployee}
+        date={selectedDate}                // <-- pass it in
+        onUpdate={() => setLocalRefresh((prev) => prev + 1)}
       />
 
     </Card>
+
   );
+
 };
+
 const styles = StyleSheet.create({
   // Navigation
   navigationHeader: {
@@ -366,6 +296,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  navButtonDisabled: {
+    backgroundColor: Colors.gray,
+    opacity: 0.2,
   },
   navButtonText: {
     color: 'black',

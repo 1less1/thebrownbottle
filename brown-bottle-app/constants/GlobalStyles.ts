@@ -4,12 +4,12 @@ import { Colors } from '@/constants/Colors';
 export const GlobalStyles = StyleSheet.create({
     // Text Styles
     pageHeader: {
-        textAlign: 'left', 
-        fontSize: 36, 
-        color: 'black', 
-        fontWeight: 'bold', 
-        marginLeft: 30, 
-        marginBottom:10
+        textAlign: 'left',
+        fontSize: 36,
+        color: 'black',
+        fontWeight: 'bold',
+        marginLeft: 30,
+        marginBottom: 10
     },
     headerText: {
         color: 'black',
@@ -19,11 +19,11 @@ export const GlobalStyles = StyleSheet.create({
     },
     floatingHeaderText: {
         color: 'black',
-        textAlign: 'left', 
-        fontSize: 18, 
+        textAlign: 'left',
+        fontSize: 18,
         fontStyle: 'normal',
         fontWeight: "bold",
-        marginBottom: 8 
+        marginBottom: 8
     },
     smallText: {
         color: 'black',
@@ -46,7 +46,7 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 16,
         marginRight: 5,
         fontStyle: 'normal',
-        alignSelf: 'center',
+        alignSelf: 'flex-start',
     },
     boldMediumText: {
         color: 'black',
@@ -78,6 +78,11 @@ export const GlobalStyles = StyleSheet.create({
     altText: {
         color: 'gray',
         fontSize: 14,
+        fontStyle: 'normal',
+    },
+    mediumAltText: {
+        color: 'gray',
+        fontSize: 16,
         fontStyle: 'normal',
     },
     boldAltText: {
@@ -112,11 +117,22 @@ export const GlobalStyles = StyleSheet.create({
         borderColor: Colors.borderColor,
         borderRadius: 5,
         padding: 10,
-        fontSize: 16,
+        fontSize: 14,
         backgroundColor: Colors.inputBG,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
     },
     submitButton: {
         backgroundColor: Colors.buttonBG,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
+    deleteButton: {
+        backgroundColor: Colors.deleteRed,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,

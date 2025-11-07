@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
+
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 import RoleDropdown from '@/components/modular/RoleDropdown';
@@ -160,8 +164,15 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
   return (
 
     <ModularModal visible={visible} onClose={onClose}>
-      {/* Title */}
-      <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
+
+      {/* Header */}
+      <View style={GlobalStyles.headerContainer}>
+        <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
+        <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
+          <Ionicons name="close" size={28} color={Colors.black} />
+        </TouchableOpacity>
+      </View>
+
 
       {/* Employee Form */}
       {originalEmpData ? (
@@ -187,6 +198,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
             style={GlobalStyles.input}
             value={email}
             onChangeText={setEmail}
+            placeholder="email@domain.com"
+            placeholderTextColor={Colors.gray}
             keyboardType="email-address"
             autoCapitalize="none"
             editable={edit}
@@ -197,6 +210,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
             style={GlobalStyles.input}
             value={phoneNumber}
             onChangeText={(text) => setPhoneNumber(formatPhone(text))}
+            placeholder="XXX-XXX-XXXX"
+            placeholderTextColor={Colors.gray}
             keyboardType="phone-pad"
             editable={edit}
           />
@@ -206,6 +221,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
             style={GlobalStyles.input}
             value={wage}
             onChangeText={((text) => setWage(formatWage(text)))}
+            placeholder="00.00"
+            placeholderTextColor={Colors.gray}
             keyboardType="decimal-pad"
             editable={edit}
           />

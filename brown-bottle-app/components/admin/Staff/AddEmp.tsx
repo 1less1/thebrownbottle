@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+
 import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '@/constants/Colors';
@@ -89,7 +90,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
             }
 
             if (primaryRole == null) {
-                alert("Please assign a primary role!");
+                alert("Please assign a primary role.");
                 setLoading(false);
                 return;
             }
@@ -133,8 +134,14 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
             {/* Add Emp Modal */}
             <ModularModal visible={modalVisible} onClose={toggleModal}>
-                {/* Title */}
-                <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
+
+                {/* Header */}
+                <View style={GlobalStyles.headerContainer}>
+                    <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
+                    <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
+                        <Ionicons name="close" size={28} color={Colors.black} />
+                    </TouchableOpacity>
+                </View>
 
                 {/* Employee Form */}
                 <View style={styles.formContainer}>
@@ -157,6 +164,8 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         style={GlobalStyles.input}
                         value={email}
                         onChangeText={setEmail}
+                        placeholder="email@domain.com"
+                        placeholderTextColor={Colors.gray}
                         keyboardType="email-address"
                         autoCapitalize="none"
                     />
@@ -166,6 +175,8 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         style={GlobalStyles.input}
                         value={phoneNumber}
                         onChangeText={(text) => setPhoneNumber(formatPhone(text))}
+                        placeholder="XXX-XXX-XXXX"
+                        placeholderTextColor={Colors.gray}
                         keyboardType="phone-pad"
                     />
 
@@ -174,6 +185,8 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         style={GlobalStyles.input}
                         value={wage}
                         onChangeText={((text) => setWage(formatWage(text)))}
+                        placeholder="00.00"
+                        placeholderTextColor={Colors.gray}
                         keyboardType="decimal-pad"
                     />
 

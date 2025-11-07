@@ -8,191 +8,227 @@ import {
   TextInput,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Toast from "react-native-toast-message";
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 import SectionDropdown from "@/components/modular/SectionDropdown";
-import { Colors } from '@/constants/Colors';
-import { ScheduleEmployee, ShiftDisplay } from '@/types/api';
+
+
+import { insertShift, updateShift, deleteShift } from '@/utils/api/shift';
+import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/api';
+import { formatSQLTime, formatTime } from '@/utils/Helper';
+
 
 interface ShiftModalProps {
   visible: boolean;
   onClose: () => void;
-  employee: ScheduleEmployee | null;
-  date: Date | null;
-  shift: ShiftDisplay | any | null;
+  shiftData: ScheduleShift | null;
+  employeeData: ScheduleEmployee | null;
+  date: string;
+  onUpdate?: () => void;
 }
 
 
-const ShiftModal: React.FC<ShiftModalProps> = ({
-  visible,
-  onClose,
-  employee,
-  date,
-  shift,
-}) => {
-  const [startInput, setStartInput] = useState('');
-  const [endInput, setEndInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
+const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, employeeData, date, onUpdate }) => {
+
   const [loading, setLoading] = useState(false);
-  const [selectedSectionId, setSelectedSectionId] = useState<number>(shift?.section_id ?? -1);
+
+  const [employeeId, setEmployeeId] = useState<number | null>(null);
+  const [shiftId, setShiftId] = useState<number | null>(null);
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+  const [sectionId, setSectionId] = useState<number | null>(null);
 
 
   // Initialize values when modal opens
   useEffect(() => {
-    if (!visible || !date || employee == null) return;
-    if (!date) return;
+    if (visible) {
+      setEmployeeId(employeeData?.employee_id ?? null)
+      setShiftId(shiftData?.shift_id ?? null)
+      setStartTime(shiftData?.start_time ?? "");
+      setEndTime(shiftData?.end_time ?? "");
+      setSectionId(shiftData?.section_id ?? null);
+    }
+  }, [visible, shiftData, employeeData]);
 
-    if (shift) {
-      setStartInput(shift.start_time ?? '');
-      setEndInput(shift.end_time ?? '');
-      setSelectedSectionId(shift.section_id ?? -1);
-    } else {
-      setStartInput('');
-      setEndInput('');
-      setSelectedSectionId(-1);
+
+  const buildFormData = (): Partial<Shift> => ({
+    employee_id: employeeData?.employee_id,
+    section_id: sectionId ?? shiftData?.section_id,
+    date: date,   // YYYY-MM-DD
+    start_time: formatSQLTime(startTime), // HH:MM
+    end_time: formatSQLTime(endTime),  // HH:MM
+  });
+
+
+  const handleDelete = async () => {
+
+    if (!shiftData) {
+      return;
     }
 
+    setLoading(true);
 
-    setError(null);
-  }, [visible, shift, date]);
+    try {
+      await deleteShift(shiftData.shift_id);
+      alert("Shift successfully deleted!");
+      onUpdate?.();
+      onClose();
+    } catch (error: any) {
+      alert("Unable to delete shift: " + error.message);
+    } finally {
+      setLoading(false);
+    }
 
+  };
 
-  const handleDelete = () => {
-    return;
-  }
+  const handleSave = async () => {
+    setLoading(true);
 
-  const handleSave = () => {
-    return;
-  }
+    const formData = buildFormData();
 
-  if (!employee || !date) return null;
+    try {
 
+      // Validate Required Fields
+      if (!startTime.trim()) {
+        alert("Please assign a start time.");
+        setLoading(false);
+        return;
+      }
+
+      if (!endTime.trim()) {
+        alert("Please assign a end time.");
+        setLoading(false);
+        return;
+      }
+
+      if (sectionId == null) {
+        alert("Please assign a section.")
+        setLoading(false)
+        return;
+      }
+
+      if (shiftData) {
+        if (shiftId !== null) {
+          await updateShift(shiftId, formData);
+        }
+        alert("Shift successfully updated!");
+      } else {
+        await insertShift(formData);
+        alert("Shift successfully added!");
+      }
+      onUpdate?.();
+      onClose();
+    } catch (error: any) {
+      alert("Unable to save shift: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+
+  };
 
 
   return (
+
     <ModularModal visible={visible} onClose={onClose}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>{shift ? 'Edit Shift' : 'Add Shift'}</Text>
-            <Text style={styles.subtitle}>{employee.employee_name}</Text>
-            <Text style={styles.date}>{date.toLocaleDateString()}</Text>
-          </View>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={Colors.black} />
-          </TouchableOpacity>
+
+      {/* Header */}
+      <View style={GlobalStyles.headerContainer}>
+        <View>
+          <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
+          <Text style={GlobalStyles.mediumText}>{employeeData?.full_name ?? ""}</Text>
+          <Text style={GlobalStyles.mediumAltText}>{(date)}</Text>
         </View>
+        <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
+          <Ionicons name="close" size={28} color={Colors.black} />
+        </TouchableOpacity>
+      </View>
 
-        {/* Input fields */}
-        <View style={styles.inputs}>
-          <Text style={styles.label}>Start Time (24-hour)</Text>
+      {loading ? (
+        <Text style={GlobalStyles.loadingText}>Loading shift data...</Text>
+      ) : (
+        <View style={styles.formContainer}>
+
+          {/* Input fields */}
+          <Text style={GlobalStyles.inputLabelText}>Start Time</Text>
           <TextInput
-            value={startInput}
-            onChangeText={setStartInput}
-            placeholder="09:00:00"
+            style={GlobalStyles.input}
+            value={startTime}
+            onChangeText={(text) => setStartTime(text)} // raw input
+            onBlur={() => setStartTime(formatTime(startTime))} // format on blur
+            placeholder="HH:MM AM/PM"
             placeholderTextColor={Colors.gray}
-            style={styles.textInput}
+            editable={!loading}
           />
 
-          <Text style={styles.label}>End Time (24-hour)</Text>
+          <Text style={GlobalStyles.inputLabelText}>End Time</Text>
           <TextInput
-            value={endInput}
-            onChangeText={setEndInput}
-            placeholder="17:00:00"
+            style={GlobalStyles.input}
+            value={endTime}
+            onChangeText={(text) => setEndTime(text)} // raw input
+            onBlur={() => setEndTime(formatTime(endTime))} // format on blur
+            placeholder="HH:MM AM/PM"
             placeholderTextColor={Colors.gray}
-            style={styles.textInput}
+            editable={!loading}
           />
 
-          <Text style={styles.label}>Section</Text>
+          <Text style={GlobalStyles.inputLabelText}>Section</Text>
           <SectionDropdown
-            selectedSectionId={selectedSectionId}
-            onSectionSelect={(value) => setSelectedSectionId(value as number)}
+            selectedSectionId={sectionId}
+            onSectionSelect={(value) => setSectionId(value as number)}
             labelText=""
             containerStyle={{ marginBottom: 10 }}
           />
 
-
-          {error ? <Text style={styles.inputError}>{error}</Text> : null}
-        </View>
-
-        {/* Buttons */}
-        <View style={styles.actions}>
-          <ModularButton
-            text={loading ? 'Saving...' : shift ? 'Save Changes' : 'Add Shift'}
-            onPress={handleSave}
-          />
-          {shift && (
+          {/* Buttons */}
+          <View style={styles.buttonRowContainer}>
             <ModularButton
-              text="Delete Shift"
-              onPress={handleDelete}
-              style={{ backgroundColor: '#e15f45ff' }}
+              textStyle={{ color: 'white' }}
+              style={GlobalStyles.submitButton}
+              text={shiftData ? 'Save Changes' : 'Add Shift'}
+              onPress={handleSave}
             />
-          )}
-          <ModularButton text="Cancel" onPress={onClose} style={styles.cancelButton} />
+
+            {shiftData && (
+              <ModularButton
+                text="Delete Shift"
+                onPress={handleDelete}
+                style={GlobalStyles.deleteButton}
+              />
+            )}
+          </View>
+
         </View>
-      </View>
+      )}
+
     </ModularModal>
+
   );
+
 };
 
+
 const styles = StyleSheet.create({
-  container: { gap: 16 },
+  formContainer: {
+    gap: 12,
+    marginTop: 10,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.black,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.black,
-    marginTop: 2,
-  },
-  date: {
-    fontSize: 13,
-    color: Colors.gray,
-    marginTop: 2,
-  },
-  closeButton: {
-    padding: 4,
-  },
-  inputs: {
-    gap: 12,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.gray,
-    marginBottom: 6,
-  },
-  textInput: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: Colors.gray,
-    borderRadius: 8,
-    backgroundColor: Colors.white,
-  },
-  inputError: {
-    color: '#D9534F',
-    marginTop: 6,
-    fontSize: 13,
-  },
-  actions: {
-    gap: 12,
-  },
-  cancelButton: {
-    backgroundColor: Colors.borderColor,
-    marginTop: 8,
+  buttonRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 20,
   },
 });
+
 
 export default ShiftModal;
