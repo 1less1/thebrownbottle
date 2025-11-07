@@ -11,7 +11,7 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getSection } from "@/utils/api/section";
 
-import { Section } from '@/types/api';
+import { Section } from '@/types/iApi';
 
 
 interface DropdownOption {

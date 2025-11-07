@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { 
-  View, Text, TouchableOpacity, StyleSheet, Modal, 
-  FlatList, TouchableWithoutFeedback, StyleProp, 
-  ViewStyle, TextStyle
+import {
+    View, Text, TouchableOpacity, StyleSheet, Modal,
+    FlatList, TouchableWithoutFeedback, StyleProp,
+    ViewStyle, TextStyle
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -11,7 +11,7 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getRole } from "@/utils/api/role";
 
-import { Role } from '@/types/api';
+import { Role } from '@/types/iApi';
 
 
 interface DropdownOption {
@@ -105,7 +105,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
             >
                 <TouchableWithoutFeedback onPress={() => setVisible(false)}>
                     <View style={styles.overlay}>
-                        
+
                         {/* "Dropdown" Modal Content */}
                         <TouchableWithoutFeedback>
                             <View style={styles.dropdown}>
@@ -118,7 +118,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
                                 ) : (
                                     // Dropdown List
                                     <FlatList
-                                        style={{flexGrow: 0}}
+                                        style={{ flexGrow: 0 }}
                                         // Add placeholder as first item listed with an id=null
                                         data={[{ role_id: null, role_name: placeholder }, ...data]}
                                         keyExtractor={(item) => (item.role_id !== null ? item.role_id.toString() : 'null')}

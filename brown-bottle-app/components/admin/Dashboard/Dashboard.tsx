@@ -3,24 +3,33 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { User } from '@/utils/SessionContext';
 
-import DefaultView from '@/components/DefaultView'
+import { useState } from 'react';
+
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/modular/Card';
-import AltCard from '@/components/modular/AltCard';
 
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
-
+import TimeOffView from '@/components/calendar/timeOff/AdminTimeOff';
 
 interface DashboardProps {
   user: User;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+  
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setRefreshing(false), 800);
+  };
   
   return (
 
-    <DefaultScrollView >
+    <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
       
       <View style={{ marginTop: 10, width: '85%'}}>
 
@@ -36,7 +45,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </View>
       </View>
 
-      <View style={{ marginTop: 10, width: '85%' }}>
+      <View style={{ width: '85%' }}>
+
+        <Card style={[styles.card, { padding: 10, marginBottom: 20, width: '100%' }]}>
+          <TimeOffView  />
+        </Card>
 
         <Text style={GlobalStyles.floatingHeaderText}>
           Announcement Feed - Will be able to edit and delete announcments here

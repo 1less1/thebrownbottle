@@ -1,5 +1,6 @@
 import Constants from "expo-constants";
 import { buildQueryString } from "@/utils/helper";
+import { to12HourFormat } from "@/utils/dateTimeHelpers";
 
 export async function getUserShifts(employee_id: number) {
   // Retrieve Environment Variables
@@ -56,7 +57,6 @@ export async function createShift(
 
     const data = await response.json();
 
-    
     return data;
   } catch (error) {
     console.error("Failed to create shift:", error);
@@ -162,8 +162,8 @@ export async function getScheduleData(params?: ScheduleParams) {
 
 // Process raw API data into spreadsheet format
 export function processScheduleForSpreadsheet(
-  data: any[],  // Can be shifts OR employee records with nullable shifts
-  startDate: Date, 
+  data: any[], // Can be shifts OR employee records with nullable shifts
+  startDate: Date,
   days: number = 7
 ) {
   const dates: string[] = [];
@@ -176,7 +176,9 @@ export function processScheduleForSpreadsheet(
     currentDate.setDate(startDate.getDate() + i);
 
     const dateStr = `${currentDate.getMonth() + 1}/${currentDate.getDate()}`;
-    const dayStr = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayStr = currentDate.toLocaleDateString("en-US", {
+      weekday: "short",
+    });
 
     dates.push(dateStr);
     dayNames.push(dayStr);
@@ -192,7 +194,7 @@ export function processScheduleForSpreadsheet(
         employee_id: employeeId,
         employee_name: record.employee_name,
         primary_role_name: record.primary_role_name,
-        shifts: new Array(days).fill(null)
+        shifts: new Array(days).fill(null),
       };
     }
 
@@ -200,11 +202,11 @@ export function processScheduleForSpreadsheet(
     if (record.shift_id && record.date) {
       // Parse as *local* date, not UTC, to avoid day-offset bug
       let shiftDate: Date;
-      if (record.date.includes('T')) {
+      if (record.date.includes("T")) {
         // Handles backend sending full ISO datetimes like "2025-10-29T00:00:00Z"
         shiftDate = new Date(record.date);
       } else {
-        const [year, month, day] = record.date.split('-').map(Number);
+        const [year, month, day] = record.date.split("-").map(Number);
         shiftDate = new Date(year, month - 1, day);
       }
 
@@ -217,9 +219,11 @@ export function processScheduleForSpreadsheet(
       if (dayIndex >= 0 && dayIndex < days) {
         employeeMap[employeeId].shifts[dayIndex] = {
           shift_id: record.shift_id,
-          time: `${record.start_time}-${record.end_time}`,
+          time: `${to12HourFormat(record.start_time)} - ${to12HourFormat(
+            record.end_time
+          )}`,
           section: record.section_name,
-          section_id: record.section_id
+          section_id: record.section_id,
         };
       }
     }
@@ -231,6 +235,6 @@ export function processScheduleForSpreadsheet(
   return {
     dates,
     dayNames,
-    employees
+    employees,
   };
 }

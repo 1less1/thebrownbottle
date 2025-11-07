@@ -16,6 +16,8 @@ import { User } from '@/utils/SessionContext';
 import { insertRecurringTask, insertTask } from '@/utils/api/task';
 import { isValidDate } from '@/utils/helper';
 
+import { formatDateWithYear } from '@/utils/dateTimeHelpers';
+
 
 interface TasksModalProps {
   visible: boolean;
@@ -29,7 +31,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   const [selectedSectionName, setSelectedSectionName] = useState<string>("");
 
   const handleSectionSelect = (sectionId: number, sectionName: string) => {
-      setSelectedSectionId(sectionId);
+    setSelectedSectionId(sectionId);
   };
 
   const [title, setTitle] = useState('');
@@ -37,7 +39,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
   const [due_date, setDueDate] = useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
   const [isRecurring, setIsRecurring] = useState(false);
-  const [start_date, setStartDate] =  useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
+  const [start_date, setStartDate] = useState(dayjs().format('YYYY-MM-DD')); // Default to today's date
 
   // end_date allowed to be NULL!
   const [end_date, setEndDate] = useState<string | null>(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Default to tomorrow's date
@@ -168,9 +170,9 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
     onClose();
   };
 
-  
-  
-  
+
+
+
   // User Interface Code ---------------------------------------------------------------------------------------
   return (
 
@@ -178,10 +180,10 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
 
       <Text style={GlobalStyles.modalTitle}>New Task</Text>
-      
+
       {/* Title Input */}
-      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, { marginBottom: 15 }]}  />
-      
+      <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, { marginBottom: 15 }]} />
+
       {/* Description Input */}
       <TextInput
         placeholder="Description"
@@ -191,22 +193,22 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         numberOfLines={4}
         style={[GlobalStyles.input, { marginBottom: 15, height: 100, textAlignVertical: 'top' }]}
       />
-      
+
       {/* Due Date Input */}
       {!isRecurring && (
         <>
-          <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
-            <ModularButton 
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
+            <ModularButton
               text='Choose Due Date'
               textStyle={{ color: 'black' }}
               style={[
                 { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
-              ]} 
+              ]}
               onPress={() => setDPVisibleOne(true)}
             />
-            <View style={styles.dateContainer}>     
+            <View style={styles.dateContainer}>
               <Text style={GlobalStyles.text}>Date: </Text>
-              <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{due_date}</Text>
+              <Text style={[GlobalStyles.text, { color: Colors.blue }]}>{formatDateWithYear(due_date)}</Text>
             </View>
           </View>
 
@@ -226,7 +228,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       <View style={{ marginBottom: 15 }}>
         <SectionDropdown selectedSectionId={selectedSectionId} onSectionSelect={handleSectionSelect} labelText="Assign To:" />
       </View>
-      
+
       {/* Recurring Checkbox */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15, }}>
         <Pressable onPress={() => setIsRecurring(!isRecurring)} style={{ marginRight: 5 }}>
@@ -242,7 +244,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
       {/* Recurring Task Components */}
       {isRecurring && (
-        
+
         <>
           {/* Day Checkboxes */}
           <View style={{ marginBottom: 15 }}>
@@ -255,18 +257,18 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
           <>
             {/* Start Date Input */}
-            <View style= {{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
-              <ModularButton 
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
+              <ModularButton
                 text='Choose Start Date'
                 textStyle={{ color: 'black' }}
                 style={[
                   { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
-                ]} 
+                ]}
                 onPress={() => setDPVisibleTwo(true)}
               />
-              <View style={styles.dateContainer}>     
+              <View style={styles.dateContainer}>
                 <Text style={GlobalStyles.text}>Date: </Text>
-                <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{start_date}</Text>
+                <Text style={[GlobalStyles.text, { color: Colors.blue }]}>{formatDateWithYear(start_date)}</Text>
               </View>
             </View>
 
@@ -280,24 +282,24 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               }}
             />
           </>
-          
-        
 
-          {!noEndDate && (        
+
+
+          {!noEndDate && (
             <>
-              {/* End Date Input */}  
-              <View style= {{ flexDirection: 'row', alignItems: 'center',  gap: 5, marginBottom: 15, }}>
-                <ModularButton 
+              {/* End Date Input */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
+                <ModularButton
                   text='Choose End Date'
                   textStyle={{ color: 'black' }}
                   style={[
-                    { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, } 
-                  ]} 
+                    { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
+                  ]}
                   onPress={() => setDPVisibleThree(true)}
                 />
-                <View style={styles.dateContainer}>     
+                <View style={styles.dateContainer}>
                   <Text style={GlobalStyles.text}>Date: </Text>
-                  <Text style={[GlobalStyles.text, {color: Colors.blue }]}>{end_date}</Text>
+                  <Text style={[GlobalStyles.text, { color: Colors.blue }]}> {end_date ? formatDateWithYear(end_date) : null}</Text>
                 </View>
               </View>
 
@@ -335,7 +337,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                 name={noEndDate ? 'checkbox' : 'square-outline'}
                 size={24}
                 color={noEndDate ? Colors.selectedBox : Colors.unselectedBox}
-            />
+              />
             </Pressable>
             <Text style={GlobalStyles.mediumText}>No End Date</Text>
           </View>
@@ -344,20 +346,20 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
 
 
       {/* Assign and Cancel Buttons */}
-      <View style={styles.buttonRowContainer }>
-          <ModularButton
-            text="Assign"
-            textStyle={{ color: 'white'}}
-            style={GlobalStyles.submitButton}
-            onPress={handleAssign}
-          />
+      <View style={styles.buttonRowContainer}>
+        <ModularButton
+          text="Assign"
+          textStyle={{ color: 'white' }}
+          style={GlobalStyles.submitButton}
+          onPress={handleAssign}
+        />
 
-          <ModularButton
-            text="Cancel"
-            textStyle={{ color: 'gray'}}
-            style={GlobalStyles.cancelButton}
-            onPress={handleClose}
-          />
+        <ModularButton
+          text="Cancel"
+          textStyle={{ color: 'gray' }}
+          style={GlobalStyles.cancelButton}
+          onPress={handleClose}
+        />
       </View>
 
 
@@ -377,8 +379,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     borderRadius: 5,
-    backgroundColor: 'white', 
-    borderColor: Colors.borderColor, 
+    backgroundColor: 'white',
+    borderColor: Colors.borderColor,
     borderWidth: 1,
     paddingVertical: 10,
     paddingHorizontal: 15,

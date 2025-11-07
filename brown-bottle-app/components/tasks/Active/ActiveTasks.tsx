@@ -16,11 +16,11 @@ import TaskList from '@/components/tasks/TaskList';
 import { getTasks, updateTask } from '@/utils/api/task';
 import { getAllSections } from '@/utils/api/section';
 import { User } from '@/utils/SessionContext';
-import { Task, Section } from '@/types/api';
+import { Task, Section } from '@/types/iApi';
 
 interface ActiveTasksProps {
-  user: User
-  sections: Section[]
+    user: User
+    sections: Section[]
 }
 
 const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
@@ -49,7 +49,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
         setSelectedSectionId(sectionId);
         setSelectedSectionName(sectionName);
     };
-    
+
     // ------------------------------------------------------------------------------
 
 
@@ -57,15 +57,15 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
 
     const [checkedTasks, setCheckedTasks] = useState<number[]>([]);
     const handleCheckChange = (taskId: number, isChecked: boolean) => {
-    setCheckedTasks(prev => {
-        if (isChecked) return [...prev, taskId];
-        return prev.filter(id => id !== taskId);
-    });
+        setCheckedTasks(prev => {
+            if (isChecked) return [...prev, taskId];
+            return prev.filter(id => id !== taskId);
+        });
     };
 
     // Log when checkedTasks changes - **DEBUGGING**
     useEffect(() => {
-    console.log('Checked task IDs:', checkedTasks);
+        console.log('Checked task IDs:', checkedTasks);
     }, [checkedTasks]);
 
     // ------------------------------------------------------------------------------
@@ -80,9 +80,9 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
         setError(false);
         try {
             const data = await getTasks({
-            section_id: selectedSectionId,
-            complete: 0,
-            today: true,
+                section_id: selectedSectionId,
+                complete: 0,
+                today: true,
             });
             setTaskData(data);
             setCheckedTasks([]);
@@ -92,7 +92,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchIncompleteTasks();
     }, [selectedSectionId]);
@@ -112,7 +112,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
         try {
             // Update all checked tasks to complete = 1
             await Promise.all(
-            checkedTasks.map(taskId => updateTask(taskId, { complete: 1, last_modified_by: Number(user.employee_id) }))
+                checkedTasks.map(taskId => updateTask(taskId, { complete: 1, last_modified_by: Number(user.employee_id) }))
             );
 
             alert("Task(s) Submitted Successfully!");
@@ -133,14 +133,14 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
 
     return (
 
-        <View style={{flex: 1, width: '100%'}}>
+        <View style={{ flex: 1, width: '100%' }}>
 
             <Text style={GlobalStyles.floatingHeaderText}>
                 {selectedSectionName ? selectedSectionName : "Loading..."}
             </Text>
 
             <Card style={styles.container}>
-            
+
                 <View style={styles.scrollContainer}>
 
                     <ModularButton
@@ -154,7 +154,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
                             selectedSectionId={selectedSectionId}
                             onSectionSelect={handleSectionSelect}
                             sections={sections} // Pass sections data from Parent
-                            fetchSections={false}  
+                            fetchSections={false}
                             labelText="Section:"
                         />
                         <ModularButton
@@ -184,29 +184,29 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
                         )}
                     </DefaultScrollView>
 
-                    <View style={styles.buttonRowContainer }>
+                    <View style={styles.buttonRowContainer}>
                         <ModularButton
                             text="Submit"
-                            textStyle={{ color: 'white'}}
+                            textStyle={{ color: 'white' }}
                             style={GlobalStyles.submitButton}
                             onPress={() => setSubmitModalVisible(true)}
                         />
                     </View>
 
                     <ModularModal visible={submitModalVisible} onClose={() => setSubmitModalVisible(false)}>
-                        
+
                         <Text style={GlobalStyles.text}>Are you sure you want to submit the selected task(s) as complete?</Text>
-                        <View style={styles.buttonRowContainer }>
+                        <View style={styles.buttonRowContainer}>
                             <ModularButton
                                 text="Yes"
-                                textStyle={{ color: 'white'}}
+                                textStyle={{ color: 'white' }}
                                 style={GlobalStyles.submitButton}
                                 onPress={handleSubmit}
                             />
 
                             <ModularButton
                                 text="Cancel"
-                                textStyle={{ color: 'gray'}}
+                                textStyle={{ color: 'gray' }}
                                 style={GlobalStyles.cancelButton}
                                 onPress={() => setSubmitModalVisible(false)}
                             />
@@ -214,7 +214,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, sections }) => {
                     </ModularModal>
 
                 </View>
-            
+
             </Card>
 
         </View>
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
     },
-    buttonRowContainer : {
+    buttonRowContainer: {
         marginTop: 10,
         marginBottom: 5,
         flexDirection: 'row',

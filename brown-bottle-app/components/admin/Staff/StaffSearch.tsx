@@ -16,7 +16,7 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import EditEmp from "@/components/admin/Staff/EditEmp";
 
-import { Employee } from "@/types/api";
+import { Employee } from "@/types/iApi";
 import { getEmployee } from "@/utils/api/employee";
 
 
@@ -57,9 +57,9 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
 
     const buildParams = (
-        searchTerm: string, 
-        isActive: number | null, 
-        roleId: number | null, 
+        searchTerm: string,
+        isActive: number | null,
+        roleId: number | null,
         admin: number | null
     ) => {
         const wildcardTerm = `%${searchTerm.trim()}%`;
@@ -83,9 +83,9 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
 
     const fetchEmployees = async (
-        searchTerm: string, 
-        isActive: number | null, 
-        roleId: number | null, 
+        searchTerm: string,
+        isActive: number | null,
+        roleId: number | null,
         admin: number | null
     ) => {
         setLoading(true);

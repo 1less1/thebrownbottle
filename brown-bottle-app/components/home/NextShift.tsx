@@ -7,7 +7,7 @@ import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
 
 import { getUserShifts } from '@/utils/api/shift';
-import { Shift }  from '@/types/api'
+import { Shift } from '@/types/iApi'
 
 interface Props {
   employee_id: number;
@@ -16,7 +16,7 @@ interface Props {
 const NextShift: React.FC<Props> = ({ employee_id }) => {
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false); 
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchShifts = async () => {
@@ -55,7 +55,7 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
     .filter((shift) => shift.shiftDateTime && shift.shiftDateTime > now)
     .sort((a, b) => a.shiftDateTime!.getTime() - b.shiftDateTime!.getTime())[0];
 
-  
+
   if (loading) {
     return (
       <Card style={styles.container}>
@@ -85,7 +85,7 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
     <Card style={styles.container}>
       <AltCard style={styles.shiftCard}>
         <Text style={GlobalStyles.headerText}>Date: {nextShift.date}</Text>
-        <Text style={[GlobalStyles.text, { marginVertical: 5}]}>
+        <Text style={[GlobalStyles.text, { marginVertical: 5 }]}>
           Time: {nextShift.start_time} - {nextShift.end_time}
         </Text>
         <Text style={GlobalStyles.altText}>Section: {nextShift.section_name}</Text>

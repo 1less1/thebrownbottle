@@ -14,7 +14,7 @@ import RoleDropdown from '@/components/modular/RoleDropdown';
 import ModularDropdown from '@/components/modular/ModularDropdown';
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
-import { Employee } from "@/types/api";
+import { Employee } from "@/types/iApi";
 import { getEmployee } from "@/utils/api/employee";
 import { removeEmployees } from '@/utils/api/employee';
 

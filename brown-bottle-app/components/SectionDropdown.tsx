@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getSection } from "@/utils/api/section";
 
-import { Section } from '@/types/api'
+import { Section } from '@/types/iApi'
 
 interface SectionDropdownProps {
   selectedSectionId: number;
@@ -108,7 +108,7 @@ const SectionDropdown: React.FC<SectionDropdownProps> = ({
         }}
         style={[styles.picker, pickerStyle]}
       >
-        <Picker.Item label="Select a section..." value={-1} color="black"/>
+        <Picker.Item label="Select a section..." value={-1} color="black" />
         {sections.map((section) => (
           <Picker.Item
             key={section.section_id}

@@ -11,10 +11,10 @@ import SectionDropdown from "@/components/modular/SectionDropdown"
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
-import { ScheduleData, ScheduleEmployee, ShiftDisplay } from "@/types/api";
+import { ScheduleData, ScheduleEmployee, ShiftDisplay } from "@/types/iApi";
 import { getScheduleData, processScheduleForSpreadsheet } from "@/utils/api/shift";
 
-import { Section } from "@/types/api";
+import { Section } from "@/types/iApi";
 import { getSection } from "@/utils/api/section";
 
 import Toast from "react-native-toast-message";
@@ -181,7 +181,7 @@ const SpreadSheet: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
     : Math.max(135, screenWidth * 0.12);
 
   const DAY_COL_WIDTH = isMobile
-    ? 120
+    ? 135
     : scheduleData
       ? Math.max(120, (screenWidth * 0.70) / scheduleData.dates.length)
       : 120;
@@ -318,29 +318,29 @@ const SpreadSheet: React.FC<StaffSearchProps> = ({ refreshTrigger, onRefreshDone
     }
   };
 
-const handleDeleteShift = async (shiftId: number) => {
-  try {
-    await deleteShift(shiftId);
+  const handleDeleteShift = async (shiftId: number) => {
+    try {
+      await deleteShift(shiftId);
 
-    // Refresh schedule data after deletion
-    await fetchScheduleData(query);
+      // Refresh schedule data after deletion
+      await fetchScheduleData(query);
 
-    Toast.show({
-      type: "success",
-      text1: "Shift deleted",
-      position: "bottom",
-    });
+      Toast.show({
+        type: "success",
+        text1: "Shift deleted",
+        position: "bottom",
+      });
 
-    setModalVisible(false);
-  } catch (error) {
-    console.error("Error deleting shift:", error);
-    Toast.show({
-      type: "error",
-      text1: "Failed to delete shift",
-      position: "bottom",
-    });
-  }
-};
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error deleting shift:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to delete shift",
+        position: "bottom",
+      });
+    }
+  };
 
 
 

@@ -9,7 +9,7 @@ import AltCard from '@/components/modular/AltCard';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
-import { Task } from '@/types/api';
+import { Task } from '@/types/iApi';
 import { formatDATE } from '@/utils/helper';
 
 interface CheckBoxCardProps {
@@ -21,7 +21,7 @@ interface CheckBoxCardProps {
 const LONG_PRESS_DURATION = 500; // ms, match delayLongPress
 
 const CheckBoxCard: React.FC<CheckBoxCardProps> = ({ task, checked, onCheckChange }) => {
-  
+
   const [modalVisible, setModalVisible] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const fillAnim = useRef(new Animated.Value(0)).current;
@@ -85,7 +85,7 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({ task, checked, onCheckChang
               {task.title}
             </Text>
           </View>
-          
+
           <Ionicons
             name={checked ? 'checkbox' : 'square-outline'}
             size={24}
@@ -108,7 +108,7 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({ task, checked, onCheckChang
             <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
               Due Date:{' '}
             </Text>
-              {formatDATE(task.due_date, 'weekday')}
+            {formatDATE(task.due_date, 'weekday')}
           </Text>
 
           <Text style={[GlobalStyles.text, { marginTop: 5 }]}>
@@ -130,9 +130,9 @@ const CheckBoxCard: React.FC<CheckBoxCardProps> = ({ task, checked, onCheckChang
         <ModularButton text="Close" onPress={closeModal} style={{ marginVertical: 5 }} />
 
       </ModularModal>
-      
+
     </>
-    
+
   );
 };
 

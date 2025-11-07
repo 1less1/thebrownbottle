@@ -1,10 +1,10 @@
 import React from 'react';
 import { Text, StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import { Task } from '@/types/api';
+import { Task } from '@/types/iApi';
 import CheckBoxCard from '@/components/tasks/CheckBoxCard';
 
 interface TaskListProps {
@@ -14,9 +14,9 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({ tasks, checkedTasks, onCheckChange }) => {
-  
+
   return (
-    
+
     <View style={{ width: '100%' }}>
       {tasks.map((task) => (
         <CheckBoxCard

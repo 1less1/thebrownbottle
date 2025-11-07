@@ -7,7 +7,7 @@ import ModularButton from '@/components/modular/ModularButton';
 import RoleDropdown from '@/components/modular/RoleDropdown';
 import ModularDropdown from '@/components/modular/ModularDropdown';
 
-import { Employee } from "@/types/api";
+import { Employee } from "@/types/iApi";
 import { updateEmployee } from '@/utils/api/employee';
 import { isValidEmail, isValidPhone, formatPhone, formatWage, buildPatchData } from '@/utils/helper';
 
