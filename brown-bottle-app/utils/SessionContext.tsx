@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-import { Employee } from '@/types/iApi';
+import { Employee } from '@/types/iEmployee';
 
 export type User = Employee;
 

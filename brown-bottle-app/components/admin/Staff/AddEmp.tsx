@@ -11,9 +11,9 @@ import ModularButton from '@/components/modular/ModularButton';
 import RoleDropdown from '@/components/modular/RoleDropdown';
 import ModularDropdown from '@/components/modular/ModularDropdown';
 
-import { Employee } from "@/types/iApi";
-import { insertEmployee } from '@/utils/api/employee';
-import { isValidEmail, isValidPhone, formatPhone, formatWage, buildPatchData } from '@/utils/Helper';
+import { Employee } from "@/types/iEmployee";
+import { insertEmployee } from '@/routes/employee';
+import { isValidEmail, isValidPhone, formatPhone, formatWage } from '@/utils/formHelpers';
 
 interface AddEmpProps {
     onInsert?: () => void;

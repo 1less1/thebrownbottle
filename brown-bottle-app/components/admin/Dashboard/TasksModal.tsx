@@ -13,8 +13,8 @@ import ModularButton from '@/components/modular/ModularButton';
 import DatePickerModal from '@/components/modular/DatePickerModal';
 
 import { User } from '@/utils/SessionContext';
-import { insertRecurringTask, insertTask } from '@/utils/api/task';
-import { isValidDate } from '@/utils/Helper';
+import { insertRecurringTask, insertTask } from '@/routes/task';
+import { isValidDate } from '@/utils/generalHelpers';
 
 import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 

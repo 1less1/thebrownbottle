@@ -92,3 +92,58 @@ export function formatDateTime(timestamp: string): string {
     minute: '2-digit',
   });
 }
+
+// Input: date object
+// Output: date string (YYYY-MM-DD)
+export const formatSQLDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() is 0-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+// Input: time string (HH:MM AM/PM)
+// Output: SQL 24 Hour time (HH:MM)
+export const formatSQLTime = (time: string): string => {
+  const [rawTime, modifier] = time.trim().split(" ");
+  let [hours, minutes] = rawTime.split(":").map(Number);
+
+  if (modifier.toUpperCase() === "PM" && hours < 12) {
+    hours += 12;
+  } else if (modifier.toUpperCase() === "AM" && hours === 12) {
+    hours = 0;
+  }
+
+  const formattedHours = String(hours).padStart(2, "0");
+  const formattedMinutes = String(minutes).padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes}`;
+};
+
+// Input: time string (e.g. "9:5", "13:45", "07:30", "1230", "7:30pm")
+// Output: formatted time string (HH:MM AM/PM)
+export const formatTime = (value: string): string => {
+  const cleaned = value.trim().toLowerCase().replace(/\s+/g, "");
+  const match = cleaned.match(/^(\d{1,2})(:?)(\d{2})?(am|pm)?$/);
+
+  if (!match) return "";
+
+  let hours = parseInt(match[1], 10);
+  let minutes = match[3] ? parseInt(match[3], 10) : 0;
+  
+  const modifier = match[4]?.toUpperCase() || (hours >= 8 && hours <= 11 ? "AM" : "PM");
+
+  if (
+    isNaN(hours) || isNaN(minutes) ||
+    hours < 0 || hours > 23 ||
+    minutes < 0 || minutes > 59
+  ) return "";
+
+  // Convert to 12-hour format
+  const displayHours = hours % 12 === 0 ? 12 : hours % 12;
+  const formattedHours = String(displayHours).padStart(2, "0");
+  const formattedMinutes = String(minutes).padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes} ${modifier}`;
+};

@@ -1,8 +1,8 @@
 import Constants from "expo-constants";
 
-import { buildQueryString } from "@/utils/Helper";
+import { buildQueryString } from "@/utils/apiHelpers";
 
-import { ScheduleEmployee, ScheduleShift, ScheduleAPI } from "@/types/api";
+import { ScheduleEmployee, ScheduleShift, ScheduleAPI } from "@/types/iShift";
 
 // GET: Fetches data from the shift table
 export async function getSchedule(params?: Partial<ScheduleAPI>) {

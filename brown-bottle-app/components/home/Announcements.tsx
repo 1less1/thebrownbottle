@@ -13,8 +13,8 @@ import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
 import LoadingCard from '@/components/modular/LoadingCard';
 
-import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
-import { Announcement } from '@/types/iApi';
+import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/routes/announcement';
+import { Announcement } from '@/types/iAnnouncement';
 
 const Announcements = () => {
 
@@ -23,9 +23,8 @@ const Announcements = () => {
   const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
   const [selectedRoleName, setSelectedRoleName] = useState<string>("");
 
-  const handleRoleSelect = (roleId: number, roleName: string) => {
+  const handleRoleSelect = (roleId: number) => {
     setSelectedRoleId(roleId);
-    setSelectedRoleName(roleName);
   };
 
   const [loading, setLoading] = useState(true);
@@ -66,8 +65,8 @@ const Announcements = () => {
 
         <RoleDropdown
           selectedRoleId={selectedRoleId}
-          onRoleSelect={handleRoleSelect}
-          labelText='Filter by Role:'
+          onRoleSelect={(value) => handleRoleSelect(value as number)}
+          labelText=""
         />
 
         <DefaultScrollView>

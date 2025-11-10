@@ -9,9 +9,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getRole } from "@/utils/api/role";
+import { getRole } from "@/routes/role";
 
-import { Role } from '@/types/iApi';
+import { Role } from '@/types/iRole';
 
 
 interface DropdownOption {

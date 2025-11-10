@@ -9,8 +9,8 @@ import AltCard from '@/components/modular/AltCard';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
-import { Task } from '@/types/iApi';
-import { formatDATE } from '@/utils/Helper';
+import { Task } from '@/types/iTask';
+import { formatDATE } from '@/utils/generalHelpers';
 
 interface CheckBoxCardProps {
   task: Task;

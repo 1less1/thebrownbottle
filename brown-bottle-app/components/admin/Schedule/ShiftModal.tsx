@@ -17,9 +17,12 @@ import ModularButton from '@/components/modular/ModularButton';
 import SectionDropdown from "@/components/modular/SectionDropdown";
 
 
-import { insertShift, updateShift, deleteShift } from '@/utils/api/shift';
-import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iApi';
-import { formatSQLTime, formatTime } from '@/utils/Helper';
+import { insertShift, updateShift, deleteShift } from '@/routes/shift';
+import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iShift';
+import { formatSQLTime, formatTime } from '@/utils/dateTimeHelpers';
+
+import { useConfirm } from '@/hooks/useConfirm';
+
 import { to24HourFormat, to12HourFormat } from '@/utils/dateTimeHelpers';
 
 
@@ -42,6 +45,8 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
   const [sectionId, setSectionId] = useState<number | null>(null);
+
+  const { confirm } = useConfirm();
 
   useEffect(() => {
     if (visible) {
@@ -68,6 +73,13 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
     if (!shiftData) {
       return;
     }
+
+    // Confirmation Popup
+    const ok = await confirm(
+      'Confirm Deletion',
+      'Are you sure you want to delete this shift? This action cannot be undone.'
+    );
+    if (!ok) return;
 
     setLoading(true);
 
@@ -111,10 +123,21 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       }
 
       if (shiftData) {
+
+        // Update Confirmation Popup
+        const ok = await confirm(
+          'Confirm Update',
+          'Do you want to update this shift?'
+        );
+        if (!ok) {
+          setLoading(false);
+          return;
+        }
+
         if (shiftId !== null) {
           await updateShift(shiftId, formData);
+          alert("Shift successfully updated!");
         }
-        alert("Shift successfully updated!");
       } else {
         await insertShift(formData);
         alert("Shift successfully added!");
@@ -123,7 +146,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       onClose();
     } catch (error: any) {
       console.log("Unable to save shift: " + error.message);
-      alert("Unable to save shift! Make sure shift details have been properly changed or try again later.")
+      alert("Unable to save shift! Make sure shift details have been edited or try again later.")
     } finally {
       setLoading(false);
     }

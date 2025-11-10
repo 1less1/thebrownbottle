@@ -5,7 +5,7 @@ import { Colors } from '@/constants/Colors';
 import ModularButton from '../modular/ModularButton';
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';
-import { getEmployee } from '@/utils/api/employee';
+import { getEmployee } from '@/routes/employee';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 const HandleLogin = () => {

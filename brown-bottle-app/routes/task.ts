@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import { UpdateTaskFields } from "@/types/iApi";
+import { UpdateTaskFields } from "@/types/iTask";
 
 // POST Request that INSERTS a task into the database - **Works**
 export async function insertTask(

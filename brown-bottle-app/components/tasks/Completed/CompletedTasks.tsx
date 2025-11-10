@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import dayjs from 'dayjs';
-import { parseLocalDate } from '@/utils/Helper';
+import { parseLocalDate } from '@/utils/generalHelpers';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -16,10 +16,11 @@ import UniversalDatePicker from '@/components/modular/UniversalDatePicker';
 import SectionDropdown from '@/components/SectionDropdown';
 import TaskList from '@/components/tasks/TaskList';
 
-import { getTasks, updateTask } from '@/utils/api/task';
-import { getAllSections } from '@/utils/api/section';
+import { getTasks, updateTask } from '@/routes/task';
+import { getSection } from '@/routes/section';
 import { User } from '@/utils/SessionContext';
-import { Task, Section } from '@/types/iApi';
+import { Task } from '@/types/iTask';
+import { Section } from '@/types/iSection';
 
 
 interface CompletedTasksProps {

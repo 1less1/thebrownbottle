@@ -13,9 +13,9 @@ import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
-import { formatSQLDate } from "@/utils/Helper";
-import { ScheduleEmployee, ScheduleShift, Shift } from "@/types/iApi";
-import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/utils/api/schedule";
+import { formatSQLDate } from "@/utils/dateTimeHelpers";
+import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
+import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/routes/schedule";
 
 interface SpreadSheetProps {
   parentRefresh?: number;

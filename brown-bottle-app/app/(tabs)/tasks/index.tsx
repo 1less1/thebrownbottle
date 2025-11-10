@@ -14,8 +14,9 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
-import { Task, Section } from '@/types/iApi';
-import { getAllSections } from '@/utils/api/section';
+import { Task } from '@/types/iTask';
+import { Section } from '@/types/iSection';
+import { getSection } from '@/routes/section';
 
 export default function Tasks() {
   // Dynamic Status Bar
@@ -34,7 +35,7 @@ export default function Tasks() {
   // Fetch Sections
   useEffect(() => {
     async function loadSections() {
-      const data = await getAllSections();
+      const data = await getSection();
       setSections(data);
       //setSelectedSectionName(data[0].section_name);
     }

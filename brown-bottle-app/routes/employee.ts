@@ -1,8 +1,8 @@
 import Constants from "expo-constants";
 
-import { buildQueryString } from "@/utils/Helper";
+import { buildQueryString } from "@/utils/apiHelpers";
 
-import { Employee } from "@/types/iApi";
+import { Employee } from "@/types/iEmployee";
 
 // GET: Fetches data from the employee table
 export async function getEmployee(params?: Partial<Employee>) {
