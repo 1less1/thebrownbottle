@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-import { Employee } from '@/types/api';
+import { Employee } from '@/types/iApi';
 
 export type User = Employee;
 
@@ -16,8 +16,8 @@ type SessionContextType = {
 
 const SessionContext = createContext<SessionContextType>({
   user: null,
-  setUser: async () => {},
-  clearSession: async () => {},
+  setUser: async () => { },
+  clearSession: async () => { },
 });
 
 const USER_KEY = 'user_session';

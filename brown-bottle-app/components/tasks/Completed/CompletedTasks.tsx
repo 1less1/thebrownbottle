@@ -19,15 +19,15 @@ import TaskList from '@/components/tasks/TaskList';
 import { getTasks, updateTask } from '@/utils/api/task';
 import { getAllSections } from '@/utils/api/section';
 import { User } from '@/utils/SessionContext';
-import { Task, Section} from '@/types/api';
+import { Task, Section } from '@/types/iApi';
 
 
 interface CompletedTasksProps {
-  user: User
-  sections: Section[]
+    user: User
+    sections: Section[]
 }
 
-const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
+const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections }) => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -56,25 +56,25 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
         setSelectedSectionId(sectionId);
         setSelectedSectionName(sectionName);
     };
-    
+
     // ------------------------------------------------------------------------------
 
 
     // Date Time Handling -----------------------------------------------------------
-    
+
     const [selectedDate, setSelectedDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
 
     // Handler receives a formatted date string (YYYY-MM-DD)
     const handleDateChange = (formattedDate: string) => {
-    const parsed = dayjs(formattedDate, 'YYYY-MM-DD', true); // strict parsing
-    if (parsed.isValid()) {
-        // Normalize to start of day and format back to string
-        setSelectedDate(parsed.startOf('day').format('YYYY-MM-DD'));
-    } else {
-        console.warn('Invalid date string:', formattedDate);
+        const parsed = dayjs(formattedDate, 'YYYY-MM-DD', true); // strict parsing
+        if (parsed.isValid()) {
+            // Normalize to start of day and format back to string
+            setSelectedDate(parsed.startOf('day').format('YYYY-MM-DD'));
+        } else {
+            console.warn('Invalid date string:', formattedDate);
         }
     };
-    
+
     const [datePickerVisible, setDatePickerVisible] = useState(false);
     const toggleDatePicker = () => {
         setDatePickerVisible((prev) => !prev);
@@ -110,9 +110,9 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
         setError(false);
         try {
             const data = await getTasks({
-            section_id: selectedSectionId,
-            complete: 1,
-            due_date: selectedDate,
+                section_id: selectedSectionId,
+                complete: 1,
+                due_date: selectedDate,
             });
             setTaskData(data);
             setCheckedTasks([]);
@@ -142,7 +142,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
         try {
             // Update all checked tasks to complete = 0
             await Promise.all(
-                checkedTasks.map(taskId => updateTask(taskId, { complete: 0, last_modified_by: Number(user.employee_id)}))
+                checkedTasks.map(taskId => updateTask(taskId, { complete: 0, last_modified_by: Number(user.employee_id) }))
             );
 
             alert('Task(s) marked as Incomplete Successfully!');
@@ -157,20 +157,20 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
             alert('Error: Failed to mark Task(s) as Incomplete. Please try again.');
         }
     };
-    
+
     // ------------------------------------------------------------------------------
 
 
     return (
-        
-        <View style={{flex: 1, width: '100%'}}>
+
+        <View style={{ flex: 1, width: '100%' }}>
 
             <Text style={GlobalStyles.floatingHeaderText}>
                 {selectedSectionName ? selectedSectionName : "Loading..."}
-            </Text>             
-            
+            </Text>
+
             <Card style={styles.container}>
-            
+
                 <View style={styles.scrollContainer}>
 
                     <View style={styles.filterRowContainer}>
@@ -179,7 +179,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                             onPress={() => setFilterModalVisible(true)}
                             style={{ flexGrow: 1, flexShrink: 1, }}
                         />
-                        <View style={{ paddingRight: 5}}>
+                        <View style={{ paddingRight: 5 }}>
                             <Text style={GlobalStyles.altText}>
                                 <Text style={GlobalStyles.boldText}>Selected Date: </Text>
                                 {selectedDate}
@@ -192,22 +192,22 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                             selectedSectionId={selectedSectionId}
                             onSectionSelect={handleSectionSelect}
                             sections={sections} // Pass sections from parent
-                            fetchSections={false}  
+                            fetchSections={false}
                             labelText="Section:"
                         />
 
-                        
+
                         <ModularButton
                             text="Choose Date"
-                            textStyle={{ color: 'black'}}
+                            textStyle={{ color: 'black' }}
                             style={[
-                                GlobalStyles.submitButton, 
-                                {backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, marginVertical: 10}
+                                GlobalStyles.submitButton,
+                                { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, marginVertical: 10 }
                             ]}
                             onPress={toggleDatePicker}
                         />
-                        
-                        
+
+
                         {datePickerVisible && (
                             <View style={{ marginBottom: 10 }}>
                                 <UniversalDatePicker
@@ -219,7 +219,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                             </View>
                         )}
 
-                    
+
 
                         <ModularButton
                             text="Close"
@@ -248,29 +248,29 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                         )}
                     </DefaultScrollView>
 
-                    <View style={styles.buttonRowContainer }>
+                    <View style={styles.buttonRowContainer}>
                         <ModularButton
                             text="Submit"
-                            textStyle={{ color: 'white'}}
+                            textStyle={{ color: 'white' }}
                             style={GlobalStyles.submitButton}
                             onPress={() => setSubmitModalVisible(true)}
                         />
                     </View>
 
                     <ModularModal visible={submitModalVisible} onClose={() => setSubmitModalVisible(false)}>
-                        
+
                         <Text style={GlobalStyles.text}>Are you sure you want mark the following task(s) as incomplete?</Text>
-                        <View style={styles.buttonRowContainer }>
+                        <View style={styles.buttonRowContainer}>
                             <ModularButton
                                 text="Yes"
-                                textStyle={{ color: 'white'}}
+                                textStyle={{ color: 'white' }}
                                 style={GlobalStyles.submitButton}
                                 onPress={handleSubmit}
                             />
 
                             <ModularButton
                                 text="Cancel"
-                                textStyle={{ color: 'gray'}}
+                                textStyle={{ color: 'gray' }}
                                 style={GlobalStyles.cancelButton}
                                 onPress={() => setSubmitModalVisible(false)}
                             />
@@ -278,7 +278,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, sections}) => {
                     </ModularModal>
 
                 </View>
-            
+
             </Card>
 
         </View>
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
     },
-    buttonRowContainer : {
+    buttonRowContainer: {
         marginTop: 10,
         marginBottom: 5,
         flexDirection: 'row',
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         alignItems: 'center',
-        marginTop: 5, 
+        marginTop: 5,
         marginBottom: 10,
         gap: 10,
     },

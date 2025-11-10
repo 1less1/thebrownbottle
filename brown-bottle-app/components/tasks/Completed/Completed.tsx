@@ -7,12 +7,12 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import CompletedTasks from '@/components/tasks/Completed/CompletedTasks';
 
-import { User } from '@/utils/SessionContext'; 
-import { Section } from '@/types/api';
+import { User } from '@/utils/SessionContext';
+import { Section } from '@/types/iApi';
 
 interface CompletedProps {
-  user: User;
-  sections: Section[]
+    user: User;
+    sections: Section[]
 }
 
 const Completed: React.FC<CompletedProps> = ({ user, sections }) => {
@@ -20,8 +20,8 @@ const Completed: React.FC<CompletedProps> = ({ user, sections }) => {
     return (
 
         <DefaultScrollView>
-            
-            <View style={{marginVertical: 20, width: "100%"}}>
+
+            <View style={{ marginVertical: 20, width: "100%" }}>
                 <CompletedTasks user={user} sections={sections} />
             </View>
 

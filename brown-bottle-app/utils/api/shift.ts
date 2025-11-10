@@ -2,7 +2,9 @@ import Constants from "expo-constants";
 
 import { buildQueryString } from "@/utils/Helper";
 
-import { Shift, ShiftAPI, ScheduleEmployee, ScheduleShift } from "@/types/api";
+import { to12HourFormat } from "@/utils/dateTimeHelpers";
+
+import { Shift, ShiftAPI, ScheduleEmployee, ScheduleShift } from "@/types/iApi";
 
 // GET: Fetches data from the shift table
 export async function getShift(params?: Partial<ShiftAPI>) {

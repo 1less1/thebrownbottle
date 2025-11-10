@@ -19,7 +19,7 @@ LocaleConfig.locales['en'] = {
 LocaleConfig.defaultLocale = 'en';
 
 
-import { ShiftData } from '@/types/shift';
+import { ShiftData } from '@/types/iShift';
 
 interface Props {
   shifts: ShiftData[];

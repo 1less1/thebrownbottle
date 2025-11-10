@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, StyleSheet, View } from 'react-native';
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from "@/components/modular/Card";
@@ -14,22 +14,22 @@ import ModularModal from '@/components/modular/ModularModal';
 import LoadingCard from '@/components/modular/LoadingCard';
 
 import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/utils/api/announcement';
-import { Announcement } from '@/types/api';
+import { Announcement } from '@/types/iApi';
 
 const Announcements = () => {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  
+
   const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
   const [selectedRoleName, setSelectedRoleName] = useState<string>("");
-  
+
   const handleRoleSelect = (roleId: number, roleName: string) => {
-      setSelectedRoleId(roleId);
-      setSelectedRoleName(roleName);
+    setSelectedRoleId(roleId);
+    setSelectedRoleName(roleName);
   };
-  
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false); 
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -61,14 +61,14 @@ const Announcements = () => {
   return (
 
     <Card style={styles.container}>
-      
+
       <View style={styles.scrollContainer}>
 
         <RoleDropdown
-            selectedRoleId={selectedRoleId}
-            onRoleSelect={handleRoleSelect}
-            labelText='Filter by Role:'
-          />
+          selectedRoleId={selectedRoleId}
+          onRoleSelect={handleRoleSelect}
+          labelText='Filter by Role:'
+        />
 
         <DefaultScrollView>
 
@@ -82,13 +82,13 @@ const Announcements = () => {
           ) : error ? (
             <LoadingCard
               loadingText="Unable to load announcements!"
-              textStyle= {GlobalStyles.errorText}
+              textStyle={GlobalStyles.errorText}
               containerStyle={{ height: 400 }}
             />
 
           ) : (
             announcements.map((announcement) => (
-              
+
               <AltCard
                 key={announcement.announcement_id}
                 style={styles.announcementContainer}>

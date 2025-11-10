@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { Colors } from '@/constants/Colors';
+import { StyleSheet } from "react-native";
+import { Colors } from "@/constants/Colors";
 
 export const GlobalStyles = StyleSheet.create({
     // Text Styles
@@ -143,5 +143,24 @@ export const GlobalStyles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
     },
+  // Badge Styles
+  accepted: {
+    color: "#28a745",
+    backgroundColor: "#d4edda",
+    padding: 6,
+    borderRadius: 4,
+  },
+  denied: {
+    color: "#dc3545",
+    backgroundColor: "#f8d7da",
+    padding: 6,
+    borderRadius: 4,
+  },
 
+  pending: {
+    color: "#ff9800",
+    backgroundColor: "#fff3e0",
+    padding: 6,
+    borderRadius: 4,
+  },
 });

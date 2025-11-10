@@ -14,10 +14,8 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
 import { formatSQLDate } from "@/utils/Helper";
-import { ScheduleEmployee, ScheduleShift, Shift } from "@/types/api";
+import { ScheduleEmployee, ScheduleShift, Shift } from "@/types/iApi";
 import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/utils/api/schedule";
-
-import Toast from "react-native-toast-message";
 
 interface SpreadSheetProps {
   parentRefresh?: number;
@@ -178,7 +176,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   );
 
   return (
-    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.7 }}>
+    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.67 }}>
 
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>

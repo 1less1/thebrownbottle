@@ -7,6 +7,7 @@ from datetime import datetime
 # GET Time_off_Request ----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
+
 def get_tor(db, request):
     """
     Fetches TOR records based on optional URL query parameters.
@@ -54,7 +55,7 @@ def get_tor(db, request):
                 DATE_FORMAT(tor.end_date, '%Y-%m-%d') AS end_date,
                 tor.reason,
                 tor.status,
-                TIME_FORMAT(tor.timestamp, '%H:%i') AS timestamp
+                DATE_FORMAT(tor.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM time_off_request tor
             JOIN employee e ON tor.employee_id = e.employee_id
             WHERE 1 = 1
@@ -62,7 +63,7 @@ def get_tor(db, request):
 
         query_params = []
 
-        # Build Dynamic Query 
+        # Build Dynamic Query
         if request_id is not None:
             query += " AND tor.request_id = %s"
             query_params.append(request_id)
@@ -78,7 +79,7 @@ def get_tor(db, request):
                 return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
             query += " AND tor.start_date = %s"
             query_params.append(start_date)
-        
+
         if end_date:
             try:
                 datetime.strptime(end_date, '%Y-%m-%d')
@@ -100,7 +101,7 @@ def get_tor(db, request):
                 datetime.strptime(timestamp, '%H:%M:%S')
             except ValueError:
                 return jsonify({"error": "Invalid time format. Expected HH:MM:SS."}), 400
-            query += " AND tor.timestamp = %s"
+            query += " AND TIME(tor.timestamp) = %s"
             query_params.append(timestamp)
 
         # Last Query Line
@@ -128,8 +129,8 @@ def get_tor(db, request):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-    
-    
+
+
 # POST Time_off_Request ---------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -148,13 +149,14 @@ def insert_tor(db, request):
         # Define Expected Field Types
         field_types = {
             'employee_id': int,
-            'start_date': str, # YYYY-MM-DD
-            'end_date': str, # YYYY-MM-DD
+            'start_date': str,  # YYYY-MM-DD
+            'end_date': str,  # YYYY-MM-DD
             'reason': str,
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -174,7 +176,7 @@ def insert_tor(db, request):
             (employee_id, start_date, end_date, reason)
             VALUES (%s, %s, %s, %s);
         """, (employee_id, start_date, end_date, reason))
-        
+
         inserted_id = cursor.lastrowid
 
         conn.commit()
@@ -188,7 +190,7 @@ def insert_tor(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -200,7 +202,8 @@ def insert_tor(db, request):
 
 # PATCH Time_off_Request --------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-    
+
+
 def update_tor(db, request, request_id):
     """
     Updates an existing TOR record (partial update).
@@ -230,7 +233,8 @@ def update_tor(db, request, request_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(request_id)  # WHERE parameter at the end -> WHERE request_id = %s
+        # WHERE parameter at the end -> WHERE request_id = %s
+        values.append(request_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -240,7 +244,7 @@ def update_tor(db, request, request_id):
             SET {set_clause}
             WHERE request_id = %s;
         """
-        
+
         cursor.execute(query, tuple(values))
         conn.commit()
         rowcount = cursor.rowcount

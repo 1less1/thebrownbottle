@@ -14,7 +14,7 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
-import { Task, Section } from '@/types/api';
+import { Task, Section } from '@/types/iApi';
 import { getAllSections } from '@/utils/api/section';
 
 export default function Tasks() {
@@ -33,28 +33,32 @@ export default function Tasks() {
   const [sections, setSections] = useState<Section[]>([]);
   // Fetch Sections
   useEffect(() => {
-      async function loadSections() {
-          const data = await getAllSections();
-          setSections(data);
-          //setSelectedSectionName(data[0].section_name);
-      }
-      loadSections();
+    async function loadSections() {
+      const data = await getAllSections();
+      setSections(data);
+      //setSelectedSectionName(data[0].section_name);
+    }
+    loadSections();
   }, []);
 
 
   // Define available tabs and corresponding components
   const tabs = [
-    { key: 'active', title: 'Active', component: user && sections ? <Active user={user} sections={sections} /> : 
-    <LoadingCircle
-      size="large"
-      style={{ marginTop: 40, alignSelf: 'center' }}
-    /> },
+    {
+      key: 'active', title: 'Active', component: user && sections ? <Active user={user} sections={sections} /> :
+        <LoadingCircle
+          size="large"
+          style={{ marginTop: 40, alignSelf: 'center' }}
+        />
+    },
 
-    { key: 'completed', title: 'Completed', component: user && sections ? <Completed user={user} sections={sections}/> : 
-    <LoadingCircle
-      size="large"
-      style={{ marginTop: 40, alignSelf: 'center' }}
-    /> },
+    {
+      key: 'completed', title: 'Completed', component: user && sections ? <Completed user={user} sections={sections} /> :
+        <LoadingCircle
+          size="large"
+          style={{ marginTop: 40, alignSelf: 'center' }}
+        />
+    },
   ];
 
 
@@ -64,9 +68,9 @@ export default function Tasks() {
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
-        { /* Tasks Header */ }
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor}}>
-          
+        { /* Tasks Header */}
+        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
+
           <Text style={GlobalStyles.pageHeader}>Tasks</Text>
 
           {/* Tab Bar */}
@@ -86,60 +90,60 @@ export default function Tasks() {
           </View>
 
         </View>
-        
+
         {/* Render content based on selected tab */}
         <View style={styles.tabContent}>
           {tabs[activeTab]?.component}
         </View>
-              
+
       </View>
-      
+
     </DefaultView>
 
   );
 };
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
   header: {
     fontSize: 36,
     fontWeight: "bold",
     color: "black",
     marginLeft: 20,
     marginTop: 40,
-    marginBottom:20,
-    
+    marginBottom: 20,
+
   },
   tabBar: {
-      alignSelf: 'center',
-      flexDirection: "row",
-      borderRadius: 10,
-      width: "90%",
-      marginTop: 20,
-      marginBottom: 15,
-      borderColor:'lightgrey',
-      borderWidth: 1,
-    },
-    tabButton: {
-      flex: 1,
-      padding: 10,
-      alignItems: "center",
-      justifyContent: "center",
-      margin: 4,
-    },
-    activeTabButton: {
-      backgroundColor: 'white',
-      borderRadius: 10,
-      borderColor: Colors.darkTan,
-      borderWidth: 1,
-    },
-    tabText: {
-      fontSize: 16,
-      color: "black",
-    },
-    tabContent: {
-      flex: 1,
-      width: '85%',
-      alignItems: 'center',
-      alignSelf: 'center',
-    },
-  });
+    alignSelf: 'center',
+    flexDirection: "row",
+    borderRadius: 10,
+    width: "90%",
+    marginTop: 20,
+    marginBottom: 15,
+    borderColor: 'lightgrey',
+    borderWidth: 1,
+  },
+  tabButton: {
+    flex: 1,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 4,
+  },
+  activeTabButton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderColor: Colors.darkTan,
+    borderWidth: 1,
+  },
+  tabText: {
+    fontSize: 16,
+    color: "black",
+  },
+  tabContent: {
+    flex: 1,
+    width: '85%',
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+});

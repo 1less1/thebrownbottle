@@ -18,8 +18,9 @@ import SectionDropdown from "@/components/modular/SectionDropdown";
 
 
 import { insertShift, updateShift, deleteShift } from '@/utils/api/shift';
-import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/api';
+import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iApi';
 import { formatSQLTime, formatTime } from '@/utils/Helper';
+import { to24HourFormat, to12HourFormat } from '@/utils/dateTimeHelpers';
 
 
 interface ShiftModalProps {
@@ -42,8 +43,6 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
   const [endTime, setEndTime] = useState<string>("");
   const [sectionId, setSectionId] = useState<number | null>(null);
 
-
-  // Initialize values when modal opens
   useEffect(() => {
     if (visible) {
       setEmployeeId(employeeData?.employee_id ?? null)
@@ -181,7 +180,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
             selectedSectionId={sectionId}
             onSectionSelect={(value) => setSectionId(value as number)}
             labelText=""
-            containerStyle={{ marginBottom: 10 }}
+            containerStyle={{ marginBottom: 10, backgroundColor: Colors.inputBG }}
           />
 
           {/* Buttons */}
@@ -229,6 +228,9 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 20,
   },
+  inputError: { color: '#D9534F', marginTop: 6, fontSize: 13 },
+  actions: { gap: 12 },
+  cancelButton: { backgroundColor: Colors.borderColor, marginTop: 8 },
 });
 
 

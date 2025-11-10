@@ -8,60 +8,94 @@ import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Calendar from '@/components/calendar/Calendar';
 import Shifts from '@/components/calendar/Shifts';
-import TimeOff from '@/components/calendar/TimeOff';
+import TimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
 
 import { testShifts } from '@/data/testShifts';
-import { ShiftData } from '@/types/shift';
 
-export default function Tasks() {
-  // Dynamic Status Bar
-    useFocusEffect(
-      useCallback(() => {
-        StatusBar.setBackgroundColor(Colors.white);
-        StatusBar.setBarStyle('dark-content');
-      }, [])
-    );
+export default function CalendarPage() {
+  useFocusEffect(
+    useCallback(() => {
+      StatusBar.setBackgroundColor(Colors.white);
+      StatusBar.setBarStyle('dark-content');
+    }, [])
+  );
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    setRefreshKey((prev) => prev + 1);
+    setTimeout(() => setRefreshing(false), 800);
+  }, []);
+
   
+
   return (
-
     <DefaultView backgroundColor={Colors.white}>
-
-
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-
-
-        { /* Calendar Header */ }
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
-          <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
+        {/* Calendar Header */}
+        <View
+          style={{
+            width: '100%',
+            paddingTop: 10,
+            backgroundColor: Colors.white,
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.altBorderColor,
+          }}
+        >
+          <Text
+            style={{
+              textAlign: 'left',
+              fontSize: 36,
+              color: 'black',
+              fontWeight: 'bold',
+              marginLeft: 30,
+              marginBottom: 10,
+            }}
+          >
             Calendar
           </Text>
         </View>
 
-        <DefaultScrollView>
-
-           {/* Upcoming Shifts View */}
+        <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
+          {/* Upcoming Shifts View */}
           <View style={{ width: '85%', marginVertical: 20 }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Upcoming Shifts</Text>
-            <Shifts shifts={testShifts}/>
+            <Text
+              style={{
+                textAlign: 'left',
+                fontSize: 18,
+                color: 'black',
+                fontWeight: 'bold',
+                marginBottom: 8,
+              }}
+            >
+              Upcoming Shifts
+            </Text>
+            <Shifts shifts={testShifts} refreshKey={refreshKey} />
           </View>
 
           <View style={{ width: '85%' }}>
-            <Calendar shifts={testShifts}/>
+            <Calendar shifts={testShifts} refreshKey={refreshKey} />
           </View>
 
           {/* Time Off View */}
           <View style={{ width: '85%', marginTop: 20, marginBottom: 60 }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Time Off Requests</Text>
-            <TimeOff/>
+            <Text
+              style={{
+                textAlign: 'left',
+                fontSize: 18,
+                color: 'black',
+                fontWeight: 'bold',
+                marginBottom: 8,
+              }}
+            >
+              Time Off Requests
+            </Text>
+            <TimeOff refreshKey={refreshKey} />
           </View>
-
         </DefaultScrollView>
-
-
       </View>
-
-
     </DefaultView>
-
-  )
-};
+  );
+}

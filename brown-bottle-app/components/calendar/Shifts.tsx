@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/Colors'; 
+import { Colors } from '@/constants/Colors';
 import Card from "@/components/modular/Card";
 import AltCard from '../modular/AltCard';
 
-import { ShiftData } from '@/types/shift';
+import { ShiftData } from '@/types/iShift';
 
 interface Props {
     shifts: ShiftData[];
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 10,
-      },
+    },
     shiftCard: {
         width: '100%',
         backgroundColor: Colors.lightTan,
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: '500',
         color: Colors.black,
-    
+
     },
     noShiftsText: {
         fontSize: 14,

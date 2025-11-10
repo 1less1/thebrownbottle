@@ -7,12 +7,12 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import ActiveTasks from '@/components/tasks/Active/ActiveTasks';
 
-import { User } from '@/utils/SessionContext'; 
-import { Section } from '@/types/api';
+import { User } from '@/utils/SessionContext';
+import { Section } from '@/types/iApi';
 
 interface ActiveProps {
-  user: User;
-  sections: Section[]
+    user: User;
+    sections: Section[]
 }
 
 const Active: React.FC<ActiveProps> = ({ user, sections }) => {
@@ -20,8 +20,8 @@ const Active: React.FC<ActiveProps> = ({ user, sections }) => {
     return (
 
         <DefaultScrollView>
-            
-            <View style={{marginVertical: 20, width: "100%"}}>
+
+            <View style={{ marginVertical: 20, width: "100%" }}>
                 <ActiveTasks user={user} sections={sections} />
             </View>
 

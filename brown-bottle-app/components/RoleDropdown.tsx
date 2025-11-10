@@ -7,7 +7,7 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 
 import { getRole } from "@/utils/api/role";
 
-import { Role } from '@/types/api';
+import { Role } from '@/types/iApi';
 
 interface RoleDropdownProps {
   selectedRoleId: number;
@@ -108,7 +108,7 @@ const RoleDropdown: React.FC<RoleDropdownProps> = ({
         }}
         style={[styles.picker, pickerStyle]}
       >
-        <Picker.Item label="Select a role..." value={-1} color="black"/>
+        <Picker.Item label="Select a role..." value={-1} color="black" />
         {roles.map((role) => (
           <Picker.Item
             key={role.role_id}
