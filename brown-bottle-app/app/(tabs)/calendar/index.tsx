@@ -8,7 +8,7 @@ import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Calendar from '@/components/calendar/Calendar';
 import Shifts from '@/components/calendar/Shifts';
-import TimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
+import CalendarTimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
 
 import { testShifts } from '@/data/testShifts';
 
@@ -92,7 +92,7 @@ export default function CalendarPage() {
             >
               Time Off Requests
             </Text>
-            <TimeOff refreshKey={refreshKey} />
+            <CalendarTimeOff refreshKey={refreshKey} />
           </View>
         </DefaultScrollView>
       </View>
