@@ -1,5 +1,12 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, RefreshControl } from 'react-native';
+import {
+    ScrollView,
+    View,
+    Text,
+    StyleSheet,
+    RefreshControl,
+    ActivityIndicator,
+} from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 interface ModularListViewProps<T> {
@@ -12,8 +19,6 @@ interface ModularListViewProps<T> {
     maxHeight?: number;
     refreshing?: boolean;
     onRefresh?: () => void;
-    header?: React.ReactNode;
-    footer?: React.ReactNode;
 }
 
 export default function ModularListView<T>({
@@ -26,42 +31,76 @@ export default function ModularListView<T>({
     maxHeight = 350,
     refreshing,
     onRefresh,
-    header,
-    footer,
 }: ModularListViewProps<T>) {
-    if (loading) return <Text style={styles.status}>Loading...</Text>;
-    if (error) return <Text style={[styles.status, styles.error]}>{error}</Text>;
-    if (data.length === 0) return <Text style={styles.status}>{emptyText}</Text>;
+    if (loading)
+        return (
+            <View style={styles.statusContainer}>
+                <ActivityIndicator color={Colors.gray} size="small" />
+                <Text style={styles.statusText}>Loading...</Text>
+            </View>
+        );
+
+    if (error)
+        return (
+            <View style={styles.statusContainer}>
+                <Text style={[styles.statusText, styles.errorText]}>{error}</Text>
+            </View>
+        );
+
+    if (data.length === 0)
+        return (
+            <View style={styles.statusContainer}>
+                <Text style={styles.statusText}>{emptyText}</Text>
+            </View>
+        );
 
     return (
         <ScrollView
             style={{ marginTop: 10, maxHeight }}
             refreshControl={
-                onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} /> : undefined
+                onRefresh ? (
+                    <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} />
+                ) : undefined
             }
         >
-            {header && <View style={styles.header}>{header}</View>}
+
             {data.map((item, index) => (
-                <View key={keyExtractor ? keyExtractor(item, index) : index}>{renderItem(item, index)}</View>
+                <View
+                    key={keyExtractor ? keyExtractor(item, index) : index}
+                    style={styles.requestItem}
+                >
+                    {renderItem(item, index)}
+                </View>
             ))}
-            {footer && <View style={styles.footer}>{footer}</View>}
+
         </ScrollView>
     );
 }
 
-
 const styles = StyleSheet.create({
+    statusContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 20,
+    },
     statusText: {
         textAlign: 'center',
+        color: Colors.gray,
+        fontSize: 13,
+        marginTop: 5,
+    },
+    errorText: {
+        color: 'red',
         marginTop: 15,
-        color: Colors.gray,
+        textAlign: 'center',
     },
-    status: {
-        fontSize: 12,
-        color: Colors.gray,
-        marginTop: 2,
+    requestItem: {
+        backgroundColor: Colors.inputBG,
+        padding: 12,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: Colors.borderColor,
+        marginBottom: 10,
     },
-    error: { color: 'red' },
-    header: { marginBottom: 8 },
-    footer: { marginTop: 8 },
+
 });

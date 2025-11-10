@@ -1,50 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import TimeOffModal from './TimeOffModal';
 import { Colors } from '@/constants/Colors';
 import Card from '@/components/modular/Card';
 import { useSession } from '@/utils/SessionContext';
 import { getTimeOffRequests } from '@/routes/time_off_request';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { formatDate } from '@/utils/dateTimeHelpers';
+import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';
-
-import { formatDateTime } from '@/utils/dateTimeHelpers';
-
-import { TimeOffRequest } from '@/types/iTimeOff';
-import { TimeOffProps } from '@/types/iTimeOff';
-
+import { TimeOffRequest, TimeOffProps } from '@/types/iTimeOff';
+import TimeOffFilter from "./TimeOffFilter";
 
 
 const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
   const { user } = useSession();
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"All" | "Pending" | "Completed">("All");
 
-  const toggleModal = () => setModalVisible(!modalVisible);
 
+  const toggleModal = () => setModalVisible((prev) => !prev);
 
   const fetchUserRequests = async () => {
     if (!user?.employee_id) return;
 
     try {
       setLoading(true);
-
-      // Fetch only this employee’s requests (filtered at the backend)
       const myRequests: TimeOffRequest[] = await getTimeOffRequests({
         employee_id: user.employee_id,
       });
 
-      // Sort so pending requests appear first, then by timestamp (descending)
-      const sortedRequests = myRequests.sort((a, b) => {
+      const sorted = myRequests.sort((a, b) => {
         if (a.status === 'Pending' && b.status !== 'Pending') return -1;
         if (a.status !== 'Pending' && b.status === 'Pending') return 1;
         return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
       });
 
-      setRequests(sortedRequests);
+      setRequests(sorted);
       setError(null);
     } catch (err) {
       console.error('Error fetching time off requests:', err);
@@ -53,7 +47,6 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchUserRequests();
@@ -68,33 +61,39 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
       </Card>
     );
   }
+
   return (
-
-    <Card style={{ paddingVertical: 10, paddingHorizontal: 20, shadowColor: '#000', }}>
+    <Card>
       {/* Header Row */}
-      <View style={styles.row}>
-        <Text style={styles.header}></Text>
 
-        {/* Add Button */}
-        <TouchableOpacity onPress={toggleModal}>
-          <View style={styles.addButton}>
-            <Text style={styles.addText}>Add</Text>
-          </View>
-        </TouchableOpacity>
+      <View style={styles.row}>
+        <View style={styles.rowRight}>
+          <TimeOffFilter
+            selectedFilter={filter}
+            onChange={(val) => setFilter(val)}
+          />
+
+          <TouchableOpacity onPress={toggleModal}>
+            <View style={styles.addButton}>
+              <Text style={styles.addText}>Add</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
 
+
+      {/* Main List */}
       <ModularListView
         data={requests}
         loading={loading}
         error={error}
+        emptyText="No time off requests yet."
         renderItem={(req) => (
-          <View key={req.request_id} style={styles.requestItem}>
-            {/* Top Row: Date + Status (aligned left/right) */}
+          <>
             <View style={styles.rowBetween}>
               <Text style={styles.date}>
-                {formatDate(req.start_date)} {'\u00A0'}–{'\u200B'} {formatDate(req.end_date)}
+                {formatDate(req.start_date)} {'–'} {formatDate(req.end_date)}
               </Text>
-
               <Text
                 style={[
                   styles.statusText,
@@ -107,18 +106,18 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
               >
                 {req.status}
               </Text>
-
             </View>
 
-            {/* Bottom Row: Reason */}
-            <Text style={[GlobalStyles.boldMediumText, { marginTop: 4, color: Colors.gray }]}>
+            <Text
+              style={[GlobalStyles.boldMediumText, { marginTop: 4, color: Colors.gray }]}
+            >
               {req.reason}
             </Text>
 
             <Text style={styles.timestamp}>
               Submitted at {formatDateTime(req.timestamp)}
             </Text>
-          </View>
+          </>
         )}
       />
 
@@ -141,18 +140,10 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 16,
-    fontWeight: 'bold',
     color: Colors.black,
-  },
-  infoText: {
-    fontSize: 14,
-    color: Colors.gray,
-    fontStyle: 'italic',
-    marginTop: 8,
   },
   addButton: {
     backgroundColor: Colors.white,
-    padding: 0,
     borderRadius: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -167,13 +158,16 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     fontSize: 14,
   },
-  requestItem: {
-    backgroundColor: Colors.white,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: Colors.borderColor,
-    marginBottom: 8,
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  rowRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 10, // adds spacing between dropdown and Add button
   },
   date: {
     fontSize: 16,
@@ -182,23 +176,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     maxWidth: '55%',
   },
-  rowBetween: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: Colors.gray,
-    marginTop: 4,
-  },
   statusText: {
     fontSize: 13,
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
+  timestamp: {
+    fontSize: 12,
+    color: Colors.gray,
+    marginTop: 4,
   },
 });

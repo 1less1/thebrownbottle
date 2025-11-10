@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 import { getTimeOffRequests } from '@/routes/time_off_request';
@@ -8,11 +8,8 @@ import { useSession } from '@/utils/SessionContext';
 import AcceptDenyButtons from './AcceptDenyButtons';
 import { updateTimeOffStatus } from '@/routes/time_off_request';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';
-
-import { formatDateTime } from '@/utils/dateTimeHelpers';
-
+import { formatDateWithYear, formatDateTime } from '@/utils/dateTimeHelpers';
 import { TimeOffRequest } from '@/types/iTimeOff';
 
 type TabOption = 'active' | 'completed';
@@ -21,8 +18,9 @@ const AdminTimeOff: React.FC = () => {
   const { user } = useSession();
   const [activeTab, setActiveTab] = useState<TabOption>('active');
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch all requests
   const fetchRequests = useCallback(async () => {
@@ -39,16 +37,12 @@ const AdminTimeOff: React.FC = () => {
     }
   }, []);
 
-  const [refreshing, setRefreshing] = useState(false);
-
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchRequests(); // whatever your fetch function is
+    await fetchRequests();
     setRefreshing(false);
   };
 
-
-  // Refresh on focus
   useFocusEffect(
     useCallback(() => {
       fetchRequests();
@@ -64,11 +58,9 @@ const AdminTimeOff: React.FC = () => {
   const handleApproveRequest = async (
     employee_id: number,
     employee_name: string,
-    request_id: number,
-    timestamp: string
-  ): Promise<void> => {
+    request_id: number
+  ) => {
     try {
-      // console.log(`Approving request ${request_id} for ${employee_name} at ${req.timestamp}`);
       await updateTimeOffStatus(request_id, 'Accepted');
       await fetchRequests();
     } catch (err) {
@@ -80,9 +72,8 @@ const AdminTimeOff: React.FC = () => {
     employee_id: number,
     employee_name: string,
     request_id: number
-  ): Promise<void> => {
+  ) => {
     try {
-      console.log(`Denying request ${request_id} for ${employee_name}`);
       await updateTimeOffStatus(request_id, 'Denied');
       await fetchRequests();
     } catch (err) {
@@ -113,26 +104,27 @@ const AdminTimeOff: React.FC = () => {
           ))}
         </View>
 
-        {/* Content (modularized) */}
+        {/* Main List */}
         <ModularListView
           data={currentList}
           loading={loading}
           error={error}
-          maxHeight={350}
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          emptyText={
+            activeTab === 'active'
+              ? 'No active requests.'
+              : 'No completed requests yet.'
+          }
           renderItem={(req) => (
-            <View key={req.request_id} style={styles.requestItem}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                }}
-              >
+            <View key={req.request_id}>
+              <View style={styles.headerRow}>
                 {/* Left side: Info */}
                 <View style={{ flex: 1 }}>
                   <Text style={[GlobalStyles.boldText]}>{req.reason}</Text>
                   <Text style={styles.date}>
-                    {formatDateWithYear(req.start_date)} → {formatDateWithYear(req.end_date)}
+                    {formatDateWithYear(req.start_date)} →{' '}
+                    {formatDateWithYear(req.end_date)}
                   </Text>
 
                   <Text style={styles.employee}>
@@ -184,7 +176,6 @@ const AdminTimeOff: React.FC = () => {
 
 export default AdminTimeOff;
 
-
 const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
@@ -195,11 +186,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: 10,
-  },
-  rightColumn: {
-    alignItems: 'flex-end',
-    justifyContent: 'flex-start',
-    maxWidth: '30%',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -223,21 +209,6 @@ const styles = StyleSheet.create({
   activeTabText: {
     color: Colors.black,
   },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    color: Colors.gray,
-    fontSize: 16,
-  },
-  requestItem: {
-    backgroundColor: Colors.inputBG,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    marginBottom: 10,
-  },
   date: {
     fontSize: 13,
     color: Colors.darkGray,
@@ -253,15 +224,11 @@ const styles = StyleSheet.create({
     color: Colors.gray,
     marginTop: 4,
   },
-  status: {
+  statusText: {
     fontSize: 12,
     fontWeight: 'bold',
+    color: Colors.black,
     textTransform: 'uppercase',
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 15,
-    textAlign: 'center',
   },
   statusBadge: {
     borderRadius: 12,
@@ -273,14 +240,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
     borderColor: Colors.borderColor,
     borderWidth: 1,
-    borderRadius: 8
+    borderRadius: 8,
   },
-
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: Colors.black,
-    textTransform: 'uppercase',
-  },
-
 });
