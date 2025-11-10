@@ -29,12 +29,13 @@ export const Colors = {
   brown: '#5D3A00',
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
+  deleteRed: '#fc6d65',
 
   /* Component Colors */
   borderColor: '#ccc',
   lightBorderColor: '#eee',
   altBorderColor: '#D4CABE',
-  inputBG: '#fafafa',
+  inputBG: '#fdfdfd',
   tabBG: '#FDFBFB',
   buttonBG: '#000',
   cancelButtonBG: '#eee',

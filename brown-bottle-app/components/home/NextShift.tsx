@@ -6,8 +6,8 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
 
-import { getUserShifts } from '@/utils/api/shift';
-import { Shift } from '@/types/iApi'
+import { getShift } from '@/routes/shift';
+import { Shift } from '@/types/iShift'
 
 interface Props {
   employee_id: number;
@@ -21,7 +21,7 @@ const NextShift: React.FC<Props> = ({ employee_id }) => {
   useEffect(() => {
     const fetchShifts = async () => {
       try {
-        const data = await getUserShifts(employee_id);
+        const data = await getShift({employee_id});
         setShifts(data);
       } catch (error) {
         console.error('Error fetching user shifts:', error);

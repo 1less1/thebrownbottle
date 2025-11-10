@@ -9,9 +9,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getSection } from "@/utils/api/section";
+import { getSection } from "@/routes/section";
 
-import { Section } from '@/types/iApi';
+import { Section } from '@/types/iSection';
 
 
 interface DropdownOption {

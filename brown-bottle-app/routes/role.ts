@@ -1,18 +1,18 @@
 import Constants from "expo-constants";
 
-import { buildQueryString } from "@/utils/helper";
+import { buildQueryString } from "@/utils/apiHelpers";
 
-import { Section } from "@/types/iApi";
+import { Role } from "@/types/iRole";
 
-// Fetches data from the section table
-export async function getSection(params?: Partial<Section>) {
+// Fetches data from the role table
+export async function getRole(params?: Partial<Role>) {
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
   // Build Query String
   const queryString = buildQueryString(params || {});
 
-  const url = `${API_BASE_URL}/section?${queryString}`;
+  const url = `${API_BASE_URL}/role?${queryString}`;
   try {
     const response = await fetch(url, {
       method: "GET",

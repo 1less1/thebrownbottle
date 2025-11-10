@@ -8,7 +8,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import CompletedTasks from '@/components/tasks/Completed/CompletedTasks';
 
 import { User } from '@/utils/SessionContext';
-import { Section } from '@/types/iApi';
+import { Section } from '@/types/iSection';
 
 interface CompletedProps {
     user: User;

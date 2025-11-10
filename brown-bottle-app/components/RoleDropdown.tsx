@@ -5,9 +5,9 @@ import { Picker } from "@react-native-picker/picker";
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getRole } from "@/utils/api/role";
+import { getRole } from "@/routes/role";
 
-import { Role } from '@/types/iApi';
+import { Role } from '@/types/iRole';
 
 interface RoleDropdownProps {
   selectedRoleId: number;

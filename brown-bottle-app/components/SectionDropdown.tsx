@@ -5,9 +5,9 @@ import { Picker } from "@react-native-picker/picker";
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getSection } from "@/utils/api/section";
+import { getSection } from "@/routes/section";
 
-import { Section } from '@/types/iApi'
+import { Section } from "@/types/iSection";
 
 interface SectionDropdownProps {
   selectedSectionId: number;

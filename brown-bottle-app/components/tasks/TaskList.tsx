@@ -4,7 +4,7 @@ import { Text, StyleSheet, View } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import { Task } from '@/types/iApi';
+import { Task } from '@/types/iTask';
 import CheckBoxCard from '@/components/tasks/CheckBoxCard';
 
 interface TaskListProps {

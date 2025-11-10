@@ -1,8 +1,8 @@
 import Constants from "expo-constants";
 
-import { buildQueryString } from "@/utils/helper";
+import { buildQueryString } from "@/utils/apiHelpers";
 
-import { Employee } from "@/types/iApi";
+import { Employee } from "@/types/iEmployee";
 
 // GET: Fetches data from the employee table
 export async function getEmployee(params?: Partial<Employee>) {
@@ -13,6 +13,7 @@ export async function getEmployee(params?: Partial<Employee>) {
   const queryString = buildQueryString(params || {});
 
   const url = `${API_BASE_URL}/employee?${queryString}`;
+  
   try {
     const response = await fetch(url, {
       method: "GET",

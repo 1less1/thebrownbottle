@@ -137,7 +137,7 @@ def get_employees(db, request):
             query_params.extend(role_values)
 
         # Last Query Line
-        query += ";"
+        query += " ORDER BY e.primary_role;"
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

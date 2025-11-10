@@ -4,7 +4,7 @@ import TimeOffModal from './TimeOffModal';
 import { Colors } from '@/constants/Colors';
 import Card from '@/components/modular/Card';
 import { useSession } from '@/utils/SessionContext';
-import { getTimeOffRequests } from '@/utils/api/time_off_request';
+import { getTimeOffRequests } from '@/routes/time_off_request';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';

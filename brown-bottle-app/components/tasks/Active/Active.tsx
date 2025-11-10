@@ -8,7 +8,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import ActiveTasks from '@/components/tasks/Active/ActiveTasks';
 
 import { User } from '@/utils/SessionContext';
-import { Section } from '@/types/iApi';
+import { Section } from '@/types/iSection';
 
 interface ActiveProps {
     user: User;

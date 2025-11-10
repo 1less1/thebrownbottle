@@ -16,8 +16,8 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import EditEmp from "@/components/admin/Staff/EditEmp";
 
-import { Employee } from "@/types/iApi";
-import { getEmployee } from "@/utils/api/employee";
+import { Employee } from "@/types/iEmployee";
+import { getEmployee } from "@/routes/employee";
 
 
 

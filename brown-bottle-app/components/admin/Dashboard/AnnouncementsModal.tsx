@@ -9,7 +9,7 @@ import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
 import { User } from '@/utils/SessionContext';
-import { insertAnnouncement } from '@/utils/api/announcement';
+import { insertAnnouncement } from '@/routes/announcement';
 
 
 interface AnnouncementModalProps {
