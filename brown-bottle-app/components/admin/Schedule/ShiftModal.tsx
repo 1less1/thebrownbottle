@@ -123,7 +123,8 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       onUpdate?.();
       onClose();
     } catch (error: any) {
-      alert("Unable to save shift: " + error.message);
+      console.log("Unable to save shift: " + error.message);
+      alert("Unable to save shift! Make sure shift details have been properly changed or try again later.")
     } finally {
       setLoading(false);
     }
