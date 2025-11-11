@@ -74,20 +74,19 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
     <Card>
       {/* Header Row */}
 
-      <View style={styles.row}>
-        <View style={styles.rowRight}>
-          <TimeOffFilter
-            selectedFilter={filter}
-            onChange={(val) => setFilter(val)}
-          />
+      <View style={styles.headerRow}>
+        <TimeOffFilter
+          selectedFilter={filter}
+          onChange={(val) => setFilter(val)}
+        />
 
-          <TouchableOpacity onPress={toggleModal}>
-            <View style={styles.addButton}>
-              <Text style={styles.addText}>Add</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={toggleModal}>
+          <View style={styles.addButton}>
+            <Text style={styles.addText}>Add</Text>
+          </View>
+        </TouchableOpacity>
       </View>
+
 
 
       {/* Main List */}
@@ -141,23 +140,16 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
 export default CalendarTimeOff;
 
 const styles = StyleSheet.create({
-  row: {
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  header: {
-    fontSize: 16,
-    color: Colors.black,
+    justifyContent: 'space-between', // 💡 this does the alignment
+    marginBottom: 8,
   },
   addButton: {
-    backgroundColor: Colors.white,
     borderRadius: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
   },
   addText: {
     color: Colors.black,
@@ -170,12 +162,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  rowRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: 10, // adds spacing between dropdown and Add button
   },
   date: {
     fontSize: 16,
