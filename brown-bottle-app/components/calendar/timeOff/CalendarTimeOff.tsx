@@ -23,6 +23,14 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
 
   const toggleModal = () => setModalVisible((prev) => !prev);
 
+  const filteredRequests =
+    filter === "All"
+      ? requests
+      : filter === "Pending"
+        ? requests.filter((r) => r.status === "Pending")
+        : requests.filter((r) => r.status === "Accepted" || r.status === "Denied");
+
+
   const fetchUserRequests = async () => {
     if (!user?.employee_id) return;
 
@@ -84,10 +92,10 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
 
       {/* Main List */}
       <ModularListView
-        data={requests}
+        data={filteredRequests}
         loading={loading}
         error={error}
-        emptyText="No time off requests yet."
+        emptyText={`No ${filter === "All" ? "" : filter.toLowerCase()} requests found.`}
         renderItem={(req) => (
           <>
             <View style={styles.rowBetween}>
