@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, TextInput, ScrollView, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable } from "react-native";
 import { debounce } from "lodash";
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
@@ -244,23 +244,26 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       </View>
 
       {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: "center" }} />}
-      
+
       {/* Schedule Spreadsheet */}
       <View style={{ flex: 1 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator keyboardShouldPersistTaps="handled">
+        <ScrollView horizontal showsHorizontalScrollIndicator={true} keyboardShouldPersistTaps="handled">
           <View>
             {renderHeader()}
-            <ScrollView style={{ maxHeight: height * 0.7 }} keyboardShouldPersistTaps="handled">
-              {scheduleData.length > 0 ? scheduleData.map(renderEmployeeRow) : (
-                <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>No schedule data found</Text>
-                </View>
-              )}
-            </ScrollView>
+            <FlatList
+              data={scheduleData}
+              keyExtractor={(item) => item.employee_id.toString()}
+              renderItem={({ item }) => renderEmployeeRow(item)}
+              keyboardShouldPersistTaps="handled"
+              style={{ maxHeight: height * 0.7 }} // keep same height limit
+              scrollEnabled={true}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+            />
           </View>
         </ScrollView>
       </View>
-      
+
       {/* Shuft Modal - Add, Update, Delete */}
       <ShiftModal
         visible={modalVisible}

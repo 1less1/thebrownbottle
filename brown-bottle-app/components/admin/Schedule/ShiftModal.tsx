@@ -127,7 +127,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
         // Update Confirmation Popup
         const ok = await confirm(
           'Confirm Update',
-          'Do you want to update this shift?'
+          'Are you sure you want to update this shift?'
         );
         if (!ok) {
           setLoading(false);

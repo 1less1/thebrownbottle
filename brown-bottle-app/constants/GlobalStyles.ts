@@ -133,6 +133,7 @@ export const GlobalStyles = StyleSheet.create({
     },
     deleteButton: {
         backgroundColor: Colors.deleteRed,
+        
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,

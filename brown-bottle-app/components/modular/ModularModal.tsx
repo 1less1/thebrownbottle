@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flexGrow: 1,
+    paddingBottom: 10
   },
   background: {
     ...StyleSheet.absoluteFillObject,

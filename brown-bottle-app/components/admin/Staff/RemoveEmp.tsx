@@ -18,6 +18,8 @@ import { Employee } from "@/types/iEmployee";
 import { getEmployee } from "@/routes/employee";
 import { removeEmployees } from '@/routes/employee';
 
+import { useConfirm } from '@/hooks/useConfirm';
+
 
 interface RemoveEmpProps {
     onRemove?: () => void;
@@ -32,6 +34,8 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+
+    const { confirm } = useConfirm();
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -119,20 +123,20 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         });
     };
 
-    const handleRemoveRequest = () => {
-        if (selectedIds.size === 0) {
-            alert("You must select at least one employee to remove!");
-            return;
-        }
-        toggleConfirmationModal();
-    };
-
     const handleRemove = async () => {
 
         if (selectedIds.size == 0) {
             alert("You must select at least one employee to remove!")
             return;
         }
+
+        // Confirmation Popup
+        const ok = await confirm(
+            "Confirm Deletion",
+            `Are you sure you want to delete ${selectedIds.size} selected employee(s)?`
+        );
+
+        if (!ok) return;
 
         const employeeIdList = Array.from(selectedIds);
 
@@ -182,7 +186,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
 
             {/* Remove Emp Modal */}
-            <ModularModal visible={modalVisible} onClose={onClose}>
+            <ModularModal visible={modalVisible} onClose={onClose} scroll={false}>
 
                 {/* Title */}
                 <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
@@ -224,7 +228,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         text="Delete"
                         textStyle={{ color: 'white' }}
                         style={GlobalStyles.submitButton}
-                        onPress={handleRemoveRequest}
+                        onPress={handleRemove}
                         enabled={!loading}
                     />
                     <ModularButton
@@ -237,37 +241,6 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                 </View>
 
             </ModularModal>
-
-
-            { /* Confirmation Modal */}
-            <ModularModal visible={confirmationModalVisible} onClose={onConfirmationClose}>
-
-                <Text style={GlobalStyles.modalTitle}>Confirm Deletion</Text>
-
-                <Text style={[GlobalStyles.text, { marginVertical: 10 }]}>
-                    Are you sure you want to delete {selectedIds.size} employee{selectedIds.size > 1 ? "s" : ""}?
-                </Text>
-
-                {/* Buttons */}
-                <View style={styles.buttonRowContainer}>
-                    <ModularButton
-                        text="Yes"
-                        textStyle={{ color: 'white' }}
-                        style={GlobalStyles.submitButton}
-                        onPress={handleRemove}
-                        enabled={!loading}
-                    />
-                    <ModularButton
-                        text="Cancel"
-                        textStyle={{ color: 'gray' }}
-                        style={GlobalStyles.cancelButton}
-                        onPress={onConfirmationClose}
-                        enabled={!loading}
-                    />
-                </View>
-
-            </ModularModal>
-
 
         </View>
 

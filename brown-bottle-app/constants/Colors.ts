@@ -29,7 +29,7 @@ export const Colors = {
   brown: '#5D3A00',
   darkBrown: '#4A3508',
   greyWhite: '#FBF7F7',
-  deleteRed: '#fc6d65',
+  deleteRed: '#f8d7da',
 
   /* Component Colors */
   borderColor: '#ccc',

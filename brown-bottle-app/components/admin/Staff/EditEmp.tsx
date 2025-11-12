@@ -16,6 +16,7 @@ import { updateEmployee } from '@/routes/employee';
 import { buildPatchData } from '@/utils/apiHelpers';
 import { isValidEmail, isValidPhone, formatPhone, formatWage } from '@/utils/formHelpers';
 
+import { useConfirm } from '@/hooks/useConfirm';
 
 
 interface EditEmpProps {
@@ -53,6 +54,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
   const [secondaryRole, setSecondaryRole] = useState<number | null>(null);
   const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
   const [isActive, setIsActive] = useState<number>(1); // Default is_active=1 (True)
+
+  const { confirm } = useConfirm();
 
   // Map local variables to an Employee object
   const buildFormData = (): Employee => ({
@@ -118,6 +121,14 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
       alert("No changes detected!");
       return;
     }
+
+    // Confirmation Popup
+    const ok = await confirm(
+      "Confirm Update",
+      `Are you sure you want to update employee details?`
+    );
+
+    if (!ok) return;
 
     setLoading(true);
 
