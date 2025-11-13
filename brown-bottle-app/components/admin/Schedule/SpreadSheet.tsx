@@ -13,9 +13,11 @@ import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
-import { formatSQLDate } from "@/utils/dateTimeHelpers";
+import { formatSQLDate, formatDateNoTZ } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
 import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/routes/schedule";
+import { getTimeOffRequests } from "@/routes/time_off_request";
+import { buildBlockedDaysMap, attachBlockedDays } from "@/routes/schedule";
 
 interface SpreadSheetProps {
   parentRefresh?: number;
@@ -69,7 +71,20 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       }
 
       const schedule: ScheduleEmployee[] = await getSchedule(params);
-      setScheduleData(schedule);
+
+      // Fetch accepted time off requests
+      const timeOff = await getTimeOffRequests({
+        status: "Accepted",
+      });
+
+      // Build blocked days
+      const blockedDays = buildBlockedDaysMap(timeOff);
+
+      // Attach to schedule
+      const updatedSchedule = attachBlockedDays(schedule, blockedDays);
+      console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
+
+      setScheduleData(updatedSchedule);
     } catch (err) {
       console.error("Error fetching schedule:", err);
       alert("Error fetcching schedule!")
@@ -139,41 +154,61 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       {weekDays.map((d, i) => (
         <View key={i} style={[styles.headerCell, { width: DAY_COL_WIDTH, height: HEADER_HEIGHT }]}>
           <Text style={styles.headerText}>{d.dayName}</Text>
-          <Text style={styles.subHeaderText}>{d.date}</Text>
+          <Text style={styles.subHeaderText}>{formatDateNoTZ(d.date)}</Text>
         </View>
       ))}
     </View>
   );
 
-  const renderEmployeeRow = (employee: ScheduleEmployee) => (
-    <View key={employee.employee_id} style={styles.row}>
-      <View style={[styles.nameCell, { width: NAME_COL_WIDTH, height: ROW_HEIGHT }]}>
-        <Text style={styles.employeeName}>{employee.full_name}</Text>
-        <Text style={styles.employeeRole}>({employee.primary_role_name})</Text>
-      </View>
+  const renderEmployeeRow = (employee: ScheduleEmployee) => {
+    return (
+      <View key={employee.employee_id} style={styles.row}>
 
-      {employee.shifts.map((shift, dayIndex) => (
-        <Pressable
-          key={dayIndex}
-          onPress={() => handleCellPress(employee, dayIndex, shift)}
-          style={({ hovered }) => [
-            styles.shiftCell,
-            { width: DAY_COL_WIDTH, height: ROW_HEIGHT },
-            hovered && styles.shiftCellHovered,
-          ]}
-        >
-          {shift ? (
-            <View style={styles.shiftContent}>
-              <Text style={styles.shiftTime}>{shift.start_time}-{shift.end_time}</Text>
-              <Text style={styles.shiftSection}>{shift.section_name}</Text>
-            </View>
-          ) : (
-            <Text style={styles.noShift}>-</Text>
-          )}
-        </Pressable>
-      ))}
-    </View>
-  );
+        {/* Employee Info */}
+        <View style={[styles.nameCell, { width: NAME_COL_WIDTH, height: ROW_HEIGHT }]}>
+          <Text style={styles.employeeName}>{employee.full_name}</Text>
+          <Text style={styles.employeeRole}>({employee.primary_role_name})</Text>
+        </View>
+
+        {employee.shifts.map((shift, dayIndex) => {
+
+          const dateStr = weekDays[dayIndex].date;
+          const isDisabled = employee.blockedDays?.has(dateStr) ?? false;
+
+          return (
+            <Pressable
+              key={dayIndex}
+              disabled={isDisabled}
+              onPress={
+                isDisabled
+                  ? undefined
+                  : () => handleCellPress(employee, dayIndex, shift)
+              }
+              style={({ hovered }) => [
+                styles.shiftCell,
+                { width: DAY_COL_WIDTH, height: ROW_HEIGHT },
+                hovered && !isDisabled && styles.shiftCellHovered,
+                isDisabled && styles.shiftCellDisabled,
+              ]}
+            >
+              {shift ? (
+                <View style={styles.shiftContent}>
+                  <Text style={[styles.shiftTime, isDisabled && styles.shiftTextDisabled]}>
+                    {shift.start_time}-{shift.end_time}
+                  </Text>
+                  <Text style={[styles.shiftSection, isDisabled && styles.shiftTextDisabled]}>
+                    {shift.section_name}
+                  </Text>
+                </View>
+              ) : (
+                <Text style={styles.noShift}>-</Text>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+    );
+  };
 
   return (
     <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.67 }}>
@@ -243,8 +278,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         />
       </View>
 
-      {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: "center" }} />}
-      
+      {loading && <LoadingCircle style={{ marginTop: 10, alignSelf: "center" }} />}
+
       {/* Schedule Spreadsheet */}
       <View style={{ flex: 1 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator keyboardShouldPersistTaps="handled">
@@ -260,8 +295,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           </View>
         </ScrollView>
       </View>
-      
-      {/* Shuft Modal - Add, Update, Delete */}
+
+      {/* Shift Modal - Add, Update, Delete */}
       <ShiftModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -420,6 +455,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightGray,
     opacity: 0.6,
   },
+  shiftCellDisabled: {
+    opacity: 0.5,
+    backgroundColor: '#E8E8E8'
+  },
+  shiftTextDisabled: {
+    color: '#E8E8E8',
+  },
+
   // Empty state
   emptyState: {
     padding: 20,

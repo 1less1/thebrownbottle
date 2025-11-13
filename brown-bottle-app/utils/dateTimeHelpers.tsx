@@ -46,6 +46,11 @@ export const formatDateWithYear = (dateString: string): string => {
   return `${weekdayName}, ${dayNum} ${monthName} ${year}`;
 };
 
+export function formatDateNoTZ(dateStr: string) {
+  const [y, m, d] = dateStr.split("-");
+  return `${Number(m)}/${Number(d)}`;
+}
+
 /**
  * Converts 12-hour time (e.g., "3:45 PM") to 24-hour (e.g., "15:45")
  */
