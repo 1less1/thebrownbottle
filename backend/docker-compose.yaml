@@ -20,8 +20,9 @@ services:
       # Mounting the local .sql dump file into the docker container as 'read only'
       - ./database/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
       - ./database/sample.sql:/docker-entrypoint-initdb.d/02-sample.sql:ro
-      - ./database/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql:ro
-      - ./database/events.sql:/docker-entrypoint-initdb.d/04-events.sql:ro
+      - ./database/triggers.sql:/docker-entrypoint-initdb.d/03-triggers.sql:ro
+      - ./database/procedures.sql:/docker-entrypoint-initdb.d/04-procedures.sql:ro
+      - ./database/events.sql:/docker-entrypoint-initdb.d/05-events.sql:ro
     networks:
      - internal # The mysql container operates on the internal docker network 
   

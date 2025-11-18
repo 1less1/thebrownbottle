@@ -46,6 +46,11 @@ export const formatDateWithYear = (dateString: string): string => {
   return `${weekdayName}, ${dayNum} ${monthName} ${year}`;
 };
 
+export function formatDateNoTZ(dateStr: string) {
+  const [y, m, d] = dateStr.split("-");
+  return `${Number(m)}/${Number(d)}`;
+}
+
 /**
  * Converts 12-hour time (e.g., "3:45 PM") to 24-hour (e.g., "15:45")
  */
@@ -106,6 +111,10 @@ export const formatSQLDate = (date: Date): string => {
 // Input: time string (HH:MM AM/PM)
 // Output: SQL 24 Hour time (HH:MM)
 export const formatSQLTime = (time: string): string => {
+  if (!time || typeof time !== "string") {
+    return ""; // or throw a controlled error
+  }
+  
   const [rawTime, modifier] = time.trim().split(" ");
   let [hours, minutes] = rawTime.split(":").map(Number);
 
@@ -120,6 +129,36 @@ export const formatSQLTime = (time: string): string => {
 
   return `${formattedHours}:${formattedMinutes}`;
 };
+
+// Input: SQL Time HH:MM AM/PM
+// Output: hours, minutes, meridiem (strings or null)
+export const breakUpTime = (time: string) => {
+  const trimmed = time.trim();
+  const parts = trimmed.split(" ");
+
+  if (parts.length !== 2) {
+    return { hours: null, minutes: null, meridiem: null };
+  }
+
+  const [timePart, meridiemRaw] = parts;
+  const [hours, minutes] = timePart.split(":") || [];
+
+  const meridiem = meridiemRaw?.toUpperCase();
+  const validMeridiem = meridiem === "AM" || meridiem === "PM" ? meridiem : null;
+
+  return {
+    hours: hours || null,
+    minutes: minutes || null,
+    meridiem: validMeridiem,
+  };
+};
+
+export const isValidTime = (time: string): boolean => {
+  // Regex: HH:MM AM/PM
+  const regex = /^(0[1-9]|1[0-2]):([0-5][0-9])\s?(AM|PM)$/i;
+  return regex.test(time.trim());
+};
+
 
 // Input: time string (e.g. "9:5", "13:45", "07:30", "1230", "7:30pm")
 // Output: formatted time string (HH:MM AM/PM)

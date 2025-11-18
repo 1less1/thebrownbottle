@@ -10,6 +10,7 @@ import Card from '@/components/modular/Card';
 import CircularImage from '@/components/CircularImage';
 
 import HandleLogout from '@/components/auth/HandleLogout';
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 
 export default function Profile() {
@@ -28,13 +29,12 @@ export default function Profile() {
 
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
-            <Text style={{ textAlign: 'left', fontSize: 36, color: 'black', fontWeight: 'bold', marginLeft: 30, marginBottom:10 }}>
-              {/* No Text Here - Keeps Same Spacing for Top Bar as other Screens! */}
-              Profile
-            </Text>
+        {/* Profile Header */}
+        <View style={GlobalStyles.pageHeaderContainer}>
+          <Text style={GlobalStyles.pageHeader}>
+            Profile
+          </Text>
         </View>
-
 
         <DefaultScrollView>
           

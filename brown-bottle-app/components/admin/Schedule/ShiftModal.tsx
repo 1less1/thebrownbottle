@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  TextInput,
-} from 'react-native';
+import React from "react";
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -14,16 +8,16 @@ import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
+
+import TimeDropdown from '@/components/modular/dropdown/TimeDropdown';
 import SectionDropdown from "@/components/modular/SectionDropdown";
 
 
 import { insertShift, updateShift, deleteShift } from '@/routes/shift';
 import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iShift';
-import { formatSQLTime, formatTime } from '@/utils/dateTimeHelpers';
+import { formatSQLTime, isValidTime } from '@/utils/dateTimeHelpers';
 
 import { useConfirm } from '@/hooks/useConfirm';
-
-import { to24HourFormat, to12HourFormat } from '@/utils/dateTimeHelpers';
 
 
 interface ShiftModalProps {
@@ -43,7 +37,6 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
   const [employeeId, setEmployeeId] = useState<number | null>(null);
   const [shiftId, setShiftId] = useState<number | null>(null);
   const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
   const [sectionId, setSectionId] = useState<number | null>(null);
 
   const { confirm } = useConfirm();
@@ -53,7 +46,6 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       setEmployeeId(employeeData?.employee_id ?? null)
       setShiftId(shiftData?.shift_id ?? null)
       setStartTime(shiftData?.start_time ?? "");
-      setEndTime(shiftData?.end_time ?? "");
       setSectionId(shiftData?.section_id ?? null);
     }
   }, [visible, shiftData, employeeData]);
@@ -63,8 +55,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
     employee_id: employeeData?.employee_id,
     section_id: sectionId ?? shiftData?.section_id,
     date: date,   // YYYY-MM-DD
-    start_time: formatSQLTime(startTime), // HH:MM
-    end_time: formatSQLTime(endTime),  // HH:MM
+    start_time: formatSQLTime(startTime), // HH:MM AM/PM
   });
 
 
@@ -110,8 +101,8 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
         return;
       }
 
-      if (!endTime.trim()) {
-        alert("Please assign a end time.");
+      if (!isValidTime(startTime)) {
+        alert("Please enter a valid start time (HH:MM AM/PM).");
         setLoading(false);
         return;
       }
@@ -175,27 +166,12 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       ) : (
         <View style={styles.formContainer}>
 
+
           {/* Input fields */}
           <Text style={GlobalStyles.inputLabelText}>Start Time</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={startTime}
-            onChangeText={(text) => setStartTime(text)} // raw input
-            onBlur={() => setStartTime(formatTime(startTime))} // format on blur
-            placeholder="HH:MM AM/PM"
-            placeholderTextColor={Colors.gray}
-            editable={!loading}
-          />
-
-          <Text style={GlobalStyles.inputLabelText}>End Time</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={endTime}
-            onChangeText={(text) => setEndTime(text)} // raw input
-            onBlur={() => setEndTime(formatTime(endTime))} // format on blur
-            placeholder="HH:MM AM/PM"
-            placeholderTextColor={Colors.gray}
-            editable={!loading}
+          <TimeDropdown
+            time={startTime}
+            onTimeChange={(value) => setStartTime(value)}
           />
 
           <Text style={GlobalStyles.inputLabelText}>Section</Text>
@@ -251,9 +227,6 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 20,
   },
-  inputError: { color: '#D9534F', marginTop: 6, fontSize: 13 },
-  actions: { gap: 12 },
-  cancelButton: { backgroundColor: Colors.borderColor, marginTop: 8 },
 });
 
 

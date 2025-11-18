@@ -61,7 +61,6 @@ def get_shifts(db, request):
                 sh.section_id,
                 se.section_name,
                 TIME_FORMAT(sh.start_time, '%h:%i %p') AS start_time,
-                TIME_FORMAT(sh.end_time, '%h:%i %p') AS end_time,
                 DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
                 DATE_FORMAT(sh.date, '%W') AS day_name,
                 DAYOFWEEK(sh.date) AS day_index,
@@ -177,14 +176,13 @@ def insert_shift(db, request):
     try:
         # Define Required Fields
         required_fields = [
-            'employee_id', 'start_time', 'end_time', 'date', 'section_id'
+            'employee_id', 'start_time', 'date', 'section_id'
         ]
 
         # Define Expected Field Types
         field_types = {
             'employee_id': int,
             'start_time': str, # HH:MM:SS
-            'end_time': str, # HH:MM:SS
             'date': str, # YYYY-MM-DD
             'section_id': int,
         }
@@ -198,7 +196,6 @@ def insert_shift(db, request):
         # Extract Parameters
         employee_id = fields['employee_id']
         start_time = fields['start_time']
-        end_time = fields['end_time']
         date = fields['date']
         section_id = fields['section_id']
 
@@ -208,9 +205,9 @@ def insert_shift(db, request):
         # Execute Query
         cursor.execute("""
             INSERT INTO shift 
-            (employee_id, start_time, end_time, date, section_id)
-            VALUES (%s, %s, %s, %s, %s);
-        """, (employee_id, start_time, end_time, date, section_id))
+            (employee_id, start_time, date, section_id)
+            VALUES (%s, %s, %s, %s);
+        """, (employee_id, start_time, date, section_id))
         
         inserted_id = cursor.lastrowid
 
@@ -243,7 +240,7 @@ def update_shift(db, request, shift_id):
     """
     Updates an existing shift record (partial update).
     shift_id comes from the URL.
-    Other fields (employee_id, start_time, end_time, date, section_id) are optional.
+    Other fields (employee_id, start_time, date, section_id) are optional.
     """
     conn = None
     cursor = None
@@ -252,7 +249,6 @@ def update_shift(db, request, shift_id):
         field_types = {
             'employee_id': int,
             'start_time': str,   # HH:MM or HH:MM:SS
-            'end_time': str,
             'date': str,         # YYYY-MM-DD
             'section_id': int,
         }

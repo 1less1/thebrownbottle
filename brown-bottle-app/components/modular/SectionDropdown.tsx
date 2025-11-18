@@ -80,7 +80,7 @@ const SectionDropdown: React.FC<DropdownProps> = ({
 
             {/* Dropdown Button */}
             <TouchableOpacity
-                style={[styles.button, buttonStyle]}
+                style={[GlobalStyles.dropdownButton, buttonStyle]}
                 onPress={() => setVisible(true)}
                 disabled={!editable || loading}
             >
@@ -163,15 +163,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginRight: 8,
         color: Colors.black,
-    },
-    button: {
-        flex: 1,
-        borderWidth: 1,
-        borderColor: Colors.borderColor,
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        backgroundColor: Colors.white,
-        borderRadius: 6,
     },
     buttonContent: {
         flexDirection: "row",

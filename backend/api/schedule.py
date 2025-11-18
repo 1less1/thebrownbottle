@@ -61,7 +61,6 @@ def get_schedule_data(db, request):
                 s.shift_id,
                 s.date,
                 TIME_FORMAT(s.start_time, '%h:%i %p') AS start_time,
-                TIME_FORMAT(s.end_time, '%h:%i %p') AS end_time,
                 DATE_FORMAT(s.date, '%Y-%m-%d') AS date,
                 DATE_FORMAT(s.date, '%W') AS day_name,
                 DAYOFWEEK(s.date) AS day_index,
@@ -120,7 +119,6 @@ def get_schedule_data(db, request):
                         "day_index": row["day_index"],   # 1 (Sun)... to 6 (Sat)
                         "day_name": row["day_name"],
                         "start_time": row["start_time"],
-                        "end_time": row["end_time"],
                         "section_id": row["section_id"],
                         "section_name": row["section_name"]
                     }

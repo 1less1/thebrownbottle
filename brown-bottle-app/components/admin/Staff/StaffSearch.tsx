@@ -198,7 +198,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                         onChangeText={handleSearchChange}
                         placeholder="Search Staff by Name"
                         placeholderTextColor={Colors.gray}
-                        style={styles.input}
+                        style={GlobalStyles.searchInput}
                     />
                     <ModularButton onPress={handleReset} text="Reset" />
                 </View>
@@ -218,7 +218,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                         onSelect={(value) => setSelectedAdminOption(value as number)}
                         labelText=""
                         containerStyle={styles.dropdownButton}
-                        placeholder="Select admin..."
+                        placeholderText="Select admin..."
                         options={adminDropdownOptions}
                         editable={!loading}
                     />
@@ -281,7 +281,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: "row",
-        paddingVertical: 6,
+        paddingVertical: 10,
         gap: 6,
         marginBottom: 12,
     },
@@ -291,13 +291,6 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         gap: 12,
         marginBottom: 12,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: Colors.borderColor,
-        flexGrow: 1,
-        padding: 8,
-        borderRadius: 4,
     },
     dropdownButton: {
         minWidth: 0,      // let it shrink as much as content allows

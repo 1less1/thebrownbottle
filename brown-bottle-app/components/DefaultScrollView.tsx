@@ -14,16 +14,18 @@ interface DefaultScrollViewProps {
   topSafeAreaColor?: string;
   bottomSafeAreaColor?: string;
   scrollViewColor?: string;
+  scrollEnabled?: boolean;
 }
 
 
-const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, onRefresh, refreshing = false }) => {
+const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, onRefresh, refreshing = false, scrollEnabled = true, }) => {
 
   return (
 
     <ScrollView
       style={[styles.scrollView, style]}
       contentContainerStyle={styles.scrollContent}
+      scrollEnabled={scrollEnabled}
       showsVerticalScrollIndicator={true}
       bounces={true}
       overScrollMode="always"

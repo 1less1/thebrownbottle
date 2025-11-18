@@ -4,7 +4,6 @@ export interface Shift {
   section_id: number;
   date: string;       // 'YYYY-MM-DD'
   start_time: string; // 'HH:MM'
-  end_time: string;   // 'HH:MM'
   timestamp: string;
 
   // Only appear in JSON responses
@@ -41,10 +40,9 @@ export interface ScheduleAPI {
 export interface ScheduleShift {
   shift_id: number;
   date: string;
-  start_time: string;   // e.g., "10:00 AM" (matches TIME_FORMAT '%h:%i %p')
-  end_time: string;     // e.g., "06:00 PM"
-  section_id: number;   // matches s.section_id
-  section_name: string; // matches sec.section_name
+  start_time: string;   // e.g., HH:MM AM/PM
+  section_id: number;   
+  section_name: string;
   day_name: string;     // e.g., "Monday"
   day_index: number;    // 1–7 (Sunday=1)
 }
@@ -55,4 +53,5 @@ export interface ScheduleEmployee {
   primary_role: number | null;
   primary_role_name: string;
   shifts: (ScheduleShift | null)[]; // 7 Entries: Sunday (1)... to Saturday (7)
+  blockedDays?: Set<string>; // Set of 'YYYY-MM-DD' strings representing blocked days
 }

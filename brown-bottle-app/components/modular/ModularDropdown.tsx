@@ -20,7 +20,7 @@ interface ModularDropdownProps {
   onSelect: (value: number | string | null, key: string) => void;
   labelText?: string;
   usePlaceholder?: boolean;
-  placeholder?: string;
+  placeholderText?: string;
   placeholderValue?: number | string | null;
   editable?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
@@ -33,7 +33,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
   onSelect,
   labelText = "Filter:",
   usePlaceholder = true,
-  placeholder = "Select an option...",
+  placeholderText = "Select an option...",
   placeholderValue = null,
   editable = true,
   containerStyle,
@@ -52,7 +52,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
   };
 
   const dropdownOptions = usePlaceholder
-    ? [{ key: placeholder, value: placeholderValue }, ...options]
+    ? [{ key: placeholderText, value: placeholderValue }, ...options]
     : options;
 
   return (
@@ -63,7 +63,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
 
       {/* Dropdown Button */}
       <TouchableOpacity
-        style={[styles.button, buttonStyle]}
+        style={[GlobalStyles.dropdownButton, buttonStyle]}
         onPress={() => setVisible(true)}
         disabled={!editable}
       >
@@ -74,7 +74,7 @@ const ModularDropdown: React.FC<ModularDropdownProps> = ({
               { color: selectedLabel ? Colors.black : Colors.gray, marginRight: 5 },
             ]}
           >
-            {selectedLabel || placeholder}
+            {selectedLabel || placeholderText}
           </Text>
           <Ionicons
             name={visible ? "chevron-up" : "chevron-down"}
@@ -143,15 +143,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginRight: 8,
     color: Colors.black,
-  },
-  button: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    backgroundColor: Colors.white,
-    borderRadius: 6,
   },
   buttonContent: {
     flexDirection: "row",

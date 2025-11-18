@@ -47,8 +47,7 @@ export async function insertShift(fields: Partial<Shift>) {
 
   // Required db fields for POST
   const requiredFields: (keyof Shift)[] = [
-    "employee_id", "start_time", "end_time",
-    "date", "section_id"
+    "employee_id", "start_time", "date", "section_id"
   ];
 
   try {

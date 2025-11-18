@@ -111,6 +111,20 @@ export const GlobalStyles = StyleSheet.create({
     },
 
     // Component Styles
+    pageHeaderContainer: {
+        width: '100%',
+        paddingTop: 10,
+        backgroundColor: Colors.white,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.altBorderColor,
+    },
+    searchInput: {
+        borderWidth: 1,
+        borderColor: Colors.borderColor,
+        flexGrow: 1,
+        padding: 8,
+        borderRadius: 4,
+    },
     input: {
         flexShrink: 1,
         borderWidth: 1,
@@ -119,6 +133,14 @@ export const GlobalStyles = StyleSheet.create({
         padding: 10,
         fontSize: 14,
         backgroundColor: Colors.inputBG,
+    },
+    dropdownButton: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: Colors.borderColor,
+        padding: 10,
+        backgroundColor: Colors.white,
+        borderRadius: 6,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -133,7 +155,7 @@ export const GlobalStyles = StyleSheet.create({
     },
     deleteButton: {
         backgroundColor: Colors.deleteRed,
-        
+
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -144,24 +166,25 @@ export const GlobalStyles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
     },
-  // Badge Styles
-  accepted: {
-    color: "#28a745",
-    backgroundColor: "#d4edda",
-    padding: 6,
-    borderRadius: 4,
-  },
-  denied: {
-    color: "#dc3545",
-    backgroundColor: "#f8d7da",
-    padding: 6,
-    borderRadius: 4,
-  },
 
-  pending: {
-    color: "#ff9800",
-    backgroundColor: "#fff3e0",
-    padding: 6,
-    borderRadius: 4,
-  },
+    // Badge Styles
+    accepted: {
+        color: "#28a745",
+        backgroundColor: "#d4edda",
+        padding: 6,
+        borderRadius: 4,
+    },
+    denied: {
+        color: "#dc3545",
+        backgroundColor: "#f8d7da",
+        padding: 6,
+        borderRadius: 4,
+    },
+
+    pending: {
+        color: "#ff9800",
+        backgroundColor: "#fff3e0",
+        padding: 6,
+        borderRadius: 4,
+    },
 });

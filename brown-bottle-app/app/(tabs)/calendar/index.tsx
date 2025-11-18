@@ -2,6 +2,7 @@ import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'reac
 import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
@@ -29,31 +30,17 @@ export default function CalendarPage() {
     setTimeout(() => setRefreshing(false), 800);
   }, []);
 
-  
+
 
   return (
+    
     <DefaultView backgroundColor={Colors.white}>
+      
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
+        
         {/* Calendar Header */}
-        <View
-          style={{
-            width: '100%',
-            paddingTop: 10,
-            backgroundColor: Colors.white,
-            borderBottomWidth: 1,
-            borderBottomColor: Colors.altBorderColor,
-          }}
-        >
-          <Text
-            style={{
-              textAlign: 'left',
-              fontSize: 36,
-              color: 'black',
-              fontWeight: 'bold',
-              marginLeft: 30,
-              marginBottom: 10,
-            }}
-          >
+        <View style={GlobalStyles.pageHeaderContainer}>
+          <Text style={GlobalStyles.pageHeader}>
             Calendar
           </Text>
         </View>
@@ -94,8 +81,13 @@ export default function CalendarPage() {
             </Text>
             <CalendarTimeOff refreshKey={refreshKey} />
           </View>
+          
         </DefaultScrollView>
+        
       </View>
+
     </DefaultView>
+
   );
-}
+
+};

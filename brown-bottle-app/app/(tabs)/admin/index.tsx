@@ -4,7 +4,9 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
+
 import DefaultView from '@/components/DefaultView';
 import Dashboard from "@/components/admin/Dashboard/Dashboard";
 import Schedule from "@/components/admin/Schedule/Schedule";
@@ -44,7 +46,9 @@ const Admin = () => {
         />
     },
 
-    { key: 'schedule', title: 'Schedule', component: <Schedule /> },
+    { 
+      key: 'schedule', title: 'Schedule', component: <Schedule /> 
+    },
 
     {
       key: 'staff', title: 'Staff', component: <Staff />
@@ -76,7 +80,8 @@ const Admin = () => {
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
 
         <View style={{ backgroundColor: Colors.white }}>
-          <Text style={styles.header}>Admin</Text>
+          
+          <Text style={GlobalStyles.pageHeader}>Admin</Text>
 
           {/* Tab Bar */}
           <View style={styles.tabBar}>

@@ -48,7 +48,7 @@ export const Colors = {
   white:'#FFFFFF',
   lightGray: '#E5E5EA',
   gray: '#B1B1B5',
-  darkGray: '6B6B6E',
+  darkGray: '#6B6B6E',
   blue: '#2e86de',
 
 };
