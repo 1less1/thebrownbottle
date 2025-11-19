@@ -10,6 +10,7 @@ import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';
 import { TimeOffRequest, TimeOffProps } from '@/types/iTimeOff';
 import TimeOffFilter from "./TimeOffFilter";
+import StatusBadge from '@/components/modular/StatusBadge';
 
 
 const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
@@ -82,7 +83,7 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
 
         <TouchableOpacity onPress={toggleModal}>
           <View style={styles.addButton}>
-            <Text style={styles.addText}>Add</Text>
+            <Text style={GlobalStyles.boldText}>Add</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -98,32 +99,23 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
         renderItem={(req) => (
           <>
             <View style={styles.rowBetween}>
-              <Text style={styles.date}>
+              <Text style={GlobalStyles.semiBoldText}>
                 {formatDate(req.start_date)} {'–'} {formatDate(req.end_date)}
               </Text>
-              <Text
-                style={[
-                  styles.statusText,
-                  req.status === 'Accepted'
-                    ? GlobalStyles.accepted
-                    : req.status === 'Denied'
-                      ? GlobalStyles.denied
-                      : GlobalStyles.pending,
-                ]}
-              >
-                {req.status}
-              </Text>
+              <StatusBadge status={req.status} />
             </View>
 
             <Text
-              style={[GlobalStyles.boldMediumText, { marginTop: 4, color: Colors.gray }]}
+              style={[GlobalStyles.altText, { marginTop: 4 }]}
             >
               {req.reason}
             </Text>
 
-            <Text style={styles.timestamp}>
+            <Text style={[GlobalStyles.smallAltText, { marginTop: 4, color: Colors.gray }]}>
               Submitted at {formatDateTime(req.timestamp)}
             </Text>
+
+
           </>
         )}
       />
@@ -147,16 +139,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   addButton: {
-    borderRadius: 5,
+    backgroundColor: Colors.white,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-  },
-  addText: {
-    color: Colors.black,
-    fontWeight: 'bold',
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    fontSize: 14,
+    paddingVertical: 6,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -169,11 +157,6 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontWeight: 'bold',
     maxWidth: '55%',
-  },
-  statusText: {
-    fontSize: 13,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
   },
   timestamp: {
     fontSize: 12,

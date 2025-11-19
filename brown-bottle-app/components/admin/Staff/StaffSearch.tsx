@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { useWindowDimensions, View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { debounce } from "lodash";
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
@@ -45,6 +45,10 @@ interface StaffSearchProps {
 
 
 const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone }) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Employee[]>([]);
 
@@ -169,7 +173,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                                 setSelectedEmployee(item);
                                 setEditEmpVisible(true);
                             }}>
-                                <Text numberOfLines={1} ellipsizeMode="tail" style={[GlobalStyles.text, { color: Colors.blue, textDecorationLine: 'underline' }]}>
+                                <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.linkText}>
                                     {cellContent}
                                 </Text>
                             </TouchableOpacity>
@@ -189,7 +193,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
         <>
 
-            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: 500 }}>
+            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: HEIGHT * 0.55 }}>
 
                 {/* Search Bar + Reset Button */}
                 <View style={styles.searchContainer}>
@@ -237,16 +241,17 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                 {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
 
                 {/* Data Table */}
-                {/* Horizontal Scroll only */}
+                {/* Scroll View = Horizontal */}
+                {/* Flat List = Vertical */}
                 <View style={{ flex: 1 }}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>
+                    <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={styles.tableContainer}>
                             {renderHeader()}
                             <FlatList
                                 data={results}
                                 keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
                                 renderItem={renderCell}
-                                style={{ maxHeight: 350 }}
+                                style={{ maxHeight: HEIGHT * 0.4 }}
                                 scrollEnabled={true}
                                 nestedScrollEnabled={true}
                                 showsVerticalScrollIndicator={true}
@@ -264,6 +269,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
             </Card>
 
+            {/* Edit Employee Modal - Update */}
             <EditEmp
                 visible={editEmpVisible}
                 onClose={closeEditEmp}
@@ -283,18 +289,23 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         paddingVertical: 10,
         gap: 6,
-        marginBottom: 12,
+        marginBottom: 8,
     },
     filterContainer: {
         flexDirection: "row",
-        flexWrap: "wrap", // allows wrapping on small screens
+        flexWrap: "wrap",
         justifyContent: "flex-start",
         gap: 12,
         marginBottom: 12,
     },
+    tableContainer: {
+        flex: 1,
+        maxWidth: "100%",
+        alignSelf: "stretch",
+    },
     dropdownButton: {
-        minWidth: 0,      // let it shrink as much as content allows
-        alignSelf: "flex-start", // size to content rather than container
+        flexShrink: 1,
+        minWidth: 150,
     },
     row: {
         flexDirection: "row",
@@ -305,15 +316,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Colors.lightBorderColor,
         flexShrink: 1,
-    },
-    tableContainer: {
-        flex: 1,
-        maxWidth: "100%",
-        alignSelf: "stretch",
-    },
-    headerText: {
-        fontWeight: "bold",
-        textAlign: "left",
     },
 });
 

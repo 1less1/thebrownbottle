@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
-import { Dimensions } from 'react-native';
+import { useWindowDimensions, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import { debounce } from "lodash";
@@ -26,6 +25,10 @@ interface RemoveEmpProps {
 }
 
 const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Employee[]>([]);
 
@@ -178,7 +181,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         <View style={styles.container}>
 
 
-            {/* Clickable Content */}
+            {/* Clickable Tile */}
             <TouchableOpacity onPress={onOpen} style={styles.removeButton}>
                 <Ionicons name="person-remove" size={30} color="black" style={styles.icon} />
                 <Text style={[GlobalStyles.boldText, styles.iconText]}>Remove Employee</Text>
@@ -189,7 +192,12 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
             <ModularModal visible={modalVisible} onClose={onClose} scroll={false}>
 
                 {/* Title */}
-                <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
+                <View style={GlobalStyles.headerContainer}>
+                    <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
+                    <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
+                        <Ionicons name="close" size={28} color={Colors.black} />
+                    </TouchableOpacity>
+                </View>
 
                 {/* Search Bar + Reset Button */}
                 <View style={styles.searchContainer}>
@@ -205,8 +213,8 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
                 {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
 
-                {/* Search Results */}
-                <View style={{ height: 200 }}>
+                {/* Search Results (Scrollable) */}
+                <View style={{ height: HEIGHT * 0.42 }}>
                     <FlatList
                         data={results}
                         keyExtractor={(item) => item.employee_id?.toString() ?? ""}
@@ -223,19 +231,12 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                 </View>
 
                 {/* Buttons */}
-                <View style={styles.buttonRowContainer}>
+                <View style={GlobalStyles.buttonRowContainer}>
                     <ModularButton
                         text="Delete"
                         textStyle={{ color: 'white' }}
                         style={GlobalStyles.submitButton}
                         onPress={handleRemove}
-                        enabled={!loading}
-                    />
-                    <ModularButton
-                        text="Cancel"
-                        textStyle={{ color: 'gray' }}
-                        style={GlobalStyles.cancelButton}
-                        onPress={onClose}
                         enabled={!loading}
                     />
                 </View>
@@ -309,12 +310,6 @@ const styles = StyleSheet.create({
         color: Colors.white,
         fontSize: 14,
         fontWeight: "bold",
-    },
-    buttonRowContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        gap: 10,
-        marginTop: 20,
     },
 
 });

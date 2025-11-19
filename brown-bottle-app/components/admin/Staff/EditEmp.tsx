@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { useWindowDimensions, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -38,6 +38,10 @@ const isActiveDropdownOptions = [
 
 
 const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }) => {
+  const { width, height } = useWindowDimensions();
+  const WIDTH = width;
+  const HEIGHT = height;
+
   const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(false);
 
@@ -176,7 +180,7 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
   return (
 
-    <ModularModal visible={visible} onClose={onClose}>
+    <ModularModal visible={visible} onClose={onClose} scroll={false}>
 
       {/* Header */}
       <View style={GlobalStyles.headerContainer}>
@@ -189,110 +193,119 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
       {/* Employee Form */}
       {originalEmpData ? (
-        <View style={styles.formContainer}>
-          <Text style={GlobalStyles.mediumText}>First Name</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={firstName}
-            onChangeText={setFirstName}
-            editable={edit}
-          />
+        <>
+          <View style={[styles.formContainer, { height: HEIGHT * 0.42 }]}>
 
-          <Text style={GlobalStyles.mediumText}>Last Name</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={lastName}
-            onChangeText={setLastName}
-            editable={edit}
-          />
+            <ScrollView>
 
-          <Text style={GlobalStyles.mediumText}>Email</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="email@domain.com"
-            placeholderTextColor={Colors.gray}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            editable={edit}
-          />
 
-          <Text style={GlobalStyles.mediumText}>Phone</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={phoneNumber}
-            onChangeText={(text) => setPhoneNumber(formatPhone(text))}
-            placeholder="XXX-XXX-XXXX"
-            placeholderTextColor={Colors.gray}
-            keyboardType="phone-pad"
-            editable={edit}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>First Name</Text>
+              <TextInput
+                style={GlobalStyles.input}
+                value={firstName}
+                onChangeText={setFirstName}
+                editable={edit}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Wage</Text>
-          <TextInput
-            style={GlobalStyles.input}
-            value={wage}
-            onChangeText={((text) => setWage(formatWage(text)))}
-            placeholder="00.00"
-            placeholderTextColor={Colors.gray}
-            keyboardType="decimal-pad"
-            editable={edit}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Last Name</Text>
+              <TextInput
+                style={GlobalStyles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                editable={edit}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Admin</Text>
-          <ModularDropdown
-            options={adminDropdownOptions}
-            selectedValue={admin}
-            onSelect={(value) => setAdmin(value as number)}
-            labelText=""
-            editable={edit}
-            containerStyle={styles.dropdownButton}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Email</Text>
+              <TextInput
+                style={GlobalStyles.input}
+                value={email}
+                onChangeText={setEmail}
+                placeholder="email@domain.com"
+                placeholderTextColor={Colors.gray}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={edit}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Primary Role</Text>
-          <RoleDropdown
-            selectedRoleId={primaryRole}
-            onRoleSelect={setPrimaryRole}
-            labelText=""
-            placeholder="None"
-            editable={edit}
-            containerStyle={styles.dropdownButton}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Phone</Text>
+              <TextInput
+                style={GlobalStyles.input}
+                value={phoneNumber}
+                onChangeText={(text) => setPhoneNumber(formatPhone(text))}
+                placeholder="XXX-XXX-XXXX"
+                placeholderTextColor={Colors.gray}
+                keyboardType="phone-pad"
+                editable={edit}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Secondary Role</Text>
-          <RoleDropdown
-            selectedRoleId={secondaryRole}
-            onRoleSelect={setSecondaryRole}
-            labelText=""
-            placeholder="None"
-            editable={edit}
-            containerStyle={styles.dropdownButton}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Wage</Text>
+              <TextInput
+                style={GlobalStyles.input}
+                value={wage}
+                onChangeText={((text) => setWage(formatWage(text)))}
+                placeholder="00.00"
+                placeholderTextColor={Colors.gray}
+                keyboardType="decimal-pad"
+                editable={edit}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Tertiary Role</Text>
-          <RoleDropdown
-            selectedRoleId={tertiaryRole}
-            onRoleSelect={setTertiaryRole}
-            labelText=""
-            placeholder="None"
-            editable={edit}
-            containerStyle={styles.dropdownButton}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
+              <ModularDropdown
+                options={adminDropdownOptions}
+                selectedValue={admin}
+                onSelect={(value) => setAdmin(value as number)}
+                labelText=""
+                editable={edit}
+                containerStyle={styles.dropdownButton}
+              />
 
-          <Text style={GlobalStyles.mediumText}>Active</Text>
-          <ModularDropdown
-            options={isActiveDropdownOptions}
-            selectedValue={isActive}
-            onSelect={(value) => setIsActive(value as number)}
-            labelText=""
-            usePlaceholder={false}
-            editable={edit}
-            containerStyle={styles.dropdownButton}
-          />
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Primary Role</Text>
+              <RoleDropdown
+                selectedRoleId={primaryRole}
+                onRoleSelect={setPrimaryRole}
+                labelText=""
+                placeholder="None"
+                editable={edit}
+                containerStyle={styles.dropdownButton}
+              />
 
-          {/* Buttons */}
-          <View style={styles.buttonRowContainer}>
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Secondary Role</Text>
+              <RoleDropdown
+                selectedRoleId={secondaryRole}
+                onRoleSelect={setSecondaryRole}
+                labelText=""
+                placeholder="None"
+                editable={edit}
+                containerStyle={styles.dropdownButton}
+              />
+
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Tertiary Role</Text>
+              <RoleDropdown
+                selectedRoleId={tertiaryRole}
+                onRoleSelect={setTertiaryRole}
+                labelText=""
+                placeholder="None"
+                editable={edit}
+                containerStyle={styles.dropdownButton}
+              />
+
+              <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Active</Text>
+              <ModularDropdown
+                options={isActiveDropdownOptions}
+                selectedValue={isActive}
+                onSelect={(value) => setIsActive(value as number)}
+                labelText=""
+                usePlaceholder={false}
+                editable={edit}
+                containerStyle={styles.dropdownButton}
+              />
+
+            </ScrollView>
+
+          </View>
+
+
+          <View style={GlobalStyles.buttonRowContainer}>
             {edit ? (
               <ModularButton
                 text="Update"
@@ -307,15 +320,8 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 onPress={handleEdit}
               />
             )}
-            <ModularButton
-              text="Cancel"
-              textStyle={{ color: 'gray' }}
-              style={GlobalStyles.cancelButton}
-              onPress={onClose}
-            />
           </View>
-
-        </View>
+        </>
 
       ) : (
         <Text style={GlobalStyles.loadingText}>Loading employee data...</Text>
@@ -331,12 +337,6 @@ const styles = StyleSheet.create({
   formContainer: {
     gap: 12,
     marginTop: 10,
-  },
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-    marginTop: 20,
   },
   dropdownButton: {
     minWidth: 0,

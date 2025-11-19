@@ -4,6 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useConfirm } from '@/hooks/useConfirm';
 import { ButtonProps } from '@/types/iTimeOff';
 
+import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
+
 const AcceptDenyButtons: React.FC<ButtonProps> = ({
   employee_id,
   employee_name,
@@ -52,12 +55,12 @@ const AcceptDenyButtons: React.FC<ButtonProps> = ({
           styles.content,
           {
             marginRight: isSmallScreen ? 0 : 10,
-            backgroundColor: '#c2ffba',
-            borderColor: '#5ccf4c',
+            backgroundColor: Colors.bgGreen,
+            borderColor: Colors.acceptGreen,
           },
         ]}
       >
-        <Ionicons name="checkmark-circle" size={20} color="#409135" />
+        <Ionicons name="checkmark-circle" size={20} color={Colors.acceptGreen} />
       </TouchableOpacity>
       {/* Deny Button */}
       <TouchableOpacity
@@ -66,12 +69,12 @@ const AcceptDenyButtons: React.FC<ButtonProps> = ({
           styles.content,
           {
             marginTop: isSmallScreen ? 10 : 0,
-            backgroundColor: '#f8d7da',
-            borderColor: 'red',
+            backgroundColor: Colors.bgRed,
+            borderColor: Colors.denyRed,
           },
         ]}
       >
-        <Ionicons name="close-circle" size={20} color="#dc3545" />
+        <Ionicons name="close-circle" size={20} color={Colors.denyRed} />
       </TouchableOpacity>
     </View>
   );

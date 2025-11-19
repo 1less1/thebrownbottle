@@ -14,32 +14,6 @@ const UniversalDatePicker: React.FC<Props> = ({ dateString, onChange }) => {
   
   const [selectedDate, setSelectedDate] = useState(dateString);
 
-  /* // Web date input
-  if (Platform.OS === 'web') {
-    return (
-      <input
-        type="date"
-        dateObject={selectedDate}
-        onChange={(e) => {
-          const [year, month, day] = e.target.dateObject.split('-').map(Number);
-          const newDate = new Date(year, month - 1, day);
-          setSelectedDate(formatDate(newDate));
-          onChange(formatDate(newDate));
-        }}
-        style={{
-          padding: 10,
-          borderWidth: 1,
-          borderColor: '#ccc',
-          borderRadius: 5,
-          fontSize: 16,
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-      />
-    );
-  }
-  */
-
   // Picker For all 3 Platforms (Web, IOS, Android)
   return (
 
@@ -60,17 +34,18 @@ const UniversalDatePicker: React.FC<Props> = ({ dateString, onChange }) => {
         theme={{
           backgroundColor: 'white',
           calendarBackground: 'white',
-          textSectionTitleColor: Colors.darkBrown,
+          textSectionTitleColor: 'black',
           selectedDayBackgroundColor: Colors.blue,
           selectedDayTextColor: 'white',
-          todayTextColor: Colors.blue,
+          todayTextColor: 'black',
           dayTextColor: 'black',
-          arrowColor: Colors.darkBrown,
-          monthTextColor: Colors.darkBrown,
+          arrowColor: 'black',
+          monthTextColor: 'black',
           todayDotColor: Colors.blue,
-          textDayFontWeight: '400',
+          todayBackgroundColor: Colors.lightBorderColor,
+          textDayFontWeight: '600',
           textMonthFontWeight: 'bold',
-          textDayHeaderFontWeight: '400',
+          textDayHeaderFontWeight: '600',
           textDayFontSize: 13,
           textMonthFontSize: 16,
           textDayHeaderFontSize: 14,

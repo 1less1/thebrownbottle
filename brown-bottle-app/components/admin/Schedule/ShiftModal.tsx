@@ -137,7 +137,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       onClose();
     } catch (error: any) {
       console.log("Unable to save shift: " + error.message);
-      alert("Unable to save shift! Make sure shift details have been edited or try again later.")
+      alert("Unable to save shift! A shift for this employee may already exist or shift details may not have been updated. Try again later!")
     } finally {
       setLoading(false);
     }

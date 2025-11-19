@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { useWindowDimensions, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -25,6 +25,10 @@ const adminDropdownOptions = [
 ];
 
 const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
 
@@ -126,130 +130,131 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
         <View style={styles.container}>
 
-            {/* Clickable Content */}
+            {/* Clickable Tile */}
             <TouchableOpacity onPress={toggleModal} style={styles.addButton}>
                 <Ionicons name="person-add" size={30} color="black" style={styles.icon} />
                 <Text style={[GlobalStyles.boldText, styles.iconText]}>Add Employee</Text>
             </TouchableOpacity>
 
             {/* Add Emp Modal */}
-            <ModularModal visible={modalVisible} onClose={toggleModal}>
+            <ModularModal visible={modalVisible} onClose={toggleModal} scroll={false}>
 
                 {/* Header */}
                 <View style={GlobalStyles.headerContainer}>
-                    <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
+                    <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
                     <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
                         <Ionicons name="close" size={28} color={Colors.black} />
                     </TouchableOpacity>
                 </View>
 
-                {/* Employee Form */}
-                <View style={styles.formContainer}>
-                    <Text style={GlobalStyles.mediumText}>First Name</Text>
-                    <TextInput
-                        style={GlobalStyles.input}
-                        value={firstName}
-                        onChangeText={setFirstName}
-                    />
+                {/* Employee Form (Scrollable)*/}
+                <View style={[styles.formContainer, { height: HEIGHT * 0.42 }]}>
 
-                    <Text style={GlobalStyles.mediumText}>Last Name</Text>
-                    <TextInput
-                        style={GlobalStyles.input}
-                        value={lastName}
-                        onChangeText={setLastName}
-                    />
+                    <ScrollView>
 
-                    <Text style={GlobalStyles.mediumText}>Email</Text>
-                    <TextInput
-                        style={GlobalStyles.input}
-                        value={email}
-                        onChangeText={setEmail}
-                        placeholder="email@domain.com"
-                        placeholderTextColor={Colors.gray}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Phone</Text>
-                    <TextInput
-                        style={GlobalStyles.input}
-                        value={phoneNumber}
-                        onChangeText={(text) => setPhoneNumber(formatPhone(text))}
-                        placeholder="XXX-XXX-XXXX"
-                        placeholderTextColor={Colors.gray}
-                        keyboardType="phone-pad"
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Wage</Text>
-                    <TextInput
-                        style={GlobalStyles.input}
-                        value={wage}
-                        onChangeText={((text) => setWage(formatWage(text)))}
-                        placeholder="00.00"
-                        placeholderTextColor={Colors.gray}
-                        keyboardType="decimal-pad"
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Admin</Text>
-                    <ModularDropdown
-                        options={adminDropdownOptions}
-                        selectedValue={admin}
-                        onSelect={(value) => setAdmin(value as number)}
-                        labelText=""
-                        containerStyle={styles.dropdownButton}
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Primary Role</Text>
-                    <RoleDropdown
-                        selectedRoleId={primaryRole}
-                        onRoleSelect={setPrimaryRole}
-                        labelText=""
-                        placeholder="None"
-                        containerStyle={styles.dropdownButton}
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Secondary Role</Text>
-                    <RoleDropdown
-                        selectedRoleId={secondaryRole}
-                        onRoleSelect={setSecondaryRole}
-                        labelText=""
-                        placeholder="None"
-                        containerStyle={styles.dropdownButton}
-                    />
-
-                    <Text style={GlobalStyles.mediumText}>Tertiary Role</Text>
-                    <RoleDropdown
-                        selectedRoleId={tertiaryRole}
-                        onRoleSelect={setTertiaryRole}
-                        labelText=""
-                        placeholder="None"
-                        containerStyle={styles.dropdownButton}
-                    />
-
-                    {/* Buttons */}
-                    <View style={styles.buttonRowContainer}>
-                        <ModularButton
-                            text="Add"
-                            textStyle={{ color: 'white' }}
-                            style={GlobalStyles.submitButton}
-                            onPress={handleInsert}
-                            enabled={!loading}
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>First Name</Text>
+                        <TextInput
+                            style={GlobalStyles.input}
+                            value={firstName}
+                            onChangeText={setFirstName}
                         />
-                        <ModularButton
-                            text="Reset "
-                            onPress={resetForm}
-                            enabled={!loading}
-                        />
-                        <ModularButton
-                            text="Cancel"
-                            textStyle={{ color: 'gray' }}
-                            style={GlobalStyles.cancelButton}
-                            onPress={onClose}
-                        />
-                    </View>
 
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Last Name</Text>
+                        <TextInput
+                            style={GlobalStyles.input}
+                            value={lastName}
+                            onChangeText={setLastName}
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Email</Text>
+                        <TextInput
+                            style={GlobalStyles.input}
+                            value={email}
+                            onChangeText={setEmail}
+                            placeholder="email@domain.com"
+                            placeholderTextColor={Colors.gray}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Phone</Text>
+                        <TextInput
+                            style={GlobalStyles.input}
+                            value={phoneNumber}
+                            onChangeText={(text) => setPhoneNumber(formatPhone(text))}
+                            placeholder="XXX-XXX-XXXX"
+                            placeholderTextColor={Colors.gray}
+                            keyboardType="phone-pad"
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Wage</Text>
+                        <TextInput
+                            style={GlobalStyles.input}
+                            value={wage}
+                            onChangeText={((text) => setWage(formatWage(text)))}
+                            placeholder="00.00"
+                            placeholderTextColor={Colors.gray}
+                            keyboardType="decimal-pad"
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Admin</Text>
+                        <ModularDropdown
+                            options={adminDropdownOptions}
+                            selectedValue={admin}
+                            onSelect={(value) => setAdmin(value as number)}
+                            labelText=""
+                            containerStyle={styles.dropdownButton}
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Primary Role</Text>
+                        <RoleDropdown
+                            selectedRoleId={primaryRole}
+                            onRoleSelect={setPrimaryRole}
+                            labelText=""
+                            placeholder="None"
+                            containerStyle={styles.dropdownButton}
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Secondary Role</Text>
+                        <RoleDropdown
+                            selectedRoleId={secondaryRole}
+                            onRoleSelect={setSecondaryRole}
+                            labelText=""
+                            placeholder="None"
+                            containerStyle={styles.dropdownButton}
+                        />
+
+                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Tertiary Role</Text>
+                        <RoleDropdown
+                            selectedRoleId={tertiaryRole}
+                            onRoleSelect={setTertiaryRole}
+                            labelText=""
+                            placeholder="None"
+                            containerStyle={styles.dropdownButton}
+                        />
+
+                    </ScrollView>
 
                 </View>
+
+                {/* Buttons */}
+                <View style={GlobalStyles.buttonRowContainer}>
+                    <ModularButton
+                        text="Add"
+                        textStyle={{ color: 'white' }}
+                        style={GlobalStyles.submitButton}
+                        onPress={handleInsert}
+                        enabled={!loading}
+                    />
+                    <ModularButton
+                        text="Reset "
+                        onPress={resetForm}
+                        enabled={!loading}
+                    />
+                </View>
+
+
+
 
             </ModularModal>
 
@@ -284,12 +289,6 @@ const styles = StyleSheet.create({
     formContainer: {
         gap: 12,
         marginTop: 10,
-    },
-    buttonRowContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        gap: 10,
-        marginTop: 20,
     },
     dropdownButton: {
         minWidth: 0,

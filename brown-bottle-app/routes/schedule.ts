@@ -64,7 +64,7 @@ export const getWeekDateRange = (start: Date) => {
   const end = new Date(start);
   end.setDate(start.getDate() + 6);
   const formatDate = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
-  return `${formatDate(start)} - ${formatDate(end)}, ${start.getFullYear()}`;
+  return `${formatDate(start)}-${formatDate(end)} ${start.getFullYear()}`;
 };
 
 export const getWeekDates = (start: Date, days = 7) => {

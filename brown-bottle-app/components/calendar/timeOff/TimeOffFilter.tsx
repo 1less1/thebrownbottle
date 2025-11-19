@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState} from "react";
 import { StyleSheet, View } from "react-native";
 import ModularDropdown from "@/components/modular/ModularDropdown";
 import { Colors } from "@/constants/Colors";
@@ -32,7 +32,7 @@ const TimeOffFilter: React.FC<TimeOffFilterProps> = ({
         selectedValue={selectedFilter}
         onSelect={(value, key) => onChange(key as "All" | "Pending" | "Completed")}
         options={options}
-        placeholder="Select Status"
+        placeholderText="Select Status"
         containerStyle={styles.dropdownContainer}
         buttonStyle={styles.dropdownButton}
       />
@@ -51,8 +51,8 @@ const styles = StyleSheet.create({
     flex: 0,
   },
   dropdownButton: {
-  minWidth: 130,
-  maxWidth: 160, 
-  alignSelf: "flex-start",
-},
+    minWidth: 130,
+    maxWidth: 160,
+    alignSelf: "flex-start",
+  },
 });

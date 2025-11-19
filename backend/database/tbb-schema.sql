@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (
   `section_id` INT UNSIGNED NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`shift_id`),
-  UNIQUE INDEX `employee_date_section_idx` (`employee_id`, `date`, `section_id`),
+  UNIQUE INDEX employee_date_idx (employee_id, date),
   INDEX `section_id_idx` (`section_id`),
   CONSTRAINT `sch_employee_id`
     FOREIGN KEY (`employee_id`)

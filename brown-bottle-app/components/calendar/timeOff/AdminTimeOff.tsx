@@ -11,6 +11,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import ModularListView from '@/components/modular/ModularListView';
 import { formatDateWithYear, formatDateTime } from '@/utils/dateTimeHelpers';
 import { TimeOffRequest } from '@/types/iTimeOff';
+import StatusBadge from '@/components/modular/StatusBadge';
 
 type TabOption = 'active' | 'completed';
 
@@ -121,20 +122,20 @@ const AdminTimeOff: React.FC = () => {
               <View style={styles.headerRow}>
                 {/* Left side: Info */}
                 <View style={{ flex: 1 }}>
-                  <Text style={[GlobalStyles.boldText]}>{req.reason}</Text>
-                  <Text style={styles.date}>
+                  <Text style={[GlobalStyles.semiBoldText]}>{req.reason}</Text>
+                  <Text style={[GlobalStyles.smallSemiBoldAltText, { marginTop: 4 }]}>
                     {formatDateWithYear(req.start_date)} →{' '}
                     {formatDateWithYear(req.end_date)}
                   </Text>
 
-                  <Text style={styles.employee}>
+                  <Text style={[GlobalStyles.smallAltText, { marginTop: 4 }]}>
                     <Text>Requested by: </Text>
                     <Text style={{ fontWeight: 'bold' }}>
                       {req.first_name} {req.last_name}
                     </Text>
                   </Text>
 
-                  <Text style={styles.timestamp}>
+                  <Text style={[GlobalStyles.smallAltText, { marginTop: 4, color: Colors.gray }]}>
                     Submitted at {formatDateTime(req.timestamp)}
                   </Text>
                 </View>
@@ -151,18 +152,7 @@ const AdminTimeOff: React.FC = () => {
                       onDenyRequest={handleDenyRequest}
                     />
                   ) : (
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        req.status === 'Accepted'
-                          ? GlobalStyles.accepted
-                          : req.status === 'Denied'
-                            ? GlobalStyles.denied
-                            : styles.neutralBadge,
-                      ]}
-                    >
-                      <Text style={styles.statusText}>{req.status}</Text>
-                    </View>
+                    <StatusBadge status={req.status}/>
                   )}
                 </View>
               </View>
@@ -227,7 +217,6 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: Colors.black,
     textTransform: 'uppercase',
   },
   statusBadge: {

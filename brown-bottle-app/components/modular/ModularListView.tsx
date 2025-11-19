@@ -6,6 +6,7 @@ import {
     StyleSheet,
     RefreshControl,
     ActivityIndicator,
+    FlatList
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
@@ -55,25 +56,19 @@ export default function ModularListView<T>({
         );
 
     return (
-        <ScrollView
+        <FlatList
             style={{ marginTop: 10, maxHeight }}
-            refreshControl={
-                onRefresh ? (
-                    <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} />
-                ) : undefined
+            data={data}
+            keyExtractor={(item, index) =>
+                keyExtractor ? String(keyExtractor(item, index)) : String(index)
             }
-        >
-
-            {data.map((item, index) => (
-                <View
-                    key={keyExtractor ? keyExtractor(item, index) : index}
-                    style={styles.requestItem}
-                >
-                    {renderItem(item, index)}
-                </View>
-            ))}
-
-        </ScrollView>
+            renderItem={({ item, index }) => (
+                <View style={styles.requestItem}>{renderItem(item, index)}</View>
+            )}
+            refreshing={!!refreshing}
+            onRefresh={onRefresh}
+            showsVerticalScrollIndicator={true}
+        />
     );
 }
 

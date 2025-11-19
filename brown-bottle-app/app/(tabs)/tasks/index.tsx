@@ -67,7 +67,7 @@ export default function Tasks() {
 
     <DefaultView backgroundColor={Colors.white}>
 
-      <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
+      <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
 
         { /* Tasks Header */}
         <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>

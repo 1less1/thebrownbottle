@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable } from "react-native";
 import { debounce } from "lodash";
 
+import { Ionicons } from '@expo/vector-icons';
+
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
 
@@ -30,7 +32,9 @@ const isTodayOptions = [
 ];
 
 const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
-  const { width: screenWidth, height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
+  const WIDTH = width;
+  const HEIGHT = height;
 
   const [query, setQuery] = useState("");
 
@@ -128,10 +132,10 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   }, [selectedSectionId, selectedRoleId, isToday, currentWeekStart, parentRefresh, localRefresh]);
 
   // Layout Calculations
-  const isMobile = screenWidth < 768;
-  const NAME_COL_WIDTH = isMobile ? 135 : Math.max(135, screenWidth * 0.12);
+  const isMobile = WIDTH < 768;
+  const NAME_COL_WIDTH = isMobile ? 135 : Math.max(135, WIDTH * 0.12);
   const weekDays = getWeekDates(currentWeekStart, 7);
-  const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (screenWidth * 0.70) / weekDays.length);
+  const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (WIDTH * 0.70) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
 
@@ -194,7 +198,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
             >
               {shift ? (
                 <View style={styles.shiftContent}>
-                  <Text style={[styles.shiftTime, isDisabled && styles.shiftTextDisabled]}>
+                  <Text style={[GlobalStyles.semiBoldSmallText, isDisabled && styles.shiftTextDisabled]}>
                     {shift.start_time}
                   </Text>
                   <Text style={[styles.shiftSection, isDisabled && styles.shiftTextDisabled]}>
@@ -217,17 +221,19 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>
+
         {/* Previous Button */}
         <TouchableOpacity
           style={[styles.navButton, isToday === 1 && styles.navButtonDisabled]}
           onPress={() => setCurrentWeekStart(prev => navigateWeek(prev, "prev"))}
           disabled={isToday === 1}
         >
-          <Text style={styles.navButtonText}>← Previous</Text>
+          <Ionicons name="arrow-back-outline" size={20} color={Colors.black} />
         </TouchableOpacity>
 
+        {/* Week Label */}
         <View style={styles.weekDisplay}>
-          <Text style={styles.weekText}>
+          <Text style={GlobalStyles.boldMediumText}>
             {isToday === 1 ? "Today" : getWeekDateRange(currentWeekStart)}
           </Text>
         </View>
@@ -238,8 +244,9 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           onPress={() => setCurrentWeekStart(prev => navigateWeek(prev, "next"))}
           disabled={isToday === 1}
         >
-          <Text style={styles.navButtonText}>Next →</Text>
+          <Ionicons name="arrow-forward-outline" size={20} color={Colors.black} />
         </TouchableOpacity>
+
       </View>
 
       {/* Search Container */}
@@ -285,8 +292,10 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: "center" }} />}
 
       {/* Schedule Spreadsheet */}
+      {/* Scroll View = Horizontal */}
+      {/* Flat List = Vertical */}
       <View style={{ flex: 1 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={true} keyboardShouldPersistTaps="handled">
+        <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <View>
             {renderHeader()}
             <FlatList
@@ -294,7 +303,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
               keyExtractor={(item) => item.employee_id.toString()}
               renderItem={({ item }) => renderEmployeeRow(item)}
               keyboardShouldPersistTaps="handled"
-              style={{ maxHeight: height * 0.7 }}
+              style={{ maxHeight: HEIGHT * 0.7 }}
               scrollEnabled={true}
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={true}
@@ -340,20 +349,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray,
     opacity: 0.2,
   },
-  navButtonText: {
-    color: 'black',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    textAlignVertical: 'center',
-  },
   weekDisplay: {
     flex: 1,
     alignItems: 'center',
-  },
-  weekText: {
-    fontWeight: 'bold',
-    fontSize: 14,
   },
 
   // Search and filters
@@ -371,8 +369,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   dropdownButton: {
-    minWidth: 0,
-    alignSelf: "flex-start",
+    flexShrink: 1,   // allow shrinking
+    minWidth: 140,   // optional baseline
   },
 
   // Schedule grid
@@ -385,15 +383,15 @@ const styles = StyleSheet.create({
     borderRightWidth: 5
   },
   headerRow: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: Colors.whiteGray,
     borderBottomWidth: 2,
-    borderColor: '#ccc',
+    borderColor: Colors.borderColor,
   },
   headerCell: {
     justifyContent: 'center',
     alignItems: 'center',
     borderRightWidth: 1,
-    borderColor: '#ccc',
+    borderColor: Colors.gray,
     padding: 4,
   },
   headerText: {
@@ -403,7 +401,7 @@ const styles = StyleSheet.create({
   },
   subHeaderText: {
     fontSize: 12,
-    color: '#555',
+    color: Colors.darkGray,
     textAlign: 'center',
   },
 
@@ -411,17 +409,17 @@ const styles = StyleSheet.create({
   nameCell: {
     justifyContent: 'center',
     padding: 8,
-    backgroundColor: '#fafafa',
+    backgroundColor: Colors.whiteGray,
     borderRightWidth: 1,
     borderColor: Colors.lightBorderColor,
   },
   employeeName: {
     fontWeight: '600',
-    fontSize: 15,
+    fontSize: 14,
   },
   employeeRole: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 13,
+    color: Colors.darkGray,
     fontStyle: 'italic',
   },
 
@@ -430,22 +428,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRightWidth: 1,
-    borderColor: '#eee',
+    borderColor: Colors.lightGray,
     padding: 4,
   },
   shiftContent: {
     alignItems: 'center',
   },
-  shiftTime: {
-    fontWeight: '600',
-    fontSize: 12,
-  },
   shiftSection: {
     fontSize: 12,
-    color: '#666',
+    color: Colors.darkGray,
   },
   noShift: {
-    color: '#ccc',
+    color: Colors.darkGray,
     fontSize: 14,
   },
   shiftCellHovered: {
@@ -453,20 +447,11 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   shiftCellDisabled: {
-    opacity: 0.5,
+    opacity: 0.6,
     backgroundColor: Colors.lightGray
   },
   shiftTextDisabled: {
     color: Colors.lightGray,
-  },
-
-  // Empty state
-  emptyState: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  emptyText: {
-    color: '#999',
   },
 });
 

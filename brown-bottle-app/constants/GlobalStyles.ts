@@ -25,10 +25,28 @@ export const GlobalStyles = StyleSheet.create({
         fontWeight: "bold",
         marginBottom: 8
     },
+    semiBoldSmallText: {
+        color: 'black',
+        fontSize: 12,
+        fontStyle: 'normal',
+        fontWeight: '600',
+    },
+    boldSmallText: {
+        color: 'black',
+        fontSize: 12,
+        fontStyle: 'normal',
+        fontWeight: 'bold',
+    },
     smallText: {
         color: 'black',
         fontSize: 12,
         fontStyle: 'normal',
+    },
+    semiBoldText: {
+        color: 'black',
+        fontSize: 14,
+        fontStyle: 'normal',
+        fontWeight: '600',
     },
     boldText: {
         color: 'black',
@@ -41,12 +59,24 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'normal',
     },
+    linkText: {
+        color: Colors.blue,
+        fontSize: 14,
+        fontStyle: 'normal',
+        textDecorationLine: 'underline',
+    },
     inputLabelText: {
         color: 'black',
         fontSize: 16,
         marginRight: 5,
         fontStyle: 'normal',
         alignSelf: 'flex-start',
+    },
+    semiBoldMediumText: {
+        color: 'black',
+        fontSize: 16,
+        fontStyle: 'normal',
+        fontWeight: '600',
     },
     boldMediumText: {
         color: 'black',
@@ -59,6 +89,12 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 16,
         fontStyle: 'normal',
     },
+    semiBoldLargeText: {
+        color: 'black',
+        fontSize: 18,
+        fontStyle: 'normal',
+        fontWeight: '600',
+    },
     boldLargeText: {
         color: 'black',
         fontSize: 18,
@@ -70,6 +106,12 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 18,
         fontStyle: 'normal',
     },
+    smallSemiBoldAltText: {
+        color: 'gray',
+        fontSize: 12,
+        fontStyle: 'normal',
+        fontWeight: '600',
+    },
     smallAltText: {
         color: 'gray',
         fontSize: 12,
@@ -80,16 +122,22 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'normal',
     },
-    mediumAltText: {
+    semiBoldAltText: {
         color: 'gray',
-        fontSize: 16,
+        fontSize: 14,
         fontStyle: 'normal',
+        fontWeight: '600',
     },
     boldAltText: {
         color: 'gray',
         fontSize: 14,
         fontStyle: 'normal',
         fontWeight: 'bold',
+    },
+    mediumAltText: {
+        color: 'gray',
+        fontSize: 16,
+        fontStyle: 'normal',
     },
     loadingText: {
         fontSize: 14,
@@ -100,7 +148,7 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'normal',
         fontWeight: 400,
-        color: 'red',
+        color: Colors.errorRed,
     },
     modalTitle: {
         fontSize: 20,
@@ -147,15 +195,26 @@ export const GlobalStyles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'flex-start',
     },
+    buttonRowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 10,
+        marginTop: 20,
+    },
     submitButton: {
         backgroundColor: Colors.buttonBG,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
     },
+    acceptButton: {
+        backgroundColor: Colors.bgGreen,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+    },
     deleteButton: {
-        backgroundColor: Colors.deleteRed,
-
+        backgroundColor: Colors.bgRed,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -168,23 +227,37 @@ export const GlobalStyles = StyleSheet.create({
     },
 
     // Badge Styles
-    accepted: {
-        color: "#28a745",
-        backgroundColor: "#d4edda",
+    acceptedBadge: {
+        backgroundColor: Colors.bgGreen,
         padding: 6,
         borderRadius: 4,
     },
-    denied: {
-        color: "#dc3545",
-        backgroundColor: "#f8d7da",
+    acceptedText: {
+        color: Colors.acceptGreen,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    deniedBadge: {
+        backgroundColor: Colors.bgRed,
         padding: 6,
         borderRadius: 4,
     },
-
-    pending: {
-        color: "#ff9800",
-        backgroundColor: "#fff3e0",
+    deniedText: {
+        color: Colors.denyRed,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    pendingBadge: {
+        backgroundColor: Colors.bgYellow,
         padding: 6,
         borderRadius: 4,
     },
+    pendingText: {
+        color: Colors.pendingYellow,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    }
 });

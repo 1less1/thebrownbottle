@@ -34,7 +34,7 @@ export default function HomeScreen() {
     <DefaultView backgroundColor={Colors.mediumTan}>
 
 
-      <View style={{flex: 1, backgroundColor: Colors.greyWhite}}>
+      <View style={{flex: 1, backgroundColor: Colors.bgGray}}>
 
 
         {/* Medium Tan Background that takes up 85% for Over Scroll */}
@@ -49,7 +49,7 @@ export default function HomeScreen() {
           {/* First Strip */}
           <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 180, width: '100%' }} />
           {/* Second Strip */}
-          <View style={{ backgroundColor: Colors.greyWhite, position: 'absolute', top: 150, height: '100%', width: '100%' }} />
+          <View style={{ backgroundColor: Colors.bgGray, position: 'absolute', top: 150, height: '100%', width: '100%' }} />
           {/* Circular Image */}
           <View style={{ marginTop: 90}}>
             <CircularImage size={145} />
