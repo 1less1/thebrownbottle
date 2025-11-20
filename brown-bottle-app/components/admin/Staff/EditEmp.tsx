@@ -185,9 +185,11 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
       {/* Header */}
       <View style={GlobalStyles.headerContainer}>
         <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
+        {/*
         <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
           <Ionicons name="close" size={28} color={Colors.black} />
         </TouchableOpacity>
+        */}
       </View>
 
 
@@ -320,6 +322,12 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 onPress={handleEdit}
               />
             )}
+            <ModularButton
+              text="Cancel"
+              textStyle={{ color: 'gray' }}
+              style={GlobalStyles.cancelButton}
+              onPress={onClose}
+            />
           </View>
         </>
 

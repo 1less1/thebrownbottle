@@ -142,9 +142,11 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                 {/* Header */}
                 <View style={GlobalStyles.headerContainer}>
                     <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
+                    {/*
                     <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
                         <Ionicons name="close" size={28} color={Colors.black} />
                     </TouchableOpacity>
+                    */}
                 </View>
 
                 {/* Employee Form (Scrollable)*/}
@@ -152,21 +154,21 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
                     <ScrollView>
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>First Name</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>First Name</Text>
                         <TextInput
                             style={GlobalStyles.input}
                             value={firstName}
                             onChangeText={setFirstName}
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Last Name</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Last Name</Text>
                         <TextInput
                             style={GlobalStyles.input}
                             value={lastName}
                             onChangeText={setLastName}
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Email</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Email</Text>
                         <TextInput
                             style={GlobalStyles.input}
                             value={email}
@@ -177,7 +179,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             autoCapitalize="none"
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Phone</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Phone</Text>
                         <TextInput
                             style={GlobalStyles.input}
                             value={phoneNumber}
@@ -187,7 +189,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             keyboardType="phone-pad"
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Wage</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Wage</Text>
                         <TextInput
                             style={GlobalStyles.input}
                             value={wage}
@@ -197,7 +199,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             keyboardType="decimal-pad"
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Admin</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
                         <ModularDropdown
                             options={adminDropdownOptions}
                             selectedValue={admin}
@@ -206,7 +208,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             containerStyle={styles.dropdownButton}
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Primary Role</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Primary Role</Text>
                         <RoleDropdown
                             selectedRoleId={primaryRole}
                             onRoleSelect={setPrimaryRole}
@@ -215,7 +217,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             containerStyle={styles.dropdownButton}
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Secondary Role</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Secondary Role</Text>
                         <RoleDropdown
                             selectedRoleId={secondaryRole}
                             onRoleSelect={setSecondaryRole}
@@ -224,7 +226,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                             containerStyle={styles.dropdownButton}
                         />
 
-                        <Text style={[GlobalStyles.mediumText, {marginVertical: 6}]}>Tertiary Role</Text>
+                        <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Tertiary Role</Text>
                         <RoleDropdown
                             selectedRoleId={tertiaryRole}
                             onRoleSelect={setTertiaryRole}
@@ -250,6 +252,12 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         text="Reset "
                         onPress={resetForm}
                         enabled={!loading}
+                    />
+                    <ModularButton
+                        text="Cancel"
+                        textStyle={{ color: 'gray' }}
+                        style={GlobalStyles.cancelButton}
+                        onPress={onClose}
                     />
                 </View>
 

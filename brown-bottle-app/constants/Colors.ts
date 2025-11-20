@@ -38,6 +38,8 @@ export const Colors = {
   bgGreen: '#d4edda',
   pendingYellow: '#ff9800',
   bgYellow: '#fff3e0',
+  bgBlue: '#d1ecf1',
+  buttonBlue: '#2e86de',
 
   borderColor: '#ccc',
   lightBorderColor: '#eee',

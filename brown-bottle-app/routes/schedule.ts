@@ -60,14 +60,7 @@ export const navigateWeek = (date: Date, direction: "prev" | "next") => {
   return newWeek;
 };
 
-export const getWeekDateRange = (start: Date) => {
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  const formatDate = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
-  return `${formatDate(start)}-${formatDate(end)} ${start.getFullYear()}`;
-};
-
-export const getWeekDates = (start: Date, days = 7) => {
+export const getWeekDayList = (start: Date, days = 7) => {
   return Array.from({ length: days }, (_, i) => {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
@@ -76,6 +69,27 @@ export const getWeekDates = (start: Date, days = 7) => {
       dayName: d.toLocaleDateString("en-US", { weekday: "short" }),
     };
   });
+};
+
+
+// Input: Date for current week start (Date Object)
+// Output: weekStart and weekEnd strings
+export function getWeekStartEnd (currentWeekStart: Date): { weekStartStr: string; weekEndStr: string } {
+  // Week start in local timezone (YYYY-MM-DD)
+  const weekStartStr = currentWeekStart.toLocaleDateString("en-CA");
+
+  // Week end = start + 6 days, also in local timezone
+  const weekEnd = new Date(currentWeekStart.getTime() + 6 * 86400000);
+  const weekEndStr = weekEnd.toLocaleDateString("en-CA");
+
+  return { weekStartStr, weekEndStr };
+}
+
+export const getWeekRangeString = (start: Date) => {
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const formatDate = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}`;
+  return `${formatDate(start)}-${formatDate(end)} ${start.getFullYear()}`;
 };
 
 export const buildBlockedDaysMap = (timeOffRequests: any[]) => {

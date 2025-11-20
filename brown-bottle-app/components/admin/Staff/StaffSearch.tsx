@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useWindowDimensions, View, Text, TextInput, ActivityIndicator, FlatList, ScrollView, StyleSheet, TouchableOpacity } from "react-native";
+import { useWindowDimensions, View, Text, TextInput, FlatList, ScrollView, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { debounce } from "lodash";
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
@@ -204,7 +206,15 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                         placeholderTextColor={Colors.gray}
                         style={GlobalStyles.searchInput}
                     />
-                    <ModularButton onPress={handleReset} text="Reset" />
+                    <ModularButton
+                        onPress={handleReset}
+                        onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
+                        text=""
+                        enabled={!loading}
+                        textStyle={{ marginRight: 4 }}
+                    >
+                        <Ionicons name="reload-outline" size={20} color={Colors.black} />
+                    </ModularButton>
                 </View>
 
                 {/* Dropdowns */}

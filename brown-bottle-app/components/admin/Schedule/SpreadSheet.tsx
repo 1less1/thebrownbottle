@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable, Alert } from "react-native";
 import { debounce } from "lodash";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -17,9 +17,11 @@ import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
 import { formatSQLDate, formatDateNoTZ } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
-import { getSchedule, getSunday, navigateWeek, getWeekDateRange, getWeekDates } from "@/routes/schedule";
+import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeString, getWeekDayList } from "@/routes/schedule";
 import { getTimeOffRequests } from "@/routes/time_off_request";
 import { buildBlockedDaysMap, attachBlockedDays } from "@/routes/schedule";
+
+import { exportToCSV } from "@/utils/exportSchedule";
 
 interface SpreadSheetProps {
   parentRefresh?: number;
@@ -57,10 +59,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const fetchSchedule = async (searchTerm: string) => {
     setLoading(true);
     try {
-      const weekStartStr = currentWeekStart.toISOString().split("T")[0];
-      const weekEndStr = new Date(currentWeekStart.getTime() + 6 * 86400000)
-        .toISOString()
-        .split("T")[0];
+      const { weekStartStr, weekEndStr } = getWeekStartEnd(currentWeekStart);
 
       const params: Record<string, any> = {
         full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
@@ -126,6 +125,15 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     }
   };
 
+  const handleThisWeekReset = () => {
+    const sundayThisWeek = getSunday(new Date());
+    if (currentWeekStart.getTime() !== sundayThisWeek.getTime()) {
+      debouncedSearch.cancel();
+      setLocalRefresh((prev) => prev + 1);
+      setCurrentWeekStart(sundayThisWeek);
+    }
+  };
+
   // Fetch Schedule Data on Initialization and State Update
   useEffect(() => {
     triggerRefresh(query)
@@ -134,7 +142,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   // Layout Calculations
   const isMobile = WIDTH < 768;
   const NAME_COL_WIDTH = isMobile ? 135 : Math.max(135, WIDTH * 0.12);
-  const weekDays = getWeekDates(currentWeekStart, 7);
+  const weekDays = getWeekDayList(currentWeekStart, 7);
   const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (WIDTH * 0.70) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
@@ -149,7 +157,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     setModalVisible(true);
   };
 
-
+  // Render Header Row with column names: "Employee", "Monday", "Tuesday"... "Friday"
   const renderHeader = () => (
     <View style={[styles.row, styles.headerRow]}>
       <View style={[styles.headerCell, { width: NAME_COL_WIDTH, height: HEADER_HEIGHT }]}>
@@ -164,6 +172,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     </View>
   );
 
+  // Render Employee Rows based on each ScheduleEmployee Object parsed from the /schedule API route
   const renderEmployeeRow = (employee: ScheduleEmployee) => {
     return (
       <View key={employee.employee_id} style={styles.row}>
@@ -234,7 +243,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         {/* Week Label */}
         <View style={styles.weekDisplay}>
           <Text style={GlobalStyles.boldMediumText}>
-            {isToday === 1 ? "Today" : getWeekDateRange(currentWeekStart)}
+            {isToday === 1 ? "Today" : getWeekRangeString(currentWeekStart)}
           </Text>
         </View>
 
@@ -258,7 +267,35 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           placeholderTextColor={Colors.gray}
           style={GlobalStyles.searchInput}
         />
-        <ModularButton onPress={handleReset} text="Reset" />
+        <ModularButton
+          onPress={handleReset}
+          onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
+          text=""
+          enabled={!loading}
+          textStyle={{ marginRight: 4 }}
+        >
+          <Ionicons name="reload-outline" size={20} color={Colors.black} />
+        </ModularButton>
+        <ModularButton
+          onPress={handleThisWeekReset}
+          onLongPress={() => Alert.alert("Hint", "Reset to Current Week")}
+          style={{ backgroundColor: Colors.bgBlue }}
+          text=""
+          textStyle={{ marginRight: 4 }}
+          enabled={!loading}
+        >
+          <Ionicons name="calendar-number-outline" size={20} color={Colors.black} />
+        </ModularButton>
+        <ModularButton
+          onPress={() => exportToCSV(scheduleData, weekDays)}
+          onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
+          style={{ backgroundColor: Colors.bgGreen }}
+          text=""
+          textStyle={{ marginRight: 4 }}
+          enabled={!loading}
+        >
+          <Ionicons name="download-outline" size={20} color={Colors.black} />
+        </ModularButton>
       </View>
 
       {/* Filter Container */}
@@ -364,6 +401,7 @@ const styles = StyleSheet.create({
   // Search and filters
   searchContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
     paddingVertical: 10,
     gap: 6,
     marginBottom: 8,

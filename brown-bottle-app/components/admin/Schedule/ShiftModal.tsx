@@ -156,9 +156,11 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
           <Text style={GlobalStyles.semiBoldMediumText}>{employeeData?.full_name ?? ""}</Text>
           <Text style={GlobalStyles.altText}>{(date)}</Text>
         </View>
+        {/*
         <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
           <Ionicons name="close" size={28} color={Colors.black} />
         </TouchableOpacity>
+        */}
       </View>
 
       {loading ? (
@@ -190,7 +192,6 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
               text={shiftData ? 'Save Changes' : 'Add Shift'}
               onPress={handleSave}
             />
-
             {shiftData && (
               <ModularButton
                 text="Delete Shift"
@@ -198,6 +199,12 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
                 style={GlobalStyles.deleteButton}
               />
             )}
+            <ModularButton
+              text="Cancel"
+              textStyle={{ color: 'gray' }}
+              style={GlobalStyles.cancelButton}
+              onPress={onClose}
+            />
           </View>
 
         </View>

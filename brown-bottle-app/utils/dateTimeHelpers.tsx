@@ -13,8 +13,8 @@ export const formatDate = (dateString: string): string => {
   const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const weekdayName = weekdays[dateObj.getDay()];
   const dayNum = String(dateObj.getDate()).padStart(2, '0');
@@ -114,7 +114,7 @@ export const formatSQLTime = (time: string): string => {
   if (!time || typeof time !== "string") {
     return ""; // or throw a controlled error
   }
-  
+
   const [rawTime, modifier] = time.trim().split(" ");
   let [hours, minutes] = rawTime.split(":").map(Number);
 
@@ -170,7 +170,7 @@ export const formatTime = (value: string): string => {
 
   let hours = parseInt(match[1], 10);
   let minutes = match[3] ? parseInt(match[3], 10) : 0;
-  
+
   const modifier = match[4]?.toUpperCase() || (hours >= 8 && hours <= 11 ? "AM" : "PM");
 
   if (

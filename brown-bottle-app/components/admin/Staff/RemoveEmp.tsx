@@ -191,12 +191,14 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
             {/* Remove Emp Modal */}
             <ModularModal visible={modalVisible} onClose={onClose} scroll={false}>
 
-                {/* Title */}
+                {/* Header */}
                 <View style={GlobalStyles.headerContainer}>
                     <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
+                    {/*
                     <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
                         <Ionicons name="close" size={28} color={Colors.black} />
                     </TouchableOpacity>
+                    */}
                 </View>
 
                 {/* Search Bar + Reset Button */}
@@ -238,6 +240,12 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         style={GlobalStyles.submitButton}
                         onPress={handleRemove}
                         enabled={!loading}
+                    />
+                    <ModularButton
+                        text="Cancel"
+                        textStyle={{ color: 'gray' }}
+                        style={GlobalStyles.cancelButton}
+                        onPress={onClose}
                     />
                 </View>
 

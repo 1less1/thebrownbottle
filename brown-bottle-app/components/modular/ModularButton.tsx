@@ -1,10 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, StyleProp, ViewStyle, TextStyle, } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, StyleProp, ViewStyle, TextStyle, } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 interface ModularButtonProps {
   text?: string;
   onPress: () => void;
+  onLongPress?: () => void;
+  children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;     // Optional override for button
   textStyle?: StyleProp<TextStyle>; // Optional override for button text
   enabled?: boolean;
@@ -13,13 +15,14 @@ interface ModularButtonProps {
 const ModularButton: React.FC<ModularButtonProps> = ({
   text = 'Press Me',
   onPress,
+  onLongPress,
+  children,
   style,
   textStyle,
   enabled = true,
 }) => {
 
   return (
-
     <TouchableOpacity
       style={[
         styles.button,
@@ -27,9 +30,14 @@ const ModularButton: React.FC<ModularButtonProps> = ({
         style,
       ]}
       onPress={onPress}
+      onLongPress={onLongPress}
+      delayLongPress={800} // 800ms delay
       disabled={!enabled}
     >
-      <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+      <View style={styles.content}>
+        {text && <Text style={[styles.buttonText, textStyle]}>{text}</Text>}
+        {children}
+      </View>
     </TouchableOpacity>
 
   );
@@ -42,6 +50,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.darkTan,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flexDirection: 'row',   // ✅ icon + text side by side
     alignItems: 'center',
     justifyContent: 'center',
   },
