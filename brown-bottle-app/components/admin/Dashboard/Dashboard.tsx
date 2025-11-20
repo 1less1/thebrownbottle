@@ -31,7 +31,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
       
-      <View style={{ marginTop: 10, width: '85%'}}>
+      <View style={{ margin: 16, width: '85%'}}>
 
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
@@ -76,8 +76,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    paddingBottom: 25,
-    paddingTop: 10,
   },
   card: {
     width: '48%',

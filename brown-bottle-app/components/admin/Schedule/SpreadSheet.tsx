@@ -312,6 +312,13 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         </ScrollView>
       </View>
 
+      {/* Fallback */}
+      {!loading && scheduleData.length === 0 && query.length > 0 && (
+        <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
+          No results found...
+        </Text>
+      )}
+
       {/* Shift Modal - Add, Update, Delete */}
       <ShiftModal
         visible={modalVisible}

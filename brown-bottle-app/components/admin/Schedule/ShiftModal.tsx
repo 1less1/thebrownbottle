@@ -153,8 +153,8 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       <View style={GlobalStyles.headerContainer}>
         <View>
           <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
-          <Text style={GlobalStyles.mediumText}>{employeeData?.full_name ?? ""}</Text>
-          <Text style={GlobalStyles.mediumAltText}>{(date)}</Text>
+          <Text style={GlobalStyles.semiBoldMediumText}>{employeeData?.full_name ?? ""}</Text>
+          <Text style={GlobalStyles.altText}>{(date)}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
           <Ionicons name="close" size={28} color={Colors.black} />

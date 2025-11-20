@@ -1,14 +1,7 @@
 import React from 'react';
-import {
-    ScrollView,
-    View,
-    Text,
-    StyleSheet,
-    RefreshControl,
-    ActivityIndicator,
-    FlatList
-} from 'react-native';
+import { ScrollView, FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { Colors } from '@/constants/Colors';
+
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -17,9 +10,7 @@ interface ModularListViewProps<T> {
     loading?: boolean;
     error?: string | null;
     emptyText?: string;
-    maxHeight?: number;
-    refreshing?: boolean;
-    onRefresh?: () => void;
+    listHeight?: number;
 }
 
 export default function ModularListView<T>({
@@ -29,9 +20,7 @@ export default function ModularListView<T>({
     loading,
     error,
     emptyText = 'No requests yet.',
-    maxHeight = 350,
-    refreshing,
-    onRefresh,
+    listHeight = 300,
 }: ModularListViewProps<T>) {
     if (loading)
         return (
@@ -56,23 +45,32 @@ export default function ModularListView<T>({
         );
 
     return (
-        <FlatList
-            style={{ marginTop: 10, maxHeight }}
-            data={data}
-            keyExtractor={(item, index) =>
-                keyExtractor ? String(keyExtractor(item, index)) : String(index)
-            }
-            renderItem={({ item, index }) => (
-                <View style={styles.requestItem}>{renderItem(item, index)}</View>
-            )}
-            refreshing={!!refreshing}
-            onRefresh={onRefresh}
-            showsVerticalScrollIndicator={true}
-        />
+
+        <View style={styles.listContainer}>
+            {/* Nested the FlatList which renders contenr in a DISABLED Horizontal ScrollView to avoid rendering issues*/}
+            <ScrollView horizontal={true} scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
+                <FlatList
+                    style={{ margin: 6, height: listHeight }}
+                    data={data}
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={true}
+                    keyExtractor={(item, index) =>
+                        keyExtractor ? String(keyExtractor(item, index)) : String(index)
+                    }
+                    renderItem={({ item, index }) => (
+                        <View style={styles.requestItem}>{renderItem(item, index)}</View>
+                    )}
+                />
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    listContainer: {
+        flex: 1,
+        maxWidth: "100%",
+    },
     statusContainer: {
         alignItems: 'center',
         justifyContent: 'center',

@@ -110,8 +110,6 @@ const AdminTimeOff: React.FC = () => {
           data={currentList}
           loading={loading}
           error={error}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
           emptyText={
             activeTab === 'active'
               ? 'No active requests.'
@@ -152,7 +150,7 @@ const AdminTimeOff: React.FC = () => {
                       onDenyRequest={handleDenyRequest}
                     />
                   ) : (
-                    <StatusBadge status={req.status}/>
+                    <StatusBadge status={req.status} />
                   )}
                 </View>
               </View>
