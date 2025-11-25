@@ -1,13 +1,7 @@
 import React from 'react';
-import {
-    ScrollView,
-    View,
-    Text,
-    StyleSheet,
-    RefreshControl,
-    ActivityIndicator,
-} from 'react-native';
+import { ScrollView, FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { Colors } from '@/constants/Colors';
+
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -16,9 +10,8 @@ interface ModularListViewProps<T> {
     loading?: boolean;
     error?: string | null;
     emptyText?: string;
-    maxHeight?: number;
     refreshing?: boolean;
-    onRefresh?: () => void;
+    onRefresh?: () => void | Promise<void>;
 }
 
 export default function ModularListView<T>({
@@ -28,7 +21,6 @@ export default function ModularListView<T>({
     loading,
     error,
     emptyText = 'No requests yet.',
-    maxHeight = 350,
     refreshing,
     onRefresh,
 }: ModularListViewProps<T>) {
@@ -55,29 +47,35 @@ export default function ModularListView<T>({
         );
 
     return (
-        <ScrollView
-            style={{ marginTop: 10, maxHeight }}
-            refreshControl={
-                onRefresh ? (
-                    <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} />
-                ) : undefined
-            }
-        >
 
-            {data.map((item, index) => (
-                <View
-                    key={keyExtractor ? keyExtractor(item, index) : index}
-                    style={styles.requestItem}
-                >
-                    {renderItem(item, index)}
-                </View>
-            ))}
-
-        </ScrollView>
+        <View style={styles.listContainer}>
+            {/* Nested the FlatList which renders contenr in a DISABLED Horizontal ScrollView to avoid rendering issues*/}
+            <ScrollView horizontal={true} scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
+                <FlatList
+                    style={{ marginTop: 10}}
+                    data={data}
+                    nestedScrollEnabled={true}
+                    showsVerticalScrollIndicator={true}
+                    keyExtractor={(item, index) =>
+                        keyExtractor ? String(keyExtractor(item, index)) : String(index)
+                    }
+                    renderItem={({ item, index }) => (
+                        <View style={styles.requestItem}>{renderItem(item, index)}</View>
+                    )}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                />
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    listContainer: {
+        flex: 1,
+        maxWidth: "100%",
+        maxHeight: 300
+    },
     statusContainer: {
         alignItems: 'center',
         justifyContent: 'center',

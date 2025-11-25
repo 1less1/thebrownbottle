@@ -155,7 +155,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     deleteButton: {
         backgroundColor: Colors.deleteRed,
-
+        borderColor: Colors.deleteBorderColor,
+        borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -187,4 +188,11 @@ export const GlobalStyles = StyleSheet.create({
         padding: 6,
         borderRadius: 4,
     },
+    awaitingApproval: { 
+        color: "#8b8b8bff",
+        backgroundColor: "#e3e5e6ff",
+        fontSize: 10,
+        padding: 4,
+        borderRadius: 4,
+    }
 });

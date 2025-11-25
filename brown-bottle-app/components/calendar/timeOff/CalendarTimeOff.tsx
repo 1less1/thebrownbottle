@@ -9,8 +9,9 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';
 import { TimeOffRequest, TimeOffProps } from '@/types/iTimeOff';
-import TimeOffFilter from "./TimeOffFilter";
-
+import LoadingCircle from '@/components/modular/LoadingCircle';
+import ModularDropdown from '@/components/modular/ModularDropdown';
+import ModularButton from '@/components/modular/ModularButton';
 
 const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
   const { user } = useSession();
@@ -18,17 +19,23 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
   const [requests, setRequests] = useState<TimeOffRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"All" | "Pending" | "Completed">("All");
 
 
   const toggleModal = () => setModalVisible((prev) => !prev);
+  type FilterValue = typeof filterOptions[number]["key"];
 
+  const [filter, setFilter] = useState<FilterValue>("All");
   const filteredRequests =
     filter === "All"
       ? requests
-      : filter === "Pending"
-        ? requests.filter((r) => r.status === "Pending")
-        : requests.filter((r) => r.status === "Accepted" || r.status === "Denied");
+      : requests.filter((r) => r.status === filter);
+
+  const filterOptions = [
+    { key: "All", label: "All" },
+    { key: "Pending", label: "Pending" },
+    { key: "Denied", label: "Denied" },
+    { key: "Accepted", label: "Accepted" },
+  ];
 
 
   const fetchUserRequests = async () => {
@@ -63,9 +70,7 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
   if (!user) {
     return (
       <Card style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
-        <Text style={{ color: Colors.gray, fontStyle: 'italic' }}>
-          Loading user data...
-        </Text>
+        <LoadingCircle />
       </Card>
     );
   }
@@ -75,16 +80,29 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
       {/* Header Row */}
 
       <View style={styles.headerRow}>
-        <TimeOffFilter
-          selectedFilter={filter}
-          onChange={(val) => setFilter(val)}
-        />
-
-        <TouchableOpacity onPress={toggleModal}>
+        <View style={{}}>
+          <ModularDropdown
+            labelText=""
+            selectedValue={filter}
+            containerStyle={styles.dropdownButton}
+            onSelect={(value) => setFilter(value as FilterValue)}
+            usePlaceholder={false}
+            options={filterOptions.map(opt => ({
+              key: opt.label,  // what the user sees
+              value: opt.key,  // what gets passed back to setFilter
+            }))}
+          />
+        </View>
+        {/* <TouchableOpacity onPress={toggleModal}>
           <View style={styles.addButton}>
             <Text style={styles.addText}>Add</Text>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <ModularButton
+          text="Add"
+          onPress={toggleModal}
+          style={styles.addButton}
+        />
       </View>
 
 
@@ -150,6 +168,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: Colors.borderColor,
+    backgroundColor: Colors.white
   },
   addText: {
     color: Colors.black,
@@ -179,5 +198,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.gray,
     marginTop: 4,
+  },
+  dropdownButton: {
+    minWidth: 110,
+    alignSelf: "flex-start",
   },
 });

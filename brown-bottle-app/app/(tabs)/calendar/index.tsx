@@ -8,8 +8,8 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Calendar from '@/components/calendar/Calendar';
-import Shifts from '@/components/calendar/Shifts';
 import CalendarTimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
+import ShiftCover from '@/components/calendar/shiftCover/ShiftCover';
 
 import { testShifts } from '@/data/testShifts';
 
@@ -27,17 +27,15 @@ export default function CalendarPage() {
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     setRefreshKey((prev) => prev + 1);
-    setTimeout(() => setRefreshing(false), 800);
+    setTimeout(() => setRefreshing(false), 300);
   }, []);
 
-
-
   return (
-    
+
     <DefaultView backgroundColor={Colors.white}>
-      
+
       <View style={{ flex: 1, backgroundColor: Colors.greyWhite }}>
-        
+
         {/* Calendar Header */}
         <View style={GlobalStyles.pageHeaderContainer}>
           <Text style={GlobalStyles.pageHeader}>
@@ -57,13 +55,13 @@ export default function CalendarPage() {
                 marginBottom: 8,
               }}
             >
-              Upcoming Shifts
+              Shift Cover
             </Text>
-            <Shifts shifts={testShifts} refreshKey={refreshKey} />
+            <ShiftCover refreshKey={refreshKey} />
           </View>
 
           <View style={{ width: '85%' }}>
-            <Calendar shifts={testShifts} refreshKey={refreshKey} />
+            <Calendar refreshKey={refreshKey} />
           </View>
 
           {/* Time Off View */}
@@ -81,9 +79,9 @@ export default function CalendarPage() {
             </Text>
             <CalendarTimeOff refreshKey={refreshKey} />
           </View>
-          
+
         </DefaultScrollView>
-        
+
       </View>
 
     </DefaultView>

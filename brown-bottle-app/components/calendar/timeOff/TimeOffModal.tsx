@@ -3,11 +3,11 @@ import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import { useSession } from '@/utils/SessionContext'; // ✅ get global user
+import { useSession } from '@/utils/SessionContext';
 import ModularModal from '@/components/modular/ModularModal';
-import DatePickerModal from '@/components/modular/DatePickerModal';
 import ModularButton from '@/components/modular/ModularButton';
 import { insertTimeOffRequest } from '@/routes/time_off_request';
+import CalendarWidget from '../CalendarWidget';
 
 import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 
@@ -19,8 +19,8 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [DPVisibleOne, setDPVisibleOne] = useState(false);
-  const [DPVisibleTwo, setDPVisibleTwo] = useState(false);
+  const [startDateVisible, setStartDateVisible] = useState(false);
+  const [endDateVisible, setEndDateVisible] = useState(false);
 
   const resetForm = () => {
     setReason('');
@@ -33,13 +33,6 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
       alert('User not found. Please log in again.');
       return;
     }
-
-    console.log('Submitting Time Off Request:', {
-      employee_id: user.employee_id,
-      reason,
-      startDate,
-      endDate,
-    });
 
     if (!reason.trim() || !startDate || !endDate) {
       alert('Please fill in all fields!');
@@ -76,84 +69,69 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
       <Text style={GlobalStyles.modalTitle}>Make a Time Off Request</Text>
 
       {/* Date Pickers */}
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-start',
-          gap: 10,
-        }}
-      >
-        {/* Start Date Input */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 5,
-            marginBottom: 15,
-          }}
-        >
-          <ModularButton
-            text="Choose Start Date"
-            textStyle={{ color: 'black' }}
-            style={[styles.calendarButton]}
-            onPress={() => setDPVisibleOne(true)}
-          />
-          <View style={styles.dateContainer}>
-            <Text style={GlobalStyles.text}>Date: </Text>
-            <Text
-              style={[GlobalStyles.text, { color: Colors.blue }]}
-            >
-              {formatDateWithYear(startDate)}
-            </Text>
-          </View>
-        </View>
 
-        <DatePickerModal
-          visible={DPVisibleOne}
-          onClose={() => setDPVisibleOne(false)}
-          dateString={startDate}
-          onChange={(newDate) => {
-            setStartDate(newDate);
-            setDPVisibleOne(false);
-          }}
+      {/* Start Date */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 15 }}>
+        <ModularButton
+          text="Choose Start Date"
+          textStyle={{ color: 'black' }}
+          style={[styles.calendarButton]}
+          onPress={() => setStartDateVisible(true)}
         />
 
-        {/* End Date Input */}
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 5,
-            marginBottom: 15,
-          }}
-        >
-          <ModularButton
-            text="Choose End Date"
-            textStyle={{ color: 'black' }}
-            style={[styles.calendarButton]}
-            onPress={() => setDPVisibleTwo(true)}
-          />
-          <View style={styles.dateContainer}>
-            <Text style={GlobalStyles.text}>Date: </Text>
-            <Text
-              style={[GlobalStyles.text, { color: Colors.blue }]}
-            >
-              {formatDateWithYear(endDate)}
-            </Text>
-          </View>
+        <View style={styles.dateContainer}>
+          <Text style={GlobalStyles.text}>Date: </Text>
+          <Text style={[GlobalStyles.text, { color: Colors.blue }]}>
+            {startDate ? formatDateWithYear(startDate) : ""}
+          </Text>
         </View>
-
-        <DatePickerModal
-          visible={DPVisibleTwo}
-          onClose={() => setDPVisibleTwo(false)}
-          dateString={endDate}
-          onChange={(newDate) => {
-            setEndDate(newDate);
-            setDPVisibleTwo(false);
-          }}
-        />
       </View>
+
+      <ModularModal visible={startDateVisible} onClose={() => setStartDateVisible(false)}>
+        <CalendarWidget
+          mode="picker"
+          showShifts={false}
+          initialDate={startDate}
+          onSelectDate={({ date }) => {
+            setStartDate(date);
+            setStartDateVisible(false);
+          }}
+        />
+
+        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setStartDateVisible(false)} />
+      </ModularModal>
+
+      {/* End Date */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 15 }}>
+        <ModularButton
+          text="Choose End Date"
+          textStyle={{ color: 'black' }}
+          style={[styles.calendarButton]}
+          onPress={() => setEndDateVisible(true)}
+        />
+
+        <View style={styles.dateContainer}>
+          <Text style={GlobalStyles.text}>Date: </Text>
+          <Text style={[GlobalStyles.text, { color: Colors.blue }]}>
+            {endDate ? formatDateWithYear(endDate) : ""}
+          </Text>
+        </View>
+      </View>
+
+      <ModularModal visible={endDateVisible} onClose={() => setEndDateVisible(false)}>
+        <CalendarWidget
+          mode="picker"
+          showShifts={false}
+          initialDate={startDate}
+          onSelectDate={({ date }) => {
+            setEndDate(date);
+            setEndDateVisible(false);
+          }}
+        />
+
+        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setEndDateVisible(false)} />
+      </ModularModal>
+
 
       {/* Reason Field */}
       <Text

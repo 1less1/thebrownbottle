@@ -6,33 +6,34 @@ import AltCard from '@/components/modular/AltCard';
 interface CalendarModalProps {
   visible: boolean,
   date: string | null;
-  startTime: string | null;
-  role: string | null;
+  startTime: string | undefined;
+  role: string | undefined;
   onClose: () => void;
 }
 
 const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime, role, onClose }) => {
   return (
     <Modal visible={visible} transparent animationType="fade">
-      
+
       <View style={styles.overlay}>
 
         <AltCard style={{ backgroundColor: Colors.white, width: '75%', padding: 16, margin: 0 }}>
           {/* Date Header */}
           <Text style={styles.dateText}>{date}</Text>
+
+          <>
+            {startTime && (
+              <Text style={styles.styledText}>
+                Start Time: {startTime}
+              </Text>
+            )}
+            {role && (
+              <Text style={styles.styledText}>
+                Role: {role}
+              </Text>
+            )}
             
-            <>
-              {startTime && (
-                <Text style={styles.styledText}>
-                  Start Time: {startTime}
-                </Text>
-              )}
-              {role && (
-                <Text style={styles.styledText}>
-                  Role: {role}
-                </Text>
-              )}
-            </>
+          </>
 
           {/* Close Button */}
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>

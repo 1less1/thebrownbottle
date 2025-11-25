@@ -1,97 +1,198 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { Colors } from '@/constants/Colors';
-import CalendarModal from '@/components/calendar/CalendarModal';
+import React, { useState, useEffect, useMemo } from "react";
+import { View, StyleSheet } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
+import { Colors } from "@/constants/Colors";
+import CalendarModal from "@/components/calendar/CalendarModal";
+import { useSession } from "@/utils/SessionContext";
+import { Dimensions } from "react-native";
+import { getShift } from "@/routes/shift";
 
-LocaleConfig.locales['en'] = {
-  monthNames: [
-    'January', 'February', 'March', 'April', 'May', 'June', 'July',
-    'August', 'September', 'October', 'November', 'December'
-  ],
-  dayNames: [
-    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
-  ],
-  dayNamesShort: [
-    'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
-  ]
-};
-LocaleConfig.defaultLocale = 'en';
-
-
-import { ShiftData } from '@/types/iShift';
+import { Shift } from "@/types/iShift";
 
 interface Props {
-  shifts: ShiftData[];
+  visible: boolean;
+  onClose: () => void;
+  requireShiftSelection?: boolean;
+  dateString: string; // formatted date string: YYYY-MM-DD
+  onChange: (newDate: string) => void;
 }
 
-const CalendarWidget: React.FC<Props> = ({ shifts }) => {
-  const [selectedShift, setSelectedShift] = useState<ShiftData | null>(null);
+LocaleConfig.locales["en"] = {
+  monthNames: [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ],
+  dayNames: [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ],
+  dayNamesShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+};
+LocaleConfig.defaultLocale = "en";
 
-  const handleDayPress = (day: any) => {
-    const shift = shifts.find(shift => shift.date === day.dateString);
-    if (shift) {
-      setSelectedShift(shift);
-    }
-  };
-
-  const markedDates = shifts.reduce((acc, shift) => {
-    if (shift.date) {
-      acc[shift.date] = {
-        selected: true,
-        selectedColor: Colors.darkBrown,
-        marked: true,
-      };
-    }
-    return acc;
-  }, {} as Record<string, any>);
+const CalendarWidget: React.FC<{
+  mode?: "calendar" | "picker";
+  requireShiftSelection?: boolean;
+  showShifts?: boolean;
+  onSelectDate?: (payload: { date: string; shift: Shift | null }) => void;
+  initialDate?: string;
+  onLoadingChange?: (loading: boolean) => void;
+}> = ({
+  mode = "calendar",
+  requireShiftSelection = false,
+  showShifts = true,
+  onSelectDate,
+  initialDate,
+  onLoadingChange
+}) => {
 
 
-  return (
-    <View style={styles.container}>
-      <Calendar
-        current={new Date().toISOString().split('T')[0]}
-        markedDates={markedDates}
-        onDayPress={handleDayPress}
-        theme={{
-          backgroundColor: Colors.white,
-          calendarBackground: Colors.white,
-          textSectionTitleColor: Colors.darkBrown,
-          selectedDayBackgroundColor: Colors.darkBrown,
-          selectedDayTextColor: Colors.white,
-          todayTextColor: Colors.lightBrown,
-          dayTextColor: 'black',
-          arrowColor: Colors.darkBrown,
-          monthTextColor: Colors.darkBrown,
-          textDayFontWeight: '400',
-          textMonthFontWeight: 'bold',
-          textDayHeaderFontWeight: '400',
-          textDayFontSize: 12,
-          textMonthFontSize: 16,
-          textDayHeaderFontSize: 12,
-        }}
-      />
+    const { user } = useSession();
 
-      {/* Show modal if a date is selected */}
-      {selectedShift && (
+    const [shifts, setShifts] = useState<Shift[]>([]);
+    const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
-        <CalendarModal
-          visible={!!selectedShift}
-          date={selectedShift.date}
-          startTime={selectedShift.startTime}
-          role={selectedShift.role}
-          onClose={() => setSelectedShift(null)}
+    const [selectedDate, setSelectedDate] = useState(
+      initialDate || new Date().toISOString().split("T")[0]
+    );
+
+
+    /** ---- FETCH SHIFTS (ONLY IF ALLOWED) ---- */
+    useEffect(() => {
+      if (!showShifts || !user?.employee_id) {
+        console.log("Exiting early: no user or shifts not enabled");
+        return;
+      }
+
+      onLoadingChange?.(true);
+
+      (async () => {
+        try {
+          const data = await getShift({ employee_id: user.employee_id });
+          setShifts(data || []);
+        } catch (err) {
+          console.log("Fetch failed:", err);
+        } finally {
+          onLoadingChange?.(false);
+        }
+      })();
+    }, [showShifts, user?.employee_id]);
+
+
+    const markedDates = useMemo(() => {
+      const map: Record<string, any> = {};
+      const today = new Date().toISOString().split("T")[0];
+
+      // Mark shift days
+      if (showShifts) {
+        shifts.forEach((shift) => {
+          map[shift.date] = {
+            selected: true,
+            selectedColor: Colors.darkBrown,
+          };
+        });
+      }
+      // Always show dot on today
+      if (!map[today]) map[today] = {};
+      map[today].marked = true;
+      map[today].dotColor = "white";
+
+      return map;
+    }, [shifts, selectedDate, showShifts]);
+
+    /** ---- HANDLE DAY PRESS ---- */
+    const handleDayPress = (day: { dateString: string }) => {
+      const isShiftDay = shifts.some((s) => s.date === day.dateString);
+
+      // Only allow selecting dates that have shifts when enabled
+      if (mode === "picker" && requireShiftSelection && !isShiftDay) {
+        return;
+      }
+
+      setSelectedDate(day.dateString);
+
+      if (mode === "picker") {
+        const selectedShift = shifts.find(s => {
+          const normalized = new Date(s.date).toISOString().split("T")[0];
+          return normalized === day.dateString;
+        });
+
+        // return BOTH: the selected date and shift object if exists
+        onSelectDate?.({
+          date: day.dateString,
+          shift: selectedShift || null
+        });
+
+        return;
+      }
+
+      const match = shifts.find((s) => s.date === day.dateString);
+      setSelectedShift(match || null);
+    };
+
+    const screenWidth = Dimensions.get("window").width;
+    const baseWidth = 380;
+    const scale = Math.min(screenWidth / baseWidth, 1.1);
+
+
+    return (
+      <View style={styles.container}>
+        <Calendar
+          current={selectedDate}
+          markedDates={markedDates}
+          onDayPress={handleDayPress}
+          theme={{
+            backgroundColor: Colors.white,
+            calendarBackground: Colors.white,
+            textSectionTitleColor: Colors.darkBrown,
+            selectedDayBackgroundColor: Colors.darkBrown,
+            selectedDayTextColor: Colors.white,
+            todayTextColor: Colors.lightBrown,
+            dayTextColor: "black",
+            arrowColor: Colors.darkBrown,
+            monthTextColor: Colors.darkBrown,
+            textDayFontWeight: "400",
+            textMonthFontWeight: "bold",
+            textDayHeaderFontWeight: "400",
+            textDayFontSize: 12 * scale,
+            textMonthFontSize: 16 * scale,
+            textDayHeaderFontSize: 12 * scale,
+          }}
         />
 
-      )}
-    </View>
-  );
-};
+        {/* Only show shift modal when used as the schedule calendar */}
+        {mode === "calendar" && selectedShift && (
+          <CalendarModal
+            visible
+            date={selectedShift.date}
+            startTime={selectedShift.start_time}
+            role={selectedShift.primary_role_name}
+            onClose={() => setSelectedShift(null)}
+          />
+        )}
+      </View>
+    );
+  };
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-  },
+    width: "100%",
+  }
 });
 
 export default CalendarWidget;
