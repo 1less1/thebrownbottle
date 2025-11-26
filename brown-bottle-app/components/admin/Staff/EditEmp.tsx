@@ -8,8 +8,10 @@ import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import RoleDropdown from '@/components/modular/RoleDropdown';
-import ModularDropdown from '@/components/modular/ModularDropdown';
+import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
+
+import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { Employee } from "@/types/iEmployee";
 import { updateEmployee } from '@/routes/employee';
@@ -26,16 +28,9 @@ interface EditEmpProps {
   onUpdate?: () => void;
 }
 
-const adminDropdownOptions = [
-  { value: 1, key: "Yes" },
-  { value: 0, key: "No" },
-];
+const adminDropdownOptions = yesNoDropdownOptions;
 
-const isActiveDropdownOptions = [
-  { value: 1, key: "Yes" },
-  { value: 0, key: "No" },
-]
-
+const isActiveDropdownOptions = yesNoDropdownOptions;
 
 const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }) => {
   const { width, height } = useWindowDimensions();
@@ -53,7 +48,7 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [wage, setWage] = useState("");
-  const [admin, setAdmin] = useState(0);
+  const [admin, setAdmin] = useState(0); // Default admin=0 (False)
   const [primaryRole, setPrimaryRole] = useState<number | null>(null);
   const [secondaryRole, setSecondaryRole] = useState<number | null>(null);
   const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
@@ -253,52 +248,47 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
               <ModularDropdown
-                options={adminDropdownOptions}
+                data={adminDropdownOptions}
                 selectedValue={admin}
                 onSelect={(value) => setAdmin(value as number)}
-                labelText=""
-                editable={edit}
+                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Primary Role</Text>
               <RoleDropdown
-                selectedRoleId={primaryRole}
+                selectedRole={primaryRole}
                 onRoleSelect={setPrimaryRole}
-                labelText=""
-                placeholder="None"
-                editable={edit}
+                placeholderText="None"
+                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Secondary Role</Text>
               <RoleDropdown
-                selectedRoleId={secondaryRole}
+                selectedRole={secondaryRole}
                 onRoleSelect={setSecondaryRole}
-                labelText=""
-                placeholder="None"
-                editable={edit}
+                placeholderText="None"
+                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Tertiary Role</Text>
               <RoleDropdown
-                selectedRoleId={tertiaryRole}
+                selectedRole={tertiaryRole}
                 onRoleSelect={setTertiaryRole}
-                labelText=""
-                placeholder="None"
-                editable={edit}
+                placeholderText="None"
+                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Active</Text>
               <ModularDropdown
-                options={isActiveDropdownOptions}
+                data={isActiveDropdownOptions}
                 selectedValue={isActive}
                 onSelect={(value) => setIsActive(value as number)}
-                labelText=""
                 usePlaceholder={false}
-                editable={edit}
+                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 

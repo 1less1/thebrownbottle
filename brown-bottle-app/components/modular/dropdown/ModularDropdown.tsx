@@ -4,89 +4,66 @@ import {
     FlatList, TouchableWithoutFeedback, StyleProp,
     ViewStyle, TextStyle
 } from "react-native";
+
 import { Ionicons } from "@expo/vector-icons";
 
 import { Colors } from "@/constants/Colors";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import { getSection } from "@/routes/section";
+import { DropdownOption } from "@/types/iDropdown";
 
-import { Section } from '@/types/iSection';
-
-
-interface DropdownOption {
-    key: string;
-    value: number | null;
-}
-
-interface DropdownProps {
-    selectedSectionId: number | null;
-    onSelect: (value: number | null, key: string) => void;
+interface DropdownProps<T extends number | string | null> {
+    data: DropdownOption<T>[];
+    selectedValue: T | null;
+    onSelect: (value: T | null) => void;
     labelText?: string;
-    placeholder?: string;
-    editable?: boolean;
+    usePlaceholder?: boolean;
+    placeholderText?: string;
+    disabled?: boolean;
     containerStyle?: StyleProp<ViewStyle>;
     buttonStyle?: StyleProp<ViewStyle>;
 }
 
-const SectionDropdown: React.FC<DropdownProps> = ({
-    selectedSectionId,
+const ModularDropdown = <T extends string | number | null>({
+    data,
+    selectedValue,
     onSelect,
-    labelText = "Filter:",
-    placeholder = "Select a section...",
-    editable = true,
+    labelText = "",
+    usePlaceholder = true,
+    placeholderText = "Select an option...",
+    disabled = false,
     containerStyle,
     buttonStyle,
-}) => {
+}: DropdownProps<T>) => {
 
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState(false);
     const [visible, setVisible] = useState(false);
-    const [data, setData] = useState<Section[]>([]);
 
-    const selectedSection = data.find((r) => r.section_id === selectedSectionId);
-    const selectedSectionName = selectedSection ? selectedSection.section_name : "";
+    const dropdownOptions: DropdownOption<T>[] = usePlaceholder
+        ? [{ key: placeholderText, value: null as T }, ...data]
+        : data;
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const response = await getSection();
-            setData(response);
-        } catch (err) {
-            console.error("Failed to fetch sections:", err);
-            setError(true);
-        } finally {
-            setLoading(false);
-        }
-    }
+    const selectedOption = dropdownOptions.find(opt => opt.value === selectedValue);
+    const displayLabel = selectedOption ? selectedOption.key : placeholderText;
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-
-    const handleSelect = (option: DropdownOption) => {
-        onSelect(option.value, option.key);
+    const handleSelect = (option: DropdownOption<T>) => {
+        onSelect(option.value);
         setVisible(false);
     };
 
-
     return (
-
         <View style={[styles.container, containerStyle]}>
-
-            {/* Filter Label */}
+            {/* Optional Label */}
             {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
 
             {/* Dropdown Button */}
             <TouchableOpacity
                 style={[GlobalStyles.dropdownButton, buttonStyle]}
                 onPress={() => setVisible(true)}
-                disabled={!editable || loading}
+                disabled={disabled}
             >
                 <View style={styles.buttonContent}>
-                    <Text style={[styles.optionText, { color: selectedSectionName ? Colors.black : Colors.gray, marginRight: 5 }]}>
-                        {selectedSectionName || placeholder}
+                    <Text style={[styles.optionText, { color: selectedValue === null ? Colors.gray : Colors.black, marginRight: 5 }]}>
+                        {displayLabel}
                     </Text>
                     <Ionicons
                         name={visible ? "chevron-up" : "chevron-down"}
@@ -96,56 +73,54 @@ const SectionDropdown: React.FC<DropdownProps> = ({
                 </View>
             </TouchableOpacity>
 
-            {/* Modal dropdown */}
+            {/* Dropdown Modal */}
             <Modal
                 transparent
                 visible={visible}
                 animationType="fade"
                 onRequestClose={() => setVisible(false)}
             >
+
+                {/* Overlay */}
                 <TouchableWithoutFeedback onPress={() => setVisible(false)}>
                     <View style={styles.overlay}>
 
-                        {/* "Dropdown" Modal Content */}
+                        {/* Dropdown List */}
                         <TouchableWithoutFeedback>
                             <View style={styles.dropdown}>
-                                {loading ? (
-                                    // Loading Text
-                                    <Text style={GlobalStyles.loadingText}>Loading...</Text>
-                                ) : error ? (
-                                    // Error Text
-                                    <Text style={GlobalStyles.errorText}>Failed to load roles.</Text>
+                                {data.length === 0 ? (
+                                    <Text style={[GlobalStyles.errorText, { marginTop: 12, marginHorizontal: 8, marginBottom: 20 }]}>
+                                        Failed to fetch!
+                                    </Text>
                                 ) : (
-                                    // Dropdown List
                                     <FlatList
-                                        style={{ flexGrow: 0 }}
-                                        // Add placeholder as first item listed with an id=null
-                                        data={[{ section_id: null, section_name: placeholder }, ...data]}
-                                        keyExtractor={(item) => (item.section_id !== null ? item.section_id.toString() : 'null')}
+                                        data={dropdownOptions}
+                                        keyExtractor={(item, idx) => item.value !== null ? item.value.toString() : `null-${idx}`}
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 style={styles.option}
-                                                onPress={() => handleSelect({ value: item.section_id, key: item.section_name })}
+                                                onPress={() => handleSelect(item)}
                                             >
+                                                {/* Display Dropdown options as "Keys" */}
                                                 <Text
                                                     style={[
                                                         styles.optionText,
-                                                        item.section_id === selectedSectionId && styles.selectedOption,
-                                                        item.section_id === null && selectedSectionId !== null && { color: Colors.gray },
+                                                        item.value === selectedValue && styles.selectedOption,
+                                                        item.value === null && item.value !== selectedValue && { color: Colors.gray },
                                                     ]}
                                                 >
-                                                    {item.section_name}
+                                                    {item.key}
                                                 </Text>
                                             </TouchableOpacity>
                                         )}
                                     />
-
                                 )}
                             </View>
                         </TouchableWithoutFeedback>
 
                     </View>
                 </TouchableWithoutFeedback>
+
             </Modal>
 
         </View>
@@ -199,4 +174,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SectionDropdown;
+export default ModularDropdown

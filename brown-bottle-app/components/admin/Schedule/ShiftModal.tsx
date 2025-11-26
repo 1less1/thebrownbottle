@@ -10,7 +10,7 @@ import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
 import TimeDropdown from '@/components/modular/dropdown/TimeDropdown';
-import SectionDropdown from "@/components/modular/SectionDropdown";
+import SectionDropdown from "@/components/modular/dropdown/SectionDropdown";
 
 
 import { insertShift, updateShift, deleteShift } from '@/routes/shift';
@@ -178,7 +178,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
 
           <Text style={GlobalStyles.inputLabelText}>Section</Text>
           <SectionDropdown
-            selectedSectionId={sectionId}
+            selectedSection={sectionId}
             onSectionSelect={(value) => setSectionId(value as number)}
             labelText=""
             containerStyle={{ marginBottom: 10, backgroundColor: Colors.inputBG }}

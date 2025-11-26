@@ -8,12 +8,13 @@ import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
 
 import Card from "@/components/modular/Card";
-import RoleDropdown from "@/components/modular/RoleDropdown";
-import SectionDropdown from "@/components/modular/SectionDropdown";
-import ModularDropdown from "@/components/modular/ModularDropdown";
+import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
+
+import { CheckboxOption } from "@/types/iCheckbox";
+import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { formatSQLDate, formatDateNoTZ } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
@@ -21,17 +22,17 @@ import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeStri
 import { getTimeOffRequests } from "@/routes/time_off_request";
 import { buildBlockedDaysMap, attachBlockedDays } from "@/routes/schedule";
 
-import { exportToCSV } from "@/utils/exportSchedule";
+import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
+
+import RoleCheckbox from "@/components/modular/checkbox/RoleCheckbox";
+import SectionCheckbox from "@/components/modular/checkbox/SectionCheckbox";
 
 interface SpreadSheetProps {
   parentRefresh?: number;
   onRefreshDone?: () => void;
 }
 
-const isTodayOptions = [
-  { value: 1, key: "Yes" },
-  { value: 0, key: "No" },
-];
+const isTodayOptions = yesNoDropdownOptions;
 
 const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const { width, height } = useWindowDimensions();
@@ -44,13 +45,13 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const [loading, setLoading] = useState(false);
 
   const [scheduleData, setScheduleData] = useState<ScheduleEmployee[]>([]);
-  const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
 
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-  const [selectedSectionId, setSelectedSectionId] = useState<number | null>(null);
+  const [selectedSections, setSelectedSections] = useState<CheckboxOption<number>[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]);
   const [isToday, setIsToday] = useState<number>(0);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
@@ -61,11 +62,14 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     try {
       const { weekStartStr, weekEndStr } = getWeekStartEnd(currentWeekStart);
 
+      const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
+      const sectionIds = selectedSections.map(s => s.value); // Create array of sectionIds --> [1, 2, 3]
+
       const params: Record<string, any> = {
         full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
         is_today: isToday,
-        role_id: selectedRoleId ?? undefined,
-        section_id: selectedSectionId ?? undefined,
+        role_id: roleIds.length > 0 ? roleIds : undefined,
+        section_id: sectionIds.length > 0 ? sectionIds : undefined, // ✅ array
       };
 
       if (isToday === 0) {
@@ -100,7 +104,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     debounce((searchTerm: string) => {
       fetchSchedule(searchTerm);
     }, 500),
-    [selectedSectionId, selectedRoleId, isToday, currentWeekStart]
+    [selectedSections, selectedRoles, isToday, currentWeekStart]
   );
 
   const handleSearchChange = (searchTerm: string) => {
@@ -115,11 +119,11 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   }
 
   const handleReset = () => {
-    if (query != "" || selectedSectionId !== null || selectedRoleId != null || isToday != 0) {
+    if (query != "" || selectedSections.length > 0 || selectedRoles.length > 0 || isToday != 0) {
       debouncedSearch.cancel();
       setQuery("");
-      setSelectedSectionId(null);
-      setSelectedRoleId(null);
+      setSelectedRoles([]);
+      setSelectedSections([]);
       setIsToday(0);
       setLocalRefresh((prev) => prev + 1);
     }
@@ -137,7 +141,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   // Fetch Schedule Data on Initialization and State Update
   useEffect(() => {
     triggerRefresh(query)
-  }, [selectedSectionId, selectedRoleId, isToday, currentWeekStart, parentRefresh, localRefresh]);
+  }, [selectedSections, selectedRoles, isToday, currentWeekStart, parentRefresh, localRefresh]);
 
   // Layout Calculations
   const isMobile = WIDTH < 768;
@@ -267,6 +271,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           placeholderTextColor={Colors.gray}
           style={GlobalStyles.searchInput}
         />
+
         <ModularButton
           onPress={handleReset}
           onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
@@ -276,6 +281,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         >
           <Ionicons name="reload-outline" size={20} color={Colors.black} />
         </ModularButton>
+
         <ModularButton
           onPress={handleThisWeekReset}
           onLongPress={() => Alert.alert("Hint", "Reset to Current Week")}
@@ -286,6 +292,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         >
           <Ionicons name="calendar-number-outline" size={20} color={Colors.black} />
         </ModularButton>
+
+        {/*
         <ModularButton
           onPress={() => exportToCSV(scheduleData, weekDays)}
           onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
@@ -296,33 +304,51 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         >
           <Ionicons name="download-outline" size={20} color={Colors.black} />
         </ModularButton>
+        */}
+
+        <ModularButton
+          onPress={() => exportToPDF(currentWeekStart, scheduleData, weekDays)}
+          onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
+          style={{ backgroundColor: Colors.bgRed }}
+          text=""
+          textStyle={{ marginRight: 4 }}
+          enabled={!loading}
+        >
+          <Ionicons name="download-outline" size={20} color={Colors.black} />
+        </ModularButton>
+
       </View>
 
       {/* Filter Container */}
       <View style={styles.filterContainer}>
-        <RoleDropdown
-          selectedRoleId={selectedRoleId}
-          onRoleSelect={(value) => setSelectedRoleId(value as number)}
-          placeholder="All Roles"
-          labelText=""
+        <RoleCheckbox
+          selectedRoles={selectedRoles}
+          onRoleSelect={(keys, values) => {
+            setSelectedRoles(values.map((value, index) => ({
+              key: keys[index],
+              value: value,
+            })));
+          }}
           containerStyle={styles.dropdownButton}
         />
-        <SectionDropdown
-          selectedSectionId={selectedSectionId}
-          onSectionSelect={(value) => setSelectedSectionId(value as number)}
-          placeholder="All Sections"
-          labelText=""
+        <SectionCheckbox
+          selectedSections={selectedSections}
+          onSectionSelect={(keys, values) => {
+            setSelectedSections(values.map((value, index) => ({
+              key: keys[index],
+              value: value,
+            })));
+          }}
           containerStyle={styles.dropdownButton}
         />
         <ModularDropdown
+          data={isTodayOptions}
           selectedValue={isToday}
-          // Declare value being selected is a number
           onSelect={(value) => setIsToday(value as number)}
           labelText="Today:"
           containerStyle={styles.dropdownButton}
-          options={isTodayOptions}
           usePlaceholder={false}
-          editable={!loading}
+          disabled={loading}
         />
       </View>
 

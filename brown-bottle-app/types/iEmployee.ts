@@ -6,6 +6,7 @@ export interface Employee {
   phone_number: string;
   wage: string; // DECIMAL MySQL types are formatted as strings in JSON
   admin: number;
+  role_id?: number[]
   primary_role: number | null;
   secondary_role: number | null;
   tertiary_role: number | null;

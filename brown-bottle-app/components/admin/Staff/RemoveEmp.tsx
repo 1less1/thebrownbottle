@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useWindowDimensions, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { useWindowDimensions, View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Alert } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
 import { debounce } from "lodash";
@@ -167,13 +167,17 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                 <Text style={GlobalStyles.text}>{item.full_name}</Text>
                 <TouchableOpacity
                     onPress={() => toggleSelection(item.employee_id)}
-                    style={[styles.checkbox, isSelected && styles.checkboxSelected]}
                 >
-                    {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                    <Ionicons
+                        name={isSelected ? "checkbox-outline" : "square-outline"}
+                        size={20}
+                        color={isSelected ? Colors.blue : Colors.gray}
+                    />
                 </TouchableOpacity>
             </View>
         );
     };
+
 
 
     return (
@@ -210,7 +214,15 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         placeholderTextColor={Colors.gray}
                         style={styles.input}
                     />
-                    <ModularButton onPress={handleReset} text="Reset" />
+                    <ModularButton
+                        onPress={handleReset}
+                        onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
+                        text=""
+                        enabled={!loading}
+                        textStyle={{ marginRight: 4 }}
+                    >
+                        <Ionicons name="reload-outline" size={20} color={Colors.black} />
+                    </ModularButton>
                 </View>
 
                 {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
@@ -296,30 +308,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        paddingVertical: 10,
-        paddingHorizontal: 12,
+        paddingVertical: 14,
+        paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderColor: Colors.lightBorderColor,
     },
-    checkbox: {
-        width: 20,
-        height: 20,
-        borderWidth: 1,
-        borderColor: Colors.borderColor,
-        borderRadius: 4,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    checkboxSelected: {
-        backgroundColor: Colors.blue,
-        borderColor: Colors.blue,
-    },
-    checkmark: {
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: "bold",
-    },
-
 });
 
 export default RemoveEmp;

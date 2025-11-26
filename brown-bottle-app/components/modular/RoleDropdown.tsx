@@ -21,7 +21,7 @@ interface DropdownOption {
 
 interface DropdownProps {
     selectedRoleId: number | null;
-    onRoleSelect: (value: number | null, key: string) => void;
+    onSelect: (value: number | null, key: string) => void;
     labelText?: string;
     placeholder?: string;
     editable?: boolean;
@@ -31,7 +31,7 @@ interface DropdownProps {
 
 const RoleDropdown: React.FC<DropdownProps> = ({
     selectedRoleId,
-    onRoleSelect,
+    onSelect,
     labelText = "Filter:",
     placeholder = "Select a role...",
     editable = true,
@@ -66,7 +66,7 @@ const RoleDropdown: React.FC<DropdownProps> = ({
 
 
     const handleSelect = (option: DropdownOption) => {
-        onRoleSelect(option.value, option.key);
+        onSelect(option.value, option.key);
         setVisible(false);
     };
 

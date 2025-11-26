@@ -3,6 +3,7 @@ import mysql.connector
 import os
 import request_helper
 from datetime import datetime
+from typing import List
 
 # GET Schedule Data -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -24,8 +25,8 @@ def get_schedule_data(db, request):
     param_types = {
         'start_date': str,
         'end_date': str,
-        'section_id': int,
-        'role_id': int,
+        'section_id': List[int],
+        'role_id': List[int],
         'full_name': str,
         'is_today': str
     }
@@ -36,8 +37,8 @@ def get_schedule_data(db, request):
 
     start_date = params.get("start_date")
     end_date = params.get("end_date")
-    section_id = params.get("section_id")
-    role_id = params.get("role_id")
+    section_ids = params.get("section_id", []) # List of section_ids
+    role_ids = params.get("role_id", []) # List of role_ids
     full_name = params.get("full_name")
     is_today = params.get("is_today")
 
@@ -59,7 +60,6 @@ def get_schedule_data(db, request):
                 e.primary_role,
                 r.role_name AS primary_role_name,
                 s.shift_id,
-                s.date,
                 TIME_FORMAT(s.start_time, '%h:%i %p') AS start_time,
                 DATE_FORMAT(s.date, '%Y-%m-%d') AS date,
                 DATE_FORMAT(s.date, '%W') AS day_name,
@@ -71,26 +71,32 @@ def get_schedule_data(db, request):
             LEFT JOIN shift s
                 ON e.employee_id = s.employee_id
                 AND s.date BETWEEN %s AND %s
-                AND (%s IS NULL OR s.section_id = %s)  -- <-- only include shifts for this section
             LEFT JOIN section sec ON s.section_id = sec.section_id
             WHERE e.is_active = 1
         """
 
-        query_params = [start_date, end_date, section_id, section_id]
+        query_params = [start_date, end_date]
 
-        if section_id is not None:
-                    query += " AND s.section_id = %s"
-                    query_params.append(section_id)
+        if section_ids and len(section_ids) > 0:
+            placeholders = ','.join(['%s'] * len(section_ids))
+            query += f" AND s.section_id IN ({placeholders})"
+            query_params.extend(section_ids)
                     
-        if role_id is not None:
-            query += " AND e.primary_role = %s"
-            query_params.append(role_id)
+        if role_ids and len(role_ids) > 0:
+            placeholders = ','.join(['%s'] * len(role_ids))
+            query += f" AND e.primary_role IN ({placeholders})"
+            query_params.extend(role_ids)
 
         if full_name:
             query += " AND CONCAT(e.first_name, ' ', e.last_name) LIKE %s"
             query_params.append(f"%{full_name}%")
-
-        query += " ORDER BY e.last_name ASC;"
+        
+        # Group by role_id if user is trying to filter by role_id or section_id (more pleasing for UI)
+        # Otherwise, order by last_name
+        if (role_ids and len(role_ids) > 0) or (section_ids and len(section_ids) > 0):
+            query += " ORDER BY e.primary_role ASC, e.last_name ASC;"
+        else:
+            query += " ORDER BY e.last_name ASC;"
 
         cursor.execute(query, tuple(query_params))
         rows = cursor.fetchall()
@@ -116,7 +122,7 @@ def get_schedule_data(db, request):
                     employees[emp_id]["shifts"][array_index] = {
                         "shift_id": row["shift_id"],
                         "date": row["date"],
-                        "day_index": row["day_index"],   # 1 (Sun)... to 6 (Sat)
+                        "day_index": row["day_index"],   # 1 (Sun)... to 7 (Sat)
                         "day_name": row["day_name"],
                         "start_time": row["start_time"],
                         "section_id": row["section_id"],

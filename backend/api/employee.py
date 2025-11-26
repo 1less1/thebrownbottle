@@ -2,6 +2,7 @@ from flask import jsonify
 import mysql.connector
 import os
 import request_helper
+from typing import List
 
 # GET Employees -----------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ def get_employees(db, request):
             'phone_number': str,
             'wage': float,
             'admin': int,
+            'role_id': List[int], # Used for filtering all 3 role designations below 
             'primary_role': int,
             'secondary_role': int,
             'tertiary_role': int,
@@ -43,6 +45,7 @@ def get_employees(db, request):
         phone_number = params.get('phone_number')
         wage = params.get('wage')
         admin = params.get('admin')
+        role_ids = params.get('role_id')
         primary_role = params.get('primary_role')
         secondary_role = params.get('secondary_role')
         tertiary_role = params.get('tertiary_role')
@@ -120,6 +123,18 @@ def get_employees(db, request):
         role_clauses = []
         role_values = []
 
+        # If a list of role_ids is provided, apply to all 3 role columns
+        if role_ids and len(role_ids) > 0:
+            placeholders = ','.join(['%s'] * len(role_ids))
+            role_clauses.append(f"primary_role IN ({placeholders})")
+            role_clauses.append(f"secondary_role IN ({placeholders})")
+            role_clauses.append(f"tertiary_role IN ({placeholders})")
+            # Add values 3 times (once for each column)
+            role_values.extend(role_ids)
+            role_values.extend(role_ids)
+            role_values.extend(role_ids)
+
+        # Individual role filters (optional, if user passes them directly)
         if primary_role is not None:
             role_clauses.append("primary_role = %s")
             role_values.append(primary_role)
@@ -137,7 +152,11 @@ def get_employees(db, request):
             query_params.extend(role_values)
 
         # Last Query Line
-        query += " ORDER BY e.primary_role;"
+        if role_ids and len(role_ids) > 0:
+            query += " ORDER BY e.primary_role ASC, e.last_name ASC;"
+        else:
+            query += " ORDER BY e.last_name ASC;"
+
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

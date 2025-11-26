@@ -8,8 +8,10 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import RoleDropdown from '@/components/modular/RoleDropdown';
-import ModularDropdown from '@/components/modular/ModularDropdown';
+import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
+
+import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { Employee } from "@/types/iEmployee";
 import { insertEmployee } from '@/routes/employee';
@@ -19,10 +21,7 @@ interface AddEmpProps {
     onInsert?: () => void;
 }
 
-const adminDropdownOptions = [
-    { value: 1, key: "Yes" },
-    { value: 0, key: "No" },
-];
+const adminDropdownOptions = yesNoDropdownOptions;
 
 const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
     const { width, height } = useWindowDimensions();
@@ -201,37 +200,33 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
                         <ModularDropdown
-                            options={adminDropdownOptions}
+                            data={adminDropdownOptions}
                             selectedValue={admin}
                             onSelect={(value) => setAdmin(value as number)}
-                            labelText=""
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Primary Role</Text>
                         <RoleDropdown
-                            selectedRoleId={primaryRole}
+                            selectedRole={primaryRole}
                             onRoleSelect={setPrimaryRole}
-                            labelText=""
-                            placeholder="None"
+                            placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Secondary Role</Text>
                         <RoleDropdown
-                            selectedRoleId={secondaryRole}
+                            selectedRole={secondaryRole}
                             onRoleSelect={setSecondaryRole}
-                            labelText=""
-                            placeholder="None"
+                            placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Tertiary Role</Text>
                         <RoleDropdown
-                            selectedRoleId={tertiaryRole}
+                            selectedRole={tertiaryRole}
                             onRoleSelect={setTertiaryRole}
-                            labelText=""
-                            placeholder="None"
+                            placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />
 

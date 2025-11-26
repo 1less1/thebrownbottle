@@ -10,28 +10,25 @@ import { Colors } from "@/constants/Colors";
 import Card from "@/components/modular/Card";
 import AltCard from "@/components/modular/AltCard";
 
-import RoleDropdown from "@/components/modular/RoleDropdown";
-import ModularDropdown from "@/components/modular/ModularDropdown";
+import RoleCheckbox from '@/components/modular/checkbox/RoleCheckbox';
+import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import EditEmp from "@/components/admin/Staff/EditEmp";
 
+import { CheckboxOption } from "@/types/iCheckbox";
+import { yesNoDropdownOptions } from '@/types/iDropdown';
+
 import { Employee } from "@/types/iEmployee";
 import { getEmployee } from "@/routes/employee";
 
 
 
-const adminDropdownOptions = [
-    { value: 1, key: "Yes" },
-    { value: 0, key: "No" },
-];
+const adminDropdownOptions = yesNoDropdownOptions;
 
-const isActiveDropdownOptions = [
-    { value: 1, key: "Yes" },
-    { value: 0, key: "No" },
-]
+const isActiveDropdownOptions = yesNoDropdownOptions;
 
 const columns = [
     { key: "full_name", label: "Name", width: 120 },
@@ -57,46 +54,24 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-    const [selectedAdminOption, setSelectedAdminOption] = useState<number | null>(null);
-    const [selectedIsActiveOption, setSelectedIsActiveOption] = useState<number>(1); // Default value is_active=1 (True)
+    const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]); // Default to Empty Array
+    const [selectedIsAdmin, setSelectedIsAdmin] = useState<number | null>(null); // Default to null ("placeholderText")
+    const [selectedIsActive, setSelectedIsActive] = useState<number>(1); // Default is_active=1 ("Yes")
 
-
-    const buildParams = (
-        searchTerm: string,
-        isActive: number | null,
-        roleId: number | null,
-        admin: number | null
-    ) => {
-        const wildcardTerm = `%${searchTerm.trim()}%`;
-        const params: Record<string, any> = { full_name: wildcardTerm };
-
-        if (isActive !== null) {
-            params.is_active = isActive;
-        }
-        if (roleId !== null) {
-            params.primary_role = roleId;
-            params.secondary_role = roleId;
-            params.tertiary_role = roleId;
-        }
-
-        if (admin !== null) {
-            params.admin = admin;
-        }
-
-        return params;
-    };
-
-
-    const fetchEmployees = async (
-        searchTerm: string,
-        isActive: number | null,
-        roleId: number | null,
-        admin: number | null
-    ) => {
+    const fetchEmployees = async (searchTerm: string,) => {
         setLoading(true);
         try {
-            const response = await getEmployee(buildParams(searchTerm, isActive, roleId, admin));
+            const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
+
+            const params: Record<string, any> = {
+                full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
+                is_active: selectedIsActive,
+                role_id: roleIds.length > 0 ? roleIds : undefined,
+                admin: selectedIsAdmin,
+            };
+
+            const response = await getEmployee(params);
+
             setResults(response);
         } catch (error: any) {
             console.error("Search failed:", error.message);
@@ -109,9 +84,9 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
     const debouncedSearch = useCallback(
         debounce((searchTerm: string) => {
-            fetchEmployees(searchTerm, selectedIsActiveOption, selectedRoleId, selectedAdminOption);
+            fetchEmployees(searchTerm);
         }, 500),
-        [selectedIsActiveOption, selectedRoleId, selectedAdminOption]
+        [selectedIsActive, selectedRoles, selectedIsAdmin]
     );
 
 
@@ -121,16 +96,18 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
     };
 
     const triggerRefresh = (searchTerm: string) => {
-        fetchEmployees(searchTerm, selectedIsActiveOption, selectedRoleId, selectedAdminOption);
+        setQuery(searchTerm);
+        debouncedSearch.cancel();
+        debouncedSearch(searchTerm);
     };
 
     const handleReset = () => {
-        if (query !== "" || selectedRoleId !== null || selectedAdminOption !== null || selectedIsActiveOption !== 1) {
+        if (query !== "" || selectedRoles.length > 0 || selectedIsAdmin !== null || selectedIsActive !== 1) {
             debouncedSearch.cancel();
             setQuery("");
-            setSelectedRoleId(null);
-            setSelectedAdminOption(null);
-            setSelectedIsActiveOption(1);
+            setSelectedRoles([]);
+            setSelectedIsAdmin(null);
+            setSelectedIsActive(1);
             setLocalRefresh((prev) => prev + 1); // triggers refresh
         }
     };
@@ -139,7 +116,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
     // Fetch Employees on Initialization and State Update
     useEffect(() => {
         triggerRefresh(query);
-    }, [selectedRoleId, selectedAdminOption, selectedIsActiveOption, parentRefresh, localRefresh]);
+    }, [selectedRoles, selectedIsAdmin, selectedIsActive, parentRefresh, localRefresh]);
 
 
     const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
@@ -219,32 +196,32 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
                 {/* Dropdowns */}
                 <View style={styles.filterContainer}>
-                    <RoleDropdown
-                        selectedRoleId={selectedRoleId}
-                        onRoleSelect={(value) => setSelectedRoleId(value)}
-                        labelText=""
+                    <RoleCheckbox
+                        selectedRoles={selectedRoles}
+                        onRoleSelect={(keys, values) => {
+                            setSelectedRoles(values.map((value, index) => ({
+                                key: keys[index],
+                                value: value,
+                            })));
+                        }}
                         containerStyle={styles.dropdownButton}
-                        editable={!loading}
                     />
                     <ModularDropdown
-                        selectedValue={selectedAdminOption}
-                        // Declare value being selected is a number
-                        onSelect={(value) => setSelectedAdminOption(value as number)}
-                        labelText=""
+                        data={adminDropdownOptions}
+                        selectedValue={selectedIsAdmin}
+                        onSelect={(value) => setSelectedIsAdmin(value as number)}
                         containerStyle={styles.dropdownButton}
-                        placeholderText="Select admin..."
-                        options={adminDropdownOptions}
-                        editable={!loading}
+                        placeholderText={"Select admin..."}
+                        disabled={loading}
                     />
                     <ModularDropdown
-                        selectedValue={selectedIsActiveOption}
-                        // Declare value being selected is a number
-                        onSelect={(value) => setSelectedIsActiveOption(value as number)}
+                        data={isActiveDropdownOptions}
+                        selectedValue={selectedIsActive}
+                        onSelect={(value) => setSelectedIsActive(value as number)}
                         labelText="Active:"
                         containerStyle={styles.dropdownButton}
-                        options={isActiveDropdownOptions}
                         usePlaceholder={false}
-                        editable={!loading}
+                        disabled={loading}
                     />
                 </View>
 

@@ -30,8 +30,8 @@ export interface ShiftAPI {
 }
 
 export interface ScheduleAPI {
-  role_id?: number;
-  section_id?: number;
+  role_id?: number | number[]; // Ex: role_id: 1 or role_id = [1, 2, 3]
+  section_id?: number | number[]; // Ex: section_id: 1 or section_id = [1, 2, 3]
   start_date?: string;
   end_date?: string;
   full_name?: string;

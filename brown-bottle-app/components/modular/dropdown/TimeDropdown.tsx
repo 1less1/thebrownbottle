@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import ModularDropdown from "@/components/modular/ModularDropdown";
+import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 
 import { breakUpTime } from "@/utils/dateTimeHelpers";
 
@@ -50,19 +50,18 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
         <View style={styles.rowContainer}>
 
             <ModularDropdown
-                options={hourOptions}
+                data={hourOptions}
                 selectedValue={hours}
                 onSelect={(value) =>
                     onTimeChange(`${value}:${minutes} ${meridiem}`)
                 }
                 placeholderText="HH"
-                labelText=""
                 containerStyle={styles.dropdownButton}
                 buttonStyle={GlobalStyles.input}
             />
 
             <ModularDropdown
-                options={minuteOptions}
+                data={minuteOptions}
                 selectedValue={minutes}
                 onSelect={(value) =>
                     onTimeChange(`${hours}:${value} ${meridiem}`)
@@ -73,13 +72,12 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
             />
 
             <ModularDropdown
-                options={meridiemOptions}
+                data={meridiemOptions}
                 selectedValue={meridiem}
                 onSelect={(value) =>
                     onTimeChange(`${hours}:${minutes} ${value}`)
                 }
                 placeholderText="AM/PM"
-                labelText=""
                 containerStyle={styles.dropdownButton}
             />
 
