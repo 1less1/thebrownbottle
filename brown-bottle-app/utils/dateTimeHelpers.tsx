@@ -186,3 +186,19 @@ export const formatTime = (value: string): string => {
 
   return `${formattedHours}:${formattedMinutes} ${modifier}`;
 };
+export const formatShiftDate = (rawDate: string): string => {
+  if (!rawDate) return "";
+
+  // Extract just the date portion: "Sat, 01 Nov 2025"
+  const parts = rawDate.split(" ");
+
+  // Expected: ["Sat,", "01", "Nov", "2025", "00:00:00", "GMT"]
+  if (parts.length < 4) return rawDate;
+
+  const weekday = parts[0].replace(",", "");
+  const day = parts[1];
+  const month = parts[2];
+  const year = parts[3];
+
+  return `${weekday}, ${month} ${day}, ${year}`;
+};

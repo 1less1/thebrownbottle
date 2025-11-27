@@ -1,29 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 import Card from "@/components/modular/Card";
-import AltCard from "@/components/modular/Card"
 import CalendarWidget from '@/components/calendar/CalendarWidget';
+import LoadingCircle from '../modular/LoadingCircle';
+import { useSession } from '@/utils/SessionContext';
 
-import { ShiftData } from '@/types/iShift';
+const Calendar = ({ refreshKey }: { refreshKey: number }) => {
+  const { user } = useSession();
 
-interface Props {
-  shifts: ShiftData[];
-}
-
-const Calendar: React.FC<Props> = ({ shifts }) => {
+  if (!user) {
+    return (
+      <Card style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+        <LoadingCircle />
+      </Card>
+    );
+  }
 
   return (
     <Card style={styles.container}>
-
-      <CalendarWidget shifts={shifts} />
-
+      <CalendarWidget 
+        key={refreshKey}
+        mode="calendar" 
+        showShifts 
+      />
     </Card>
-
-
   );
-
 };
 
 const styles = StyleSheet.create({

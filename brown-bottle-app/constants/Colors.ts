@@ -1,24 +1,24 @@
-const tintColorLight = '#0a7ea4'; // tab button color when pressed
-const tintColorDark = '#fff';  // tab button color when pressed
+const tintColorLight = "#0a7ea4"; // tab button color when pressed
+const tintColorDark = "#fff"; // tab button color when pressed
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#FBF7F7',
+    text: "#11181C",
+    background: "#FBF7F7",
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: "#687076",
+    tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: "#ECEDEE",
+    background: "#151718",
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: "#9BA1A6",
+    tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
   },
-  
+
   /* App Theme Colors */
   bgGray: '#FBF7F7',
   lightTan: '#FAF3ED',
@@ -40,6 +40,10 @@ export const Colors = {
   bgYellow: '#fff3e0',
   bgBlue: '#d1ecf1',
   buttonBlue: '#2e86de',
+
+  // Ishimwe additions
+  deleteRed: "#f8d7da",
+  deleteBorderColor: "#dfaaafff",
 
   borderColor: '#ccc',
   lightBorderColor: '#eee',
@@ -63,5 +67,5 @@ export const Colors = {
   gray: '#B1B1B5',
   darkGray: '#666',
   blue: '#2e86de',
-
+  greyWhite: "#FBF7F7"
 };

@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
   `shift_id` INT UNSIGNED NOT NULL,
   `accepted_employee_id` INT UNSIGNED DEFAULT NULL,
   `requested_employee_id` INT UNSIGNED NOT NULL,
-  `status` ENUM('Pending', 'Accepted', 'Denied') NOT NULL DEFAULT 'Pending',
+  `status` ENUM('Pending', 'Awaiting Approval', 'Accepted', 'Denied') NOT NULL DEFAULT 'Pending',
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cover_request_id`),
   INDEX `fk_shift_cover_request_shift1_idx` (`shift_id` ASC),

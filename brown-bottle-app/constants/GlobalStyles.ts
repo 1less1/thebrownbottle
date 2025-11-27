@@ -214,7 +214,10 @@ export const GlobalStyles = StyleSheet.create({
         borderRadius: 5,
     },
     deleteButton: {
-        backgroundColor: Colors.bgRed,
+        // Old Dom Version --> backgroundColor: Colors.bgRed,
+        backgroundColor: Colors.deleteRed,
+        borderColor: Colors.deleteBorderColor,
+        borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -258,6 +261,14 @@ export const GlobalStyles = StyleSheet.create({
         color: Colors.pendingYellow,
         fontSize: 12,
         fontWeight: 'bold',
-        textTransform: 'uppercase',
+        textTransform: 'uppercase'
+    },
+    // Ishimwe edit below!!!
+    awaitingApproval: { 
+        color: "#8b8b8bff",
+        backgroundColor: "#e3e5e6ff",
+        fontSize: 10,
+        padding: 4,
+        borderRadius: 4,
     }
 });

@@ -39,11 +39,10 @@ def get_db_connection():
         database=os.environ["DB_NAME"]
     )
 
+
 @app.route('/health')
 def health_check():
     return {"status": "ok"}
-
-
 
 
 # Employee Routes - /employee ---------------------------------------------------------------------------
@@ -56,6 +55,7 @@ def get_employees():
     """
     return employee.get_employees(get_db_connection(), request)
 
+
 @app.route('/employee/insert', methods=['POST'])
 def insert_employee():
     """
@@ -63,7 +63,8 @@ def insert_employee():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple role inserts from different clients
         return employee.insert_employee(get_db_connection(), request)
-    
+
+
 @app.route('/employee/update/<int:employee_id>', methods=['PATCH'])
 def update_employee(employee_id):
     """
@@ -76,7 +77,6 @@ def update_employee(employee_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Role Routes - /role -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -87,6 +87,7 @@ def get_roles():
     """
     return role.get_roles(get_db_connection(), request)
 
+
 @app.route('/role/insert', methods=['POST'])
 def insert_role():
     """
@@ -94,7 +95,8 @@ def insert_role():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple role inserts from different clients
         return role.insert_role(get_db_connection(), request)
-    
+
+
 @app.route('/role/update/<int:role_id>', methods=['PATCH'])
 def update_role(role_id):
     """
@@ -107,7 +109,6 @@ def update_role(role_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Section Routes - /section -----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -118,6 +119,7 @@ def get_sections():
     """
     return section.get_sections(get_db_connection(), request)
 
+
 @app.route('/section/insert', methods=['POST'])
 def insert_section():
     """
@@ -125,7 +127,8 @@ def insert_section():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple section inserts from different clients
         return section.insert_section(get_db_connection(), request)
-    
+
+
 @app.route('/section/update/<int:section_id>', methods=['PATCH'])
 def update_section(section_id):
     """
@@ -138,7 +141,6 @@ def update_section(section_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Task Routes - /task -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -149,6 +151,7 @@ def get_tasks():
     """
     return task.get_tasks(get_db_connection(), request)
 
+
 @app.route('/task/insert', methods=['POST'])
 def handle_new_task():
     """
@@ -156,6 +159,7 @@ def handle_new_task():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple task inserts from different clients
         return task.handle_new_task(get_db_connection(), request)
+
 
 @app.route('/task/update/<int:task_id>', methods=['PATCH'])
 def update_task(task_id):
@@ -169,7 +173,6 @@ def update_task(task_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Recurring Task Routes - /recurring-task ---------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -181,6 +184,7 @@ def get_recurring_tasks():
     """
     return recurring_task.get_recurring_tasks(get_db_connection(), request)
 
+
 @app.route('/recurring-task/insert', methods=['POST'])
 def insert_recurring_task():
     """
@@ -188,6 +192,7 @@ def insert_recurring_task():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple recurring task inserts from different clients
         return recurring_task.insert_recurring_task(get_db_connection(), request)
+
 
 @app.route('/recurring-task/update/<int:recurring_task_id>', methods=['PATCH'])
 def update_recurring_task(recurring_task_id):
@@ -201,7 +206,6 @@ def update_recurring_task(recurring_task_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Announcement Routes - /announcement -------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -212,6 +216,7 @@ def get_announcements():
     """
     return announcement.get_announcements(get_db_connection(), request)
 
+
 @app.route('/announcement/insert', methods=['POST'])
 def insert_announcement():
     """
@@ -219,7 +224,8 @@ def insert_announcement():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple announcement inserts from different clients
         return announcement.insert_announcement(get_db_connection(), request)
-    
+
+
 @app.route('/announcement/update/<int:announcement_id>', methods=['PATCH'])
 def update_announcement(announcement_id):
     """
@@ -232,7 +238,6 @@ def update_announcement(announcement_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Shift Routes - /shift ---------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -243,6 +248,7 @@ def get_shifts():
     """
     return shift.get_shifts(get_db_connection(), request)
 
+
 @app.route('/shift/insert', methods=['POST'])
 def insert_shift():
     """
@@ -250,7 +256,8 @@ def insert_shift():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple shift inserts from different clients
         return shift.insert_shift(get_db_connection(), request)
-    
+
+
 @app.route('/shift/update/<int:shift_id>', methods=['PATCH'])
 def update_shift(shift_id):
     """
@@ -258,7 +265,8 @@ def update_shift(shift_id):
     """
     with request_lock:
         return shift.update_shift(get_db_connection(), request, shift_id)
-    
+
+
 @app.route('/shift/delete/<int:shift_id>', methods=['DELETE'])
 def delete_shift(shift_id):
     """
@@ -269,7 +277,6 @@ def delete_shift(shift_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-
 
 
 # Schedule - /schedule ----------------------------------------------------------------------------------
@@ -297,6 +304,7 @@ def get_time_off_requests():
     """
     return time_off_request.get_tor(get_db_connection(), request)
 
+
 @app.route('/tor/insert', methods=['POST'])
 def insert_time_off_request():
     """
@@ -304,7 +312,8 @@ def insert_time_off_request():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple shift inserts from different clients
         return time_off_request.insert_tor(get_db_connection(), request)
-    
+
+
 @app.route('/tor/update/<int:request_id>', methods=['PATCH'])
 def update_time_off_request(request_id):
     """
@@ -327,6 +336,7 @@ def get_shift_cover_requests():
     """
     return shift_cover_request.get_scr(get_db_connection(), request)
 
+
 @app.route('/scr/insert', methods=['POST'])
 def insert_shift_cover_request():
     """
@@ -334,17 +344,34 @@ def insert_shift_cover_request():
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple shift inserts from different clients
         return shift_cover_request.insert_scr(get_db_connection(), request)
-    
+
+
 @app.route('/scr/update/<int:cover_request_id>', methods=['PATCH'])
-def update_shft_cover_request(cover_request_id):
+def update_shift_cover_request(cover_request_id):
     """
     PATCH (Update) shift cover requests by id
     """
     with request_lock:
         return shift_cover_request.update_scr(get_db_connection(), request, cover_request_id)
 
+
+@app.route('/scr/delete/<int:cover_request_id>', methods=['DELETE'])
+def delete_shift_cover_request(cover_request_id):
+    """
+    DELETE shift cover requests by id
+    """
+    with request_lock:
+        return shift_cover_request.delete_scr(get_db_connection(), cover_request_id)
+
+
+
+@app.route("/scr/approve/<int:cover_request_id>", methods=["POST"])
+def approve_shift_request(cover_request_id):
+    return shift_cover_request.approve_scr(get_db_connection(), cover_request_id)
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 for rule in app.url_map.iter_rules():
     print(rule)

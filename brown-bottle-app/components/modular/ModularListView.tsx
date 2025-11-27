@@ -11,6 +11,8 @@ interface ModularListViewProps<T> {
     error?: string | null;
     emptyText?: string;
     listHeight?: number;
+    refreshing?: boolean;
+    onRefresh?: () => void | Promise<void>;
 }
 
 export default function ModularListView<T>({
@@ -21,6 +23,8 @@ export default function ModularListView<T>({
     error,
     emptyText = 'No requests yet.',
     listHeight = 300,
+    refreshing,
+    onRefresh,
 }: ModularListViewProps<T>) {
     if (loading)
         return (
@@ -60,6 +64,8 @@ export default function ModularListView<T>({
                     renderItem={({ item, index }) => (
                         <View style={styles.requestItem}>{renderItem(item, index)}</View>
                     )}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
                 />
             </ScrollView>
         </View>

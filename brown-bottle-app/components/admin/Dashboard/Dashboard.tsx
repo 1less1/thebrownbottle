@@ -11,6 +11,7 @@ import Card from '@/components/modular/Card';
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
 import TimeOffView from '@/components/calendar/timeOff/AdminTimeOff';
+import ShiftCoverView from '@/components/calendar/shiftCover/ShiftCoverView';
 
 interface DashboardProps {
   user: User;
@@ -46,9 +47,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
       </View>
 
       <View style={{ width: '85%' }}>
+        <Text style={GlobalStyles.boldLargeText}>Time Off Requests</Text>
+        <Card style={[styles.card, { padding: 10, marginBottom: 20,marginTop: 10, width: '100%' }]}>
 
-        <Card style={[styles.card, { padding: 10, marginBottom: 20, width: '100%' }]}>
           <TimeOffView  />
+        </Card>
+
+        <Text style={GlobalStyles.boldLargeText}>Shift Cover Requests</Text>
+        <Card style={[styles.card, { padding: 10, marginBottom: 20, width: '100%' }]}>
+          <ShiftCoverView  />
         </Card>
 
         <Text style={GlobalStyles.floatingHeaderText}>
