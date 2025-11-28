@@ -9,10 +9,10 @@ import ModularListView from '@/components/modular/ModularListView';
 import { formatShiftDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import { ShiftCoverButtons } from './ShiftCoverButtons';
 import { ShiftCoverRequest } from '@/types/iShiftCover';
-import { getShiftCoverRequest } from '@/routes/shift_cover_requests';
+import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { useConfirm } from "@/hooks/useConfirm";
-import { updateShiftCoverRequest } from '@/routes/shift_cover_requests';
-import { approveShiftCoverRequest } from '@/routes/shift_cover_requests';
+import { updateShiftCoverRequest } from '@/routes/shift_cover_request';
+import { approveShiftCoverRequest } from '@/routes/shift_cover_request';
 
 
 type TabOption = 'active' | 'completed';
@@ -102,8 +102,7 @@ const ShiftCoverView: React.FC = () => {
     try {
       setProcessingId(request_id); 
 
-      await updateShiftCoverRequest({
-        cover_request_id: request_id,
+      await updateShiftCoverRequest( request_id, {
         status: "Denied",
         accepted_employee_id: request?.accepted_employee_id ?? null 
       });
@@ -190,9 +189,9 @@ const ShiftCoverView: React.FC = () => {
                       style={[
                         styles.statusBadge,
                         req.status === 'Accepted'
-                          ? GlobalStyles.accepted
+                          ? GlobalStyles.acceptedBadge
                           : req.status === 'Denied'
-                            ? GlobalStyles.denied
+                            ? GlobalStyles.deniedBadge
                             : styles.neutralBadge,
                       ]}
                     >

@@ -11,7 +11,7 @@ import ShiftDetailsModal from "./ShiftDetailsModal";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import { formatDateTime, formatTime, formatShiftDate } from "@/utils/dateTimeHelpers";
-import { getShiftCoverRequest } from "@/routes/shift_cover_requests";
+import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { ShiftCoverRequest } from "@/types/iShiftCover";
 import { ShiftCoverFilters } from "./ShiftCoverFilters";
 import RoleDropdown from "@/components/modular/RoleDropdown";
@@ -164,7 +164,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                 <View style={{ flexGrow: 0.4, }}>
                     <RoleDropdown
                         selectedRoleId={roleFilter}
-                        onRoleSelect={(value) => setRoleFilter(value as number)}
+                        onSelect={(value) => setRoleFilter(value as number)}
                         placeholder="All Roles"
                         labelText=""
                     />
@@ -208,12 +208,12 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                                 style={[
                                     styles.statusText,
                                     req.status === "Accepted"
-                                        ? GlobalStyles.accepted
+                                        ? GlobalStyles.acceptedBadge
                                         : req.status === "Denied"
-                                            ? GlobalStyles.denied
+                                            ? GlobalStyles.deniedBadge
                                             : req.status === "Awaiting Approval"
                                                 ? GlobalStyles.awaitingApproval
-                                                : GlobalStyles.pending,
+                                                : GlobalStyles.pendingBadge,
                                 ]}
                             >
                                 {req.status}

@@ -60,7 +60,7 @@ def get_tasks(db, request):
                 t.last_modified_by,
                 t.last_modified_at,
                 CONCAT(lm.first_name, ' ', lm.last_name) AS last_modified_name,
-                t.timestamp
+                DATE_FORMAT(t.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM task t
             JOIN employee e ON t.author_id = e.employee_id
             JOIN section s ON t.section_id = s.section_id
@@ -177,7 +177,7 @@ def insert_task(db, request):
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")

@@ -13,7 +13,7 @@ import { Shift } from '@/types/iShift';
 import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 import { useConfirm } from '@/hooks/useConfirm';
 
-import { insertShiftCoverRequest, hasPendingRequest } from '@/routes/shift_cover_requests';
+import { insertShiftCoverRequest, hasPendingRequest } from '@/routes/shift_cover_request';
 import { ShiftCoverModalProps, InsertShiftCoverRequest } from '@/types/iShiftCover';
 
 const ShiftCoverModal: React.FC<ShiftCoverModalProps> = ({ visible, onClose, onSubmitted, requests }) => {
@@ -69,7 +69,6 @@ const ShiftCoverModal: React.FC<ShiftCoverModalProps> = ({ visible, onClose, onS
         const payload: InsertShiftCoverRequest = {
             requested_employee_id: Number(user.employee_id),
             shift_id: selectedShift.shift_id,
-            status: "Pending",
         };
 
         try {

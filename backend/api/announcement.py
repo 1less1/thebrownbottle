@@ -46,8 +46,7 @@ def get_announcements(db, request):
                 r.role_name,
                 a.title,
                 a.description,
-                DATE_FORMAT(a.timestamp, '%m/%d/%Y') AS date,
-                DATE_FORMAT(a.timestamp, '%H:%i') AS time
+                DATE_FORMAT(a.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM announcement a
             JOIN employee e ON a.author_id = e.employee_id
             JOIN role r ON a.role_id = r.role_id
@@ -151,7 +150,7 @@ def insert_announcement(db, request):
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")

@@ -183,27 +183,6 @@ DEFAULT CHARACTER SET = utf8mb3;
 
 
 -- -----------------------------------------------------
--- Table `thebrownbottle`.`availibility`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`availibility` (
-  `availibility_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `employee_id` INT UNSIGNED NOT NULL,
-  `day_of_week` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
-  `status` ENUM('Pending', 'Approved', 'Denied') NOT NULL,
-  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`availibility_id`),
-  UNIQUE INDEX `avalibility_id_UNIQUE` (`availibility_id` ASC) VISIBLE,
-  UNIQUE INDEX `employee_id_UNIQUE` (`employee_id` ASC) VISIBLE,
-  CONSTRAINT `ava_employee_id`
-    FOREIGN KEY (`employee_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
--- -----------------------------------------------------
 -- Table `thebrownbottle`.`shift`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift` (

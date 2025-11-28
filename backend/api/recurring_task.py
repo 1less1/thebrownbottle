@@ -57,7 +57,7 @@ def get_recurring_tasks(db, request):
                 sun,
                 start_date,
                 end_date,
-                timestamp
+                DATE_FORMAT(timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM recurring_task 
             WHERE 1 = 1
         """
@@ -180,7 +180,7 @@ def insert_recurring_task(db, request):
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")

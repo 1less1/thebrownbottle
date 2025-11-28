@@ -181,7 +181,7 @@ def insert_tor(db, request):
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")

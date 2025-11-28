@@ -6,6 +6,5 @@ export interface Announcement {
   role_name: string;
   title: string;
   description: string;
-  date: string; // MM/DD/YYYY format
-  time: string; // HH:MM format
+  timestamp: string;
 }

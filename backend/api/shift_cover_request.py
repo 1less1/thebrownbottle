@@ -22,10 +22,9 @@ def get_scr(db, request):
             'shift_id': int,
             'accepted_employee_id': int,
             'requested_employee_id': int,
-            'employee_id': int,
+            'employee_id': int,  # Filter all requests either requested by or accepted by the provided employee_id parameter
             'requester_role_id': int,
             'status': str,
-            'timestamp': str
         }
 
         # Validate and parse parameters
@@ -41,7 +40,6 @@ def get_scr(db, request):
         employee_id = params.get('employee_id')
         requester_role_id = params.get('requester_role_id')
         status = params.get('status')
-        timestamp = params.get('timestamp')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -66,7 +64,7 @@ def get_scr(db, request):
                 sec.section_id AS section_id,
                 sec.section_name AS section_name,
 
-                s.date AS shift_date,
+                DATE_FORMAT(s.date, '%Y-%m-%d') AS shift_date,
                 TIME_FORMAT(s.start_time, '%H:%i %p') AS shift_start,
 
                 DATE_FORMAT(scr.timestamp, '%Y-%m-%d %H:%i') AS timestamp,
@@ -91,38 +89,30 @@ def get_scr(db, request):
             query += " AND scr.shift_id = %s"
             query_params.append(shift_id)
 
-        if accepted_employee_id is not None:
-            query += " AND scr.accepted_employee_id = %s"
-            query_params.append(accepted_employee_id)
-
-        if requested_employee_id is not None:
-            query += " AND scr.requested_employee_id = %s"
-            query_params.append(requested_employee_id)
-
-        # match either the requester or the accepter for the same employee
+        # Employee ID filter logic
         if employee_id is not None:
+            # If employee_id is provided, ignore accepted_employee_id and requested_employee_id
             query += " AND (scr.requested_employee_id = %s OR scr.accepted_employee_id = %s)"
             query_params.extend([employee_id, employee_id])
+        else:
+            # Otherwise, allow filtering by accepted_employee_id and/or requested_employee_id
+            if accepted_employee_id is not None:
+                query += " AND scr.accepted_employee_id = %s"
+                query_params.append(accepted_employee_id)
 
-        # filter by role of the requester
+            if requested_employee_id is not None:
+                query += " AND scr.requested_employee_id = %s"
+                query_params.append(requested_employee_id)
+
+
+        # Filter by role of the requester
         if requester_role_id is not None:
             query += " AND r.role_id = %s"
             query_params.append(requester_role_id)
 
-        if timestamp:
-            try:
-                datetime.strptime(timestamp, '%H:%M:%S')
-            except ValueError:
-                return jsonify({"error": "Invalid time format. Expected HH:MM:SS."}), 400
-            query += " AND scr.timestamp = %s"
-            query_params.append(timestamp)
-
         if status is not None:
-            if status.lower() == 'pending' and employee_id is not None:
-                query += " AND scr.status IN ('Pending', 'Awaiting Approval')"
-            else:
-                query += " AND scr.status = %s"
-                query_params.append(status)
+            query += " AND scr.status = %s"
+            query_params.append(status)
 
         # Last Query Line
         query += " ORDER BY scr.timestamp ASC;"
@@ -164,13 +154,12 @@ def insert_scr(db, request):
     try:
         # Define Required Fields
         required_fields = [
-            'requested_employee_id', 'status', 'shift_id'
+            'requested_employee_id', 'shift_id'
         ]
 
         # Define Expected Field Types
         field_types = {
             'requested_employee_id': int,
-            'status': str,
             'shift_id': int,
         }
 
@@ -183,7 +172,6 @@ def insert_scr(db, request):
 
         # Extract Parameters
         requested_employee_id = fields['requested_employee_id']
-        status = fields['status']
         shift_id = fields['shift_id']
 
         conn = db
@@ -192,14 +180,15 @@ def insert_scr(db, request):
         # Execute Query
         cursor.execute("""
             INSERT INTO shift_cover_request 
-            (requested_employee_id, status, shift_id)
-            VALUES (%s, %s, %s);
-        """, (requested_employee_id, status, shift_id))
+            (requested_employee_id, shift_id)
+            VALUES (%s, %s);
+        """, (requested_employee_id, shift_id))
+
         inserted_id = cursor.lastrowid
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
@@ -208,6 +197,7 @@ def insert_scr(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+    
     finally:
         if cursor:
             cursor.close()
@@ -225,7 +215,7 @@ def update_scr(db, request, cover_request_id):
     """
     Updates an existing shift_cover_request record (partial update).
     cover_request_id comes from the URL.
-    Other fields (accepted_employee_id, requested_employee_id, timestamp, status, shift_id) are optional.
+    Other fields (accepted_employee_id, shift_id, status) are optional.
     """
     conn = None
     cursor = None
@@ -233,10 +223,8 @@ def update_scr(db, request, cover_request_id):
         # Define Expected Field Types
         field_types = {
             'accepted_employee_id': int,
-            'timestamp': str,   # HH:MM or HH:MM:SS
-            'status': str,
             'shift_id': int,
-            'requested_employee_id': int,
+            'status': str,
         }
 
         # Validate the fields in JSON body (only optional fields here)
@@ -249,8 +237,7 @@ def update_scr(db, request, cover_request_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        # WHERE parameter at the end -> WHERE cover_request_id = %s
-        values.append(cover_request_id)
+        values.append(cover_request_id) # WHERE parameter at the end -> WHERE cover_request_id = %s
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -284,33 +271,48 @@ def update_scr(db, request, cover_request_id):
             conn.close()
 
 # -------------------------------------------------------------------------------------------------------
-# DELETE Shift_cover_request ----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
+# DELETE Shift_cover_request -------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------
 
 def delete_scr(db, cover_request_id):
     """
-    Permanently removes a shift_cover_request record from the database.
+    Deletes a shift_cover_request record by cover_request_id.
     """
     conn = None
     cursor = None
     try:
         conn = db
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Check if shift cover request exists
+        cursor.execute(
+            "SELECT cover_request_id FROM shift_cover_request WHERE cover_request_id = %s",
+            (cover_request_id,)
+        )
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({"status": "error", "message": "Shift cover request not found"}), 404
+
+        # Delete the shift cover request
         cursor.execute(
             "DELETE FROM shift_cover_request WHERE cover_request_id = %s",
-            (cover_request_id,),
+            (cover_request_id,)
         )
         conn.commit()
-        if cursor.rowcount == 0:
-            return jsonify({"status": "error", "message": "No shift cover request found with given ID"}), 404
-        return jsonify({"status": "success", "deleted_rows": cursor.rowcount}), 200
+
+        return jsonify({"status": "success", "message": "Shift cover request deleted"}), 200
+
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
         return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
     finally:
         if cursor:
             cursor.close()
@@ -318,7 +320,9 @@ def delete_scr(db, cover_request_id):
             conn.close()
 
 # -------------------------------------------------------------------------------------------------------
-# APPROVE Shift_cover_request ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+# APPROVE Shift_cover_request ---------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -328,6 +332,7 @@ def approve_scr(db, cover_request_id):
 
     try:
 
+        # Get shift cover request from API URL
         cursor.execute("""
             SELECT shift_id, accepted_employee_id
             FROM shift_cover_request
@@ -337,32 +342,32 @@ def approve_scr(db, cover_request_id):
         row = cursor.fetchone()
 
         if not row:
-            return jsonify({"error": "Request not found"}), 404
+            return jsonify({"error": "Shift cover request not found"}), 404
 
         shift_id = row["shift_id"]
-        employee_id = row["accepted_employee_id"]
+        accepted_employee_id = row["accepted_employee_id"]
 
-        if employee_id is None:
-            return jsonify({"error": "No accepting employee set"}), 400
-
+        # Update the shift cover request status to "Accepted"
         cursor.execute("""
             UPDATE shift_cover_request
             SET status = 'Accepted'
             WHERE cover_request_id = %s
         """, (cover_request_id,))
 
+        # Update the target shift with the NEW accepted_employee_id
         cursor.execute("""
             UPDATE shift
             SET employee_id = %s
             WHERE shift_id = %s
-        """, (employee_id, shift_id))
+        """, (accepted_employee_id, shift_id))
+
 
         cursor.execute("""
             UPDATE shift_cover_request
             SET status = 'Denied'
             WHERE shift_id = %s
             AND cover_request_id != %s
-            AND status IN ('Pending', 'Awaiting Approval')
+            AND status = 'Pending'
         """, (shift_id, cover_request_id))
 
         conn.commit()

@@ -51,7 +51,7 @@ export default function ModularListView<T>({
     return (
 
         <View style={styles.listContainer}>
-            {/* Nested the FlatList which renders contenr in a DISABLED Horizontal ScrollView to avoid rendering issues*/}
+            {/* Nested the FlatList which renders content in a DISABLED Horizontal ScrollView to avoid rendering issues*/}
             <ScrollView horizontal={true} scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
                 <FlatList
                     style={{ margin: 6, height: listHeight }}

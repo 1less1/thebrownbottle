@@ -9,7 +9,6 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
 import ModularListView from '@/components/modular/ModularListView';
 import { TimeOffRequest, TimeOffProps } from '@/types/iTimeOff';
-import TimeOffFilter from "./TimeOffFilter";
 import StatusBadge from '@/components/modular/StatusBadge';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';

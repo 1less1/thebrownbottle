@@ -6,11 +6,11 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import ModularButton from '@/components/modular/ModularButton';
 import { formatShiftDate, formatTime } from '@/utils/dateTimeHelpers';
-import { updateShiftCoverRequest } from '@/routes/shift_cover_requests';
+import { updateShiftCoverRequest } from '@/routes/shift_cover_request';
 import { useConfirm } from '@/hooks/useConfirm';
 import { User, useSession } from '@/utils/SessionContext';
 import { useState } from 'react';
-import { deleteShiftCoverRequest } from '@/routes/shift_cover_requests';
+import { deleteShiftCoverRequest } from '@/routes/shift_cover_request';
 
 const ShiftDetailsModal: React.FC<ShiftDetailsModalProps> = ({
     visible,
@@ -38,9 +38,10 @@ const ShiftDetailsModal: React.FC<ShiftDetailsModalProps> = ({
                 status: "Awaiting Approval",
                 accepted_employee_id: Number(user?.employee_id)
             };
+
             setSubmitting(true);
-            await updateShiftCoverRequest({
-                cover_request_id: request.cover_request_id,
+
+            await updateShiftCoverRequest( request.cover_request_id, {
                 status: "Awaiting Approval",
                 accepted_employee_id: Number(user?.employee_id),
             });

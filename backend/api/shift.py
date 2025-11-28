@@ -64,7 +64,7 @@ def get_shifts(db, request):
                 DATE_FORMAT(sh.date, '%Y-%m-%d') AS date,
                 DATE_FORMAT(sh.date, '%W') AS day_name,
                 DAYOFWEEK(sh.date) AS day_index,
-                sh.timestamp
+                DATE_FORMAT(sh.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM shift sh
             JOIN employee e ON sh.employee_id = e.employee_id
             LEFT JOIN role pr ON e.primary_role = pr.role_id
@@ -213,7 +213,7 @@ def insert_shift(db, request):
 
         conn.commit()
 
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
+        return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
         print(f"Database error: {e}")

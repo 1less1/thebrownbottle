@@ -2,10 +2,10 @@ import Constants from "expo-constants";
 
 import { buildQueryString } from "@/utils/apiHelpers";
 
-import { Shift, ShiftAPI } from "@/types/iShift";
+import { Shift, GetShift, InsertShift, UpdateShift } from "@/types/iShift";
 
 // GET: Fetches data from the shift table
-export async function getShift(params?: Partial<ShiftAPI>) {
+export async function getShift(params?: Partial<GetShift>) {
 
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -18,9 +18,7 @@ export async function getShift(params?: Partial<ShiftAPI>) {
   try {
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -29,7 +27,7 @@ export async function getShift(params?: Partial<ShiftAPI>) {
 
     const data = await response.json();
 
-    return data; // JSON Response
+    return data as Shift[]; // JSON Response
 
   } catch (error) {
     console.error("Failed to fetch shift data:", error);
@@ -38,30 +36,29 @@ export async function getShift(params?: Partial<ShiftAPI>) {
 
 }
 
+
 // POST: Inserts a shift record within the shift table
-export async function insertShift(fields: Partial<Shift>) {
+export async function insertShift(fields: InsertShift) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
   const url = `${API_BASE_URL}/shift/insert`;
 
   // Required db fields for POST
-  const requiredFields: (keyof Shift)[] = [
+  const requiredFields: (keyof InsertShift)[] = [
     "employee_id", "start_time", "date", "section_id"
   ];
 
   try {
     for (const key of requiredFields) {
-      if (fields[key] === undefined || fields[key] === "") {
+      if (fields[key] === undefined || fields[key] === null || fields[key] === "") {
         throw new Error(`Missing required field: ${key}`);
       }
     }
 
     const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fields),
     });
 
@@ -69,9 +66,7 @@ export async function insertShift(fields: Partial<Shift>) {
       throw new Error(`[Shift API] Failed to POST: ${response.status}`);
     }
 
-    const data = await response.json();
-
-    return data;
+    return await response.json();
 
   } catch (error) {
     console.error("Failed to insert shift data:", error);
@@ -82,28 +77,28 @@ export async function insertShift(fields: Partial<Shift>) {
 
 
 // PATCH: Updates an shift record within the shift table
-export async function updateShift(id: number, fields: Partial<Shift>) {
+export async function updateShift(id: number, fields: UpdateShift) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  if (!id) {
+    throw new Error("Updating a shift requires an id!");
+  }
 
   const url = `${API_BASE_URL}/shift/update/${id}`;
 
   try {
     const response = await fetch(url, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fields),
     });
 
     if (!response.ok) {
-      throw new Error(`[Shift API] Failed to PATCH: ${response.status}`);
+      throw new Error(`[Shift API] Failed to PATCH: ${id} - ${response.status}`);
     }
 
-    const data = await response.json();
-
-    return data;
+    return await response.json();
 
   } catch (error) {
     console.error("Failed to update shift data:", error);
@@ -121,17 +116,15 @@ export async function deleteShift(id: number) {
 
   try {
     const response = await fetch(url, {
-      method: "DELETE",
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
     });
 
     if (!response.ok) {
-      throw new Error(`[Shift API] Failed to DELETE Shift: ${id}: ${response.status}`);
+      throw new Error(`[Shift API] Failed to DELETE Shift: ${id} - ${response.status}`);
     }
 
-    const data = await response.json();
-
-    return data;
-
+    return await response.json();
 
   } catch (error) {
     console.error("Failed to delete selected shift:", error);
