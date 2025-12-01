@@ -11,8 +11,6 @@ import Calendar from '@/components/calendar/Calendar';
 import CalendarTimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
 import ShiftCover from '@/components/calendar/shiftCover/ShiftCover';
 
-import { testShifts } from '@/data/testShifts';
-
 export default function CalendarPage() {
   useFocusEffect(
     useCallback(() => {
