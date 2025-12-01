@@ -110,6 +110,7 @@ const AdminTimeOff: React.FC = () => {
           data={currentList}
           loading={loading}
           error={error}
+          maxHeight={350}
           emptyText={
             activeTab === 'active'
               ? 'No active requests.'

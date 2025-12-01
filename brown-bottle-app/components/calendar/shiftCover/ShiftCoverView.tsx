@@ -145,6 +145,7 @@ const ShiftCoverView: React.FC = () => {
           data={currentList}
           loading={loading}
           error={error}
+          maxHeight={350}
           refreshing={refreshing}
           onRefresh={handleRefresh}
           emptyText={

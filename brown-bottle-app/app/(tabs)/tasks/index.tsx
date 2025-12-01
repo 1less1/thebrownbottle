@@ -6,20 +6,17 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
-import TaskList from '@/components/tasks/TaskList';
-import Active from '@/components/tasks/Active/Active';
-import Completed from '@/components/tasks/Completed/Completed';
+import { ScrollView } from 'react-native';
 import LoadingCircle from '@/components/modular/LoadingCircle';
+import Tasks from '@/components/tasks/Tasks';
+
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
-import { Task } from '@/types/iTask';
 import { Section } from '@/types/iSection';
 import { getSection } from '@/routes/section';
 
-export default function Tasks() {
-  // Dynamic Status Bar
+export default function TaskPage() {
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.white);
@@ -28,81 +25,32 @@ export default function Tasks() {
   );
 
   const { user } = useSession();
-  const [activeTab, setActiveTab] = useState(0);
-
 
   const [sections, setSections] = useState<Section[]>([]);
-  // Fetch Sections
+
   useEffect(() => {
     async function loadSections() {
       const data = await getSection();
       setSections(data);
-      //setSelectedSectionName(data[0].section_name);
     }
     loadSections();
   }, []);
 
-
-  // Define available tabs and corresponding components
-  const tabs = [
-    {
-      key: 'active', title: 'Active', component: user && sections ? <Active user={user} sections={sections} /> :
-        <LoadingCircle
-          size="large"
-          style={{ marginTop: 40, alignSelf: 'center' }}
-        />
-    },
-
-    {
-      key: 'completed', title: 'Completed', component: user && sections ? <Completed user={user} sections={sections} /> :
-        <LoadingCircle
-          size="large"
-          style={{ marginTop: 40, alignSelf: 'center' }}
-        />
-    },
-  ];
-
-
   return (
-
     <DefaultView backgroundColor={Colors.white}>
-
       <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
-
-        { /* Tasks Header */}
         <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
-
           <Text style={GlobalStyles.pageHeader}>Tasks</Text>
-
-          {/* Tab Bar */}
-          <View style={styles.tabBar}>
-            {tabs.map((tab, index) => (
-              <TouchableOpacity
-                key={tab.key}
-                style={[
-                  styles.tabButton,
-                  activeTab === index && styles.activeTabButton, // Style the active tab
-                ]}
-                onPress={() => setActiveTab(index)} // Set active tab on click
-              >
-                <Text style={styles.tabText}>{tab.title}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
         </View>
 
-        {/* Render content based on selected tab */}
-        <View style={styles.tabContent}>
-          {tabs[activeTab]?.component}
-        </View>
-
+        <ScrollView style={{ flex: 1 }}>
+          <Tasks user={user} sections={sections} />
+        </ScrollView>
       </View>
-
     </DefaultView>
-
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   header: {
