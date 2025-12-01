@@ -1,7 +1,6 @@
 import React from 'react';
-import { ScrollView, FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
+import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Colors } from '@/constants/Colors';
-
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -10,7 +9,8 @@ interface ModularListViewProps<T> {
     loading?: boolean;
     error?: string | null;
     emptyText?: string;
-    listHeight?: number;
+    listHeight?: number | "auto" | "full";
+    maxHeight?: number;
     refreshing?: boolean;
     onRefresh?: () => void | Promise<void>;
 }
@@ -21,11 +21,14 @@ export default function ModularListView<T>({
     keyExtractor,
     loading,
     error,
-    emptyText = 'No requests yet.',
-    listHeight = 300,
+    emptyText = 'No items yet.',
+    listHeight = "auto",
+    maxHeight,
     refreshing,
     onRefresh,
 }: ModularListViewProps<T>) {
+
+    // --- UI States ---
     if (loading)
         return (
             <View style={styles.statusContainer}>
@@ -49,15 +52,22 @@ export default function ModularListView<T>({
         );
 
     return (
+        <View style={[
+            styles.listContainer,
+            maxHeight ? { maxHeight } : null
+        ]}>
 
-        <View style={styles.listContainer}>
-            {/* Nested the FlatList which renders content in a DISABLED Horizontal ScrollView to avoid rendering issues*/}
-            <ScrollView horizontal={true} scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
+            {/* ScrollView prevents FlatList parent scroll conflict */}
+            <ScrollView horizontal scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
                 <FlatList
-                    style={{ margin: 6, height: listHeight }}
+                    style={[
+                        { margin: 6 },
+                        typeof listHeight === "number" && { height: listHeight },
+                        listHeight === "full" && { flex: 1 },
+                    ]}
                     data={data}
-                    nestedScrollEnabled={true}
-                    showsVerticalScrollIndicator={true}
+                    nestedScrollEnabled
+                    showsVerticalScrollIndicator
                     keyExtractor={(item, index) =>
                         keyExtractor ? String(keyExtractor(item, index)) : String(index)
                     }
@@ -101,5 +111,4 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderColor,
         marginBottom: 10,
     },
-
 });

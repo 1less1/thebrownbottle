@@ -14,55 +14,61 @@ type TasksProps = {
 
 const Tasks: React.FC<TasksProps> = ({ user, sections }) => {
     const [activeTab, setActiveTab] = useState("active");
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const refresh = () => {
+        setRefreshKey(prev => prev + 1);
+    };
+
     const isLoaded = user && sections;
 
     return (
         <View style={styles.container}>
 
             {/* Tab Selector */}
-            <View style={{width:"90%"}}>
-            <View style={styles.tabBar}>
-                <TouchableOpacity
-                    style={[
-                        styles.tabButton,
-                        activeTab === "active" && styles.activeTab
-                    ]}
-                    onPress={() => setActiveTab("active")}
-                >
-                    <Text style={[
-                        styles.tabText,
-                        activeTab === "active" && styles.activeTabText
-                    ]}>
-                        To Do
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[
-                        styles.tabButton,
-                        activeTab === "completed" && styles.activeTab
-                    ]}
-                    onPress={() => setActiveTab("completed")}
-                >
-                    <Text style={[
-                        styles.tabText,
-                        activeTab === "completed" && styles.activeTabText
-                    ]}>
-                        Completed
-                    </Text>
-                </TouchableOpacity>
+            <View style={{ width: "90%" }}>
+                <View style={styles.tabBar}>
+                    <TouchableOpacity
+                        style={[
+                            styles.tabButton,
+                            activeTab === "active" && styles.activeTab
+                        ]}
+                        onPress={() => setActiveTab("active")}
+                    >
+                        <Text style={[
+                            styles.tabText,
+                            activeTab === "active" && styles.activeTabText
+                        ]}>
+                            To Do
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[
+                            styles.tabButton,
+                            activeTab === "completed" && styles.activeTab
+                        ]}
+                        onPress={() => setActiveTab("completed")}
+                    >
+                        <Text style={[
+                            styles.tabText,
+                            activeTab === "completed" && styles.activeTabText
+                        ]}>
+                            Completed
+                        </Text>
+                    </TouchableOpacity>
 
-            </View>
+                </View>
 
-            {/* Content Area */}
-            <View>
-                {!isLoaded ? (
-                    <LoadingCircle size="large" style={{ marginTop: 40 }} />
-                ) : activeTab === "active" ? (
-                    <ActiveTasks user={user} />
-                ) : (
-                    <CompletedTasks user={user} />
-                )}
-            </View>
+                {/* Content Area */}
+                <View>
+                    {!isLoaded ? (
+                        <LoadingCircle size="large" style={{ marginTop: 40 }} />
+                    ) : activeTab === "active" ? (
+                        <ActiveTasks user={user} refreshKey={refreshKey} onRefresh={refresh} />
+                    ) : (
+                        <CompletedTasks user={user} refreshKey={refreshKey} onRefresh={refresh} />
+                    )}
+                </View>
             </View>
         </View>
     );
@@ -73,7 +79,7 @@ export default Tasks;
 const styles = StyleSheet.create({
     container: {
         width: "100%",
-        alignItems:'center'
+        alignItems: 'center'
     },
 
     tabBar: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import ModularListView from "@/components/modular/ModularListView";
 import { getTasks } from "@/routes/task";
 import { getShift } from "@/routes/shift";
@@ -9,17 +9,28 @@ import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 import LoadingCircle from "../modular/LoadingCircle";
 import { TouchableOpacity, Pressable } from "react-native";
+import { formatDateTime } from "@/utils/dateTimeHelpers";
+import { GlobalStyles } from "@/constants/GlobalStyles";
+import TaskDetailsModal from "./TaskDetailsModal";
+import { ScrollView } from "react-native-reanimated/lib/typescript/Animated";
+import { updateTask } from "@/routes/task";
 interface ActiveTasksProps {
     user: User;
+    refreshKey: number;
+    onRefresh: () => void;
 }
 
-const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
+const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }) => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     const [sectionId, setSectionId] = useState<number | null>(null);
     const [hasShiftToday, setHasShiftToday] = useState<boolean | null>(null);
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
 
     const today = new Date().setHours(0, 0, 0, 0);
 
@@ -73,7 +84,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
         };
 
         fetchTasks();
-    }, [sectionId]);
+    }, [sectionId, refreshKey, hasShiftToday]);
 
     // ------------------------------
     // Group + Sort Tasks
@@ -85,6 +96,18 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
     const overdueTasks = tasks
         .filter((t) => new Date(t.due_date).setHours(0, 0, 0, 0) < today)
         .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime());
+
+    const combinedList = [];
+
+    if (upcomingTasks.length > 0) {
+        combinedList.push({ type: "header", title: "Upcoming Tasks" });
+        upcomingTasks.forEach(task => combinedList.push({ type: "task", data: task }));
+    }
+
+    if (overdueTasks.length > 0) {
+        combinedList.push({ type: "header", title: "Overdue Tasks" });
+        overdueTasks.forEach(task => combinedList.push({ type: "task", data: task }));
+    }
 
     // ------------------------------
     // UI Conditions
@@ -108,14 +131,38 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
             </View>
         );
     }
+    // ------------------------------
+    // Handle Press
+    // ------------------------------
+    const handlePress = (task: Task) => {
+        setSelectedTask(task);
+        setModalVisible(true);
+    };
+
+    const handleComplete = async (task: Task) => {
+
+        try {
+            await updateTask(task.task_id, {
+                complete: 1,
+                last_modified_by: user.employee_id,
+            })
+            setModalVisible(false);
+            onRefresh()
+            Alert.alert("Task has been Completed")
+        } catch (err) {
+            console.error("Task completion failed: ", err)
+        }
+
+    };
+
 
     return (
-        <View style={{ width: "100%", flex: 1 }}>
+        <View style={{ width: "100%" }}>
 
             {/* UPCOMING TASKS */}
-            {/* <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 10 }}>
                 Upcoming Tasks
-            </Text> */}
+            </Text>
 
             <ModularListView
                 data={upcomingTasks}
@@ -125,46 +172,84 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user }) => {
                 keyExtractor={(task) => String(task.task_id)}
                 refreshing={loading}
                 onRefresh={() => { }}
+                listHeight="auto"
                 renderItem={(task) => (
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => handlePress(task)}>
                         <View>
-                            <Text style={{ fontWeight: "bold" }}>{task.title}</Text>
-                            <Text style={{ color: Colors.gray }}>{task.due_date}</Text>
+                            <View style={styles.rowBetween}>
+                                <Text style={{ fontWeight: "bold" }}>{task.title}</Text>
+
+                                {task.recurring_task_id !== null && (
+                                    <Text style={styles.recurring}>
+                                        Recurring
+                                    </Text>
+                                )}
+                            </View>
+
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ color: Colors.gray }}>Due: </Text>
+                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>{task.due_date}</Text>
+                            </View>
+                            <Text style={styles.timestamp}>Assigned On {formatDateTime(task.timestamp)}</Text>
                         </View>
                     </TouchableOpacity>
+
                 )}
             />
 
             {/* OVERDUE SECTION (ONLY IF EXISTS) */}
-            {overdueTasks.length > 0 && (
-                <>
-                    <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 10 }}>
-                        Overdue Tasks
-                    </Text>
+            <View style={{ width: '100%' }}>
+                {overdueTasks.length > 0 && (
+                    <>
+                        <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 10 }}>
+                            Overdue Tasks
+                        </Text>
 
-                    <ModularListView
-                        data={overdueTasks}
-                        loading={loading}
-                        error={error}
-                        emptyText=""
-                        listHeight={'100%'}
-                        keyExtractor={(task) => String(task.task_id)}
-                        refreshing={loading}
-                        onRefresh={() => { }}
-                        renderItem={(task) => (
-                            <TouchableOpacity>
-                                <View>
-                                    <Text style={{ fontWeight: "bold", color: "#b3261e" }}>
-                                        {task.title}
-                                    </Text>
-                                    <Text style={{ color: Colors.gray }}>{task.due_date}</Text>
-                                </View>
-                            </TouchableOpacity>
+                        <ModularListView
+                            data={overdueTasks}
+                            loading={loading}
+                            error={error}
+                            emptyText=""
+                            keyExtractor={(task) => String(task.task_id)}
+                            refreshing={loading}
+                            onRefresh={() => { }}
+                            renderItem={(task) => (
+                                <TouchableOpacity onPress={() => handlePress(task)}>
+                                    <View>
+                                        <View style={styles.rowBetween}>
+                                            <Text style={{ fontWeight: "bold", marginBottom: 10 }}>{task.title}</Text>
 
-                        )}
-                    />
-                </>
-            )}
+                                            {task.recurring_task_id !== null && (
+                                                <Text style={styles.recurring}>
+                                                    Recurring
+                                                </Text>
+                                            )}
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text style={{ color: Colors.gray }}>Due: </Text>
+                                            <Text style={{ color: "#535353ff", fontWeight: "500" }}>{task.due_date}</Text>
+                                        </View>
+                                        <Text style={styles.timestamp}>Assigned On {formatDateTime(task.timestamp)}</Text>
+                                    </View>
+                                </TouchableOpacity>
+
+                            )}
+                        />
+
+                        <TaskDetailsModal
+                            visible={modalVisible}
+                            task={selectedTask}
+                            onClose={() => setModalVisible(false)}
+                            onComplete={handleComplete}
+                            actionLabel="Complete Task"
+                        />
+
+
+                    </>
+                )}
+            </View>
+
         </View>
     );
 };
@@ -178,6 +263,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 10,
         paddingVertical: 10,
+    },
+    rowBetween: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     scrollContainer: {
         height: 380,
@@ -194,6 +284,19 @@ const styles = StyleSheet.create({
     },
     button: {
         width: '100%'
+    },
+    recurring: {
+        backgroundColor: Colors.bgGreen,
+        padding: 6,
+        borderRadius: 4,
+        color: Colors.acceptGreen,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    timestamp: {
+        fontSize: 12,
+        color: Colors.gray,
     }
 });
 

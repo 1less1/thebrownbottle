@@ -136,7 +136,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                 onPress={toggleModal}
                 style={styles.shiftCoverButton}
             />
-
+ 
             <View style={styles.headerRow}>
                 {/* Filter Modal */}
                 <View style={{ flexGrow: 0.5, paddingRight: 5 }} >
@@ -174,6 +174,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
             <ModularListView
                 data={requests}
                 loading={loading}
+                maxHeight={350}
                 error={error}
                 emptyText={
                     ownershipFilter === "My Requests"

@@ -113,6 +113,7 @@ const CalendarTimeOff: React.FC<TimeOffProps> = ({ refreshKey }) => {
       <ModularListView
         data={filteredRequests}
         loading={loading}
+        maxHeight={350}
         error={error}
         emptyText={`No ${filter === "All" ? "" : filter.toLowerCase()} requests found.`}
         renderItem={(req) => (
