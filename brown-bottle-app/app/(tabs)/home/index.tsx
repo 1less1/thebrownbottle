@@ -10,9 +10,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
-
-import Card from '@/components/modular/Card';
-import AltCard from '@/components/modular/AltCard';
+import QuickStats from '@/components/home/QuickStats';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
@@ -65,6 +63,11 @@ export default function HomeScreen() {
             <Text style={GlobalStyles.mediumText}>
               Here's What's Happening...
             </Text>
+          </View>
+
+          {/* Quick Stats View */}
+          <View>
+            <QuickStats />
           </View>
 
           {/* Next Shift View */}
