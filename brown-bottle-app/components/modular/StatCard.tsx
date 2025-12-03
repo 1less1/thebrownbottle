@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import Card from '../modular/Card';
 import { Ionicons } from '@expo/vector-icons';
-import StatCardSkeleton from '../ui/skeletons/StatCardSkeleton';
+// import StatCardSkeleton from '../ui/skeletons/StatCardSkeleton';
 
 export type StatCardProps = {
     title: string;
@@ -32,7 +32,7 @@ const StatCard: React.FC<StatCardProps> = ({
     borderColor
 }) => {
     if (loading) {
-        return <StatCardSkeleton style={style} />;
+        // return <StatCardSkeleton style={style} />;
     }
     return (
         <View style={[styles.card, { backgroundColor, borderColor }, style]}>
