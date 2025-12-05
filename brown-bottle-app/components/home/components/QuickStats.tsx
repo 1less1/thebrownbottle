@@ -1,15 +1,36 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import StatCard from '@/components/modular/StatCard';
 
 const QuickStats = () => {
+  const [loading, setLoading] = useState(true);
   const { width } = useWindowDimensions();
+
+  // Prevent layout flicker on mobile/web initial mount
+  if (!width || width === 0) {
+    return (
+      <View style={{ width: "100%", paddingHorizontal: 16 }}>
+        <StatCard loading />
+        <StatCard loading />
+        <StatCard loading />
+      </View>
+    );
+  }
+
   const isMobile = width < 600;
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500);
+    return () => clearTimeout(t);
+  }, []);
+
 
   return (
     <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
 
       <StatCard
+        loading={loading}
         title="Upcoming Shifts"
         value={0}
         iconName="time-outline"
@@ -21,6 +42,7 @@ const QuickStats = () => {
       />
 
       <StatCard
+        loading={loading}
         title="Completed"
         value={7}
         iconName="checkmark-done-circle"
@@ -32,6 +54,7 @@ const QuickStats = () => {
       />
 
       <StatCard
+        loading={loading}
         title="Late"
         value={2}
         iconName="alert-circle-outline"
