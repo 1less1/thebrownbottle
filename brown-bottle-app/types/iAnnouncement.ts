@@ -7,4 +7,5 @@ export interface Announcement {
   title: string;
   description: string;
   timestamp: string;
+  acknowledged?: number;
 }

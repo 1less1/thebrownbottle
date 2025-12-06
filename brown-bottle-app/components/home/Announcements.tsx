@@ -5,9 +5,12 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import RoleDropdown from '@/components/modular/RoleDropdown';
 import ModularListView from "@/components/modular/ModularListView";
-import { getAllAnnouncements, getAnnouncementsByRole } from '@/routes/announcement';
+import { getAllAnnouncements, getAnnouncementsByRole, acknowledgeAnnouncement } from '@/routes/announcement';
 import { Announcement } from '@/types/iAnnouncement';
 import { Ionicons } from '@expo/vector-icons';
+
+import { useSession } from "@/utils/SessionContext";
+import { getAcknowledgedAnnouncements } from '@/routes/announcement';
 
 const Announcements = () => {
 
@@ -22,6 +25,8 @@ const Announcements = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useSession();
 
   /**
    * Fetch announcements filtered by role
@@ -53,25 +58,39 @@ const Announcements = () => {
 
   // Trigger fetch anytime the filter changes
   useEffect(() => {
-    fetchAnnouncements();
-  }, [fetchAnnouncements]);
+  async function load() {
+    await fetchAnnouncements();
+
+    // Fetch acknowledged list only after announcements load
+    const ack = await getAcknowledgedAnnouncements(user!.employee_id);
+
+    // Extract only the announcement_id values to drive UI
+    setAcknowledged(ack.map(a => a.announcement_id));
+  }
+
+  load();
+}, [fetchAnnouncements]);
 
   /**
-   * Handle "Acknowledge" button click
-   * For now – ONLY console log
-   * Later – send API request to backend + store DB record
+   * Handle "Acknowledge" click — backend + optimistic UI
    */
-  const handleAcknowledge = (announcementId: number) => {
-    console.log("Acknowledged announcement:", announcementId);
-
-    // Add ID to acknowledged list so button changes state
+  const handleAcknowledge = async (announcementId: number) => {
+    // This already updates local state correctly
     setAcknowledged((prev) => [...prev, announcementId]);
+
+    try {
+      console.log("Sending ack:", announcementId, user?.employee_id);
+      await acknowledgeAnnouncement(announcementId, user!.employee_id);
+    } catch (err) {
+      console.log("Error acknowledging announcement:", err);
+    }
   };
 
   /**
    * Render each announcement row for ModularListView
    */
   const renderAnnouncement = (announcement: Announcement) => {
+    //  use local `acknowledged` state so UI updates immediately
     const isAcknowledged = acknowledged.includes(announcement.announcement_id);
 
     return (
@@ -80,17 +99,14 @@ const Announcements = () => {
           <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
 
           <View style={styles.roleContainer}>
-            <Text style={[GlobalStyles.awaitingApproval, styles.roleName]}>{announcement.role_name}</Text>
+            <Text style={[GlobalStyles.awaitingApproval, styles.roleName]}>
+              {announcement.role_name}
+            </Text>
           </View>
         </View>
 
         <Text style={GlobalStyles.text}>{announcement.description}</Text>
         <Text style={GlobalStyles.text}>- {announcement.author}</Text>
-
-        {/* <Text style={[GlobalStyles.altText, { marginVertical: 5 }]}>
-          Date: {announcement.date}{"\n"}
-          Time: {announcement.time}
-        </Text> */}
 
         {/* Acknowledge Button */}
         {isAcknowledged ? (
@@ -129,8 +145,7 @@ const Announcements = () => {
 
         </View>
 
-
-        {/* ModularListView for list rendering, loading, error, refresh */}
+        {/* ModularListView */}
         <View style={{ height: 375 }}>
           <ModularListView
             data={announcements}
@@ -206,7 +221,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: Colors.ackknowledgedBG,
     borderRadius: 6,
-    fontWeight: 500
+    fontWeight: "500"
   },
   ackBtnText: {
     color: Colors.white,

@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     },
     requestItem: {
         backgroundColor: Colors.inputBG,
-        width: '97.5%',
+        width: '97.9%',
         alignSelf: 'center',
         padding: 12,
         marginTop: 5,
