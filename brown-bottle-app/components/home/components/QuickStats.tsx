@@ -34,9 +34,7 @@ const QuickStats = () => {
 
                 const now = new Date();
 
-                // ---------------------------------------------------------
                 // FETCH UPCOMING SHIFTS
-                // ---------------------------------------------------------
                 const shiftData = await getShift({ employee_id: employeeId });
 
                 const futureShifts = shiftData.filter((shift: any) => {
@@ -46,9 +44,7 @@ const QuickStats = () => {
 
                 setUpcomingCount(futureShifts.length);
 
-                // ---------------------------------------------------------
-                // FETCH PENDING TASKS FOR TODAY'S SECTION
-                // ---------------------------------------------------------
+                // FETCH PENDING TASKS
                 const todaysShift = await getShift({
                     employee_id: employeeId,
                     is_today: 1,
@@ -60,17 +56,15 @@ const QuickStats = () => {
                     const section_id = todaysShift[0].section_id;
                     const tasks = await getTasks({
                         section_id,
-                        complete: 0, // only incomplete tasks
+                        complete: 0,
                     });
                     setTaskCount(tasks.length);
                 }
 
-                // ---------------------------------------------------------
-                // FETCH USER'S PENDING TIME OFF REQUESTS
-                // ---------------------------------------------------------
+                // FETCH PENDING TIME OFF REQs
                 const tor = await getTimeOffRequests({
                     employee_id: employeeId,
-                    status: "Pending", // ONLY pending
+                    status: "Pending",
                 });
 
                 setPendingTimeOffCount(tor.length);
@@ -85,8 +79,19 @@ const QuickStats = () => {
             }
         };
 
+        // **Run immediately**
         fetchData();
+
+        //POLLING INTERVAL — Refresh every 10 seconds
+        const interval = setInterval(() => {
+            fetchData();
+        }, 10000); // 10,000 ms = 10 seconds
+
+        // Cleanup when component unmounts
+        return () => clearInterval(interval);
+
     }, [user?.employee_id]);
+
 
     return (
         <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
@@ -102,7 +107,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#dbeaff" }}
                 titleStyle={{ color: "#3b78ff" }}
                 valueStyle={{ color: "#3b78ff" }}
-                style={{marginLeft: 8,marginRight: 8}}
+                style={{ marginLeft: 8, marginRight: 8 }}
             />
 
             <StatCard
@@ -116,7 +121,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#fde6c4ff" }}
                 titleStyle={{ color: "#ff9800" }}
                 valueStyle={{ color: "#ff9800" }}
-                style={{marginLeft: 8,marginRight: 8}}
+                style={{ marginLeft: 8, marginRight: 8 }}
             />
 
             {/* DISPLAY LIVE PENDING TOR COUNT */}
@@ -131,7 +136,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#f2d3f5ff" }}
                 titleStyle={{ color: "#c780ceff" }}
                 valueStyle={{ color: "#c780ceff" }}
-                style={{marginLeft: 8,marginRight: 8}}
+                style={{ marginLeft: 8, marginRight: 8 }}
             />
 
         </View>
