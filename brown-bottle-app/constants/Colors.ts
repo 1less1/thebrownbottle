@@ -58,6 +58,9 @@ export const Colors = {
   selectedBox: '#2e86de',
   unselectedBox: '#666',
 
+  AnnouncemtnBG: '#f5f4f4ce',
+  ackknowledgedBG: '#e3e5e6ff',
+  TaskBG: '#f5f4f4f1',
   
   /* General Colors */
   black: '#000000',

@@ -127,36 +127,46 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, refreshKey, onRef
                 data={tasks}
                 loading={loading}
                 error={error}
-                listHeight = "full"
+                listHeight="full"
                 emptyText="No completed tasks."
                 keyExtractor={(task) => String(task.task_id)}
                 refreshing={loading}
                 onRefresh={() => { }}
+                onItemPress={(task) => handlePress(task)}
+                itemContainerStyle={styles.itemContainer}
                 renderItem={(task) => (
-                    <TouchableOpacity onPress={() => handlePress(task)}>
+                    <>
                         <View>
                             <View style={styles.rowBetween}>
                                 <Text style={{ fontWeight: "bold" }}>{task.title}</Text>
 
                                 {task.recurring_task_id !== null && (
-                                    <Text style={styles.recurring}>
-                                        Recurring
-                                    </Text>
+                                    <Text style={styles.recurring}>Recurring</Text>
                                 )}
                             </View>
+
                             <View style={{ flexDirection: 'row' }}>
                                 <Text style={{ color: Colors.gray }}>Completed by </Text>
-                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>{task.last_modified_name}</Text>
+                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>
+                                    {task.last_modified_name}
+                                </Text>
                             </View>
+
                             <View style={{ flexDirection: 'row' }}>
                                 <Text style={{ color: Colors.gray }}>Due: </Text>
-                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>{task.due_date}</Text>
+                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>
+                                    {task.due_date}
+                                </Text>
                             </View>
-                            <Text style={styles.timestamp}>Assigned On {formatDateTime(task.timestamp)}</Text>
+
+                            <Text style={styles.timestamp}>
+                                Assigned On {formatDateTime(task.timestamp)}
+                            </Text>
                         </View>
-                    </TouchableOpacity>
+                    </>
                 )}
             />
+
 
             <TaskDetailsModal
                 visible={modalVisible}
@@ -173,33 +183,18 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, refreshKey, onRef
 export default CompletedTasks;
 
 const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        backgroundColor: Colors.white,
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
     rowBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
-    scrollContainer: {
-        height: 380,
-        width: '100%',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-    },
-    buttonRowContainer: {
-        marginTop: 10,
-        marginBottom: 5,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        gap: 10,
-    },
-    button: {
-        width: '100%'
+    itemContainer: {
+        backgroundColor: Colors.TaskBG,
+        borderRadius: 16,
+        padding: 18,
+        borderColor: Colors.borderColor,
+        borderWidth: 1,
+        marginVertical: 5,
     },
     recurring: {
         backgroundColor: Colors.bgGreen,

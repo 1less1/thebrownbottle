@@ -13,8 +13,6 @@ import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/components/QuickStats';
 import { Ionicons } from '@expo/vector-icons';
 
-import Card from '@/components/modular/Card';
-import AltCard from '@/components/modular/AltCard';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
@@ -70,10 +68,11 @@ export default function HomeScreen() {
 
           {/* CONTENT */}
 
-          <View style={{ width: '85%' }}>
+          <View style={{ width: '90%' }}>
 
             {/* Quick Stats */}
             <View>
+              <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
               <QuickStats />
             </View>
 
@@ -81,10 +80,6 @@ export default function HomeScreen() {
 
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>
-                {/* <View style={{ flexDirection: 'row' }}>
-                  <Ionicons name="notifications" size={22} color="black" style={styles.icon} />
-                  <Text style={GlobalStyles.floatingHeaderText}>Announcements</Text>
-                </View> */}
                 <Announcements />
               </View>
 
@@ -120,7 +115,7 @@ const styles = StyleSheet.create({
     gap: 10
   },
   nextShiftColumn: {
-    flexBasis: '40%',
+    flexBasis: '30%',
     minWidth: 250,
     flexGrow: 1,
     marginVertical: 20,

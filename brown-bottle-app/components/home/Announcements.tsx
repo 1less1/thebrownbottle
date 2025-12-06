@@ -3,14 +3,11 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import Card from "@/components/modular/Card";
-import AltCard from '@/components/modular/AltCard';
 import RoleDropdown from '@/components/modular/RoleDropdown';
 import ModularListView from "@/components/modular/ModularListView";
 import { getAllAnnouncements, getAnnouncementsByRole } from '@/routes/announcement';
 import { Announcement } from '@/types/iAnnouncement';
 import { Ionicons } from '@expo/vector-icons';
-import { upperCase } from 'lodash';
 
 const Announcements = () => {
 
@@ -97,7 +94,7 @@ const Announcements = () => {
 
         {/* Acknowledge Button */}
         {isAcknowledged ? (
-          <Text style={{ color: "green", marginTop: 6 }}>Acknowledged ✔</Text>
+          <Text style={styles.acknowledged}>Acknowledged</Text>
         ) : (
           <TouchableOpacity
             onPress={() => handleAcknowledge(announcement.announcement_id)}
@@ -134,7 +131,7 @@ const Announcements = () => {
 
 
         {/* ModularListView for list rendering, loading, error, refresh */}
-        <View>
+        <View style={{ height: 375 }}>
           <ModularListView
             data={announcements}
             loading={loading}
@@ -162,10 +159,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   itemContainer: {
-    backgroundColor: "#f5f4f4ce",
+    backgroundColor: Colors.AnnouncemtnBG,
     padding: 16,
     borderRadius: 18,
-    marginBottom: 14,
   },
   scrollContainer: {
     maxHeight: 375,
@@ -200,11 +196,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     alignSelf: "flex-start",
-    backgroundColor: "#3478f6",
+    backgroundColor: Colors.buttonBlue,
     borderRadius: 6,
   },
+  acknowledged: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignSelf: "flex-start",
+    backgroundColor: Colors.ackknowledgedBG,
+    borderRadius: 6,
+    fontWeight: 500
+  },
   ackBtnText: {
-    color: "#fff",
+    color: Colors.white,
     fontWeight: "bold",
   },
   icon: {

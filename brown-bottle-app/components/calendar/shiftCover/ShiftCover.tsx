@@ -136,7 +136,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                 onPress={toggleModal}
                 style={styles.shiftCoverButton}
             />
- 
+
             <View style={styles.headerRow}>
                 {/* Filter Modal */}
                 <View style={{ flexGrow: 0.5, paddingRight: 5 }} >
@@ -149,7 +149,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                     />
                 </View>
 
-                <View style={{ minWidth: '20%', paddingRight: 5,flexGrow: 0.25 }}>
+                <View style={{ minWidth: '20%', paddingRight: 5, flexGrow: 0.25 }}>
                     <ModularDropdown
                         labelText=""
                         selectedValue={statusFilter}
@@ -181,14 +181,12 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                         ? "No requests available."
                         : "No available shifts right now."
                 }
+                onItemPress={(req) => {
+                    setSelectedRequest(req);
+                    setDetailModalVisible(true);
+                }}
                 renderItem={(req) => (
-                    <Pressable
-                        onPress={() => {
-                            setSelectedRequest(req);
-                            setDetailModalVisible(true);
-                        }}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.4 : 1 }]}
-                    >
+                    <>
                         {req.status !== 'Pending' &&
                             req.accepted_first_name &&
                             req.accepted_last_name && (
@@ -237,7 +235,7 @@ const ShiftCover: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
                         {/* <Text style={styles.timestamp}>
                             Submitted on {formatDateTime(req.timestamp)}
                         </Text> */}
-                    </Pressable>
+                    </>
                 )}
             />
 

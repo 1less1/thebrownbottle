@@ -102,6 +102,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#dbeaff" }}
                 titleStyle={{ color: "#3b78ff" }}
                 valueStyle={{ color: "#3b78ff" }}
+                style={{marginLeft: 8,marginRight: 8}}
             />
 
             <StatCard
@@ -115,6 +116,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#fde6c4ff" }}
                 titleStyle={{ color: "#ff9800" }}
                 valueStyle={{ color: "#ff9800" }}
+                style={{marginLeft: 8,marginRight: 8}}
             />
 
             {/* DISPLAY LIVE PENDING TOR COUNT */}
@@ -129,6 +131,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: "#f2d3f5ff" }}
                 titleStyle={{ color: "#c780ceff" }}
                 valueStyle={{ color: "#c780ceff" }}
+                style={{marginLeft: 8,marginRight: 8}}
             />
 
         </View>
@@ -139,7 +142,7 @@ export default QuickStats;
 
 const styles = StyleSheet.create({
     container: {
-        gap: 12,
+        gap: 5,
         width: '100%',
     },
     mobile: {

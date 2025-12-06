@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { Colors } from '@/constants/Colors';
+import AnimatedTouchableWrapper from "@/components/modular/AnimatedTouchable";
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -14,6 +15,8 @@ interface ModularListViewProps<T> {
     refreshing?: boolean;
     onRefresh?: () => void | Promise<void>;
     itemContainerStyle?: ViewStyle;
+    enableAnimation?: boolean;
+    onItemPress?: (item: T) => void;
 }
 
 export default function ModularListView<T>({
@@ -27,10 +30,12 @@ export default function ModularListView<T>({
     maxHeight,
     refreshing,
     onRefresh,
-    itemContainerStyle, 
+    itemContainerStyle,
+    enableAnimation = true,
+    onItemPress,
 }: ModularListViewProps<T>) {
 
-    // --- UI States ---
+    // Handles loading state
     if (loading)
         return (
             <View style={styles.statusContainer}>
@@ -39,6 +44,7 @@ export default function ModularListView<T>({
             </View>
         );
 
+    // Handles error state
     if (error)
         return (
             <View style={styles.statusContainer}>
@@ -46,6 +52,7 @@ export default function ModularListView<T>({
             </View>
         );
 
+    // Handles empty list display
     if (data.length === 0)
         return (
             <View style={styles.statusContainer}>
@@ -68,13 +75,27 @@ export default function ModularListView<T>({
                     keyExtractor={(item, index) =>
                         keyExtractor ? String(keyExtractor(item, index)) : String(index)
                     }
+                    renderItem={({ item, index }) => {
+                        const content = (
+                            <View style={[styles.requestItem, itemContainerStyle]}>
+                                {renderItem(item, index)}
+                            </View>
+                        );
 
-                    renderItem={({ item, index }) => (
-                        <View style={[styles.requestItem, itemContainerStyle]}>
-                            {renderItem(item, index)}
-                        </View>
-                    )}
+                        if (!enableAnimation)
+                            return content;
 
+                        return (
+                            <AnimatedTouchableWrapper
+                                onPress={() => onItemPress?.(item)}
+                                style={{ marginBottom: 2 }}
+                                pressScale={0.97}
+                                hoverScale={1.02}
+                            >
+                                {content}
+                            </AnimatedTouchableWrapper>
+                        );
+                    }}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                 />
@@ -106,10 +127,13 @@ const styles = StyleSheet.create({
     },
     requestItem: {
         backgroundColor: Colors.inputBG,
+        width: '97.5%',
+        alignSelf: 'center',
         padding: 12,
+        marginTop: 5,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: Colors.borderColor,
-        marginBottom: 10,
+        marginBottom: 5,
     },
 });
