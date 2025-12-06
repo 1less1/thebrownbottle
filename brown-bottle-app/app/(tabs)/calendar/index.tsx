@@ -1,19 +1,25 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import Calendar from '@/components/calendar/Calendar';
-import CalendarTimeOff from '@/components/calendar/timeOff/CalendarTimeOff';
-import ShiftCover from '@/components/calendar/shiftCover/ShiftCover';
 
-import { testShifts } from '@/data/testShifts';
+import ShiftCalendar from '@/components/calendar/ShiftCalendar/ShiftCalendar';
+import ShiftCover from '@/components/calendar/ShiftCover/ShiftCover';
+import TimeOff from '@/components/calendar/TimeOff/TimeOff';
 
-export default function CalendarPage() {
+import LoadingCircle from '@/components/modular/LoadingCircle';
+
+import { useSession } from '@/utils/SessionContext';
+
+const CalendarPage = () => {
+  // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.white);
@@ -21,71 +27,121 @@ export default function CalendarPage() {
     }, [])
   );
 
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const { user } = useSession();
 
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    setRefreshKey((prev) => prev + 1);
-    setTimeout(() => setRefreshing(false), 300);
+  const [activeTab, setActiveTab] = useState(0);
+  const TAB_STORAGE_KEY = 'calendarActiveTab';
+
+  // Save tab index on change
+  const handleTabChange = async (index: number) => {
+    setActiveTab(index);
+    await AsyncStorage.setItem(TAB_STORAGE_KEY, index.toString());
+  };
+
+  // Define available tabs and corresponding components
+  const tabs = [
+    {
+      key: 'shifts', title: 'Shifts', component: <ShiftCalendar />
+
+    },
+
+    {
+      key: 'shift cover', title: 'Shift Cover', component: <ShiftCover />
+    },
+
+    {
+      key: 'time off', title: 'Time Off', component: <TimeOff />
+    },
+  ];
+
+  // Load Saved Tab If it Exists, otherwise load tab index 0
+  useEffect(() => {
+    const loadSavedTab = async () => {
+      try {
+        const savedTabIndex = await AsyncStorage.getItem(TAB_STORAGE_KEY);
+        const tabIndex = Number(savedTabIndex);
+        if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < tabs.length) {
+          setActiveTab(tabIndex);
+        } else {
+          setActiveTab(0);
+        }
+      } catch (error) {
+        console.warn('Failed to load saved tab index:', error);
+      }
+    };
+    loadSavedTab();
   }, []);
 
   return (
 
     <DefaultView backgroundColor={Colors.white}>
-      
+
       <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
-        
-        {/* Calendar Header */}
-        <View style={GlobalStyles.pageHeaderContainer}>
-          <Text style={GlobalStyles.pageHeader}>
-            Calendar
-          </Text>
+
+        <View style={{ backgroundColor: Colors.white }}>
+
+          <Text style={GlobalStyles.pageHeader}>Calendar</Text>
+
+          {/* Tab Bar */}
+          <View style={styles.tabBar}>
+            {tabs.map((tab, index) => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[
+                  styles.tabButton,
+                  activeTab === index && styles.activeTabButton, // Style the active tab
+                ]}
+                onPress={() => handleTabChange(index)} // Set active tab on click
+              >
+                <Text style={styles.tabText}>{tab.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
-        <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
-          {/* Upcoming Shifts View */}
-          <View style={{ width: '85%', marginVertical: 20 }}>
-            <Text
-              style={{
-                textAlign: 'left',
-                fontSize: 18,
-                color: 'black',
-                fontWeight: 'bold',
-                marginBottom: 8,
-              }}
-            >
-              Shift Cover
-            </Text>
-            <ShiftCover refreshKey={refreshKey} />
-          </View>
-
-          <View style={{ width: '85%' }}>
-            <Calendar refreshKey={refreshKey} />
-          </View>
-
-          {/* Time Off View */}
-          <View style={{ width: '85%', marginTop: 20, marginBottom: 60 }}>
-            <Text
-              style={{
-                textAlign: 'left',
-                fontSize: 18,
-                color: 'black',
-                fontWeight: 'bold',
-                marginBottom: 8,
-              }}
-            >
-              Time Off Requests
-            </Text>
-            <CalendarTimeOff refreshKey={refreshKey} />
-          </View>
-
-        </DefaultScrollView>
+        {/* Render content based on selected tab */}
+        <View style={styles.tabContent}>
+          {tabs[activeTab]?.component} {/* Render the component of the active tab */}
+        </View>
 
       </View>
 
     </DefaultView>
 
   );
-
 };
+
+const styles = StyleSheet.create({
+  header: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: 'black',
+    marginLeft: 20,
+    marginTop: 25,
+    marginBottom: 20,
+  },
+  tabBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.altBorderColor,
+  },
+  tabButton: {
+    flex: 1,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTabButton: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'black',
+  },
+  tabText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  tabContent: {
+    flex: 1,
+  },
+});
+
+export default CalendarPage;

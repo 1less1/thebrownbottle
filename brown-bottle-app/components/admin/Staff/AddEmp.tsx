@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         padding: 15,
-        height: 150,
+        height: 120,
         justifyContent: 'center',
     },
     icon: {

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { User } from '@/utils/SessionContext';
+import { User, useSession } from '@/utils/SessionContext';
 
 import { useState } from 'react';
 
@@ -10,29 +10,30 @@ import Card from '@/components/modular/Card';
 
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
-import TimeOffView from '@/components/calendar/timeOff/AdminTimeOff';
-import ShiftCoverView from '@/components/calendar/shiftCover/ShiftCoverView';
+import TimeOffView from '@/components/calendar/TimeOff/AdminTimeOff';
+import ShiftCoverView from '@/components/calendar/ShiftCover/ShiftCoverView';
 
-interface DashboardProps {
-  user: User;
-}
 
-const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+
+const Dashboard = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   const handleRefresh = async () => {
     setRefreshing(true);
     setRefreshKey((prev) => prev + 1);
     setTimeout(() => setRefreshing(false), 800);
   };
-  
+
+  const { user } = useSession();
+
+  if (!user) return null;
   return (
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
-      
-      <View style={{ margin: 16, width: '85%'}}>
+
+      <View style={{ marginTop: 16, width: '85%' }}>
 
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
@@ -46,17 +47,21 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </View>
       </View>
 
-      <View style={{ width: '85%' }}>
-        <Text style={GlobalStyles.boldLargeText}>Time Off Requests</Text>
-        <Card style={[styles.card, { padding: 10, marginBottom: 20,marginTop: 10, width: '100%' }]}>
+      <View style={{ width: '85%', marginVertical: 16, gap: 16 }}>
 
-          <TimeOffView  />
-        </Card>
+        <View>
+          <Text style={GlobalStyles.floatingHeaderText}>Time Off Requests</Text>
+          <Card style={[styles.card, { padding: 10, width: '100%' }]}>
+            <TimeOffView />
+          </Card>
+        </View>
 
-        <Text style={GlobalStyles.boldLargeText}>Shift Cover Requests</Text>
-        <Card style={[styles.card, { padding: 10, marginBottom: 20, width: '100%' }]}>
-          <ShiftCoverView  />
-        </Card>
+        <View>
+          <Text style={GlobalStyles.floatingHeaderText}>Shift Cover Requests</Text>
+          <Card style={[styles.card, { padding: 10, width: '100%' }]}>
+            <ShiftCoverView />
+          </Card>
+        </View>
 
         <Text style={GlobalStyles.floatingHeaderText}>
           Announcement Feed - Will be able to edit and delete announcments here
@@ -70,10 +75,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           Recurring Task Feed - Will be able to edit and delete tasks here (sort by Section)
         </Text>
 
-
       </View>
 
-    </DefaultScrollView>
+    </DefaultScrollView >
 
   );
 }

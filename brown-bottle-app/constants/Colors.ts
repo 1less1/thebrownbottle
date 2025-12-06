@@ -39,6 +39,7 @@ export const Colors = {
   pendingYellow: '#ff9800',
   bgYellow: '#fff3e0',
   bgBlue: '#d1ecf1',
+  badgeBGGray: "#e3e5e6ff",
   buttonBlue: '#2e86de',
 
   // Ishimwe additions
@@ -67,5 +68,6 @@ export const Colors = {
   gray: '#B1B1B5',
   darkGray: '#666',
   blue: '#2e86de',
+  orange: '#de8c2e',
   greyWhite: "#FBF7F7"
 };

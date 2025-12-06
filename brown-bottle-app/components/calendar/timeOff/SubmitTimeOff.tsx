@@ -11,10 +11,18 @@ import CalendarWidget from '../CalendarWidget';
 
 import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 
-import { TimeOffModalProps } from '@/types/iTimeOff';
+import { InsertTimeOffRequest } from '@/types/iTimeOff';
 
-const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitted }) => {
-  const { user } = useSession(); //  globally available user
+
+interface ModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSubmitted?: () => void;
+}
+
+const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
+  const { user } = useSession();
+
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -40,15 +48,17 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
     }
 
     try {
-      await insertTimeOffRequest(
-        Number(user.employee_id),
-        reason,
-        startDate,
-        endDate
-      );
-      alert('Time Off Request Submitted Successfully!');
-      resetForm();
 
+      const payload: InsertTimeOffRequest = {
+        employee_id: user.employee_id,
+        reason: reason,
+        start_date: startDate,
+        end_date: endDate
+      };
+
+      await insertTimeOffRequest(payload);
+      alert('Time Off Request submitted successfully!');
+      resetForm();
       if (onSubmitted) {
         onSubmitted(); // ensures refetch finishes before closing
       }
@@ -66,7 +76,7 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
 
   return (
     <ModularModal visible={visible} onClose={onClose}>
-      <Text style={GlobalStyles.modalTitle}>Make a Time Off Request</Text>
+      <Text style={GlobalStyles.modalTitle}>New Time Off Request</Text>
 
       {/* Date Pickers */}
 
@@ -75,7 +85,7 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
         <ModularButton
           text="Choose Start Date"
           textStyle={{ color: 'black' }}
-          style={[styles.calendarButton]}
+          style={[GlobalStyles.modernButton, styles.calendarButton]}
           onPress={() => setStartDateVisible(true)}
         />
 
@@ -106,7 +116,7 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
         <ModularButton
           text="Choose End Date"
           textStyle={{ color: 'black' }}
-          style={[styles.calendarButton]}
+          style={[GlobalStyles.modernButton, styles.calendarButton]}
           onPress={() => setEndDateVisible(true)}
         />
 
@@ -137,10 +147,11 @@ const TimeOffModal: React.FC<TimeOffModalProps> = ({ visible, onClose, onSubmitt
       <Text
         style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}
       >
-        Reason For Time Off
+        Reason for Time Off
       </Text>
       <TextInput
         placeholder="Enter A Reason"
+        placeholderTextColor={Colors.gray}
         value={reason}
         onChangeText={setReason}
         multiline
@@ -187,12 +198,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   calendarButton: {
-    backgroundColor: 'white',
-    borderColor: Colors.darkTan,
-    borderWidth: 1,
     flexShrink: 1,
+    minWidth: 200,
     paddingHorizontal: 15,
   },
 });
 
-export default TimeOffModal;
+export default SubmitTimeOff;

@@ -7,7 +7,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import Card from "@/components/modular/Card";
 import AltCard from '@/components/modular/AltCard';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import RoleDropdown from '@/components/modular/RoleDropdown';
+import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
@@ -64,7 +64,7 @@ const Announcements = () => {
       <View style={styles.scrollContainer}>
 
         <RoleDropdown
-          selectedRoleId={selectedRoleId}
+          selectedRole={selectedRoleId}
           onRoleSelect={(value) => handleRoleSelect(value as number)}
           labelText=""
         />

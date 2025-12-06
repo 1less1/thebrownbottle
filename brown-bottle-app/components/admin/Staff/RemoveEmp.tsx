@@ -221,7 +221,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         enabled={!loading}
                         textStyle={{ marginRight: 4 }}
                     >
-                        <Ionicons name="reload-outline" size={20} color={Colors.black} />
+                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
                     </ModularButton>
                 </View>
 
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         padding: 15,
-        height: 150,
+        height: 120,
         justifyContent: 'center',
     },
     icon: {

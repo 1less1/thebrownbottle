@@ -1,9 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { GlobalStyles } from "@/constants/GlobalStyles";
+import { Status } from "@/types/iShiftCover";
 
 type Props = {
-    status: "Pending" | "Accepted" | "Denied";
+    status: Status
 };
 
 export default function StatusBadge({ status }: Props) {
@@ -12,20 +13,24 @@ export default function StatusBadge({ status }: Props) {
         status === "Accepted"
             ? GlobalStyles.acceptedBadge
             : status === "Denied"
-            ? GlobalStyles.deniedBadge
-            : GlobalStyles.pendingBadge;
+                ? GlobalStyles.deniedBadge
+                : status === "Awaiting Approval"
+                    ? GlobalStyles.awaitingApprovalBadge
+                    : GlobalStyles.pendingBadge;
 
     const textStyle =
         status === "Accepted"
             ? GlobalStyles.acceptedText
             : status === "Denied"
-            ? GlobalStyles.deniedText
-            : GlobalStyles.pendingText;
+                ? GlobalStyles.deniedText
+                : status === "Awaiting Approval"
+                    ? GlobalStyles.awaitingApprovalText
+                    : GlobalStyles.pendingText;
 
     return (
         <View style={containerStyle}>
             <Text style={textStyle}>{status}</Text>
         </View>
     );
-    
+
 };

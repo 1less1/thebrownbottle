@@ -19,6 +19,7 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 import EditEmp from "@/components/admin/Staff/EditEmp";
 
 import { CheckboxOption } from "@/types/iCheckbox";
+import { DropdownOption } from '@/types/iDropdown';
 import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { Employee } from "@/types/iEmployee";
@@ -28,7 +29,12 @@ import { getEmployee } from "@/routes/employee";
 
 const adminDropdownOptions = yesNoDropdownOptions;
 
-const isActiveDropdownOptions = yesNoDropdownOptions;
+const isActiveDropdownOptions: DropdownOption<number>[] = [
+    { key: "Active", value: 1 },
+    { key: "Inactive", value: 0 }
+];
+
+
 
 const columns = [
     { key: "full_name", label: "Name", width: 120 },
@@ -172,7 +178,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
         <>
 
-            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: HEIGHT * 0.55 }}>
+            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: HEIGHT * 0.52 }}>
 
                 {/* Search Bar + Reset Button */}
                 <View style={styles.searchContainer}>
@@ -190,7 +196,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                         enabled={!loading}
                         textStyle={{ marginRight: 4 }}
                     >
-                        <Ionicons name="reload-outline" size={20} color={Colors.black} />
+                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
                     </ModularButton>
                 </View>
 
@@ -218,14 +224,13 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                         data={isActiveDropdownOptions}
                         selectedValue={selectedIsActive}
                         onSelect={(value) => setSelectedIsActive(value as number)}
-                        labelText="Active:"
                         containerStyle={styles.dropdownButton}
                         usePlaceholder={false}
                         disabled={loading}
                     />
                 </View>
 
-                {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
+                {loading && <LoadingCircle size={"small"} />}
 
                 {/* Data Table */}
                 {/* Scroll View = Horizontal */}
@@ -238,7 +243,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                                 data={results}
                                 keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
                                 renderItem={renderCell}
-                                style={{ maxHeight: HEIGHT * 0.4 }}
+                                style={{ maxHeight: HEIGHT * 0.5 }}
                                 scrollEnabled={true}
                                 nestedScrollEnabled={true}
                                 showsVerticalScrollIndicator={true}
@@ -272,6 +277,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
 
 
 const styles = StyleSheet.create({
+    // Search and Filter Containers
     searchContainer: {
         flexDirection: "row",
         paddingVertical: 10,
@@ -285,14 +291,17 @@ const styles = StyleSheet.create({
         gap: 12,
         marginBottom: 12,
     },
+    dropdownButton: {
+        flex: 1,
+        flexShrink: 1,
+        minWidth: 150,
+    },
+
+    // Table
     tableContainer: {
         flex: 1,
         maxWidth: "100%",
         alignSelf: "stretch",
-    },
-    dropdownButton: {
-        flexShrink: 1,
-        minWidth: 150,
     },
     row: {
         flexDirection: "row",

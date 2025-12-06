@@ -73,6 +73,7 @@ const CalendarWidget: React.FC<{
 
 
     /** ---- FETCH SHIFTS (ONLY IF ALLOWED) ---- */
+    // Fetch Shifts on Initialization and State Update
     useEffect(() => {
       if (!showShifts || !user?.employee_id) {
         console.log("Exiting early: no user or shifts not enabled");
@@ -182,6 +183,7 @@ const CalendarWidget: React.FC<{
             date={selectedShift.date}
             startTime={selectedShift.start_time}
             role={selectedShift.primary_role_name}
+            section={selectedShift.section_name}
             onClose={() => setSelectedShift(null)}
           />
         )}

@@ -57,7 +57,7 @@ const ModularDropdown = <T extends string | number | null>({
 
             {/* Dropdown Button */}
             <TouchableOpacity
-                style={[GlobalStyles.dropdownButton, buttonStyle]}
+                style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
                 onPress={() => setVisible(true)}
                 disabled={disabled}
             >
@@ -96,6 +96,7 @@ const ModularDropdown = <T extends string | number | null>({
                                     <FlatList
                                         data={dropdownOptions}
                                         keyExtractor={(item, idx) => item.value !== null ? item.value.toString() : `null-${idx}`}
+                                        style={{ flexGrow: 0 }}
                                         renderItem={({ item }) => (
                                             <TouchableOpacity
                                                 style={styles.option}

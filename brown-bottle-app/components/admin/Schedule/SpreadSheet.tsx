@@ -19,20 +19,25 @@ import { yesNoDropdownOptions } from '@/types/iDropdown';
 import { formatSQLDate, formatDateNoTZ } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
 import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeString, getWeekDayList } from "@/routes/schedule";
-import { getTimeOffRequests } from "@/routes/time_off_request";
+import { getTimeOffRequest } from "@/routes/time_off_request";
 import { buildBlockedDaysMap, attachBlockedDays } from "@/routes/schedule";
 
 import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
 
 import RoleCheckbox from "@/components/modular/checkbox/RoleCheckbox";
 import SectionCheckbox from "@/components/modular/checkbox/SectionCheckbox";
+import { Status } from "@/types/iTimeOff";
+import { DropdownOption } from '@/types/iDropdown';
 
 interface SpreadSheetProps {
   parentRefresh?: number;
   onRefreshDone?: () => void;
 }
 
-const isTodayOptions = yesNoDropdownOptions;
+const isTodayOptions: DropdownOption<number>[] = [
+  { key: "All Shifts", value: 0 },
+  { key: "Today's Shifts", value: 1 },
+];
 
 const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const { width, height } = useWindowDimensions();
@@ -80,9 +85,10 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       const schedule: ScheduleEmployee[] = await getSchedule(params);
 
       // Fetch accepted time off requests
-      const timeOff = await getTimeOffRequests({
-        status: "Accepted",
+      const timeOff = await getTimeOffRequest({
+        status: ["Accepted"],
       });
+
 
       // Build blocked days
       const blockedDays = buildBlockedDaysMap(timeOff);
@@ -145,7 +151,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   // Layout Calculations
   const isMobile = WIDTH < 768;
-  const NAME_COL_WIDTH = isMobile ? 135 : Math.max(135, WIDTH * 0.12);
+  const NAME_COL_WIDTH = isMobile ? 160 : Math.max(160, WIDTH * 0.12);
   const weekDays = getWeekDayList(currentWeekStart, 7);
   const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (WIDTH * 0.70) / weekDays.length);
   const ROW_HEIGHT = 50;
@@ -279,7 +285,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           enabled={!loading}
           textStyle={{ marginRight: 4 }}
         >
-          <Ionicons name="reload-outline" size={20} color={Colors.black} />
+          <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
         </ModularButton>
 
         <ModularButton
@@ -293,7 +299,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           <Ionicons name="calendar-number-outline" size={20} color={Colors.black} />
         </ModularButton>
 
-        {/*
+
         <ModularButton
           onPress={() => exportToCSV(scheduleData, weekDays)}
           onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
@@ -304,18 +310,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         >
           <Ionicons name="download-outline" size={20} color={Colors.black} />
         </ModularButton>
-        */}
 
-        <ModularButton
-          onPress={() => exportToPDF(currentWeekStart, scheduleData, weekDays)}
-          onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
-          style={{ backgroundColor: Colors.bgRed }}
-          text=""
-          textStyle={{ marginRight: 4 }}
-          enabled={!loading}
-        >
-          <Ionicons name="download-outline" size={20} color={Colors.black} />
-        </ModularButton>
 
       </View>
 
@@ -345,14 +340,13 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           data={isTodayOptions}
           selectedValue={isToday}
           onSelect={(value) => setIsToday(value as number)}
-          labelText="Today:"
           containerStyle={styles.dropdownButton}
           usePlaceholder={false}
           disabled={loading}
         />
       </View>
 
-      {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: "center" }} />}
+      {loading && <LoadingCircle size={"small"} />}
 
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
@@ -424,7 +418,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Search and filters
+  // Search and Filter Containers
   searchContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -435,16 +429,16 @@ const styles = StyleSheet.create({
   filterContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "flex-start",
     gap: 12,
     marginBottom: 12,
   },
   dropdownButton: {
-    flexShrink: 1,   // allow shrinking
-    minWidth: 140,   // optional baseline
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 150,
   },
 
-  // Schedule grid
+  // Schedule Grid
   row: {
     flexDirection: 'row',
     borderBottomWidth: 1,
@@ -476,7 +470,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Employee name cell
+  // Employee Name Cell
   nameCell: {
     justifyContent: 'center',
     padding: 8,
@@ -494,7 +488,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
 
-  // Shift cells
+  // Shift Cells
   shiftCell: {
     justifyContent: 'center',
     alignItems: 'center',

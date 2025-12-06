@@ -2,6 +2,8 @@ import React from 'react';
 import { ScrollView, FlatList, View, Text, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
+import LoadingCircle from '@/components/modular/LoadingCircle';
+
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -21,17 +23,14 @@ export default function ModularListView<T>({
     keyExtractor,
     loading,
     error,
-    emptyText = 'No requests yet.',
+    emptyText = 'No data found.',
     listHeight = 300,
     refreshing,
     onRefresh,
 }: ModularListViewProps<T>) {
     if (loading)
         return (
-            <View style={styles.statusContainer}>
-                <ActivityIndicator color={Colors.gray} size="small" />
-                <Text style={styles.statusText}>Loading...</Text>
-            </View>
+            <LoadingCircle size={"small"}/>
         );
 
     if (error)

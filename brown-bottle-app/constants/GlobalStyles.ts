@@ -106,7 +106,7 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 18,
         fontStyle: 'normal',
     },
-    smallSemiBoldAltText: {
+    semiBoldSmallAltText: {
         color: 'gray',
         fontSize: 12,
         fontStyle: 'normal',
@@ -133,6 +133,12 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'normal',
         fontWeight: 'bold',
+    },
+    semiBoldMediumAltText: {
+        color: 'gray',
+        fontSize: 16,
+        fontStyle: 'normal',
+        fontWeight: '600',
     },
     mediumAltText: {
         color: 'gray',
@@ -215,8 +221,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     deleteButton: {
         // Old Dom Version --> backgroundColor: Colors.bgRed,
-        backgroundColor: Colors.deleteRed,
-        borderColor: Colors.deleteBorderColor,
+        backgroundColor: Colors.bgRed,
+        borderColor: Colors.deleteRed,
         borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -227,6 +233,14 @@ export const GlobalStyles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
+    },
+    modernButton: {
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderColor: Colors.altBorderColor,
+        borderRadius: 5,
+        borderWidth: 1,
     },
 
     // Badge Styles
@@ -263,8 +277,19 @@ export const GlobalStyles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase'
     },
+    awaitingApprovalBadge: {
+        backgroundColor: Colors.badgeBGGray,
+        padding: 6,
+        borderRadius: 4,
+    },
+    awaitingApprovalText: {
+        color: Colors.darkGray,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
     // Ishimwe edit below!!!
-    awaitingApproval: { 
+    awaitingApproval: {
         color: "#8b8b8bff",
         backgroundColor: "#e3e5e6ff",
         fontSize: 10,

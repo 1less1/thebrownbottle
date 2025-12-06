@@ -1,89 +1,156 @@
 import Constants from "expo-constants";
+import { buildQueryString } from "@/utils/apiHelpers";
+import {
+  TimeOffRequest,
+  GetTimeOffRequest,
+  InsertTimeOffRequest,
+  UpdateTimeOffRequest,
+} from "@/types/iTimeOff";
 
-export async function insertTimeOffRequest(
-  employee_id: number,
-  reason: string,
-  start_date: string,
-  end_date: string
-) {
-  // Retrieve Environment Variables
+// GET: Fetches data from the time_off_request table
+export async function getTimeOffRequest(params?: Partial<GetTimeOffRequest>) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const baseURL = API_BASE_URL;
+  const queryString = buildQueryString(params || {});
+
+  const url = `${API_BASE_URL}/tor?${queryString}`;
 
   try {
-    const timeOffRequestData = {
-      employee_id,
-      reason,
-      start_date,
-      end_date,
-    };
-
-    const response = await fetch(`${baseURL}/tor/insert`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(timeOffRequestData),
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`[TOR API] Failed to GET: ${response.status}`);
     }
 
     const data = await response.json();
-
-    return data;
+    return data as TimeOffRequest[];
   } catch (error) {
-    console.error("Failed to insert time off request:", error);
+    console.error("Failed to fetch time off request data:", error);
     throw error;
   }
+
 }
 
-export async function getTimeOffRequests(filters?: {
-  employee_id?: number;
-  status?: "Pending" | "Accepted" | "Denied";
-  start_date?: string;
-  end_date?: string;
-}) {
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-  const params = new URLSearchParams();
+// POST: Inserts a time off request record
+export async function insertTimeOffRequest(fields: InsertTimeOffRequest) {
 
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null)
-        params.append(key, String(value));
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/tor/insert`;
+
+  // Required db fields for POST
+  const requiredFields: (keyof InsertTimeOffRequest)[] = [
+    "employee_id",
+    "reason",
+    "start_date",
+    "end_date",
+  ];
+
+  try {
+    for (const key of requiredFields) {
+      if (fields[key] === undefined || fields[key] === null) {
+        throw new Error(`Missing required field: ${key}`);
+      }
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
     });
+
+    if (!response.ok) {
+      throw new Error(`[TOR API] Failed to POST: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to insert time off request data:", error);
+    throw error;
   }
 
-  const response = await fetch(`${API_BASE_URL}/tor?${params.toString()}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-
-  if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  return response.json();
 }
 
-export const updateTimeOffStatus = async (
-  request_id: number,
-  status: string
-) => {
+// PATCH: Updates a time off request record
+export async function updateTimeOffRequest(request_id: number, fields: UpdateTimeOffRequest) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-  const baseURL = API_BASE_URL;
 
-  const response = await fetch(`${baseURL}/tor/update/${request_id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error(
-      `Failed to update time off request ${request_id}: ${errText}`
-    );
+  if (!request_id) {
+    throw new Error("Updating a time off request requires a request_id!");
   }
 
-  return await response.json();
-};
+  const url = `${API_BASE_URL}/tor/update/${request_id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+
+    if (!response.ok) {
+      throw new Error(`[TOR API] Failed to PATCH: ${request_id} - ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to update time off request data:", error);
+    throw error;
+  }
+
+}
+
+// DELETE: Deletes a time off request record (irreversible)
+export async function deleteTimeOffRequest(request_id: number) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/tor/delete/${request_id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`[TOR API] Failed to DELETE Time Off Request: ${request_id} - ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete time off request:", error);
+    throw error;
+  }
+
+}
+
+// PATCH: Approve a time off request
+export async function approveTimeOffRequest(request_id: number) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/tor/approve/${request_id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`[TOR API] Failed to APPROVE Time Off Request: ${request_id} - ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to approve time off request:", error);
+    throw error;
+  }
+
+}

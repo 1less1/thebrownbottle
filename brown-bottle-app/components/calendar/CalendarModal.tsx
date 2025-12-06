@@ -1,92 +1,79 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
-import AltCard from '@/components/modular/AltCard';
+
+import ModularModal from '@/components/modular/ModularModal';
+import ModularButton from '@/components/modular/ModularButton';
 
 interface CalendarModalProps {
   visible: boolean,
   date: string | null;
   startTime: string | undefined;
   role: string | undefined;
+  section: string | undefined;
   onClose: () => void;
 }
 
-const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime, role, onClose }) => {
+
+
+const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime, role, section, onClose }) => {
+
   return (
-    <Modal visible={visible} transparent animationType="fade">
 
-      <View style={styles.overlay}>
+    <ModularModal visible={visible} onClose={onClose}>
 
-        <AltCard style={{ backgroundColor: Colors.white, width: '75%', padding: 16, margin: 0 }}>
-          {/* Date Header */}
-          <Text style={styles.dateText}>{date}</Text>
+      {/* Date Header */}
+      <Text style={GlobalStyles.modalTitle}>{date}</Text>
 
-          <>
-            {startTime && (
-              <Text style={styles.styledText}>
-                Start Time: {startTime}
-              </Text>
-            )}
-            {role && (
-              <Text style={styles.styledText}>
-                Role: {role}
-              </Text>
-            )}
-            
-          </>
+      <>
+        {startTime && (
+          <View style={styles.row}>
+            <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
+            <Text style={GlobalStyles.mediumText}>
+              {startTime}
+            </Text>
+          </View>
+        )}
+        {section && (
+          <View style={styles.row}>
+            <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
+            <Text style={GlobalStyles.mediumText}>
+              {section}
+            </Text>
+          </View>
+        )}
+        {role && (
+          <View style={styles.row}>
+            <Text style={GlobalStyles.semiBoldMediumText}>Role: </Text>
+            <Text style={GlobalStyles.mediumText}>
+              {role}
+            </Text>
+          </View>
+        )}
+      </>
 
-          {/* Close Button */}
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-
-        </AltCard>
-
+      {/* Close Button */}
+      <View style={GlobalStyles.buttonRowContainer}>
+        <ModularButton
+          text="Close"
+          textStyle={{ color: "gray" }}
+          style={[GlobalStyles.cancelButton, { flex: 1 }]}
+          onPress={onClose}
+        />
       </View>
 
-    </Modal>
+    </ModularModal >
+
 
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: Colors.darkBrown,
-    marginBottom: 8,
-  },
-  styledText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: Colors.black,
-    marginTop: 6,
-  },
-  noEventsText: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: Colors.gray,
-    fontStyle: 'italic',
-    marginTop: 6,
-  },
-  closeButton: {
-    width: '45%',
-    marginTop: 16,
-    paddingVertical: 8,
-    backgroundColor: Colors.darkBrown,
-    borderRadius: 5,
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
-  closeButtonText: {
-    color: Colors.white,
-    fontSize: 16,
+  row: {
+    flexDirection: 'row',
+    marginBottom: 10
   },
 });
 

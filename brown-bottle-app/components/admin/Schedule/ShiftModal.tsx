@@ -126,11 +126,11 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
         }
 
         if (shiftId !== null) {
-          await updateShift(shiftId, formData);
+          await updateShift(shiftId, formData as Shift);
           alert("Shift successfully updated!");
         }
       } else {
-        await insertShift(formData);
+        await insertShift(formData as Shift);
         alert("Shift successfully added!");
       }
       onUpdate?.();
@@ -194,7 +194,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
             />
             {shiftData && (
               <ModularButton
-                text="Delete Shift"
+                text="Remove Shift"
                 onPress={handleDelete}
                 style={GlobalStyles.deleteButton}
               />
