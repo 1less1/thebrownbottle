@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
 interface ModularListViewProps<T> {
@@ -13,6 +13,7 @@ interface ModularListViewProps<T> {
     maxHeight?: number;
     refreshing?: boolean;
     onRefresh?: () => void | Promise<void>;
+    itemContainerStyle?: ViewStyle;
 }
 
 export default function ModularListView<T>({
@@ -26,6 +27,7 @@ export default function ModularListView<T>({
     maxHeight,
     refreshing,
     onRefresh,
+    itemContainerStyle, 
 }: ModularListViewProps<T>) {
 
     // --- UI States ---
@@ -52,12 +54,7 @@ export default function ModularListView<T>({
         );
 
     return (
-        <View style={[
-            styles.listContainer,
-            maxHeight ? { maxHeight } : null
-        ]}>
-
-            {/* ScrollView prevents FlatList parent scroll conflict */}
+        <View style={[styles.listContainer, maxHeight ? { maxHeight } : null]}>
             <ScrollView horizontal scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
                 <FlatList
                     style={[
@@ -71,9 +68,13 @@ export default function ModularListView<T>({
                     keyExtractor={(item, index) =>
                         keyExtractor ? String(keyExtractor(item, index)) : String(index)
                     }
+
                     renderItem={({ item, index }) => (
-                        <View style={styles.requestItem}>{renderItem(item, index)}</View>
+                        <View style={[styles.requestItem, itemContainerStyle]}>
+                            {renderItem(item, index)}
+                        </View>
                     )}
+
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                 />
