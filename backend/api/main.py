@@ -234,6 +234,25 @@ def update_announcement(announcement_id):
     with request_lock:
         return announcement.update_announcement(get_db_connection(), request, announcement_id)
 
+
+@app.route('/announcement/acknowledge', methods=['POST'])
+def acknowledge_announcement():
+    """
+    POST announcement acknowledgement by announcement id and employee id
+    """
+    return announcement.acknowledge_announcement(get_db_connection(), request)
+
+
+@app.route('/announcement/acknowledged', methods=['GET'])
+def get_acknowledged_announcements_route():
+    """
+    GET acknowledgment records
+    Optional params:
+        ?employee_id=#
+        ?announcement_id=#
+    """
+    return announcement.get_acknowledged_announcements(get_db_connection(), request)
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 

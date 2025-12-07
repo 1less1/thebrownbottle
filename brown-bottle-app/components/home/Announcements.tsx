@@ -1,6 +1,5 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import { ScrollView, Text, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
@@ -13,142 +12,202 @@ import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
 import LoadingCard from '@/components/modular/LoadingCard';
 
-import { getAllAnnouncements, getUserAnnouncements, getAnnouncementsByRole } from '@/routes/announcement';
+import ModularListView from "@/components/modular/ModularListView";
+import { getAllAnnouncements, getAnnouncementsByRole, acknowledgeAnnouncement } from '@/routes/announcement';
 import { Announcement } from '@/types/iAnnouncement';
+import { Ionicons } from '@expo/vector-icons';
+
+import { useSession } from "@/utils/SessionContext";
+import { getAcknowledgedAnnouncements } from '@/routes/announcement';
 
 const Announcements = () => {
 
+  // All announcements for listview
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
-  const [selectedRoleId, setSelectedRoleId] = useState<number>(-1);
-  const [selectedRoleName, setSelectedRoleName] = useState<string>("");
+  // Store selected role (null = All)
+  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
 
-  const handleRoleSelect = (roleId: number) => {
-    setSelectedRoleId(roleId);
-  };
+  // Local list of announcement IDs the user acknowledged
+  const [acknowledged, setAcknowledged] = useState<number[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const { user } = useSession();
+
+  /**
+   * Fetch announcements filtered by role
+   * If selectedRoleId === null -> Get ALL
+   */
+  const fetchAnnouncements = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data =
+        selectedRoleId === null
+          ? await getAllAnnouncements()
+          : await getAnnouncementsByRole(selectedRoleId);
+
+      const sorted = (data as Announcement[]).sort(
+        (a, b) => b.announcement_id - a.announcement_id
+      );
+
+      setAnnouncements(sorted);
+
+    } catch (err) {
+      console.error("Error fetching announcements:", err);
+      setError("Unable to load announcements.");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedRoleId]);
+
+  // Trigger fetch anytime the filter changes
   useEffect(() => {
-    const fetchAnnouncements = async () => {
-      setLoading(true);
+  async function load() {
+    await fetchAnnouncements();
 
-      try {
-        const data =
-          selectedRoleId == -1
-            ? await getAllAnnouncements()
-            : await getAnnouncementsByRole(selectedRoleId);
+    // Fetch acknowledged list only after announcements load
+    const ack = await getAcknowledgedAnnouncements(user!.employee_id);
 
-        const sortedData = (data as Announcement[]).sort(
-          (a, b) => b.announcement_id - a.announcement_id
-        );
+    // Extract only the announcement_id values to drive UI
+    setAcknowledged(ack.map(a => a.announcement_id));
+  }
 
-        setAnnouncements(sortedData);
-      } catch (error) {
-        console.error("Error fetching announcements:", error);
-        setError(true);
-      } finally {
-        console.log("Successfully fetched announcements!")
-        setLoading(false);
-      }
-    };
+  load();
+}, [fetchAnnouncements]);
 
-    fetchAnnouncements();
-  }, [selectedRoleId]); // Only trigger the fetch when the role ID changes
+  /**
+   * Handle "Acknowledge" click — backend + optimistic UI
+   */
+  const handleAcknowledge = async (announcementId: number) => {
+    // This already updates local state correctly
+    setAcknowledged((prev) => [...prev, announcementId]);
+
+    try {
+      console.log("Sending ack:", announcementId, user?.employee_id);
+      await acknowledgeAnnouncement(announcementId, user!.employee_id);
+    } catch (err) {
+      console.log("Error acknowledging announcement:", err);
+    }
+  };
+
+  /**
+   * Render each announcement row for ModularListView
+   */
+  const renderAnnouncement = (announcement: Announcement) => {
+    //  use local `acknowledged` state so UI updates immediately
+    const isAcknowledged = acknowledged.includes(announcement.announcement_id);
+
+    return (
+      <View style={styles.announcementContainer}>
+        <View style={styles.headerContainer}>
+          <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
+
+          <View style={styles.roleContainer}>
+            <Text style={[GlobalStyles.awaitingApproval, styles.roleName]}>
+              {announcement.role_name}
+            </Text>
+          </View>
+        </View>
+
+        <Text style={GlobalStyles.text}>{announcement.description}</Text>
+        <Text style={GlobalStyles.text}>- {announcement.author}</Text>
+
+        {/* Acknowledge Button */}
+        {isAcknowledged ? (
+          <Text style={styles.acknowledged}>Acknowledged</Text>
+        ) : (
+          <TouchableOpacity
+            onPress={() => handleAcknowledge(announcement.announcement_id)}
+            style={styles.ackBtn}
+          >
+            <Text style={styles.ackBtnText}>Acknowledge</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
 
   return (
-
-    <Card style={styles.container}>
-
+    <View style={styles.container}>
       <View style={styles.scrollContainer}>
 
-        <RoleDropdown
-          selectedRole={selectedRoleId}
-          onRoleSelect={(value) => handleRoleSelect(value as number)}
-          labelText=""
-        />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
-        <DefaultScrollView>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Ionicons name="notifications" size={22} color="black" style={styles.icon} />
+            <Text style={GlobalStyles.floatingHeaderText}>Announcements</Text>
+          </View>
 
-          {loading ? (
-            <LoadingCard
-              loadingText="Loading announcements..."
-              textStyle={GlobalStyles.loadingText}
-              containerStyle={{ height: 400 }}
+          <View style={{ width: '40%' }}>
+            <RoleDropdown
+              selectedRole={selectedRoleId}
+              onRoleSelect={(value) => setSelectedRoleId(value as number)}
+              labelText=""
+              usePlaceholder={true}
+              placeholderText="All Roles"
             />
+          </View>
 
-          ) : error ? (
-            <LoadingCard
-              loadingText="Unable to load announcements!"
-              textStyle={GlobalStyles.errorText}
-              containerStyle={{ height: 400 }}
-            />
+        </View>
 
-          ) : (
-            announcements.map((announcement) => (
-
-              <AltCard
-                key={announcement.announcement_id}
-                style={styles.announcementContainer}>
-
-                <View style={styles.headerContainer}>
-                  <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
-                  <AltCard style={styles.roleContainer}>
-                    <Text style={GlobalStyles.boldText}>{announcement.role_name}</Text>
-                  </AltCard>
-                </View>
-                <Text style={GlobalStyles.text}>{announcement.description}</Text>
-                <Text style={GlobalStyles.text}>- {announcement.author}</Text>
-                <Text style={[GlobalStyles.altText, { marginVertical: 5 }]}>
-                  Date: {announcement.date}{"\n"}
-                  Time: {announcement.time}
-                </Text>
-
-              </AltCard>
-
-            ))
-          )}
-
-        </DefaultScrollView>
+        {/* ModularListView */}
+        <View style={{ height: 375 }}>
+          <ModularListView
+            data={announcements}
+            loading={loading}
+            error={error}
+            emptyText="No announcements available."
+            maxHeight={375}
+            renderItem={renderAnnouncement}
+            keyExtractor={(item) => item.announcement_id.toString()}
+            onRefresh={fetchAnnouncements}
+            refreshing={loading}
+            itemContainerStyle={styles.itemContainer}
+          />
+        </View>
 
       </View>
-
-    </Card>
-
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    backgroundColor: Colors.white,
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
+  itemContainer: {
+    backgroundColor: Colors.AnnouncemtnBG,
+    padding: 16,
+    borderRadius: 18,
+  },
   scrollContainer: {
-    height: 400,
+    maxHeight: 375,
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
   },
   announcementContainer: {
-    width: '100%',
-    backgroundColor: Colors.lightTan,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    margin: 6,
+    paddingLeft: 5,
+    marginBottom: 5,
   },
   roleContainer: {
-    backgroundColor: Colors.darkTan,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    borderRadius: 0
+    borderRadius: 3
+  },
+  roleName: {
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    padding: 8
   },
   headerContainer: {
     flexDirection: 'row',
@@ -156,6 +215,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
+  ackBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignSelf: "flex-start",
+    backgroundColor: Colors.buttonBlue,
+    borderRadius: 6,
+  },
+  acknowledged: {
+    marginTop: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    alignSelf: "flex-start",
+    backgroundColor: Colors.ackknowledgedBG,
+    borderRadius: 6,
+    fontWeight: "500"
+  },
+  ackBtnText: {
+    color: Colors.white,
+    fontWeight: "bold",
+  },
+  icon: {
+    marginRight: 3,
+  }
 });
 
 export default Announcements;
