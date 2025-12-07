@@ -1,142 +1,113 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useCallback, useState, useContext, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Colors } from '@/constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StatusBar, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
-import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
-import Card from '@/components/modular/Card';
-import CircularImage from '@/components/CircularImage';
+import { Colors } from "@/constants/Colors";
+import DefaultView from "@/components/DefaultView";
+import DefaultScrollView from "@/components/DefaultScrollView";
+import Card from "@/components/modular/Card";
+import ProfileCard from "@/components/profile/ProfileCard";
+import { useSession } from "@/utils/SessionContext";
+import { GlobalStyles } from "@/constants/GlobalStyles";
 
-import HandleLogout from '@/components/auth/HandleLogout';
-import { GlobalStyles } from '@/constants/GlobalStyles';
-
+import { getEmployee } from "@/routes/employee";
+import { Employee } from "@/types/iEmployee";
+import AccountInfo from "@/components/profile/AccountInfo";
+import ProfileStats from "@/components/profile/ProfileStats";
 
 export default function Profile() {
+  // Get signed-in user
+  const { user } = useSession();
+  const [profile, setProfile] = useState<Employee | null>(null);
+
+  useEffect(() => {
+    if (user?.employee_id) {
+      getEmployee({ employee_id: user.employee_id })
+        .then((res) => setProfile(res[0] || null))
+        .catch((error) => console.error("Profile fetch error:", error));
+    }
+  }, [user]);
+
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.white);
-      StatusBar.setBarStyle('dark-content');
+      StatusBar.setBarStyle("dark-content");
     }, [])
   );
 
   return (
-
     <DefaultView backgroundColor={Colors.white}>
-
-
       <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
 
         {/* Profile Header */}
         <View style={GlobalStyles.pageHeaderContainer}>
-          <Text style={GlobalStyles.pageHeader}>
-            Profile
-          </Text>
+          <Text style={GlobalStyles.pageHeader}>Profile</Text>
         </View>
 
         <DefaultScrollView>
-          
-          {/* Main Profile View */}
-          <View style={{ width:'85%', marginVertical: 20 }}>
 
-            <Card style={styles.profileCard}>
+          <View style={{ width: '90%' }}>
 
-            <View style={{ alignItems: 'flex-end', marginTop: 10 }}>
-              <HandleLogout />
+            {/* Profile Card */}
+            <View style={{ marginTop: 20 }}>
+              <ProfileCard profile={profile} />
             </View>
 
-          
-              <TouchableOpacity>
-                <View style={{alignItems: 'center', margin: 20}}>
-                  <CircularImage size={100} />
-                </View>
-              </TouchableOpacity>
+            <View style={[styles.contentRow, { width: '100%' }]}>
 
-              <Text style={styles.profileCardText}>John Doe</Text>
-              <Text style={{textAlign:"center", marginTop:10}}>Server</Text>
-
-            </Card>
-
-          </View>
-
-          {/* User Info */}
-          <View style={{ marginVertical: 10, width: '85%' }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>User Info</Text>
-
-            <Card style={styles.progressCard}>
-              
-                <Text>Loading user data...</Text>
-              
-            </Card>
-
-          </View>
-          
-
-          {/* This week */}
-          <View style={{ marginVertical: 10, width: '85%' }}>
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>This Week</Text>
-
-              <Card style={styles.progressCard}>
-                <Text style={{fontWeight:"bold", fontSize:16}}>6.5 Hours</Text>
-                <Text>some more info</Text>
+              {/* Account Info */}
+              <Card style={styles.accountInfo}>
+                <AccountInfo profile={profile} />
               </Card>
+
+              {/* Profile Stats */}
+              <View style={styles.stats}>
+                <ProfileStats profile={profile} />
+              </View>
+
+            </View>
           </View>
 
-
-          {/* Filler Stuff */}
-          <View style={{ width: '85%', marginBottom: 60 }}>
-
-            <Text style={{ textAlign: 'left', fontSize: 18, color: 'black', fontWeight: "bold", marginBottom: 8 }}>Recent Activity</Text>
-        
-            <Card style={styles.progressCard}>
-              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 1</Text>
-              <Text>some more info</Text>
-            </Card>
-
-            <Card style={styles.progressCard}>
-              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 2</Text>
-              <Text>some more info</Text>
-            </Card>
-
-            <Card style={styles.progressCard}>
-              <Text style={{ fontWeight:"bold", fontSize: 16 }}>Activity 3</Text>
-              <Text>some more info</Text>
-            </Card>
-
-          </View>
-          
         </DefaultScrollView>
-
-
       </View>
-
-
     </DefaultView>
-
-  )
-};
-
+  );
+}
 
 const styles = StyleSheet.create({
-  profileCard: {
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 8,
-    height: 300,
-  },
-  profileCardText: {
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
   progressCard: {
     backgroundColor: Colors.white,
     padding: 20,
     borderRadius: 8,
     marginBottom: 15,
   },
-  
+  sectionTitle: {
+    textAlign: "left",
+    fontSize: 18,
+    color: "black",
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  contentRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 10
+  },
+  accountInfo: {
+    flexBasis: '55%',
+    minWidth: 250,
+    flexGrow: 1,
+    marginVertical: 20,
+    borderRadius: 14
+  },
+  stats: {
+    flexBasis: '30%',
+    minWidth: 250,
+    flexGrow: 1,
+    marginVertical: 20,
+  }
+});
 
-})

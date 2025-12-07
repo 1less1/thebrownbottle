@@ -270,5 +270,11 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 10,
         padding: 4,
         borderRadius: 4,
-    }
+    },
+    tag: {
+        backgroundColor: "rgba(255,255,255,0.22)",
+        borderRadius: 10,
+        paddingVertical: 3,
+        paddingHorizontal: 10,
+    },
 });

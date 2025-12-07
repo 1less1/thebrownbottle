@@ -241,19 +241,17 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
                             )}
                         />
 
-                        <TaskDetailsModal
-                            visible={modalVisible}
-                            task={selectedTask}
-                            onClose={() => setModalVisible(false)}
-                            onComplete={handleComplete}
-                            actionLabel="Complete Task"
-                        />
-
-
                     </>
                 )}
             </View>
 
+            <TaskDetailsModal
+                visible={modalVisible}
+                task={selectedTask}
+                onClose={() => setModalVisible(false)}
+                onComplete={handleComplete}
+                actionLabel="Complete Task"
+            />
         </View>
     );
 };
