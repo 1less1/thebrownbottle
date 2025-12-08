@@ -11,7 +11,7 @@ import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/components/QuickStats';
-import { Ionicons } from '@expo/vector-icons';
+import ProfileAvatar from '@/components/ProfileAvatar';
 
 
 // Get Session Data
