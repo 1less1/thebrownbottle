@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet, Pressable, useWindowDimensions, Platform } from "react-native";
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
@@ -46,10 +48,17 @@ const dateDropdownOptions = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefreshDone }) => {
+const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
+
+    const PC_MAX_HEIGHT_FACTOR = 0.58; 
+    const MOBILE_MAX_HEIGHT_FACTOR = 0.4; 
+
+    const listMaxHeight = Platform.OS === 'web' 
+        ? HEIGHT * PC_MAX_HEIGHT_FACTOR  // Use a larger fraction of screen height for web
+        : HEIGHT * MOBILE_MAX_HEIGHT_FACTOR; // Use a smaller fraction for mobile
 
     const { user } = useSession();
 
@@ -67,7 +76,8 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefresh
     const [requestType, setRequestType] = useState<string>("Available");
     const [dateFilter, setDateFilter] = useState<string>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
-    //const [roleFilter, setRoleFilter] = useState<number | null>(null);
+    
+    const [localRefresh, setLocalRefresh] = useState(0);
 
     // Fetch Shift Cover Requests
     const fetchSCR = async () => {
@@ -115,12 +125,12 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefresh
     useEffect(() => {
         fetchSCR();
         console.log("Refreshing")
-    }, [user, parentRefresh, requestType, dateFilter, statusFilter]);
+    }, [user, parentRefresh, localRefresh, requestType, dateFilter, statusFilter]);
 
 
     if (!user) {
         return (
-            <Card style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+            <Card style={GlobalStyles.loadingContainer}>
                 <LoadingCircle />
             </Card>
         );
@@ -134,7 +144,8 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefresh
             <ModularButton
                 text="New Request"
                 onPress={toggleSubmitShiftCover}
-                style={GlobalStyles.modernButton}
+                style={{backgroundColor: Colors.bgBlue, borderWidth: 1, borderColor: Colors.borderBlue}}
+                textStyle={{ color: Colors.blue }}
             />
 
             <SubmitShiftCover
@@ -187,75 +198,70 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefresh
                         ? "No requests available."
                         : "No available shifts right now."
                 }
-                listHeight={HEIGHT * 0.4}
+                maxHeight={listMaxHeight}
+                itemContainerStyle={{ backgroundColor: "white" }}
+                onItemPress={(req) => {
+                    setSelectedRequest(req);
+                    setShiftDetailsModalVisible(true);
+                }}
                 renderItem={(req) => (
-                    <Pressable
-                        onPress={() => {
-                            setSelectedRequest(req);
-                            setShiftDetailsModalVisible(true);
-                        }}
-                        style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-                    >
+                    <View style={styles.badgeView}>
 
-                        <View style={styles.badgeView}>
-
-                            <View style={{ flex: 1, paddingRight: 8 }}>
+                        <View style={{ flex: 1, paddingRight: 8 }}>
 
 
-                                <View style={styles.topRow}>
-                                    <View style={styles.topLeftText}>
-                                        {/* "Employee is requesting" line */}
-                                        {req.status !== 'Pending' && req.accepted_first_name && req.accepted_last_name ? (
-                                            <>
-                                                <Text style={[GlobalStyles.boldAltText, { color: Colors.blue }]}>
-                                                    {req.accepted_first_name} {req.accepted_last_name}{" "}
-                                                </Text>
-                                                <Text style={GlobalStyles.altText}>requesting...</Text>
-                                            </>
-                                        ) : (
-                                            <Text style={GlobalStyles.semiBoldAltText}>
-                                                Shift Available
+                            <View style={styles.topRow}>
+                                <View style={styles.topLeftText}>
+                                    {/* "Employee is requesting" line */}
+                                    {req.status !== 'Pending' && req.accepted_first_name && req.accepted_last_name ? (
+                                        <>
+                                            <Text style={GlobalStyles.boldText}>
+                                                {req.accepted_first_name} {req.accepted_last_name}{" "}
                                             </Text>
-                                        )}
-                                    </View>
-
-                                    <View style={styles.badgeWrapper}>
-                                        <StatusBadge status={req.status as Status} />
-                                    </View>
+                                            <Text style={GlobalStyles.altText}>requesting...</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={GlobalStyles.semiBoldAltText}>
+                                            Shift Available
+                                        </Text>
+                                    )}
                                 </View>
 
-                                {/* Bottom Section (Free Flowing Text) */}
-                                <>
-                                    {/* Shift Details */}
-                                    <Text style={GlobalStyles.semiBoldText}>
-                                        {formatShiftDate(req.shift_date)} {"@"} {formatTime(req.shift_start)}
-                                    </Text>
-                                    {/* <Text style={GlobalStyles.altText}>Section: {req.section_name}</Text> */}
-
-                                    {/* Original Shift Assigmnent */}
-                                    <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 2 }}>
-                                        <Text style={GlobalStyles.text}>From: </Text>
-                                        <Text
-                                            style={[GlobalStyles.boldText, { color: Colors.brown }]}
-                                        >
-                                            {req.requested_first_name} {req.requested_last_name} { }
-                                        </Text>
-                                        <Text>
-                                            ({req.requester_role_name})
-                                        </Text>
-                                    </View>
-
-                                    {/* TimeStamp */}
-                                    <Text style={[GlobalStyles.smallAltText, { color: Colors.gray, marginTop: 2 }]}>
-                                        Submitted on {formatDateTime(req.timestamp)}
-                                    </Text>
-                                </>
-
+                                <View style={styles.badgeWrapper}>
+                                    <StatusBadge status={req.status as Status} />
+                                </View>
                             </View>
+
+                            {/* Bottom Section (Free Flowing Text) */}
+                            <>
+                                {/* Shift Details */}
+                                <Text style={GlobalStyles.semiBoldText}>
+                                    {formatShiftDate(req.shift_date)} {"@"} {formatTime(req.shift_start)}
+                                </Text>
+                                {/* <Text style={GlobalStyles.altText}>Section: {req.section_name}</Text> */}
+
+                                {/* Original Shift Assigmnent */}
+                                <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 2 }}>
+                                    <Text style={GlobalStyles.text}>From: </Text>
+                                    <Text
+                                        style={[GlobalStyles.boldText, { color: Colors.blue }]}
+                                    >
+                                        {req.requested_first_name} {req.requested_last_name} { }
+                                    </Text>
+                                    <Text>
+                                        ({req.requester_role_name})
+                                    </Text>
+                                </View>
+
+                                {/* TimeStamp */}
+                                <Text style={[GlobalStyles.smallAltText, { color: Colors.gray, marginTop: 2 }]}>
+                                    Submitted on {formatDateTime(req.timestamp)}
+                                </Text>
+                            </>
 
                         </View>
 
-                    </Pressable>
+                    </View>
                 )}
             />
 
@@ -263,8 +269,8 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps>  = ({ parentRefresh, onRefresh
             <ShiftDetails
                 visible={shiftDetailsModalVisible}
                 request={selectedRequest}
-                onSubmitted={fetchSCR}
                 onClose={() => setShiftDetailsModalVisible(false)}
+                onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 
         </Card>
@@ -282,7 +288,7 @@ const styles = StyleSheet.create({
         gap: 10,                 // spacing between items
         marginVertical: 10,
     },
-    dropdownButton: { 
+    dropdownButton: {
         flexGrow: 1,
         flexShrink: 1,
         minWidth: 200,

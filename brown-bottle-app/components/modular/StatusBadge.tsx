@@ -3,11 +3,11 @@ import { View, Text } from "react-native";
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Status } from "@/types/iShiftCover";
 
-type Props = {
+type BadgeProps = {
     status: Status
 };
 
-export default function StatusBadge({ status }: Props) {
+export default function StatusBadge({ status }: BadgeProps) {
     // Map status to the corresponding styles
     const containerStyle =
         status === "Accepted"

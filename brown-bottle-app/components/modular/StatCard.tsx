@@ -1,8 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AnimatedTouchableWrapper from './AnimatedTouchable';
-import LoadingCircle from './LoadingCircle';
+import AnimatedTouchableWrapper from '@/components/modular/AnimatedTouchable';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
+
+import LoadingCircle from '@/components/modular/LoadingCircle';
 
 export type StatCardProps = {
     title?: string;
@@ -27,7 +31,7 @@ const StatCard: React.FC<StatCardProps> = ({
     value,
     footerText,
     iconName,
-    iconColor = '#3b78ff',
+    iconColor = Colors.blue,
     style,
     titleStyle,
     valueStyle,

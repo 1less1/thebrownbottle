@@ -5,7 +5,7 @@ import { Colors } from '@/constants/Colors';
 
 import { getShift } from '@/routes/shift';
 import { getTasks } from '@/routes/task';
-import { getTimeOffRequests } from '@/routes/time_off_request';
+import { getTimeOffRequest } from '@/routes/time_off_request';
 import { useSession } from '@/utils/SessionContext';
 
 const QuickStats = () => {
@@ -34,7 +34,7 @@ const QuickStats = () => {
 
                 const now = new Date();
 
-                // FETCH UPCOMING SHIFTS
+                // FETCH UPCOMING SHIFTS >> Change to Shift Cover Requests!!!!
                 const shiftData = await getShift({ employee_id: employeeId });
 
                 const futureShifts = shiftData.filter((shift: any) => {
@@ -62,9 +62,9 @@ const QuickStats = () => {
                 }
 
                 // FETCH PENDING TIME OFF REQs
-                const tor = await getTimeOffRequests({
+                const tor = await getTimeOffRequest({
                     employee_id: employeeId,
-                    status: "Pending",
+                    status: ["Pending"],
                 });
 
                 setPendingTimeOffCount(tor.length);
@@ -98,29 +98,29 @@ const QuickStats = () => {
 
             <StatCard
                 loading={loading}
-                title="Upcoming Shifts"
-                value={upcomingCount}
-                iconName="time-outline"
-                backgroundColor="#eef6ff"
-                iconColor="#3b78ff"
-                borderColor='#acc4faff'
-                iconContainerStyle={{ backgroundColor: "#dbeaff" }}
-                titleStyle={{ color: "#3b78ff" }}
-                valueStyle={{ color: "#3b78ff" }}
+                title="Pending Tasks"
+                value={taskCount}
+                iconName="clipboard-outline"
+                backgroundColor={Colors.bgYellow}
+                iconColor={Colors.pendingYellow}
+                borderColor={Colors.borderYellow}
+                iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
+                titleStyle={{ color: Colors.pendingYellow }}
+                valueStyle={{ color: Colors.pendingYellow }}
                 style={{ marginLeft: 8, marginRight: 8 }}
             />
 
             <StatCard
                 loading={loading}
-                title="Pending Tasks"
-                value={taskCount}
-                iconName="clipboard-outline"
-                backgroundColor="#fff3e0"
-                iconColor="#ff9800"
-                borderColor='#fed79cff'
-                iconContainerStyle={{ backgroundColor: "#fde6c4ff" }}
-                titleStyle={{ color: "#ff9800" }}
-                valueStyle={{ color: "#ff9800" }}
+                title="Shift Cover Requests"
+                value={upcomingCount} // Fix THIS!!!
+                iconName="repeat-outline"
+                backgroundColor={Colors.bgBlue}
+                iconColor={Colors.blue}
+                borderColor={Colors.borderBlue}
+                iconContainerStyle={{ backgroundColor: Colors.bgIconBlue }}
+                titleStyle={{ color: Colors.blue }}
+                valueStyle={{ color: Colors.blue }}
                 style={{ marginLeft: 8, marginRight: 8 }}
             />
 
@@ -130,12 +130,12 @@ const QuickStats = () => {
                 title="Time Off Requests"
                 value={pendingTimeOffCount}
                 iconName="hourglass-outline"
-                backgroundColor="#fbebfcff"
-                iconColor="#c780ceff"
-                borderColor='#cea9d2ff'
-                iconContainerStyle={{ backgroundColor: "#f2d3f5ff" }}
-                titleStyle={{ color: "#c780ceff" }}
-                valueStyle={{ color: "#c780ceff" }}
+                backgroundColor={Colors.bgPurple}
+                iconColor={Colors.purple}
+                borderColor={Colors.borderPurple}
+                iconContainerStyle={{ backgroundColor: Colors.bgIconPurple }}
+                titleStyle={{ color: Colors.purple }}
+                valueStyle={{ color: Colors.purple }}
                 style={{ marginLeft: 8, marginRight: 8 }}
             />
 

@@ -15,7 +15,7 @@ Includes: style={{
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: Colors.bgGray,
+        backgroundColor: Colors.bgApp,
         height: '100%',
         width: '100%',
       }}>

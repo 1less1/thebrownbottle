@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -44,6 +44,13 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
   const { width, height } = useWindowDimensions();
   const WIDTH = width;
   const HEIGHT = height;
+
+  const PC_MAX_HEIGHT_FACTOR = 0.65;
+  const MOBILE_MAX_HEIGHT_FACTOR = 0.45;
+
+  const listMaxHeight = Platform.OS === 'web'
+    ? HEIGHT * PC_MAX_HEIGHT_FACTOR  // Use a larger fraction of screen height for web
+    : HEIGHT * MOBILE_MAX_HEIGHT_FACTOR; // Use a smaller fraction for mobile
 
   const { user } = useSession();
 
@@ -96,22 +103,15 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
     }
   };
 
-  const handleReset = () => {
-    if (statusFilter != null || dateFilter != "Newest") {
-      setStatusFilter(null);
-      setDateFilter("Newest");
-    }
-  };
-
   // Fetch Time Off Requests Data on Initialization and State Update
   useEffect(() => {
     fetchTOR();
     console.log("Refreshing")
-  }, [user, parentRefresh, statusFilter, dateFilter]);
+  }, [user, parentRefresh, localRefresh, statusFilter, dateFilter]);
 
   if (!user) {
     return (
-      <Card style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+      <Card style={GlobalStyles.loadingContainer}>
         <LoadingCircle />
       </Card>
     );
@@ -149,21 +149,9 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
           <ModularButton
             text="Add"
             onPress={toggleSubmitTimeOff}
-            style={GlobalStyles.modernButton}
+            style={{ flex: 1, minWidth: 200, backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
+            textStyle={{ color: Colors.purple }}
           />
-
-
-          <ModularButton
-            onPress={handleReset}
-            onLongPress={() => Alert.alert("Hint", "Reset All Filters")}
-            text=""
-            style={GlobalStyles.modernButton}
-            enabled={!loading}
-          >
-            <Ionicons name="reload-outline" size={16} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
-          </ModularButton>
-
-
         </View>
 
       </View>
@@ -174,43 +162,40 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         loading={loading}
         error={error}
         emptyText="No requests found."
-        listHeight={HEIGHT * 0.52}
+        maxHeight={listMaxHeight}
+        onItemPress={(req) => {
+          setSelectedRequest(req);
+          setTimeOffDetailsVisible(true);
+        }}
+        itemContainerStyle={{ backgroundColor: "white" }}
         renderItem={(req) => (
-          <Pressable
-            onPress={() => {
-              setSelectedRequest(req);
-              setTimeOffDetailsVisible(true);
-            }}
-            style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1 }]}
-          >
-            <View style={styles.badgeView}>
-              <View style={{ flex: 1, paddingRight: 8 }}>
+          <View style={styles.badgeView}>
+            <View style={{ flex: 1, paddingRight: 8 }}>
 
-                {/* Top Row */}
-                <View style={styles.topRow}>
-                  <View style={styles.topLeftText}>
-                    <Text style={GlobalStyles.semiBoldText}>
-                      {req.start_date === req.end_date
-                        ? formatDate(req.start_date)
-                        : `${formatDate(req.start_date)} → ${formatDate(req.end_date)}`
-                      }
-                    </Text>
-                  </View>
-
-                  <View style={styles.badgeWrapper}>
-                    <StatusBadge status={req.status as Status} />
-                  </View>
+              {/* Top Row */}
+              <View style={styles.topRow}>
+                <View style={styles.topLeftText}>
+                  <Text style={GlobalStyles.semiBoldText}>
+                    {req.start_date === req.end_date
+                      ? formatDate(req.start_date)
+                      : `${formatDate(req.start_date)} → ${formatDate(req.end_date)}`
+                    }
+                  </Text>
                 </View>
 
-                {/* Bottom Section */}
-                <>
-                  <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
-                    Submitted on {formatDateTime(req.timestamp)}
-                  </Text>
-                </>
+                <View style={styles.badgeWrapper}>
+                  <StatusBadge status={req.status as Status} />
+                </View>
               </View>
+
+              {/* Bottom Section */}
+              <>
+                <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
+                  Submitted on {formatDateTime(req.timestamp)}
+                </Text>
+              </>
             </View>
-          </Pressable>
+          </View>
         )}
       />
 
@@ -224,12 +209,10 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
 
       <TimeOffDetails
         visible={timeOffDetailsVisible}
-        onClose={toggleTimeOffDetails}
         request={selectedRequest}
+        onClose={toggleTimeOffDetails}
         onSubmitted={() => setLocalRefresh(prev => prev + 1)}
       />
-
-
 
     </Card>
 

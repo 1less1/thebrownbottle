@@ -12,7 +12,7 @@ const LandingScreen = () => {
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
-      StatusBar.setBackgroundColor(Colors.bgGray);
+      StatusBar.setBackgroundColor(Colors.bgApp);
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
@@ -24,9 +24,9 @@ const LandingScreen = () => {
   };
   return (
 
-    <DefaultView backgroundColor={Colors.bgGray}>
+    <DefaultView backgroundColor={Colors.bgApp}>
       <TouchableWithoutFeedback onPress={dismissKeyboardIfMobile} >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.bgGray }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.bgApp }}>
 
           <View style={{ alignItems: 'center' }}>
             <Image

@@ -172,6 +172,14 @@ export const GlobalStyles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: Colors.altBorderColor,
     },
+    loadingContainer: {
+        width: '100%',
+        backgroundColor: Colors.white,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
     searchInput: {
         borderWidth: 1,
         borderColor: Colors.borderColor,
@@ -220,10 +228,7 @@ export const GlobalStyles = StyleSheet.create({
         borderRadius: 5,
     },
     deleteButton: {
-        // Old Dom Version --> backgroundColor: Colors.bgRed,
         backgroundColor: Colors.bgRed,
-        borderColor: Colors.deleteRed,
-        borderWidth: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -246,7 +251,8 @@ export const GlobalStyles = StyleSheet.create({
     // Badge Styles
     acceptedBadge: {
         backgroundColor: Colors.bgGreen,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     acceptedText: {
@@ -257,7 +263,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     deniedBadge: {
         backgroundColor: Colors.bgRed,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     deniedText: {
@@ -268,7 +275,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     pendingBadge: {
         backgroundColor: Colors.bgYellow,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     pendingText: {
@@ -278,11 +286,24 @@ export const GlobalStyles = StyleSheet.create({
         textTransform: 'uppercase'
     },
     awaitingApprovalBadge: {
-        backgroundColor: Colors.badgeBGGray,
-        padding: 6,
+        backgroundColor: Colors.badgeGray,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     awaitingApprovalText: {
+        color: Colors.darkGray,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
+    standardBadge: {
+        backgroundColor: Colors.badgeGray,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+    },
+    standardBadgeText: {
         color: Colors.darkGray,
         fontSize: 12,
         fontWeight: 'bold',

@@ -291,7 +291,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         <ModularButton
           onPress={handleThisWeekReset}
           onLongPress={() => Alert.alert("Hint", "Reset to Current Week")}
-          style={{ backgroundColor: Colors.bgBlue }}
+          style={{ backgroundColor: Colors.bgIconBlue }}
           text=""
           textStyle={{ marginRight: 4 }}
           enabled={!loading}

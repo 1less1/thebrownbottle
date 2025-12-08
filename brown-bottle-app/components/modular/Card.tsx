@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     alignItems: undefined,
     backgroundColor: 'white', // Default background, can be overridden
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
 
     //Border
     borderWidth: 1,

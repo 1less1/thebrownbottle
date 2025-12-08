@@ -20,7 +20,7 @@ export const Colors = {
   },
 
   /* App Theme Colors */
-  bgGray: '#FBF7F7',
+  bgApp: '#F7F7F5',
   lightTan: '#FAF3ED',
   mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
@@ -33,18 +33,35 @@ export const Colors = {
   /* Component Colors */
   errorRed: '#dc3545',
   denyRed: '#dc3545',
+  red: '#dc3545',
+  borderRed: '#dfaaafff',
   bgRed: '#f8d7da',
+
+  green: '#28a745',
   acceptGreen: '#28a745',
   bgGreen: '#d4edda',
-  pendingYellow: '#ff9800',
-  bgYellow: '#fff3e0',
-  bgBlue: '#d1ecf1',
-  badgeBGGray: "#e3e5e6ff",
-  buttonBlue: '#2e86de',
 
-  // Ishimwe additions
-  deleteRed: "#f8d7da",
-  deleteBorderColor: "#dfaaafff",
+  yellow: '#ff9800',
+  pendingYellow: '#ff9800',
+  borderYellow: '#fed79cff',
+  bgYellow: '#fff3e0',
+  bgIconYellow: '#fde6c4ff',
+
+  blue: '#2e86de',
+  borderBlue: '#acc4faff',
+  bgBlue: '#eef6ff',
+  bgIconBlue: '#dbeaff',
+
+  purple: '#c780ceff',
+  borderPurple: '#cea9d2ff',
+  bgPurple: '#fbebfcff',
+  bgIconPurple: '#f2d3f5ff',
+
+  bgGray: '#f1f1f195',
+  bgIconGray: '#e3e5e6ff',
+  badgeGray: '#e3e5e6ff',
+
+  buttonBlue: '#2e86de',
 
   borderColor: '#ccc',
   lightBorderColor: '#eee',
@@ -59,18 +76,17 @@ export const Colors = {
   selectedBox: '#2e86de',
   unselectedBox: '#666',
 
-  AnnouncemtnBG: '#f5f4f4ce',
   ackknowledgedBG: '#e3e5e6ff',
   TaskBG: '#f5f4f4f1',
-  
+
   /* General Colors */
   black: '#000000',
-  white:'#FFFFFF',
+  white: '#FFFFFF',
   whiteGray: '#FAFAFA',
   lightGray: '#E5E5EA',
   gray: '#B1B1B5',
   darkGray: '#666',
-  blue: '#2e86de',
   orange: '#de8c2e',
   greyWhite: "#FBF7F7"
+
 };

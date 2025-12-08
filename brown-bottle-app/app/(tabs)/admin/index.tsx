@@ -76,7 +76,7 @@ const Admin = () => {
 
     <DefaultView backgroundColor={Colors.white}>
 
-      <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
+      <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
         <View style={{ backgroundColor: Colors.white }}>
 

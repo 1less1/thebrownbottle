@@ -4,6 +4,7 @@ import { Colors } from '@/constants/Colors';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 import AnimatedTouchableWrapper from "@/components/modular/AnimatedTouchable";
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -40,14 +41,14 @@ export default function ModularListView<T>({
     // Handles loading state
     if (loading)
         return (
-            <LoadingCircle size={"small"}/>
+            <LoadingCircle size={"small"} />
         );
 
     // Handles error state
     if (error)
         return (
             <View style={styles.statusContainer}>
-                <Text style={[styles.statusText, styles.errorText]}>{error}</Text>
+                <Text style={GlobalStyles.errorText}>{error}</Text>
             </View>
         );
 
@@ -55,7 +56,7 @@ export default function ModularListView<T>({
     if (data.length === 0)
         return (
             <View style={styles.statusContainer}>
-                <Text style={styles.statusText}>{emptyText}</Text>
+                <Text style={GlobalStyles.altText}>{emptyText}</Text>
             </View>
         );
 
@@ -76,7 +77,7 @@ export default function ModularListView<T>({
                     }
                     renderItem={({ item, index }) => {
                         const content = (
-                            <View style={[styles.requestItem, itemContainerStyle]}>
+                            <View style={[styles.listItem, itemContainerStyle]}>
                                 {renderItem(item, index)}
                             </View>
                         );
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     statusContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 20,
+        paddingVertical: 20,
     },
     statusText: {
         textAlign: 'center',
@@ -124,13 +125,13 @@ const styles = StyleSheet.create({
         marginTop: 15,
         textAlign: 'center',
     },
-    requestItem: {
-        backgroundColor: Colors.inputBG,
+    listItem: {
+        backgroundColor: Colors.bgGray,
+        padding: 12,
         width: '97.9%',
         alignSelf: 'center',
-        padding: 12,
         marginTop: 5,
-        borderRadius: 8,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: Colors.borderColor,
         marginBottom: 5,

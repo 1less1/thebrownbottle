@@ -13,6 +13,7 @@ import ModularModal from '@/components/modular/ModularModal';
 import LoadingCard from '@/components/modular/LoadingCard';
 
 import ModularListView from "@/components/modular/ModularListView";
+import Badge from '@/components/modular/Badge';
 import { getAllAnnouncements, getAnnouncementsByRole, acknowledgeAnnouncement } from '@/routes/announcement';
 import { Announcement } from '@/types/iAnnouncement';
 import { Ionicons } from '@expo/vector-icons';
@@ -66,18 +67,18 @@ const Announcements = () => {
 
   // Trigger fetch anytime the filter changes
   useEffect(() => {
-  async function load() {
-    await fetchAnnouncements();
+    async function load() {
+      await fetchAnnouncements();
 
-    // Fetch acknowledged list only after announcements load
-    const ack = await getAcknowledgedAnnouncements(user!.employee_id);
+      // Fetch acknowledged list only after announcements load
+      const ack = await getAcknowledgedAnnouncements(user!.employee_id);
 
-    // Extract only the announcement_id values to drive UI
-    setAcknowledged(ack.map(a => a.announcement_id));
-  }
+      // Extract only the announcement_id values to drive UI
+      setAcknowledged(ack.map(a => a.announcement_id));
+    }
 
-  load();
-}, [fetchAnnouncements]);
+    load();
+  }, [fetchAnnouncements]);
 
   /**
    * Handle "Acknowledge" click — backend + optimistic UI
@@ -106,15 +107,13 @@ const Announcements = () => {
         <View style={styles.headerContainer}>
           <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
 
-          <View style={styles.roleContainer}>
-            <Text style={[GlobalStyles.awaitingApproval, styles.roleName]}>
-              {announcement.role_name}
-            </Text>
+          <View style={styles.badgeWrapper}>
+            <Badge text={announcement.role_name}/>
           </View>
         </View>
 
         <Text style={GlobalStyles.text}>{announcement.description}</Text>
-        <Text style={GlobalStyles.text}>- {announcement.author}</Text>
+        <Text style={GlobalStyles.semiBoldSmallAltText}>- {announcement.author}</Text>
 
         {/* Acknowledge Button */}
         {isAcknowledged ? (
@@ -166,7 +165,6 @@ const Announcements = () => {
             keyExtractor={(item) => item.announcement_id.toString()}
             onRefresh={fetchAnnouncements}
             refreshing={loading}
-            itemContainerStyle={styles.itemContainer}
           />
         </View>
 
@@ -182,11 +180,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
-  itemContainer: {
-    backgroundColor: Colors.AnnouncemtnBG,
-    padding: 16,
-    borderRadius: 18,
-  },
   scrollContainer: {
     maxHeight: 375,
     width: '100%',
@@ -198,6 +191,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingLeft: 5,
     marginBottom: 5,
+  },
+  badgeWrapper: {
+    flexShrink: 0,
+    alignItems: "flex-end",
   },
   roleContainer: {
     alignItems: 'flex-start',

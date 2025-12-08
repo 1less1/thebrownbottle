@@ -27,7 +27,7 @@ export default function Profile() {
     <DefaultView backgroundColor={Colors.white}>
 
 
-      <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
+      <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
         {/* Profile Header */}
         <View style={GlobalStyles.pageHeaderContainer}>

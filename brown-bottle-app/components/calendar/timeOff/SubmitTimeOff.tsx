@@ -59,9 +59,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       await insertTimeOffRequest(payload);
       alert('Time Off Request submitted successfully!');
       resetForm();
-      if (onSubmitted) {
-        onSubmitted(); // ensures refetch finishes before closing
-      }
+      onSubmitted?.();
       onClose();
     } catch (error) {
       console.error('Error submitting time off request:', error);
@@ -81,17 +79,17 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       {/* Date Pickers */}
 
       {/* Start Date */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 15 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
         <ModularButton
           text="Choose Start Date"
-          textStyle={{ color: 'black' }}
-          style={[GlobalStyles.modernButton, styles.calendarButton]}
+          style={{ flexGrow: 1, flexShrink: 1, minWidth: 200, flexBasis: '48%', backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
+          textStyle={{ color: Colors.purple }}
           onPress={() => setStartDateVisible(true)}
         />
 
         <View style={styles.dateContainer}>
           <Text style={GlobalStyles.text}>Date: </Text>
-          <Text style={[GlobalStyles.text, { color: Colors.blue }]}>
+          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple}]}>
             {startDate ? formatDateWithYear(startDate) : ""}
           </Text>
         </View>
@@ -112,17 +110,17 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       </ModularModal>
 
       {/* End Date */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginBottom: 15 }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
         <ModularButton
           text="Choose End Date"
-          textStyle={{ color: 'black' }}
-          style={[GlobalStyles.modernButton, styles.calendarButton]}
+          style={{ flexGrow: 1, flexShrink: 1, flexBasis: '48%', minWidth: 200, backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
+          textStyle={{ color: Colors.purple }}
           onPress={() => setEndDateVisible(true)}
         />
 
         <View style={styles.dateContainer}>
           <Text style={GlobalStyles.text}>Date: </Text>
-          <Text style={[GlobalStyles.text, { color: Colors.blue }]}>
+          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
             {endDate ? formatDateWithYear(endDate) : ""}
           </Text>
         </View>
@@ -186,8 +184,11 @@ const styles = StyleSheet.create({
   },
   dateContainer: {
     flexShrink: 1,
+    flexGrow: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
+    minWidth: 200,
+    flexBasis: '48%',
     borderRadius: 5,
     backgroundColor: 'white',
     borderColor: Colors.borderColor,

@@ -103,12 +103,12 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
           title="No Upcoming Shifts"
           value="You're all caught up!"
           iconName="calendar-clear-outline"
-          backgroundColor="#f1f1f195"
-          iconColor="#9a9a9aff"
+          backgroundColor={Colors.bgGray}
+          iconColor={Colors.darkGray}
           borderColor={Colors.borderColor}
-          iconContainerStyle={{ backgroundColor: "#dededeff" }}
-          titleStyle={{ color: "#525456ff", fontSize: 18 }}
-          valueStyle={{ color: "#8b8d91ff", fontSize: 16, fontWeight: "500" }}
+          iconContainerStyle={{ backgroundColor: Colors.bgIconGray }}
+          titleStyle={GlobalStyles.semiBoldLargeText}
+          valueStyle={GlobalStyles.altText}
         />
       </View>
     );
