@@ -66,30 +66,33 @@ const Announcements = () => {
   }, [selectedRoleId]);
 
   // Trigger fetch anytime the filter changes
+  // Fetch announcements when role filter changes
   useEffect(() => {
-    async function load() {
-      await fetchAnnouncements();
-
-      // Fetch acknowledged list only after announcements load
-      const ack = await getAcknowledgedAnnouncements(user!.employee_id);
-
-      // Extract only the announcement_id values to drive UI
-      setAcknowledged(ack.map(a => a.announcement_id));
-    }
-
-    load();
+    fetchAnnouncements();
   }, [fetchAnnouncements]);
+
+  // Fetch acknowledged announcements ONLY once user is present
+  useEffect(() => {
+    const loadAcknowledged = async () => {
+      if (!user) return;
+      const ack = await getAcknowledgedAnnouncements(user.employee_id);
+      setAcknowledged(ack.map(a => a.announcement_id));
+    };
+    loadAcknowledged();
+  }, [user]);
+
 
   /**
    * Handle "Acknowledge" click — backend + optimistic UI
    */
   const handleAcknowledge = async (announcementId: number) => {
+    if (!user) return;
     // This already updates local state correctly
     setAcknowledged((prev) => [...prev, announcementId]);
 
     try {
       console.log("Sending ack:", announcementId, user?.employee_id);
-      await acknowledgeAnnouncement(announcementId, user!.employee_id);
+      await acknowledgeAnnouncement(announcementId, user.employee_id);
     } catch (err) {
       console.log("Error acknowledging announcement:", err);
     }
@@ -108,7 +111,7 @@ const Announcements = () => {
           <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
 
           <View style={styles.badgeWrapper}>
-            <Badge text={announcement.role_name}/>
+            <Badge text={announcement.role_name} />
           </View>
         </View>
 
@@ -190,6 +193,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingLeft: 5,
     marginBottom: 5,
+    marginRight: 10
+
   },
   badgeWrapper: {
     flexShrink: 0,
