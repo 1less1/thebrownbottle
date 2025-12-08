@@ -80,7 +80,7 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
 
         try {
             await insertShiftCoverRequest(payload);
-            alert("Shift Cover Request submitted successfully!");
+            alert("Shift cover request submitted successfully!");
             onSubmitted?.();
             onClose();
         } catch (error: any) {

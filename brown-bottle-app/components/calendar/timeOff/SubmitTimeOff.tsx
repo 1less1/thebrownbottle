@@ -57,7 +57,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       };
 
       await insertTimeOffRequest(payload);
-      alert('Time Off Request submitted successfully!');
+      alert('Time off request submitted successfully!');
       resetForm();
       onSubmitted?.();
       onClose();
