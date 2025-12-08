@@ -178,7 +178,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 10,
   },
   scrollContainer: {
     maxHeight: 375,

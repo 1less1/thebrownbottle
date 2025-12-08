@@ -10,7 +10,7 @@ import DefaultScrollView from '@/components/DefaultScrollView';
 import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
-import QuickStats from '@/components/home/components/QuickStats';
+import QuickStats from '@/components/home/QuickStats';
 import ProfileAvatar from '@/components/ProfileAvatar';
 
 

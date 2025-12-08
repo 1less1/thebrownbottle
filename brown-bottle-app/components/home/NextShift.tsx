@@ -129,10 +129,10 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
           title={dateDisplay}
           value={`${nextOrCurrentShift.start_time} - Active Now`}
           iconName="time"
-          backgroundColor="#fff8e1"
-          iconColor="#ffa726"
-          borderColor="#f9bb10"
-          iconContainerStyle={{ backgroundColor: "#ffecc2" }}
+          backgroundColor={Colors.bgYellow}
+          iconColor={Colors.pendingYellow}
+          borderColor={Colors.borderYellow}
+          iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
           valueStyle={{ fontWeight: "600", fontSize: 17 }}
           titleStyle={{ fontSize: 15 }}
           footerText={`${showSection ? nextOrCurrentShift.section_name : ''} ${showRole && nextOrCurrentShift.primary_role_name
@@ -161,10 +161,10 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
         title={dateDisplay} // Top row
         value={`${timeDisplay}`} // Middle row
         iconName="calendar-outline"
-        backgroundColor="#f1f1f195"
-        iconColor="#9a9a9aff"
+        backgroundColor={Colors.bgGray}
+        iconColor={Colors.darkGray}
         borderColor={Colors.borderColor}
-        iconContainerStyle={{ backgroundColor: "#dededeff" }}
+        iconContainerStyle={{ backgroundColor: Colors.bgIconGray }}
         valueStyle={{ fontSize: 18 }}
         titleStyle={{ fontSize: 15 }}
         footerText={`${showSection ? nextOrCurrentShift.section_name : ''} ${showRole && nextOrCurrentShift.primary_role_name
@@ -178,19 +178,6 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-  },
-  shiftCard: {
-    width: '100%',
-    backgroundColor: Colors.lightTan,
-    alignSelf: 'center',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    margin: 6,
-  },
 });
 
 export default NextShift;
