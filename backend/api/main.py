@@ -234,6 +234,25 @@ def update_announcement(announcement_id):
     with request_lock:
         return announcement.update_announcement(get_db_connection(), request, announcement_id)
 
+
+@app.route('/announcement/acknowledge', methods=['POST'])
+def acknowledge_announcement():
+    """
+    POST announcement acknowledgement by announcement id and employee id
+    """
+    return announcement.acknowledge_announcement(get_db_connection(), request)
+
+
+@app.route('/announcement/acknowledged', methods=['GET'])
+def get_acknowledged_announcements_route():
+    """
+    GET acknowledgment records
+    Optional params:
+        ?employee_id=#
+        ?announcement_id=#
+    """
+    return announcement.get_acknowledged_announcements(get_db_connection(), request)
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -321,6 +340,15 @@ def update_time_off_request(request_id):
     """
     with request_lock:
         return time_off_request.update_tor(get_db_connection(), request, request_id)
+    
+
+@app.route('/tor/delete/<int:request_id>', methods=['DELETE'])
+def delete_time_off_request(request_id):
+    """
+    DELETE time off requests by id
+    """
+    with request_lock:
+        return time_off_request.delete_tor(get_db_connection(), request_id)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -364,11 +392,10 @@ def delete_shift_cover_request(cover_request_id):
         return shift_cover_request.delete_scr(get_db_connection(), cover_request_id)
 
 
-
 @app.route("/scr/approve/<int:cover_request_id>", methods=["PATCH"])
 def approve_shift_request(cover_request_id):
     """
-    UPDATE ("Approve") shift cover requests by id and UPDATE the targeted Shift Record
+    UPDATE ("Approve") shift cover requests by id and UPDATE the targeted shift Record
     """
     with request_lock:
         return shift_cover_request.approve_scr(get_db_connection(), cover_request_id)

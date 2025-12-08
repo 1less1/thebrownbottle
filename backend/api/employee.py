@@ -7,6 +7,7 @@ from typing import List
 # GET Employees -----------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
+
 def get_employees(db, request):
     """
     Fetches employee records based on optional URL query parameters.
@@ -24,12 +25,13 @@ def get_employees(db, request):
             'phone_number': str,
             'wage': float,
             'admin': int,
-            'role_id': List[int], # Used for filtering all 3 role designations below 
+            # Used for filtering all 3 role designations below
+            'role_id': List[int],
             'primary_role': int,
             'secondary_role': int,
             'tertiary_role': int,
             'full_name': str,
-            'is_active': int
+            'is_active': int,
         }
 
         # Validate and parse parameters
@@ -72,7 +74,8 @@ def get_employees(db, request):
                 sr.role_name AS secondary_role_name,
                 e.tertiary_role,
                 tr.role_name AS tertiary_role_name,
-                e.is_active
+                e.is_active,
+                e.timestamp AS joined_date
             FROM employee e
             LEFT JOIN role pr ON e.primary_role = pr.role_id
             LEFT JOIN role sr ON e.secondary_role = sr.role_id
@@ -82,7 +85,7 @@ def get_employees(db, request):
 
         query_params = []
 
-        # Build Dynamic Query 
+        # Build Dynamic Query
         if employee_id is not None:
             query += " AND employee_id = %s"
             query_params.append(employee_id)
@@ -90,7 +93,7 @@ def get_employees(db, request):
         if first_name is not None:
             query += " AND first_name = %s"
             query_params.append(first_name)
-        
+
         if last_name is not None:
             query += " AND last_name = %s"
             query_params.append(last_name)
@@ -114,7 +117,7 @@ def get_employees(db, request):
         if admin is not None:
             query += " AND admin = %s"
             query_params.append(admin)
-        
+
         if is_active is not None:
             query += " AND is_active = %s"
             query_params.append(is_active)
@@ -157,7 +160,6 @@ def get_employees(db, request):
         else:
             query += " ORDER BY e.last_name ASC;"
 
-
         # Execute Query
         cursor.execute(query, tuple(query_params))
         result = cursor.fetchall()
@@ -194,7 +196,7 @@ def insert_employee(db, request):
     try:
         # Define Required Fields
         required_fields = [
-            'first_name', 'last_name', 'email', 'phone_number', 
+            'first_name', 'last_name', 'email', 'phone_number',
             'wage', 'admin', 'primary_role'
         ]
 
@@ -203,30 +205,31 @@ def insert_employee(db, request):
             'first_name': str,
             'last_name': str,
             'email': str,
-            'phone_number': str, # 'XXX-XXX-XXXX'
+            'phone_number': str,  # 'XXX-XXX-XXXX'
             'wage': float,
             'admin': int,
-            'primary_role': int, # role_id
-            'secondary_role': int, # optional
-            'tertiary_role': int # optional
+            'primary_role': int,  # role_id
+            'secondary_role': int,  # optional
+            'tertiary_role': int  # optional
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
 
         # Extract Parameters
-        first_name      = fields['first_name']
-        last_name       = fields['last_name']
-        email           = fields['email']
-        phone_number    = fields['phone_number']
-        wage            = fields['wage']
-        admin           = fields['admin']
-        primary_role    = fields['primary_role']
-        secondary_role  = fields.get('secondary_role')  # optional
-        tertiary_role   = fields.get('tertiary_role')   # optional
+        first_name = fields['first_name']
+        last_name = fields['last_name']
+        email = fields['email']
+        phone_number = fields['phone_number']
+        wage = fields['wage']
+        admin = fields['admin']
+        primary_role = fields['primary_role']
+        secondary_role = fields.get('secondary_role')  # optional
+        tertiary_role = fields.get('tertiary_role')   # optional
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -245,10 +248,10 @@ def insert_employee(db, request):
                 tertiary_role
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
         """, (
-            first_name, last_name, email, phone_number, 
+            first_name, last_name, email, phone_number,
             wage, admin, primary_role, secondary_role, tertiary_role
         ))
-        
+
         inserted_id = cursor.lastrowid
 
         conn.commit()
@@ -262,13 +265,13 @@ def insert_employee(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
-    
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -308,7 +311,8 @@ def update_employee(db, request, employee_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(employee_id)  # WHERE parameter at the end -> WHERE employee_id = %s
+        # WHERE parameter at the end -> WHERE employee_id = %s
+        values.append(employee_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -318,7 +322,7 @@ def update_employee(db, request, employee_id):
             SET {set_clause}
             WHERE employee_id = %s;
         """
-        
+
         cursor.execute(query, tuple(values))
         conn.commit()
         rowcount = cursor.rowcount

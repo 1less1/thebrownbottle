@@ -36,7 +36,7 @@ const Staff = () => {
         <StaffSearch parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
-      <View style={[styles.moduleContainer, { margin: 16, width: '85%' }]}>
+      <View style={[styles.moduleContainer, { marginVertical: 16, width: '85%' }]}>
         
         <Card style={styles.moduleCard}>
           <AddEmp onInsert={handleRefresh}/>

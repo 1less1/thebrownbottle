@@ -1,8 +1,10 @@
 import React from 'react';
-import { TouchableOpacity } from 'react-native';
+import { View  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useSession } from '@/utils/SessionContext'; 
+import { useSession } from '@/utils/SessionContext';
+import AnimatedTouchableWrapper from '../modular/AnimatedTouchable';
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 
 
@@ -17,9 +19,11 @@ const HandleLogout = () => {
   };
 
   return (
-    <TouchableOpacity onPress={handleLogout}> 
-      <Ionicons name="log-out" size={30} color="gray" style={{ marginBottom: 8 }} />
-    </TouchableOpacity>
+    <AnimatedTouchableWrapper onPress={handleLogout}>
+        <View style={[GlobalStyles.tag, ]}>
+        <Ionicons name="log-out-outline" size={30} color="white" style={{ marginTop: 5, marginBottom: 5, marginLeft: 3}} />
+        </View>
+    </AnimatedTouchableWrapper>
   );
 };
 

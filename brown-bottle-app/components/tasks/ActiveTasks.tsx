@@ -173,8 +173,10 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
                 refreshing={loading}
                 onRefresh={() => { }}
                 listHeight="auto"
+                itemContainerStyle={styles.itemContainer}
+                onItemPress={(task) => handlePress(task)}
                 renderItem={(task) => (
-                    <TouchableOpacity onPress={() => handlePress(task)}>
+                    <>
                         <View>
                             <View style={styles.rowBetween}>
                                 <Text style={{ fontWeight: "bold" }}>{task.title}</Text>
@@ -192,7 +194,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
                             </View>
                             <Text style={styles.timestamp}>Assigned On {formatDateTime(task.timestamp)}</Text>
                         </View>
-                    </TouchableOpacity>
+                    </>
 
                 )}
             />
@@ -213,8 +215,10 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
                             keyExtractor={(task) => String(task.task_id)}
                             refreshing={loading}
                             onRefresh={() => { }}
+                            itemContainerStyle={styles.itemContainer}
+                            onItemPress={(task) => handlePress(task)}
                             renderItem={(task) => (
-                                <TouchableOpacity onPress={() => handlePress(task)}>
+                                <>
                                     <View>
                                         <View style={styles.rowBetween}>
                                             <Text style={{ fontWeight: "bold", marginBottom: 10 }}>{task.title}</Text>
@@ -232,24 +236,22 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
                                         </View>
                                         <Text style={styles.timestamp}>Assigned On {formatDateTime(task.timestamp)}</Text>
                                     </View>
-                                </TouchableOpacity>
+                                </>
 
                             )}
                         />
-
-                        <TaskDetailsModal
-                            visible={modalVisible}
-                            task={selectedTask}
-                            onClose={() => setModalVisible(false)}
-                            onComplete={handleComplete}
-                            actionLabel="Complete Task"
-                        />
-
 
                     </>
                 )}
             </View>
 
+            <TaskDetailsModal
+                visible={modalVisible}
+                task={selectedTask}
+                onClose={() => setModalVisible(false)}
+                onComplete={handleComplete}
+                actionLabel="Complete Task"
+            />
         </View>
     );
 };
@@ -257,33 +259,18 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, refreshKey, onRefresh }
 export default ActiveTasks;
 
 const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        backgroundColor: Colors.white,
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
     rowBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
     },
-    scrollContainer: {
-        height: 380,
-        width: '100%',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-    },
-    buttonRowContainer: {
-        marginTop: 10,
-        marginBottom: 5,
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        gap: 10,
-    },
-    button: {
-        width: '100%'
+    itemContainer: {
+        backgroundColor: Colors.TaskBG,
+        borderRadius: 16,
+        padding: 18,
+        borderColor: Colors.borderColor,
+        borderWidth: 1,
+        marginVertical: 5,
     },
     recurring: {
         backgroundColor: Colors.bgGreen,

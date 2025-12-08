@@ -7,17 +7,31 @@ export interface TimeOffRequest {
   start_date: string;
   end_date: string;
   timestamp: string;
-  status: 'Pending' | 'Accepted' | 'Denied';
+  status: Status;
 }
 
-export interface TimeOffProps {
-  refreshKey?: number;
+export type Status = "Pending" | "Accepted" | "Denied";
+
+export interface GetTimeOffRequest {
+  request_id: number;
+  employee_id: number;
+  reason: string;
+  start_date: string;
+  end_date: string;
+  status: Status[];
+  date_sort: "Newest" | "Oldest";
+  timestamp_sort: "Newest" | "Oldest";
 }
 
-export interface TimeOffModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onSubmitted?: () => void;
+export interface InsertTimeOffRequest {
+  employee_id: number;
+  reason: string;
+  start_date: string;
+  end_date: string;
+}
+
+export interface UpdateTimeOffRequest {
+  status: Status;
 }
 
 export interface ButtonProps {

@@ -70,7 +70,7 @@ const ModularCheckbox = <T extends string | number>({
 
             {/* Dropdown Button */}
             <TouchableOpacity
-                style={[GlobalStyles.dropdownButton, buttonStyle]}
+                style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
                 onPress={() => {
                     setTempSelected(selectedData);
                     setVisible(true);
@@ -129,6 +129,7 @@ const ModularCheckbox = <T extends string | number>({
                                         <FlatList
                                             data={data}
                                             keyExtractor={(item) => item.value?.toString() ?? item.key}
+                                            style={{ flexGrow: 0 }}
                                             renderItem={({ item }) => {
                                                 const checked = tempSelected.some((o) => o.value === item.value);
                                                 return (
@@ -141,6 +142,7 @@ const ModularCheckbox = <T extends string | number>({
                                                                 name={checked ? "checkbox-outline" : "square-outline"}
                                                                 size={20}
                                                                 color={checked ? Colors.blue : Colors.gray}
+                                                                style={{ marginRight: 4 }}
                                                             />
                                                             {/* Display List Items as "Keys" */}
                                                             <Text style={[styles.optionText, checked && styles.selectedOption]}>
@@ -171,7 +173,7 @@ const ModularCheckbox = <T extends string | number>({
                                                 text=""
                                                 textStyle={{ marginRight: 4 }}
                                             >
-                                                <Ionicons name="reload-outline" size={20} color={Colors.black} />
+                                                <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
                                             </ModularButton>
                                         </View>
                                     </>

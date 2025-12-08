@@ -8,13 +8,14 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
+import DefaultScrollView from '@/components/DefaultScrollView';
+
 import Dashboard from "@/components/admin/Dashboard/Dashboard";
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 
-// Get Session Data
 import { useSession } from '@/utils/SessionContext';
 
 const Admin = () => {
@@ -27,6 +28,7 @@ const Admin = () => {
   );
 
   const { user } = useSession();
+
   const [activeTab, setActiveTab] = useState(0);
   const TAB_STORAGE_KEY = 'adminActiveTab';
 
@@ -39,15 +41,12 @@ const Admin = () => {
   // Define available tabs and corresponding components
   const tabs = [
     {
-      key: 'dashboard', title: 'Dashboard', component: user ? <Dashboard user={user} /> :
-        <LoadingCircle
-          size="large"
-          style={{ marginTop: 40, alignSelf: 'center' }}
-        />
+      key: 'dashboard', title: 'Dashboard', component: <Dashboard />
+
     },
 
-    { 
-      key: 'schedule', title: 'Schedule', component: <Schedule /> 
+    {
+      key: 'schedule', title: 'Schedule', component: <Schedule />
     },
 
     {
@@ -77,10 +76,10 @@ const Admin = () => {
 
     <DefaultView backgroundColor={Colors.white}>
 
-      <View style={{ flex: 1, backgroundColor: Colors.bgGray }}>
+      <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
         <View style={{ backgroundColor: Colors.white }}>
-          
+
           <Text style={GlobalStyles.pageHeader}>Admin</Text>
 
           {/* Tab Bar */}
@@ -111,6 +110,8 @@ const Admin = () => {
 
   );
 };
+
+export default Admin;
 
 const styles = StyleSheet.create({
   header: {
@@ -144,5 +145,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
-export default Admin;

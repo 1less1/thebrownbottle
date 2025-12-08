@@ -6,6 +6,7 @@ import request_helper
 # GET Announcements -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
+
 def get_announcements(db, request):
     """
     Fetches announcement records based on optional URL query parameters.
@@ -55,7 +56,7 @@ def get_announcements(db, request):
 
         query_params = []
 
-        # Build Dynamic Query 
+        # Build Dynamic Query
         if announcement_id is not None:
             query += " AND a.announcement_id = %s"
             query_params.append(announcement_id)
@@ -125,7 +126,8 @@ def insert_announcement(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -145,7 +147,7 @@ def insert_announcement(db, request):
             (author_id, title, description, role_id)
             VALUES (%s, %s, %s, %s);
         """, (author_id, title, description, role_id))
-        
+
         inserted_id = cursor.lastrowid
 
         conn.commit()
@@ -159,7 +161,7 @@ def insert_announcement(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -199,7 +201,8 @@ def update_announcement(db, request, announcement_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(announcement_id)  # WHERE parameter at the end -> WHERE announcement_id = %s
+        # WHERE parameter at the end -> WHERE announcement_id = %s
+        values.append(announcement_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -209,7 +212,7 @@ def update_announcement(db, request, announcement_id):
             SET {set_clause}
             WHERE announcement_id = %s;
         """
-        
+
         cursor.execute(query, tuple(values))
         conn.commit()
         rowcount = cursor.rowcount
@@ -236,6 +239,122 @@ def update_announcement(db, request, announcement_id):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-    
+# POST Acknowledge Announcement ------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
 
-    
+
+def acknowledge_announcement(db, request):
+    """
+    Records that an employee has acknowledged an announcement.
+    """
+    conn = None
+    cursor = None
+    try:
+        fields, error = request_helper.verify_body(
+            request,
+            {"announcement_id": int, "employee_id": int},
+            ["announcement_id", "employee_id"]
+        )
+
+        if error:
+            return jsonify(error), 400
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            INSERT IGNORE INTO announcement_acknowledgment (announcement_id, employee_id)
+            VALUES (%s, %s);
+        """, (fields["announcement_id"], fields["employee_id"]))
+
+        conn.commit()
+
+        return jsonify({"status": "success"}), 200
+
+    except Exception as e:
+        print("Ack Error:", e)
+        return jsonify({"status": "error"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# # GET Acknowledge Announcement --------------------------------------------------------------------------
+# # -------------------------------------------------------------------------------------------------------
+
+
+def get_acknowledged_announcements(db, request):
+    """
+    Fetches acknowledgment records from announcement_acknowledgment.
+
+    Behavior:
+      - No params: returns ALL acknowledgments
+      - employee_id only: all announcements acknowledged by that employee
+      - announcement_id only: all employees who acknowledged that announcement
+      - both: that specific (announcement_id, employee_id) pair
+    """
+    conn = None
+    cursor = None
+    try:
+        # Expected Parameter Types
+        param_types = {
+            'announcement_id': int,
+            'employee_id': int,
+        }
+
+        # Validate and parse parameters
+        params, error = request_helper.verify_params(request, param_types)
+        if error:
+            return jsonify(error), 400
+
+        announcement_id = params.get('announcement_id')
+        employee_id = params.get('employee_id')
+
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # Base query
+        query = """
+            SELECT 
+                aa.announcement_id,
+                aa.employee_id,
+                aa.acknowledged_at,
+                CONCAT(e.first_name, ' ', e.last_name) AS employee_name
+            FROM announcement_acknowledgment aa
+            JOIN employee e ON aa.employee_id = e.employee_id
+            WHERE 1 = 1
+        """
+        query_params = []
+
+        # Optional filters
+        if announcement_id is not None:
+            query += " AND aa.announcement_id = %s"
+            query_params.append(announcement_id)
+
+        if employee_id is not None:
+            query += " AND aa.employee_id = %s"
+            query_params.append(employee_id)
+
+        # Order by newest acknowledgements per announcement
+        # query += " ORDER BY aa.announcement_id DESC, aa.acknowledged_at DESC;"
+
+        cursor.execute(query, tuple(query_params))
+        result = cursor.fetchall()
+
+        return jsonify(result), 200
+
+    except mysql.connector.Error as e:
+        print(f"Database error (acknowledgments): {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+    except Exception as e:
+        print(f"Error occurred (acknowledgments): {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

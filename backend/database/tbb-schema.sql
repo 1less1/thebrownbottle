@@ -181,6 +181,17 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`announcement_acknowledgment`
+-- -----------------------------------------------------
+
+CREATE TABLE announcement_acknowledgment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    announcement_id INT NOT NULL,
+    employee_id  INT NOT NULL,
+    acknowledged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (announcement_id, employee_id )
+);
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`shift`

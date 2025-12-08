@@ -26,23 +26,31 @@ const ModularButton: React.FC<ModularButtonProps> = ({
     <TouchableOpacity
       style={[
         styles.button,
+        !!children && styles.iconButton,
         !enabled && styles.disabledButton,
         style,
       ]}
       onPress={onPress}
       onLongPress={onLongPress}
-      delayLongPress={800} // 800ms delay
+      delayLongPress={800}
       disabled={!enabled}
     >
+
       <View style={styles.content}>
-        {text && <Text style={[styles.buttonText, textStyle]}>{text}</Text>}
-        {children}
+        {children ? (
+          <>
+            <Text style={[styles.spacerText, textStyle]}>{""}</Text>
+            {children}
+            <Text style={[styles.spacerText, textStyle]}>{""}</Text>
+          </>
+        ) : (
+          <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        )}
       </View>
     </TouchableOpacity>
-
   );
-
 };
+
 
 const styles = StyleSheet.create({
   button: {
@@ -53,10 +61,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  iconButton: {
+    paddingHorizontal: 15,   // ✅ less padding for icon-only buttons
+  },
   content: {
     flexDirection: 'row',   // ✅ icon + text side by side
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  spacerText: {
+    opacity: 0,          // invisible
+    minWidth: 0,         // no horizontal space
+    fontSize: 14,        // match your buttonText fontSize
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
   buttonText: {
     color: 'black',
@@ -66,7 +85,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   disabledButton: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
 });
 

@@ -23,6 +23,8 @@ export interface ShiftCoverRequest {
   timestamp: string;
 }
 
+export type Status = "Pending" | "Awaiting Approval" | "Accepted" | "Denied";
+
 export interface GetShiftCoverRequest {
   cover_request_id: number;
   shift_id: number;
@@ -30,7 +32,9 @@ export interface GetShiftCoverRequest {
   requested_employee_id: number;
   employee_id: number; // Filter all requests either requested by or accepted by the provided employee_id parameter
   requester_role_id: number; // Filters requests to only show for current user's role
-  status: "Pending" | "Awaiting Approval" | "Accepted" | "Denied";
+  status: Status[]; // <-- list of allowed texts
+  date_sort: "Newest" | "Oldest";
+  timestamp_sort: "Newest" | "Oldest";
 }
 
 export interface InsertShiftCoverRequest {
@@ -40,7 +44,7 @@ export interface InsertShiftCoverRequest {
 
 export interface UpdateShiftCoverRequest {
   accepted_employee_id: number | null;
-  shift_id?: number; // Should neber really have to update this!!!
+  shift_id?: number; // Should never really have to update this!!!
   status: "Pending" | "Awaiting Approval" | "Accepted" | "Denied";
 }
 
@@ -50,6 +54,7 @@ export interface ShiftCoverModalProps {
   onSubmitted?: () => void;
   requests: ShiftCoverRequest[];
 }
+
 export interface ShiftDetailsModalProps {
   visible: boolean;
   onClose: () => void;

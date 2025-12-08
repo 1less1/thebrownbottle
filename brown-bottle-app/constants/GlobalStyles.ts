@@ -106,7 +106,7 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 18,
         fontStyle: 'normal',
     },
-    smallSemiBoldAltText: {
+    semiBoldSmallAltText: {
         color: 'gray',
         fontSize: 12,
         fontStyle: 'normal',
@@ -133,6 +133,12 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 14,
         fontStyle: 'normal',
         fontWeight: 'bold',
+    },
+    semiBoldMediumAltText: {
+        color: 'gray',
+        fontSize: 16,
+        fontStyle: 'normal',
+        fontWeight: '600',
     },
     mediumAltText: {
         color: 'gray',
@@ -165,6 +171,14 @@ export const GlobalStyles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderBottomWidth: 1,
         borderBottomColor: Colors.altBorderColor,
+    },
+    loadingContainer: {
+        width: '100%',
+        backgroundColor: Colors.white,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
     },
     searchInput: {
         borderWidth: 1,
@@ -214,10 +228,7 @@ export const GlobalStyles = StyleSheet.create({
         borderRadius: 5,
     },
     deleteButton: {
-        // Old Dom Version --> backgroundColor: Colors.bgRed,
-        backgroundColor: Colors.deleteRed,
-        borderColor: Colors.deleteBorderColor,
-        borderWidth: 1,
+        backgroundColor: Colors.bgRed,
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
@@ -228,11 +239,20 @@ export const GlobalStyles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
     },
+    modernButton: {
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderColor: Colors.altBorderColor,
+        borderRadius: 5,
+        borderWidth: 1,
+    },
 
     // Badge Styles
     acceptedBadge: {
         backgroundColor: Colors.bgGreen,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     acceptedText: {
@@ -243,7 +263,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     deniedBadge: {
         backgroundColor: Colors.bgRed,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     deniedText: {
@@ -254,7 +275,8 @@ export const GlobalStyles = StyleSheet.create({
     },
     pendingBadge: {
         backgroundColor: Colors.bgYellow,
-        padding: 6,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
         borderRadius: 4,
     },
     pendingText: {
@@ -263,12 +285,42 @@ export const GlobalStyles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase'
     },
+    awaitingApprovalBadge: {
+        backgroundColor: Colors.badgeGray,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+    },
+    awaitingApprovalText: {
+        color: Colors.darkGray,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
+    standardBadge: {
+        backgroundColor: Colors.badgeGray,
+        paddingVertical: 6,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+    },
+    standardBadgeText: {
+        color: Colors.darkGray,
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase'
+    },
     // Ishimwe edit below!!!
-    awaitingApproval: { 
+    awaitingApproval: {
         color: "#8b8b8bff",
         backgroundColor: "#e3e5e6ff",
         fontSize: 10,
         padding: 4,
         borderRadius: 4,
-    }
+    },
+    tag: {
+        backgroundColor: "rgba(255,255,255,0.22)",
+        borderRadius: 10,
+        paddingVertical: 3,
+        paddingHorizontal: 10,
+    },
 });

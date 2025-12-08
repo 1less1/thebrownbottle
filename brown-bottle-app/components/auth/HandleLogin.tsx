@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-import ModularButton from '../modular/ModularButton';
+
+import LoadingCircle from '@/components/modular/LoadingCircle';
+import ModularButton from '@/components/modular/ModularButton';
+
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';
 import { getEmployee } from '@/routes/employee';
-import { GlobalStyles } from '@/constants/GlobalStyles';
 
 const HandleLogin = () => {
   const router = useRouter();
@@ -47,6 +51,7 @@ const HandleLogin = () => {
         primary_role: Number(currentUser.primary_role),
         secondary_role: Number(currentUser.secondary_role),
         tertiary_role: Number(currentUser.tertiary_role),
+        is_active: Number(currentUser.is_active)
       });
 
       router.push({ pathname: '/(tabs)/home' });
@@ -75,7 +80,7 @@ const HandleLogin = () => {
       )}
 
       {loading ? (
-        <ActivityIndicator size="large" color={Colors.darkTan} style={{ marginTop: 10 }} />
+        <LoadingCircle size={"large"}/>
       ) : (
         <ModularButton
           text="Login"

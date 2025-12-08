@@ -73,6 +73,7 @@ const CalendarWidget: React.FC<{
 
 
     /** ---- FETCH SHIFTS (ONLY IF ALLOWED) ---- */
+    // Fetch Shifts on Initialization and State Update
     useEffect(() => {
       if (!showShifts || !user?.employee_id) {
         console.log("Exiting early: no user or shifts not enabled");
@@ -103,7 +104,7 @@ const CalendarWidget: React.FC<{
         shifts.forEach((shift) => {
           map[shift.date] = {
             selected: true,
-            selectedColor: Colors.darkBrown,
+            selectedColor: Colors.borderBlue,
           };
         });
       }
@@ -159,16 +160,16 @@ const CalendarWidget: React.FC<{
           theme={{
             backgroundColor: Colors.white,
             calendarBackground: Colors.white,
-            textSectionTitleColor: Colors.darkBrown,
-            selectedDayBackgroundColor: Colors.darkBrown,
+            textSectionTitleColor: "black",
+            selectedDayBackgroundColor: Colors.blue,
             selectedDayTextColor: Colors.white,
-            todayTextColor: Colors.lightBrown,
+            todayTextColor: Colors.blue,
             dayTextColor: "black",
-            arrowColor: Colors.darkBrown,
-            monthTextColor: Colors.darkBrown,
+            arrowColor: Colors.blue,
+            monthTextColor: Colors.blue,
             textDayFontWeight: "400",
             textMonthFontWeight: "bold",
-            textDayHeaderFontWeight: "400",
+            textDayHeaderFontWeight: "500",
             textDayFontSize: 12 * scale,
             textMonthFontSize: 16 * scale,
             textDayHeaderFontSize: 12 * scale,
@@ -182,6 +183,7 @@ const CalendarWidget: React.FC<{
             date={selectedShift.date}
             startTime={selectedShift.start_time}
             role={selectedShift.primary_role_name}
+            section={selectedShift.section_name}
             onClose={() => setSelectedShift(null)}
           />
         )}

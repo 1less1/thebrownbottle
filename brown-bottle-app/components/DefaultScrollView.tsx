@@ -36,7 +36,7 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, 
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.lightBrown}
+            tintColor={Colors.gray}
             progressViewOffset={50}
           />
         ) : undefined

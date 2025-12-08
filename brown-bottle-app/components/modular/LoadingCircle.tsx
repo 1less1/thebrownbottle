@@ -1,4 +1,4 @@
-import { ActivityIndicator, ActivityIndicatorProps, StyleProp, ViewStyle } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Text, ActivityIndicatorProps, StyleProp, ViewStyle } from 'react-native';
 import React from 'react';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -11,12 +11,30 @@ interface LoadingCircleProps {
 
 const LoadingCircle: React.FC<LoadingCircleProps> = ({
   size = 'large',
-  color = Colors.darkTan, // default fallback color
-  style,
+  color = Colors.gray, // default fallback color
+  style = styles.statusContainer,
 }) => {
   return (
-    <ActivityIndicator size={size} color={color} style={style} />
+
+    <View style={style}>
+      <ActivityIndicator size={size} color={color} />
+      <Text style={styles.statusText}>Loading...</Text>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  statusContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 20,
+  },
+  statusText: {
+    textAlign: 'center',
+    color: Colors.gray,
+    fontSize: 12,
+    marginTop: 5,
+  },
+});
 
 export default LoadingCircle;

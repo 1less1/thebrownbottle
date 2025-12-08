@@ -3,8 +3,9 @@ import mysql.connector
 import os
 import request_helper
 from datetime import datetime
+from typing import List
 
-# GET Shift_cover_request -------------------------------------------------------------------------------
+# GET Shift Cover Request -------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -24,7 +25,9 @@ def get_scr(db, request):
             'requested_employee_id': int,
             'employee_id': int,  # Filter all requests either requested by or accepted by the provided employee_id parameter
             'requester_role_id': int,
-            'status': str,
+            'status': List[str],
+            'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
+            'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
         }
 
         # Validate and parse parameters
@@ -39,7 +42,9 @@ def get_scr(db, request):
         requested_employee_id = params.get('requested_employee_id')
         employee_id = params.get('employee_id')
         requester_role_id = params.get('requester_role_id')
-        status = params.get('status')
+        statuses = params.get('status', []) # List of statuses
+        date_sort = params.get ("date_sort")
+        timestamp_sort = params.get ("timestamp_sort")
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -80,7 +85,14 @@ def get_scr(db, request):
 
         query_params = []
 
+        # -----------------------------
         # Build Dynamic Query
+        # -----------------------------
+        if statuses and len(statuses) > 0:
+            placeholders = ','.join(['%s'] * len(statuses))
+            query += f" AND scr.status IN ({placeholders})"
+            query_params.extend(statuses)
+
         if cover_request_id is not None:
             query += " AND scr.cover_request_id = %s"
             query_params.append(cover_request_id)
@@ -110,12 +122,28 @@ def get_scr(db, request):
             query += " AND r.role_id = %s"
             query_params.append(requester_role_id)
 
-        if status is not None:
-            query += " AND scr.status = %s"
-            query_params.append(status)
+        # -----------------------------
+        # Time Sorting Logic
+        # -----------------------------
+        order_clauses = []
 
-        # Last Query Line
-        query += " ORDER BY scr.timestamp ASC;"
+        # AGE SORTING FIRST
+        if date_sort == "Newest":
+            order_clauses.append("s.date DESC")
+        elif date_sort == "Oldest":
+            order_clauses.append("s.date ASC")
+        
+        # TIMESTAMP SORTING SECOND
+        if timestamp_sort == "Newest":
+            order_clauses.append("scr.timestamp DESC")
+        elif timestamp_sort == "Oldest":
+            order_clauses.append("scr.timestamp ASC")
+
+        # Default fallback
+        if not order_clauses:
+            order_clauses.append("s.date DESC")
+
+        query += " ORDER BY " + ", ".join(order_clauses)
 
         # Execute Query
         cursor.execute(query, tuple(query_params))
@@ -140,7 +168,7 @@ def get_scr(db, request):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-#  POST Shift_cover_request -----------------------------------------------------------------------------
+#  POST Shift Cover Request -----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -207,7 +235,7 @@ def insert_scr(db, request):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# PATCH Shift_cover_request -----------------------------------------------------------------------------
+# PATCH Shift Cover Request -----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -273,8 +301,8 @@ def update_scr(db, request, cover_request_id):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# DELETE Shift_cover_request -------------------------------------------------------------------------
-# --------------------------------------------------------------------------------------
+# DELETE Shift Cover Request ----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
 
 def delete_scr(db, cover_request_id):
     """
@@ -322,7 +350,7 @@ def delete_scr(db, cover_request_id):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# APPROVE Shift_cover_request ---------------------------------------------------------------------------
+# APPROVE Shift Cover Request ---------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 

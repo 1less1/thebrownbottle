@@ -2,11 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { useFocusEffect } from '@react-navigation/native';
-import { getTimeOffRequests } from '@/routes/time_off_request';
+import { getTimeOffRequest } from '@/routes/time_off_request';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { useSession } from '@/utils/SessionContext';
-import AcceptDenyButtons from './AcceptDenyButtons';
-import { updateTimeOffStatus } from '@/routes/time_off_request';
+import AcceptDenyButtons from '@/components/calendar/TimeOff/AcceptDenyButtons';
+import { updateTimeOffRequest } from '@/routes/time_off_request';
 import DefaultScrollView from '@/components/DefaultScrollView';
 import ModularListView from '@/components/modular/ModularListView';
 import { formatDateWithYear, formatDateTime } from '@/utils/dateTimeHelpers';
@@ -27,7 +27,7 @@ const AdminTimeOff: React.FC = () => {
   const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
-      const data: TimeOffRequest[] = await getTimeOffRequests();
+      const data: TimeOffRequest[] = await getTimeOffRequest();
       setRequests(data);
       setError(null);
     } catch (err) {
@@ -62,7 +62,7 @@ const AdminTimeOff: React.FC = () => {
     request_id: number
   ) => {
     try {
-      await updateTimeOffStatus(request_id, 'Accepted');
+      await updateTimeOffRequest(request_id, {status: 'Accepted'});
       await fetchRequests();
     } catch (err) {
       console.error('Error approving request:', err);
@@ -75,7 +75,7 @@ const AdminTimeOff: React.FC = () => {
     request_id: number
   ) => {
     try {
-      await updateTimeOffStatus(request_id, 'Denied');
+      await updateTimeOffRequest(request_id, {status: 'Denied'});
       await fetchRequests();
     } catch (err) {
       console.error('Error denying request:', err);
@@ -122,7 +122,7 @@ const AdminTimeOff: React.FC = () => {
                 {/* Left side: Info */}
                 <View style={{ flex: 1 }}>
                   <Text style={[GlobalStyles.semiBoldText]}>{req.reason}</Text>
-                  <Text style={[GlobalStyles.smallSemiBoldAltText, { marginTop: 4 }]}>
+                  <Text style={[GlobalStyles.semiBoldSmallText, { marginTop: 4 }]}>
                     {formatDateWithYear(req.start_date)} →{' '}
                     {formatDateWithYear(req.end_date)}
                   </Text>

@@ -9,9 +9,9 @@ import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/modular/Card';
 
-import EmpShiftCover from '@/components/calendar/ShiftCover/EmpShiftCover';
+import Calendar from '@/components/calendar/Calendar';
 
-const ShiftCover = () => {
+const ShiftCalendar = () => {
     const { user } = useSession();
 
     const [refreshing, setRefreshing] = useState(false);
@@ -31,7 +31,7 @@ const ShiftCover = () => {
         <DefaultScrollView scrollEnabled={false} refreshing={refreshing} onRefresh={handleRefresh}>
 
             <View style={{ flex: 1, width: '85%', marginTop: 16 }}>
-                <EmpShiftCover parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                <Calendar parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
 
         </DefaultScrollView>
@@ -39,4 +39,4 @@ const ShiftCover = () => {
     );
 };
 
-export default ShiftCover;
+export default ShiftCalendar;

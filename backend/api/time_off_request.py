@@ -4,7 +4,7 @@ import os
 import request_helper
 from datetime import datetime
 
-# GET Time_off_Request ----------------------------------------------------------------------------------
+# GET Time Off Request ----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
@@ -24,7 +24,8 @@ def get_tor(db, request):
             'end_date': str,
             'reason': str,
             'status': str,
-            'timestamp': str
+            'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
+            'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
         }
 
         # Validate and parse parameters
@@ -39,7 +40,8 @@ def get_tor(db, request):
         end_date = params.get('end_date')
         reason = params.get('reason')
         status = params.get('status')
-        timestamp = params.get('timestamp')
+        date_sort = params.get ("date_sort")
+        timestamp_sort = params.get ("timestamp_sort")
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -63,7 +65,9 @@ def get_tor(db, request):
 
         query_params = []
 
+        # -----------------------------
         # Build Dynamic Query
+        # -----------------------------
         if request_id is not None:
             query += " AND tor.request_id = %s"
             query_params.append(request_id)
@@ -96,16 +100,28 @@ def get_tor(db, request):
             query += " AND tor.status = %s"
             query_params.append(status)
 
-        if timestamp is not None:
-            try:
-                datetime.strptime(timestamp, '%H:%M:%S')
-            except ValueError:
-                return jsonify({"error": "Invalid time format. Expected HH:MM:SS."}), 400
-            query += " AND TIME(tor.timestamp) = %s"
-            query_params.append(timestamp)
+        # -----------------------------
+        # Time Sorting Logic
+        # -----------------------------
+        order_clauses = []
 
-        # Last Query Line
-        query += " ORDER BY tor.start_date ASC;"
+        # AGE SORTING FIRST
+        if date_sort == "Newest":
+            order_clauses.append("tor.start_date DESC")
+        elif date_sort == "Oldest":
+            order_clauses.append("tor.start_date ASC")
+
+        # TIMESTAMP SORTING SECOND
+        if timestamp_sort == "Newest":
+            order_clauses.append("tor.timestamp DESC")
+        elif timestamp_sort == "Oldest":
+            order_clauses.append("tor.timestamp ASC")
+
+        # Default fallback
+        if not order_clauses:
+            order_clauses.append("tor.start_date DESC")
+
+        query += " ORDER BY " + ", ".join(order_clauses)
 
         # Execute Query
         cursor.execute(query, tuple(query_params))
@@ -131,7 +147,7 @@ def get_tor(db, request):
 # -------------------------------------------------------------------------------------------------------
 
 
-# POST Time_off_Request ---------------------------------------------------------------------------------
+# POST Time Off Request ---------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 def insert_tor(db, request):
@@ -200,9 +216,8 @@ def insert_tor(db, request):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# PATCH Time_off_Request --------------------------------------------------------------------------------
+# PATCH Time Off Request --------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-
 
 def update_tor(db, request, request_id):
     """
@@ -215,11 +230,6 @@ def update_tor(db, request, request_id):
     try:
         # Define Expected Field Types
         field_types = {
-            'employee_id': int,
-            'start_date': str,   # YYYY-MM-DD
-            'end_date': str,
-            'timestamp': str,    # HH:MM or HH:MM:SS
-            'reason': str,
             'status': str,
         }
 
@@ -270,3 +280,53 @@ def update_tor(db, request, request_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
+# DELETE Time Off Request -------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+def delete_tor(db, request_id):
+    """
+    Deletes a time_off_request record by request_id.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # Check if shift cover request exists
+        cursor.execute(
+            "SELECT request_id FROM time_off_request WHERE request_id = %s",
+            (request_id,)
+        )
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({"status": "error", "message": "Time Off Request not found"}), 404
+
+        # Delete the shift cover request
+        cursor.execute(
+            "DELETE FROM time_off_request WHERE request_id = %s",
+            (request_id,)
+        )
+        conn.commit()
+
+        return jsonify({"status": "success", "message": "Time Off Request deleted"}), 200
+
+    except mysql.connector.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+

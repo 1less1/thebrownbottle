@@ -1,6 +1,10 @@
 import React from 'react';
-import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { ScrollView, FlatList, View, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { Colors } from '@/constants/Colors';
+
+import LoadingCircle from '@/components/modular/LoadingCircle';
+import AnimatedTouchableWrapper from "@/components/modular/AnimatedTouchable";
+import { GlobalStyles } from '@/constants/GlobalStyles';
 
 interface ModularListViewProps<T> {
     data: T[];
@@ -13,6 +17,9 @@ interface ModularListViewProps<T> {
     maxHeight?: number;
     refreshing?: boolean;
     onRefresh?: () => void | Promise<void>;
+    itemContainerStyle?: ViewStyle;
+    enableAnimation?: boolean;
+    onItemPress?: (item: T) => void;
 }
 
 export default function ModularListView<T>({
@@ -21,43 +28,40 @@ export default function ModularListView<T>({
     keyExtractor,
     loading,
     error,
-    emptyText = 'No items yet.',
+    emptyText = 'Nothing yet...',
     listHeight = "auto",
     maxHeight,
     refreshing,
     onRefresh,
+    itemContainerStyle,
+    enableAnimation = true,
+    onItemPress,
 }: ModularListViewProps<T>) {
 
-    // --- UI States ---
+    // Handles loading state
     if (loading)
         return (
-            <View style={styles.statusContainer}>
-                <ActivityIndicator color={Colors.gray} size="small" />
-                <Text style={styles.statusText}>Loading...</Text>
-            </View>
+            <LoadingCircle size={"small"} />
         );
 
+    // Handles error state
     if (error)
         return (
             <View style={styles.statusContainer}>
-                <Text style={[styles.statusText, styles.errorText]}>{error}</Text>
+                <Text style={GlobalStyles.errorText}>{error}</Text>
             </View>
         );
 
+    // Handles empty list display
     if (data.length === 0)
         return (
             <View style={styles.statusContainer}>
-                <Text style={styles.statusText}>{emptyText}</Text>
+                <Text style={GlobalStyles.altText}>{emptyText}</Text>
             </View>
         );
 
     return (
-        <View style={[
-            styles.listContainer,
-            maxHeight ? { maxHeight } : null
-        ]}>
-
-            {/* ScrollView prevents FlatList parent scroll conflict */}
+        <View style={[styles.listContainer, maxHeight ? { maxHeight } : null]}>
             <ScrollView horizontal scrollEnabled={false} contentContainerStyle={{ flex: 1 }}>
                 <FlatList
                     style={[
@@ -71,9 +75,27 @@ export default function ModularListView<T>({
                     keyExtractor={(item, index) =>
                         keyExtractor ? String(keyExtractor(item, index)) : String(index)
                     }
-                    renderItem={({ item, index }) => (
-                        <View style={styles.requestItem}>{renderItem(item, index)}</View>
-                    )}
+                    renderItem={({ item, index }) => {
+                        const content = (
+                            <View style={[styles.listItem, itemContainerStyle]}>
+                                {renderItem(item, index)}
+                            </View>
+                        );
+
+                        if (!enableAnimation)
+                            return content;
+
+                        return (
+                            <AnimatedTouchableWrapper
+                                onPress={() => onItemPress?.(item)}
+                                style={{ marginBottom: 2 }}
+                                pressScale={0.97}
+                                hoverScale={1.02}
+                            >
+                                {content}
+                            </AnimatedTouchableWrapper>
+                        );
+                    }}
                     refreshing={refreshing}
                     onRefresh={onRefresh}
                 />
@@ -90,7 +112,7 @@ const styles = StyleSheet.create({
     statusContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 20,
+        paddingVertical: 20,
     },
     statusText: {
         textAlign: 'center',
@@ -103,12 +125,15 @@ const styles = StyleSheet.create({
         marginTop: 15,
         textAlign: 'center',
     },
-    requestItem: {
-        backgroundColor: Colors.inputBG,
+    listItem: {
+        backgroundColor: Colors.bgGray,
         padding: 12,
-        borderRadius: 8,
+        width: '97.9%',
+        alignSelf: 'center',
+        marginTop: 5,
+        borderRadius: 14,
         borderWidth: 1,
         borderColor: Colors.borderColor,
-        marginBottom: 10,
+        marginBottom: 5,
     },
 });
