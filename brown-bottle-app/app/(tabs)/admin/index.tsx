@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native'; // <-- Added Platform
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -8,15 +8,14 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
 
 import Dashboard from "@/components/admin/Dashboard/Dashboard";
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
 
-import LoadingCircle from '@/components/modular/LoadingCircle';
-
 import { useSession } from '@/utils/SessionContext';
+
+import Sidebar from "@/components/admin/Sidebar";
 
 const Admin = () => {
   // Dynamic Status Bar
@@ -42,7 +41,6 @@ const Admin = () => {
   const tabs = [
     {
       key: 'dashboard', title: 'Dashboard', component: <Dashboard />
-
     },
 
     {
@@ -76,35 +74,59 @@ const Admin = () => {
 
     <DefaultView backgroundColor={Colors.white}>
 
-      <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
+      {/* Added: flexDirection row only on web to support sidebar */}
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: Colors.bgApp,
+          flexDirection: Platform.OS === "web" ? "row" : "column",
+        }}
+      >
 
-        <View style={{ backgroundColor: Colors.white }}>
+        {/* Main Content FIRST (Left side) */}
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              backgroundColor: Colors.white,
+              borderBottomWidth: Platform.OS === "web" ? 1 : 0, // add border if web
+              borderBottomColor: Platform.OS === "web" ? Colors.borderColor : "transparent",
+            }}
+          >
 
-          <Text style={GlobalStyles.pageHeader}>Admin</Text>
+            <Text style={GlobalStyles.pageHeader}>Admin</Text>
 
-          {/* Tab Bar */}
-          <View style={styles.tabBar}>
-            {tabs.map((tab, index) => (
-              <TouchableOpacity
-                key={tab.key}
-                style={[
-                  styles.tabButton,
-                  activeTab === index && styles.activeTabButton, // Style the active tab
-                ]}
-                onPress={() => handleTabChange(index)} // Set active tab on click
-              >
-                <Text style={styles.tabText}>{tab.title}</Text>
-              </TouchableOpacity>
-            ))}
+            {/* Tab Bar (Mobile Only) */}
+            {Platform.OS !== "web" && (
+              <View style={styles.tabBar}>
+                {tabs.map((tab, index) => (
+                  <TouchableOpacity
+                    key={tab.key}
+                    style={[
+                      styles.tabButton,
+                      activeTab === index && styles.activeTabButton,
+                    ]}
+                    onPress={() => handleTabChange(index)}
+                  >
+                    <Text style={styles.tabText}>{tab.title}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Tab Content */}
+          <View style={styles.tabContent}>
+            {tabs[activeTab]?.component}
           </View>
         </View>
 
-        {/* Render content based on selected tab */}
-        <View style={styles.tabContent}>
-          {tabs[activeTab]?.component} {/* Render the component of the active tab */}
-        </View>
+        {/* Sidebar (Right side) */}
+        {Platform.OS === "web" && (
+          <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} tabs={tabs} />
+        )}
 
       </View>
+
 
     </DefaultView>
 

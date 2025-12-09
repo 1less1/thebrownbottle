@@ -33,7 +33,7 @@ const Dashboard = () => {
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <View style={{ marginTop: 16, width: '85%' }}>
+      <View style={{ marginTop: 16, width: '90%' }}>
 
         <View style={styles.cardContainer}>
           <Card style={styles.card}>
@@ -47,7 +47,7 @@ const Dashboard = () => {
         </View>
       </View>
 
-      <View style={{ width: '85%', marginVertical: 16, gap: 16 }}>
+      <View style={{ width: '90%', marginVertical: 16, gap: 16 }}>
 
         <View>
           <Text style={GlobalStyles.floatingHeaderText}>Time Off Requests</Text>

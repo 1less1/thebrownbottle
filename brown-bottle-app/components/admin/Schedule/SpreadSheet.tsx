@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, TouchableOpacity, Pressable, Alert } from "react-native";
+import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, Platform, TouchableOpacity, Pressable, Alert } from "react-native";
 import { debounce } from "lodash";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -156,6 +156,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (WIDTH * 0.70) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
+  const cardHeight = Platform.OS === "web" ? height * 0.8 : height * 0.70;
+
 
   const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
     const clickedDate = new Date(currentWeekStart);
@@ -236,7 +238,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   return (
 
-    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: height * 0.70 }}> {/* OLD: height: height * 0.67 */}
+    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}> {/* OLD: height: height * 0.67 */}
 
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>
@@ -285,7 +287,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           enabled={!loading}
           textStyle={{ marginRight: 4 }}
         >
-          <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
+          <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
         </ModularButton>
 
         <ModularButton
