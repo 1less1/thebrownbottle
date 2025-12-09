@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, useWindowDimensions, Platform } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,29 +14,23 @@ import ModularListView from "@/components/modular/ModularListView";
 
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
+import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
-import SubmitShiftCover from "@/components/calendar/ShiftCover/SubmitShiftCover";
-import ShiftDetails from "@/components/calendar/ShiftCover/ShiftDetails";
+import ListItemDetails from "@/components/calendar/TimeOff/Templates/ListItemDetails";
+import TimeOffModal from "@/components/admin/Dashboard/TimeOff/TimeOffModal";
 
-import { getShiftCoverRequest } from "@/routes/shift_cover_request";
-import { ShiftCoverRequest, Status, GetShiftCoverRequest } from "@/types/iShiftCover";
+import { getTimeOffRequest } from "@/routes/time_off_request";
+import { GetTimeOffRequest, TimeOffRequest, Status } from "@/types/iTimeOff";
+
 
 import { useSession } from "@/utils/SessionContext";
 
-interface EmpShiftCoverProps {
+interface AdminTimeOffProps {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
 
-const requestTypeOptions: DropdownOption<string>[] = [
-    { key: "Available", value: "Available" },
-    { key: "My Requests", value: "My Requests" },
-];
-
 const statusOptions: DropdownOption<string>[] = [
-    { key: "Pending", value: "Pending" },
-    { key: "Awaiting Approval", value: "Awaiting Approval" },
     { key: "Accepted", value: "Accepted" },
     { key: "Denied", value: "Denied" },
 ];
@@ -46,7 +40,7 @@ const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshDone }) => {
+const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -60,25 +54,25 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
     const { user } = useSession();
 
-    const [requests, setRequests] = useState<ShiftCoverRequest[]>([]);
+    const [requests, setRequests] = useState<TimeOffRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [shiftCoverModalVisible, setSubmitShiftCoverVisible] = useState(false);
-    const [shiftDetailsModalVisible, setShiftDetailsModalVisible] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
+    const [shiftCoverModalVisible, setTimeOffModalVisible] = useState(false);
 
-    const toggleSubmitShiftCover = () => setSubmitShiftCoverVisible((prev) => !prev);
-    const toggleShiftDetailsModal = () => setShiftDetailsModalVisible((prev) => !prev);
+    const toggleTimeOffModal = () => setTimeOffModalVisible((prev) => !prev);
 
-    const [requestType, setRequestType] = useState<string>("Available");
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
+    const [roleFilter, setRoleFilter] = useState<number | null>(null);
+
+    const [activeTab, setActiveTab] = useState<"Active" | "Completed">("Active");
 
     const [localRefresh, setLocalRefresh] = useState(0);
 
-    // Fetch Shift Cover Requests
-    const fetchSCR = async () => {
+    // Fetch Time Off Requests
+    const fetchTOR = async () => {
 
         if (!user?.employee_id) return;
 
@@ -89,40 +83,48 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
             const statuses: Status[] = [];
 
-            if (requestType === 'Available') {
+            if (activeTab === 'Active') {
                 statuses.push("Pending" as Status)
             }
 
-            if (requestType === "My Requests" && statusFilter) {
-                statuses.push(statusFilter as Status);
+            if (activeTab === "Completed") {
+                if (statusFilter) {
+                    statuses.push(statusFilter as Status);
+                }
+                else {
+                    statuses.push("Accepted" as Status)
+                    statuses.push("Denied" as Status)
+                }
             }
 
-            const params: Partial<GetShiftCoverRequest> = {
+            const params: Partial<GetTimeOffRequest> = {
                 status: statuses,
-                date_sort: dateFilter,
+                date_sort: dateFilter
             };
 
-            if (requestType === 'My Requests') {
-                params.employee_id = user.employee_id;
+            if (roleFilter) {
+                params.primary_role = roleFilter;
+                params.secondary_role = roleFilter;
+                params.tertiary_role = roleFilter;
             }
 
-            const data = await getShiftCoverRequest(params);
+            const data = await getTimeOffRequest(params);
 
             setRequests(data);
 
         } catch (error) {
-            setError('Failed to fetch shift cover requests.');
+            setError('Failed to fetch time off requests.');
             console.log(error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch Shift Cover Requests on Initialization and State Update
+    // Fetch Time Off Requests on Initialization and State Update
     useEffect(() => {
-        fetchSCR();
+        fetchTOR();
         console.log("Refreshing")
-    }, [user, parentRefresh, localRefresh, requestType, dateFilter, statusFilter]);
+    }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
 
 
     if (!user) {
@@ -137,29 +139,15 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
         <Card>
 
-            {/* New Request Button */}
-            <ModularButton
-                text="New Request"
-                onPress={toggleSubmitShiftCover}
-                style={styles.newRequestButton}
-                textStyle={{ color: Colors.blue }}
-            />
-
-            <SubmitShiftCover
-                visible={shiftCoverModalVisible}
-                onClose={toggleSubmitShiftCover}
-                onSubmitted={fetchSCR}
-            />
-
-
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-                {/* Request Type Filter */}
-                <ModularDropdown
-                    data={requestTypeOptions}
-                    onSelect={(value) => setRequestType(value as string)}
-                    selectedValue={requestType}
-                    usePlaceholder={false}
+
+                {/* Role Filter */}
+                <RoleDropdown
+                    onRoleSelect={(value) => setRoleFilter(value as number)}
+                    selectedRole={roleFilter}
+                    usePlaceholder={true}
+                    placeholderText="All Roles"
                     containerStyle={styles.dropdownButton}
                 />
 
@@ -171,7 +159,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                     usePlaceholder={true}
                     placeholderText="Any Status"
                     containerStyle={styles.dropdownButton}
-                    disabled={requestType != "My Requests"}
+                    disabled={activeTab == "Active"}
                 />
 
                 {/* Date Filter */}
@@ -184,22 +172,38 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                 />
             </View>
 
+            {/* Tabs */}
+            <View style={styles.tabContainer}>
+                {(["Active", "Completed"] as const).map((tab) => (
+                    <TouchableOpacity
+                        key={tab}
+                        style={[styles.tab, activeTab === tab && styles.activeTab]}
+                        onPress={() => setActiveTab(tab)}
+                    >
+                        <Text
+                            style={[
+                                styles.tabText,
+                                activeTab === tab && styles.activeTabText,
+                            ]}
+                        >
+                            {tab}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
-            {/* Shift Cover Request Feed */}
+
+            {/* Time Off Request Feed */}
             <ModularListView
                 data={requests}
                 loading={loading}
                 error={error}
-                emptyText={
-                    requestType === "My Requests"
-                        ? "No requests found."
-                        : "No available shifts right now."
-                }
+                emptyText="No requests available."
                 maxHeight={listMaxHeight}
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);
-                    toggleShiftDetailsModal();
+                    toggleTimeOffModal();
                 }}
                 renderItem={(req) => (
                     <ListItemDetails request={req} />
@@ -207,10 +211,10 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
             />
 
 
-            <ShiftDetails
-                visible={shiftDetailsModalVisible}
+            <TimeOffModal
+                visible={shiftCoverModalVisible}
                 request={selectedRequest}
-                onClose={toggleShiftDetailsModal}
+                onClose={toggleTimeOffModal}
                 onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 
@@ -219,14 +223,15 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
     );
 };
 
-export default EmpShiftCover;
+export default AdminTimeOff;
 
 const styles = StyleSheet.create({
+    // Filters
     filterContainer: {
         flexDirection: "row",
-        flexWrap: "wrap",
+        flexWrap: "wrap",        // allow wrapping
         justifyContent: "space-between",
-        gap: 10, 
+        gap: 10,                 // spacing between items
         marginVertical: 10,
     },
     dropdownButton: {
@@ -234,10 +239,29 @@ const styles = StyleSheet.create({
         flexShrink: 1,
         minWidth: 200,
     },
-    newRequestButton: {
-        backgroundColor: Colors.bgBlue,
-        borderWidth: 1,
-        borderColor: Colors.borderBlue,
+
+    // Tabs
+    tabContainer: {
+        flexDirection: 'row',
+        marginTop: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.borderColor,
+    },
+    tab: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+    },
+    activeTab: {
+        borderBottomWidth: 2,
+        borderBottomColor: Colors.black,
+    },
+    tabText: {
+        color: Colors.gray,
+        fontWeight: 'bold',
+    },
+    activeTabText: {
+        color: Colors.black,
     },
 });
 

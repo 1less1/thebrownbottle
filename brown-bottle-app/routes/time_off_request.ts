@@ -76,7 +76,7 @@ export async function insertTimeOffRequest(fields: InsertTimeOffRequest) {
 }
 
 // PATCH: Updates a time off request record
-export async function updateTimeOffRequest(request_id: number, fields: UpdateTimeOffRequest) {
+export async function updateTimeOffRequest(request_id: number, fields: Partial<UpdateTimeOffRequest>) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
@@ -125,31 +125,6 @@ export async function deleteTimeOffRequest(request_id: number) {
     return await response.json();
   } catch (error) {
     console.error("Failed to delete time off request:", error);
-    throw error;
-  }
-
-}
-
-// PATCH: Approve a time off request
-export async function approveTimeOffRequest(request_id: number) {
-
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const url = `${API_BASE_URL}/tor/approve/${request_id}`;
-
-  try {
-    const response = await fetch(url, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.ok) {
-      throw new Error(`[TOR API] Failed to APPROVE Time Off Request: ${request_id} - ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Failed to approve time off request:", error);
     throw error;
   }
 

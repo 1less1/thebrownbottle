@@ -4,6 +4,9 @@ export interface DropdownOption<T extends number | string | null> {
   value: T;
 }
 
+export type YesNoSortType = 1 | 0;
+export type DateSortType = "Newest" | "Oldest";
+
 export const yesNoDropdownOptions: DropdownOption<number>[] = [
   { value: 1, key: "Yes" },
   { value: 0, key: "No" },

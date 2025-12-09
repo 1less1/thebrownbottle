@@ -3,13 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { useSession } from '@/utils/SessionContext';
 
 import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/modular/Card';
 
 import EmpShiftCover from '@/components/calendar/ShiftCover/EmpShiftCover';
+
+import { useSession } from '@/utils/SessionContext';
 
 const ShiftCover = () => {
     const { user } = useSession();
