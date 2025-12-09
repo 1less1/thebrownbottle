@@ -321,7 +321,7 @@ export const GlobalStyles = StyleSheet.create({
         borderRadius: 4,
     },
     tag: {
-        backgroundColor: "rgba(255,255,255,0.22)",
+        backgroundColor: "rgba(255,255,255,0.5)",
         borderRadius: 10,
         paddingVertical: 3,
         paddingHorizontal: 10,

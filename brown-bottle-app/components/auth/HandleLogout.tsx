@@ -21,7 +21,7 @@ const HandleLogout = () => {
   return (
     <AnimatedTouchableWrapper onPress={handleLogout}>
         <View style={[GlobalStyles.tag, ]}>
-        <Ionicons name="log-out-outline" size={30} color="white" style={{ marginTop: 5, marginBottom: 5, marginLeft: 3}} />
+        <Ionicons name="log-out-outline" size={30} color="black" style={{ marginTop: 5, marginBottom: 5, marginLeft: 3}} />
         </View>
     </AnimatedTouchableWrapper>
   );

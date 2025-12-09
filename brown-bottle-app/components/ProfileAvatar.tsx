@@ -1,4 +1,3 @@
-
 import React from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
 import AnimatedTouchableWrapper from "./modular/AnimatedTouchable";
@@ -7,9 +6,18 @@ interface ProfileAvatarProps {
   imageUri?: string;      // Optional profile image URI
   fullName?: string;       // Full name to extract initials
   size?: number;          // Avatar size (default: 80)
+  backgroundColor?: string;
+  borderColor?: string;
 }
 
-const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ imageUri, fullName, size = 80 }) => {
+const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
+  imageUri,
+  fullName,
+  size = 80,
+  // 2. Destructure the prop and assign the default value
+  backgroundColor = "rgba(255, 255, 255, 0.5)",
+  borderColor = "rgba(255,255,255,0.9)"
+}) => {
 
   // Function: extract initials from full name
   const getInitials = (name: string) => {
@@ -25,7 +33,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ imageUri, fullName, size 
 
   return (
     <AnimatedTouchableWrapper>
-      <View style={[styles.container, { width: size, height: size, borderRadius: size / 2 }]}>
+      <View style={[styles.container, { width: size, height: size, borderRadius: size / 2, backgroundColor: backgroundColor, borderColor: borderColor }]}>
         {imageUri ? (
           <Image
             source={{ uri: imageUri }}
@@ -43,13 +51,12 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.25)", // semi-transparent white background
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.4)",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.9)",
   },
 
   initialsText: {
-    color: "white",
+    color: "black",
     fontWeight: "700",
   },
 });

@@ -12,6 +12,7 @@ import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/QuickStats';
 import ProfileAvatar from '@/components/ProfileAvatar';
+import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
 
 
 // Get Session Data
@@ -28,6 +29,8 @@ export default function HomeScreen() {
 
   // Get session data
   const { user } = useSession();
+
+  const full_name = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
 
   return (
 
@@ -50,9 +53,11 @@ export default function HomeScreen() {
           <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 180, width: '100%' }} />
           {/* Second Strip */}
           <View style={{ backgroundColor: Colors.white, position: 'absolute', top: 150, height: '100%', width: '100%' }} />
-          {/* Circular Image */}
+
+
+          {/* Profile avatar */}
           <View style={{ marginTop: 90 }}>
-            <CircularImage size={145} />
+            <ProfileAvatar size={145} fullName={full_name} backgroundColor='#f5f0edff' borderColor='#ffffffff' />
           </View>
 
 
@@ -75,6 +80,7 @@ export default function HomeScreen() {
               <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
               <QuickStats />
             </View>
+
 
             <View style={styles.contentRow}>
 
