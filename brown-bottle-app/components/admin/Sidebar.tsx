@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderLeftWidth: 0.8,
     borderLeftColor: Colors.borderColor,
-    paddingTop: 30,
+    paddingTop: 60,
     paddingBottom: 30,
   },
   tabItem: {

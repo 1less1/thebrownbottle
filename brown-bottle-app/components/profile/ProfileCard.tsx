@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
         minHeight: 260,
         paddingVertical: 25,
         paddingHorizontal: 20,
-        backgroundColor: "#6B47FF",
+        backgroundColor: Colors.mediumTan,
         borderWidth: 1,
-        borderColor: "#6B47FF",
+        borderColor: Colors.altBorderColor,
         justifyContent: "center",
         borderRadius: 14,
     },
@@ -93,12 +93,12 @@ const styles = StyleSheet.create({
         flexShrink: 1
     },
     nameText: {
-        color: "white",
+        color: "black",
         fontSize: 22,
         fontWeight: "800"
     },
     emailText: {
-        color: "white",
+        color: "black",
         opacity: 0.9,
         marginTop: 2,
         fontSize: 15
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         gap: 6
     },
     tagText: {
-        color: "white",
+        color: "black",
         fontSize: 13,
         fontWeight: "600"
     },

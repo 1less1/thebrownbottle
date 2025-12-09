@@ -50,6 +50,7 @@ const Admin = () => {
     {
       key: 'staff', title: 'Staff', component: <Staff />
     },
+    
   ];
 
   // Load Saved Tab If it Exists, otherwise load tab index 0
