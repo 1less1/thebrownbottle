@@ -80,7 +80,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       onUpdate?.();
       onClose();
     } catch (error: any) {
-      alert("Unable to delete shift: " + error.message);
+      alert("Failed to delete shift: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -150,17 +150,11 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
     <ModularModal visible={visible} onClose={onClose}>
 
       {/* Header */}
-      <View style={GlobalStyles.headerContainer}>
-        <View>
-          <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
-          <Text style={GlobalStyles.semiBoldMediumText}>{employeeData?.full_name ?? ""}</Text>
-          <Text style={GlobalStyles.altText}>{(date)}</Text>
-        </View>
-        {/*
-        <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
-          <Ionicons name="close" size={28} color={Colors.black} />
-        </TouchableOpacity>
-        */}
+      <View>
+        <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
+
+        <Text style={GlobalStyles.semiBoldMediumText}>{employeeData?.full_name ?? ""}</Text>
+        <Text style={GlobalStyles.mediumAltText}>{(date)}</Text>
       </View>
 
       {loading ? (

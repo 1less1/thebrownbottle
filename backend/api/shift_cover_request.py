@@ -24,7 +24,9 @@ def get_scr(db, request):
             'accepted_employee_id': int,
             'requested_employee_id': int,
             'employee_id': int,  # Filter all requests either requested by or accepted by the provided employee_id parameter
-            'requester_role_id': int,
+            'requested_primary_role': int,
+            'requested_secondary_role': int,
+            'requested_tertiary_role': int,
             'status': List[str],
             'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
             'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
@@ -41,7 +43,9 @@ def get_scr(db, request):
         accepted_employee_id = params.get('accepted_employee_id')
         requested_employee_id = params.get('requested_employee_id')
         employee_id = params.get('employee_id')
-        requester_role_id = params.get('requester_role_id')
+        requested_primary_role = params.get('requested_primary_role') 
+        requested_secondary_role = params.get('requested_secondary_role')
+        requested_tertiary_role = params.get('requested_tertiary_role')
         statuses = params.get('status', []) # List of statuses
         date_sort = params.get ("date_sort")
         timestamp_sort = params.get ("timestamp_sort")
@@ -59,12 +63,14 @@ def get_scr(db, request):
 
                 requester.first_name AS requested_first_name,
                 requester.last_name AS requested_last_name,
+                requester.primary_role AS requested_primary_role,
 
                 accepter.first_name AS accepted_first_name,
                 accepter.last_name AS accepted_last_name,
+                accepter.primary_role AS accepted_primary_role,
 
-                r.role_id AS requester_role_id,
-                r.role_name AS requester_role_name,
+                requester_role.role_name AS requested_primary_role_name,
+                accepter_role.role_name AS accepted_primary_role_name,
 
                 sec.section_id AS section_id,
                 sec.section_name AS section_name,
@@ -78,7 +84,8 @@ def get_scr(db, request):
             JOIN employee requester ON scr.requested_employee_id = requester.employee_id
             LEFT JOIN employee accepter ON scr.accepted_employee_id = accepter.employee_id
             JOIN shift s ON scr.shift_id = s.shift_id
-            JOIN role r ON requester.primary_role = r.role_id
+            JOIN role requester_role ON requester.primary_role = requester_role.role_id -- Updated JOIN for requester role
+            LEFT JOIN role accepter_role ON accepter.primary_role = accepter_role.role_id -- New: JOIN for accepter role
             JOIN section sec ON s.section_id = sec.section_id
             WHERE 1 = 1
         """
@@ -117,10 +124,25 @@ def get_scr(db, request):
                 query_params.append(requested_employee_id)
 
 
-        # Filter by role of the requester
-        if requester_role_id is not None:
-            query += " AND r.role_id = %s"
-            query_params.append(requester_role_id)
+        # Handle multiple Role Clauses
+        role_clauses = []
+        role_values = []
+
+        if requested_primary_role is not None:
+            role_clauses.append("requester.primary_role = %s")
+            role_values.append(requested_primary_role)
+
+        if requested_secondary_role is not None:
+            role_clauses.append("requester.secondary_role = %s")
+            role_values.append(requested_secondary_role)
+
+        if requested_tertiary_role is not None:
+            role_clauses.append("requester.tertiary_role = %s")
+            role_values.append(requested_tertiary_role)
+
+        if role_clauses:
+            query += " AND (" + " OR ".join(role_clauses) + ")"
+            query_params.extend(role_values)
 
         # -----------------------------
         # Time Sorting Logic

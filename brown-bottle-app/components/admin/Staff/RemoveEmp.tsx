@@ -9,8 +9,6 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import RoleDropdown from '@/components/modular/RoleDropdown';
-import ModularDropdown from '@/components/modular/ModularDropdown';
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import { Employee } from "@/types/iEmployee";
@@ -196,14 +194,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
             <ModularModal visible={modalVisible} onClose={onClose} scroll={false}>
 
                 {/* Header */}
-                <View style={GlobalStyles.headerContainer}>
-                    <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
-                    {/*
-                    <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
-                        <Ionicons name="close" size={28} color={Colors.black} />
-                    </TouchableOpacity>
-                    */}
-                </View>
+                <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
 
                 {/* Search Bar + Reset Button */}
                 <View style={styles.searchContainer}>
@@ -221,7 +212,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         enabled={!loading}
                         textStyle={{ marginRight: 4 }}
                     >
-                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
+                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
                     </ModularButton>
                 </View>
 

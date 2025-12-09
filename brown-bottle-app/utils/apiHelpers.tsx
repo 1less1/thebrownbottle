@@ -36,3 +36,7 @@ export function buildPatchData<T extends Record<string, any>>(
 
   return patch;
 }
+
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};

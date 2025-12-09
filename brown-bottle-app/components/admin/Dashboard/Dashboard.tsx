@@ -1,34 +1,39 @@
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, StyleSheet } from 'react-native';
+
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { User, useSession } from '@/utils/SessionContext';
 
-import { useState } from 'react';
-
+import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
 import Card from '@/components/modular/Card';
 
 import Announcements from '@/components/admin/Dashboard/Announcements';
 import Tasks from '@/components/admin/Dashboard/Tasks';
-import TimeOffView from '@/components/calendar/TimeOff/AdminTimeOff';
-import ShiftCoverView from '@/components/calendar/ShiftCover/ShiftCoverView';
 
+import AdminShiftCover from '@/components/admin/Dashboard/ShiftCover/AdminShiftCover';
+import AdminTimeOff from '@/components/admin/Dashboard/TimeOff/AdminTimeOff';
+
+import { useSession } from '@/utils/SessionContext';
 
 
 const Dashboard = () => {
-
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    setRefreshKey((prev) => prev + 1);
-    setTimeout(() => setRefreshing(false), 800);
-  };
-
   const { user } = useSession();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   if (!user) return null;
+
   return (
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
@@ -50,30 +55,14 @@ const Dashboard = () => {
       <View style={{ width: '90%', marginVertical: 16, gap: 16 }}>
 
         <View>
-          <Text style={GlobalStyles.floatingHeaderText}>Time Off Requests</Text>
-          <Card style={[styles.card, { padding: 10, width: '100%' }]}>
-            <TimeOffView />
-          </Card>
+          <Text style={GlobalStyles.floatingHeaderText}>Shift Cover Requests</Text>
+          <AdminShiftCover parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
         </View>
 
         <View>
-          <Text style={GlobalStyles.floatingHeaderText}>Shift Cover Requests</Text>
-          <Card style={[styles.card, { padding: 10, width: '100%' }]}>
-            <ShiftCoverView />
-          </Card>
+          <Text style={GlobalStyles.floatingHeaderText}>Time Off Requests</Text>
+          <AdminTimeOff parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
         </View>
-
-        <Text style={GlobalStyles.floatingHeaderText}>
-          Announcement Feed - Will be able to edit and delete announcments here
-        </Text>
-
-        <Text style={GlobalStyles.floatingHeaderText}>
-          Normal Task Feed - Will be able to edit and delete tasks here (sort by Section)
-        </Text>
-
-        <Text style={GlobalStyles.floatingHeaderText}>
-          Recurring Task Feed - Will be able to edit and delete tasks here (sort by Section)
-        </Text>
 
       </View>
 

@@ -7,11 +7,12 @@ import { useSession } from '@/utils/SessionContext';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 import { insertTimeOffRequest } from '@/routes/time_off_request';
-import CalendarWidget from '../CalendarWidget';
+import CalendarWidget from '@/components/calendar/CalendarWidget';
 
 import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 
 import { InsertTimeOffRequest } from '@/types/iTimeOff';
+import { useConfirm } from '@/hooks/useConfirm';
 
 
 interface ModalProps {
@@ -22,6 +23,9 @@ interface ModalProps {
 
 const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
   const { user } = useSession();
+  const { confirm } = useConfirm();
+
+  const [loading, setLoading] = useState(false);
 
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -37,6 +41,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
   };
 
   const handleSubmit = async () => {
+
     if (!user) {
       alert('User not found. Please log in again.');
       return;
@@ -47,7 +52,10 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       return;
     }
 
+    if (loading) return;
+
     try {
+      setLoading(true);
 
       const payload: InsertTimeOffRequest = {
         employee_id: user.employee_id,
@@ -58,12 +66,13 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
       await insertTimeOffRequest(payload);
       alert('Time off request submitted successfully!');
-      resetForm();
       onSubmitted?.();
+      resetForm();
       onClose();
-    } catch (error) {
-      console.error('Error submitting time off request:', error);
-      alert('Failed to submit time off request. Please try again.');
+    } catch (error: any) {
+      alert("Failed to submit request: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,10 +82,11 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
   };
 
   return (
-    <ModularModal visible={visible} onClose={onClose}>
-      <Text style={GlobalStyles.modalTitle}>New Time Off Request</Text>
 
-      {/* Date Pickers */}
+    <ModularModal visible={visible} onClose={onClose}>
+
+      {/* Modal Title */}
+      <Text style={GlobalStyles.modalTitle}>New Time Off Request</Text>
 
       {/* Start Date */}
       <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
@@ -89,12 +99,13 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
         <View style={styles.dateContainer}>
           <Text style={GlobalStyles.text}>Date: </Text>
-          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple}]}>
+          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
             {startDate ? formatDateWithYear(startDate) : ""}
           </Text>
         </View>
       </View>
 
+      {/* Start Date Picker Modal */}
       <ModularModal visible={startDateVisible} onClose={() => setStartDateVisible(false)}>
         <CalendarWidget
           mode="picker"
@@ -126,6 +137,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
         </View>
       </View>
 
+      {/* End Date Picker Modal */}
       <ModularModal visible={endDateVisible} onClose={() => setEndDateVisible(false)}>
         <CalendarWidget
           mode="picker"
@@ -142,9 +154,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
 
       {/* Reason Field */}
-      <Text
-        style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}
-      >
+      <Text style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}>
         Reason for Time Off
       </Text>
       <TextInput
@@ -172,9 +182,13 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
           onPress={handleClose}
         />
       </View>
+
     </ModularModal>
+
   );
 };
+
+export default SubmitTimeOff;
 
 const styles = StyleSheet.create({
   buttonRowContainer: {
@@ -204,5 +218,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
 });
-
-export default SubmitTimeOff;

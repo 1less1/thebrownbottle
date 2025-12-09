@@ -139,14 +139,7 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
             <ModularModal visible={modalVisible} onClose={toggleModal} scroll={false}>
 
                 {/* Header */}
-                <View style={GlobalStyles.headerContainer}>
-                    <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
-                    {/*
-                    <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
-                        <Ionicons name="close" size={28} color={Colors.black} />
-                    </TouchableOpacity>
-                    */}
-                </View>
+                <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
 
                 {/* Employee Form (Scrollable)*/}
                 <View style={[styles.formContainer, { height: HEIGHT * 0.42 }]}>

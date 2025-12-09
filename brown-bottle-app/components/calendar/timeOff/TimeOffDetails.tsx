@@ -7,12 +7,15 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
+import ModalDetails from '@/components/calendar/TimeOff/Templates/ModalDetails';
+
 
 import { deleteTimeOffRequest } from '@/routes/time_off_request';
-import { useConfirm } from '@/hooks/useConfirm';
-import { User, useSession } from '@/utils/SessionContext';
+
 import { TimeOffRequest } from '@/types/iTimeOff';
-import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
+
+import { useConfirm } from '@/hooks/useConfirm';
+import { useSession } from '@/utils/SessionContext';
 
 
 interface ModalProps {
@@ -40,54 +43,29 @@ const TimeOffDetails: React.FC<ModalProps> = ({
             "Confirm Deletion",
             "Are you sure you want to delete this request? This action cannot be undone."
         );
+
         if (!ok) return;
 
         try {
             setLoading(true);
             await deleteTimeOffRequest(request.request_id);
-            alert("Time Off Request Successfully deleted!");
+            alert("Time off request successfully deleted!");
             onSubmitted?.();
             onClose?.();
-        } catch (err) {
-            console.error("Failed to delete request:", err);
-            alert("Something went wrong. Please try again.");
+        } catch (error: any) {
+            alert("Failed to delete request: " + error.message);
         } finally {
             setLoading(false);
         }
     };
 
     if (!request) return null;
+
     return (
+
         <ModularModal visible={visible} onClose={onClose}>
-            <View>
-                <Text style={GlobalStyles.modalTitle}>
-                    Time Off Request
-                </Text>
-            </View>
 
-            <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
-                <Text style={GlobalStyles.mediumText}>
-                    {request.start_date === request.end_date
-                        ? formatDate(request.start_date)
-                        : `${formatDate(request.start_date)} → ${formatDate(request.end_date)}`
-                    }
-                </Text>
-            </View>
-
-
-            <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Reason: </Text>
-                <Text style={GlobalStyles.mediumText}>
-                    {request.reason}
-                </Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={[GlobalStyles.altText, { marginTop: 2, color: Colors.gray }]}>
-                    Submitted on {formatDateTime(request.timestamp)}
-                </Text>
-            </View>
+            <ModalDetails request={request} />
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
@@ -106,7 +84,6 @@ const TimeOffDetails: React.FC<ModalProps> = ({
                     onPress={onClose}
                 />
             </View>
-
 
         </ModularModal>
 

@@ -81,7 +81,7 @@ export async function insertShiftCoverRequest(fields: InsertShiftCoverRequest) {
 
 
 // PATCH: Updates a shift cover request record within the shift_cover_request table
-export async function updateShiftCoverRequest(cover_request_id: number, fields: UpdateShiftCoverRequest) {
+export async function updateShiftCoverRequest(cover_request_id: number, fields: Partial<UpdateShiftCoverRequest>) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 

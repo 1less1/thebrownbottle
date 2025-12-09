@@ -11,20 +11,18 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 
 import ModularButton from '@/components/modular/ModularButton';
 import ModularListView from '@/components/modular/ModularListView';
-import StatusBadge from '@/components/modular/StatusBadge'
 
+import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
+import { DropdownOption, DateSortType } from '@/types/iDropdown';
+
+import ListItemDetails from '@/components/calendar/TimeOff/Templates/ListItemDetails';
 import SubmitTimeOff from '@/components/calendar/TimeOff/SubmitTimeOff';
 import TimeOffDetails from '@/components/calendar/TimeOff/TimeOffDetails';
 
-import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
-import { ageDropdownOptions, DropdownOption } from '@/types/iDropdown';
-
-import { TimeOffRequest, Status } from '@/types/iTimeOff';
-
-import { formatDate, formatDateTime } from '@/utils/dateTimeHelpers';
+import { getTimeOffRequest } from '@/routes/time_off_request';
+import { TimeOffRequest, Status, GetTimeOffRequest } from '@/types/iTimeOff';
 
 import { useSession } from '@/utils/SessionContext';
-import { getTimeOffRequest } from '@/routes/time_off_request';
 
 interface EmpTimeOffProps {
   parentRefresh?: number;
@@ -37,8 +35,10 @@ const statusOptions: DropdownOption<string>[] = [
   { key: "Denied", value: "Denied" },
 ];
 
-const ageOptions = ageDropdownOptions;
-
+const dateDropdownOptions: DropdownOption<string>[] = [
+  { key: "Newest Date", value: "Newest" },
+  { key: "Oldest Date", value: "Oldest" }
+];
 
 const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone }) => {
   const { width, height } = useWindowDimensions();
@@ -66,10 +66,11 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
   const toggleTimeOffDetails = () => setTimeOffDetailsVisible((prev) => !prev);
 
   const [statusFilter, setStatusFilter] = useState<Status | null>(null);
-  const [dateFilter, setDateFilter] = useState<string>("Newest");
+  const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
 
   const [localRefresh, setLocalRefresh] = useState(0);
 
+  // Fetch Time Off Requests
   const fetchTOR = async () => {
 
     if (!user?.employee_id) return;
@@ -85,7 +86,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         statuses.push(statusFilter as Status);
       }
 
-      const params: Record<string, any> = {
+      const params: Partial<GetTimeOffRequest> = {
         employee_id: user.employee_id,
         status: statuses,
         date_sort: dateFilter
@@ -126,6 +127,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
 
         {/* Dropdown Filters */}
         <View style={styles.filterContainer}>
+          {/* Status Filter */}
           <ModularDropdown
             data={statusOptions}
             selectedValue={statusFilter}
@@ -135,9 +137,10 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
             containerStyle={styles.dropdownButton}
           />
 
+          {/* Date Filter */}
           <ModularDropdown
-            data={ageOptions}
-            onSelect={(value) => setDateFilter(value as string)}
+            data={dateDropdownOptions}
+            onSelect={(value) => setDateFilter(value as DateSortType)}
             selectedValue={dateFilter}
             usePlaceholder={false}
             containerStyle={styles.dropdownButton}
@@ -149,12 +152,18 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
           <ModularButton
             text="Add"
             onPress={toggleSubmitTimeOff}
-            style={{ flex: 1, minWidth: 200, backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
+            style={styles.addButton}
             textStyle={{ color: Colors.purple }}
           />
         </View>
 
       </View>
+
+      <SubmitTimeOff
+        visible={submitTimeOffVisible}
+        onClose={toggleSubmitTimeOff}
+        onSubmitted={() => setLocalRefresh(prev => prev + 1)}
+      />
 
 
       <ModularListView
@@ -165,47 +174,14 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         maxHeight={listMaxHeight}
         onItemPress={(req) => {
           setSelectedRequest(req);
-          setTimeOffDetailsVisible(true);
+          toggleTimeOffDetails();
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         renderItem={(req) => (
-          <View style={styles.badgeView}>
-            <View style={{ flex: 1, paddingRight: 8 }}>
-
-              {/* Top Row */}
-              <View style={styles.topRow}>
-                <View style={styles.topLeftText}>
-                  <Text style={GlobalStyles.semiBoldText}>
-                    {req.start_date === req.end_date
-                      ? formatDate(req.start_date)
-                      : `${formatDate(req.start_date)} → ${formatDate(req.end_date)}`
-                    }
-                  </Text>
-                </View>
-
-                <View style={styles.badgeWrapper}>
-                  <StatusBadge status={req.status as Status} />
-                </View>
-              </View>
-
-              {/* Bottom Section */}
-              <>
-                <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
-                  Submitted on {formatDateTime(req.timestamp)}
-                </Text>
-              </>
-            </View>
-          </View>
+          <ListItemDetails request={req} />
         )}
       />
 
-
-
-      <SubmitTimeOff
-        visible={submitTimeOffVisible}
-        onClose={toggleSubmitTimeOff}
-        onSubmitted={() => setLocalRefresh(prev => prev + 1)}
-      />
 
       <TimeOffDetails
         visible={timeOffDetailsVisible}
@@ -248,31 +224,10 @@ const styles = StyleSheet.create({
     minWidth: 200,
   },
   addButton: {
-    backgroundColor: Colors.white,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: Colors.altBorderColor,
-    marginBottom: 4,
-    alignSelf: "flex-start",
-  },
-  badgeView: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  topRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  topLeftText: {
     flex: 1,
-    paddingRight: 8,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  badgeWrapper: {
-    flexShrink: 0,
-    alignItems: "flex-end",
+    minWidth: 200,
+    backgroundColor: Colors.bgPurple,
+    borderWidth: 1,
+    borderColor: Colors.borderPurple,
   },
 });

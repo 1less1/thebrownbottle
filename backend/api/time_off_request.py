@@ -3,6 +3,7 @@ import mysql.connector
 import os
 import request_helper
 from datetime import datetime
+from typing import List
 
 # GET Time Off Request ----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -20,10 +21,13 @@ def get_tor(db, request):
         param_types = {
             'request_id': int,
             'employee_id': int,
+            'primary_role': int,
+            'secondary_role': int,
+            'tertiary_role': int,
             'start_date': str,
             'end_date': str,
             'reason': str,
-            'status': str,
+            'status': List[str],
             'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
             'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
         }
@@ -36,10 +40,13 @@ def get_tor(db, request):
         # Extract Parameters
         request_id = params.get('request_id')
         employee_id = params.get('employee_id')
+        primary_role = params.get('primary_role')
+        secondary_role = params.get('secondary_role')
+        tertiary_role = params.get('tertiary_role')
         start_date = params.get('start_date')
         end_date = params.get('end_date')
         reason = params.get('reason')
-        status = params.get('status')
+        statuses = params.get('status', []) # List of statuses
         date_sort = params.get ("date_sort")
         timestamp_sort = params.get ("timestamp_sort")
 
@@ -51,6 +58,8 @@ def get_tor(db, request):
             SELECT
                 tor.request_id,
                 tor.employee_id,
+                e.primary_role,
+                pr.role_name AS primary_role_name,
                 e.first_name,
                 e.last_name,
                 DATE_FORMAT(tor.start_date, '%Y-%m-%d') AS start_date,
@@ -60,6 +69,7 @@ def get_tor(db, request):
                 DATE_FORMAT(tor.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM time_off_request tor
             JOIN employee e ON tor.employee_id = e.employee_id
+            LEFT JOIN role pr ON e.primary_role = pr.role_id
             WHERE 1 = 1
         """
 
@@ -68,6 +78,11 @@ def get_tor(db, request):
         # -----------------------------
         # Build Dynamic Query
         # -----------------------------
+        if statuses and len(statuses) > 0:
+            placeholders = ','.join(['%s'] * len(statuses))
+            query += f" AND tor.status IN ({placeholders})"
+            query_params.extend(statuses)
+
         if request_id is not None:
             query += " AND tor.request_id = %s"
             query_params.append(request_id)
@@ -75,7 +90,7 @@ def get_tor(db, request):
         if employee_id is not None:
             query += " AND tor.employee_id = %s"
             query_params.append(employee_id)
-
+        
         if start_date:
             try:
                 datetime.strptime(start_date, '%Y-%m-%d')
@@ -95,10 +110,26 @@ def get_tor(db, request):
         if reason is not None:
             query += " AND tor.reason = %s"
             query_params.append(reason)
+        
+        # Handle multiple Role Clauses
+        role_clauses = []
+        role_values = []
 
-        if status is not None:
-            query += " AND tor.status = %s"
-            query_params.append(status)
+        if primary_role is not None:
+            role_clauses.append("e.primary_role = %s")
+            role_values.append(primary_role)
+
+        if secondary_role is not None:
+            role_clauses.append("e.secondary_role = %s")
+            role_values.append(secondary_role)
+
+        if tertiary_role is not None:
+            role_clauses.append("e.tertiary_role = %s")
+            role_values.append(tertiary_role)
+
+        if role_clauses:
+            query += " AND (" + " OR ".join(role_clauses) + ")"
+            query_params.extend(role_values)
 
         # -----------------------------
         # Time Sorting Logic

@@ -1,35 +1,41 @@
-import React from 'react';
-import ModularModal from '@/components/modular/ModularModal';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Colors } from '@/constants/Colors';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
 import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
+
+import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import { formatDateTime, formatShiftDate, formatTime } from '@/utils/dateTimeHelpers';
-import { updateShiftCoverRequest } from '@/routes/shift_cover_request';
+import ModalDetails from '@/components/calendar/ShiftCover/Templates/ModalDetails';
+
+import { ShiftCoverRequest, Status } from '@/types/iShiftCover';
+import { updateShiftCoverRequest, deleteShiftCoverRequest } from '@/routes/shift_cover_request';
+
 import { useConfirm } from '@/hooks/useConfirm';
-import { User, useSession } from '@/utils/SessionContext';
-import { useState } from 'react';
-import { deleteShiftCoverRequest } from '@/routes/shift_cover_request';
+import { useSession } from '@/utils/SessionContext';
 
 interface ModalProps {
     visible: boolean;
     onClose: () => void;
-    request: any | null;
+    request: ShiftCoverRequest | null;
     onSubmitted?: () => void;
 }
+
 const ShiftDetails: React.FC<ModalProps> = ({
     visible,
     onClose,
     request,
     onSubmitted
 }) => {
-    const { confirm } = useConfirm();
+
     const { user } = useSession();
-    const [submitting, setSubmitting] = useState(false);
+    const { confirm } = useConfirm();
+    const [loading, setLoading] = useState(false);
 
 
     const handleSubmit = async () => {
-        if (submitting) return;
+        if (!request || loading) return;
+
 
         const ok = await confirm(
             "Confirm Request",
@@ -39,57 +45,46 @@ const ShiftDetails: React.FC<ModalProps> = ({
         if (!ok) return;
 
         try {
-            const payload = {
-                cover_request_id: request.cover_request_id,
-                status: "Awaiting Approval",
-                accepted_employee_id: Number(user?.employee_id)
+            setLoading(true);
+
+            const fields = {
+                status: "Awaiting Approval" as Status,
+                accepted_employee_id: Number(user?.employee_id),
             };
 
-            setSubmitting(true);
-
-            await updateShiftCoverRequest(request.cover_request_id, {
-                status: "Awaiting Approval",
-                accepted_employee_id: Number(user?.employee_id),
-            });
-
-
-            console.log("Submitting payload:", payload);
-
+            await updateShiftCoverRequest(request.cover_request_id, fields)
             alert("Request is now awaiting manager approval.");
-
             onSubmitted?.();
             onClose?.();
-        } catch (err) {
-            console.error("Failed to submit request:", err);
-            alert("Something went wrong. Please try again.");
+        } catch (error: any) {
+            alert("Failed to submit request: " + error.message);
         } finally {
-            setSubmitting(false);
+            setLoading(false);
         }
     };
 
     const handleDelete = async () => {
-        if (!request || submitting) return;
+        if (!request || loading) return;
 
         const ok = await confirm(
             "Confirm Deletion",
             "Are you sure you want to delete this request? This action cannot be undone."
         );
+
         if (!ok) return;
 
         try {
-            setSubmitting(true);
+            setLoading(true);
             await deleteShiftCoverRequest(request.cover_request_id);
-            alert("Shift Cover Request Successfully deleted!");
+            alert("Shift cover request successfully deleted!");
             onSubmitted?.();
             onClose?.();
-        } catch (err) {
-            console.error("Failed to delete request:", err);
-            alert("Something went wrong. Please try again.");
+        } catch (error: any) {
+            alert("Failed to delete request: " + error.message);
         } finally {
-            setSubmitting(false);
+            setLoading(false);
         }
     };
-
 
     if (!request) return null;
 
@@ -98,38 +93,10 @@ const ShiftDetails: React.FC<ModalProps> = ({
     const isPending = request.status === "Pending";
 
     return (
+
         <ModularModal visible={visible} onClose={onClose}>
-            <View>
-                <Text style={GlobalStyles.modalTitle}>
-                    {request.requested_first_name} {request.requested_last_name}'s Shift
-                </Text>
-            </View>
-            <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
-                <Text style={GlobalStyles.mediumText}>
-                    {formatShiftDate(request.shift_date)}
-                </Text>
-            </View>
 
-            <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
-                <Text style={GlobalStyles.mediumText}>
-                    {formatTime(request.shift_start)}
-                </Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
-                <Text style={GlobalStyles.mediumText}>
-                    {request.section_name}
-                </Text>
-            </View>
-
-            <View style={styles.row}>
-                <Text style={[GlobalStyles.altText, { marginTop: 2, color: Colors.gray }]}>
-                    Submitted on {formatDateTime(request.timestamp)}
-                </Text>
-            </View>
+            <ModalDetails request={request} />
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
@@ -137,18 +104,18 @@ const ShiftDetails: React.FC<ModalProps> = ({
                 {!isLocked && (
                     isOwner ? (
                         <ModularButton
-                            text={submitting ? "Removing..." : "Remove"}
+                            text={loading ? "Removing..." : "Remove"}
                             style={[GlobalStyles.deleteButton, { flex: 1 }]}
                             onPress={handleDelete}
-                            enabled={!submitting}
+                            enabled={!loading}
                         />
                     ) : (
                         <ModularButton
-                            text={submitting ? "Requesting..." : "Request Shift"}
+                            text={loading ? "Requesting..." : "Request Shift"}
                             textStyle={{ color: "white" }}
                             style={[GlobalStyles.submitButton, { flex: 1 }]}
                             onPress={handleSubmit}
-                            enabled={!submitting && isPending}
+                            enabled={!loading && isPending}
                         />
                     )
                 )}
@@ -161,15 +128,13 @@ const ShiftDetails: React.FC<ModalProps> = ({
                 />
 
             </View>
-
-
-
+            
         </ModularModal>
 
     );
 };
 
-export default ShiftDetails
+export default ShiftDetails;
 
 const styles = StyleSheet.create({
     row: {

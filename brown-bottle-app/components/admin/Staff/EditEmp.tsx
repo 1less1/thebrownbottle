@@ -178,14 +178,7 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
     <ModularModal visible={visible} onClose={onClose} scroll={false}>
 
       {/* Header */}
-      <View style={GlobalStyles.headerContainer}>
-        <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
-        {/*
-        <TouchableOpacity onPress={onClose} style={{ marginRight: 8 }}>
-          <Ionicons name="close" size={28} color={Colors.black} />
-        </TouchableOpacity>
-        */}
-      </View>
+      <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
 
 
       {/* Employee Form */}

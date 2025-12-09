@@ -160,8 +160,11 @@ export const GlobalStyles = StyleSheet.create({
         fontSize: 20,
         fontStyle: 'normal',
         fontWeight: 'bold',
-        marginBottom: 15,
+        marginBottom: 10,
         color: 'black',
+        paddingBottom: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.borderColor
     },
 
     // Component Styles

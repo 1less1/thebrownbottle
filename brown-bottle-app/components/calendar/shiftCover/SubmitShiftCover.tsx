@@ -24,23 +24,20 @@ interface ModalProps {
 
 const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
     const { user } = useSession();
-    const [selectedDate, setSelectedDate] = useState('');
     const { confirm } = useConfirm();
-    const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
-    const [submitting, setSubmitting] = useState(false);
+
+    const [loading, setLoading] = useState(false);
     const [loadingShifts, setLoadingShifts] = useState(true);
 
-    useEffect(() => {
-        if (!visible) {
-            setSelectedDate("");
-            setSelectedShift(null);
-            setSubmitting(false);
-        }
-    }, [visible]);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
+
+    const resetForm = () => {
+        setSelectedDate("");
+        setSelectedShift(null);
+    };
 
     const handleSubmit = async () => {
-
-        if (submitting) return;
 
         if (!user) {
             alert('User not found. Please log in again.');
@@ -51,6 +48,8 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
             alert('No shift found for this date.');
             return;
         }
+
+        if (loading) return;
 
         // I NEED to add a SQL TRIGGER for this!!!
         const alreadyExists = await hasPendingRequest(
@@ -67,37 +66,43 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
             'Confirm Submission',
             `Submit Shift Cover Request?`
         );
+
         if (!ok) return;
 
-        setSubmitting(true);
-
-        // ------- Payload being inserted -----------
-
-        const payload: InsertShiftCoverRequest = {
-            requested_employee_id: Number(user.employee_id),
-            shift_id: selectedShift.shift_id,
-        };
+        setLoading(true);
 
         try {
+            setLoading(true);
+
+            const payload: InsertShiftCoverRequest = {
+                requested_employee_id: user.employee_id,
+                shift_id: selectedShift.shift_id,
+            };
+
             await insertShiftCoverRequest(payload);
             alert("Shift cover request submitted successfully!");
             onSubmitted?.();
+            resetForm();
             onClose();
         } catch (error: any) {
-            alert("Failed to submit shift cover request: " + error.message);
+            alert("Failed to submit request: " + error.message);
         } finally {
-            setSubmitting(false);
+            setLoading(false);
         }
+    };
+
+    const handleClose = () => {
+        resetForm();
+        onClose();
     };
 
     return (
 
         <ModularModal visible={visible} onClose={onClose}>
 
-            {/* Header */}
-            <View style={GlobalStyles.headerContainer}>
-                <Text style={GlobalStyles.modalTitle}>New Shift Cover Request</Text>
-            </View>
+            {/* Modal Title */}
+            <Text style={GlobalStyles.modalTitle}>New Shift Cover Request</Text>
+
 
             {/* Calendar */}
             <View style={styles.calendarContainer}>
@@ -133,21 +138,22 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
                     textStyle={{ color: 'white' }}
                     style={GlobalStyles.submitButton}
                     onPress={handleSubmit}
-                    enabled={!submitting && !loadingShifts && selectedShift !== null}
+                    enabled={!loading && !loadingShifts && selectedShift !== null}
                 />
                 <ModularButton
                     text="Cancel"
                     textStyle={{ color: 'gray' }}
                     style={GlobalStyles.cancelButton}
-                    onPress={onClose}
+                    onPress={handleClose}
                 />
             </View>
-
 
         </ModularModal >
 
     );
 };
+
+export default SubmitShiftCover;
 
 const styles = StyleSheet.create({
     calendarContainer: {
@@ -167,8 +173,8 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         fontWeight: 600,
         fontSize: 18,
-        backgroundColor: Colors.bgBlue, 
-        borderWidth: 1, 
+        backgroundColor: Colors.bgBlue,
+        borderWidth: 1,
         borderColor: Colors.borderBlue,
         color: Colors.blue,
         padding: 8,
@@ -177,5 +183,3 @@ const styles = StyleSheet.create({
     }
 
 });
-
-export default SubmitShiftCover;
