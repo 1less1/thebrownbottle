@@ -8,6 +8,8 @@ import { getTasks } from '@/routes/task';
 import { getTimeOffRequest } from '@/routes/time_off_request';
 import { useSession } from '@/utils/SessionContext';
 
+import QuickStatsSkeleton from '../ui/skeleton/home/QuickStatsSkeleton';
+
 const QuickStats = () => {
     const [loading, setLoading] = useState(true);
 
@@ -22,12 +24,11 @@ const QuickStats = () => {
 
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
-     * - Upcoming Shifts Count
-     * - Pending Tasks Count (incomplete)
-     * - Pending Time Off Requests
+     * (Logic omitted for brevity)
      */
     useEffect(() => {
         const fetchData = async () => {
+            // ... (keep your existing fetchData logic)
             try {
                 const employeeId = Number(user?.employee_id);
                 if (!employeeId) return;
@@ -92,6 +93,11 @@ const QuickStats = () => {
 
     }, [user?.employee_id]);
 
+    if (loading) {
+        // Render the skeleton when data is still loading
+        return <QuickStatsSkeleton />;
+    }
+
 
     return (
         <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
@@ -107,13 +113,13 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
                 titleStyle={{ color: Colors.pendingYellow }}
                 valueStyle={{ color: Colors.pendingYellow }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card} 
             />
 
             <StatCard
                 loading={loading}
                 title="Shift Cover Requests"
-                value={upcomingCount} // Fix THIS!!!
+                value={upcomingCount}
                 iconName="repeat-outline"
                 backgroundColor={Colors.bgBlue}
                 iconColor={Colors.blue}
@@ -121,7 +127,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconBlue }}
                 titleStyle={{ color: Colors.blue }}
                 valueStyle={{ color: Colors.blue }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card} 
             />
 
             {/* DISPLAY LIVE PENDING TOR COUNT */}
@@ -136,7 +142,7 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconPurple }}
                 titleStyle={{ color: Colors.purple }}
                 valueStyle={{ color: Colors.purple }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card} 
             />
 
         </View>
@@ -147,7 +153,7 @@ export default QuickStats;
 
 const styles = StyleSheet.create({
     container: {
-        gap: 5,
+        gap: 8,
         width: '100%',
     },
     mobile: {
@@ -158,4 +164,15 @@ const styles = StyleSheet.create({
         flexWrap: 'nowrap',
         justifyContent: 'space-between',
     },
+    card: {
+        flex: 1, 
+        height: 110,
+        padding: 18,
+        marginBottom: 8,
+        marginRight: 2,
+        borderRadius: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    }
 });
