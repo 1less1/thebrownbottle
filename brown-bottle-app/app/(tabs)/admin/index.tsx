@@ -10,6 +10,7 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 
 import Dashboard from "@/components/admin/Dashboard/Dashboard";
+import Requests from '@/components/admin/Requests/Requests';
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
 
@@ -42,11 +43,12 @@ const Admin = () => {
     {
       key: 'dashboard', title: 'Dashboard', component: <Dashboard />
     },
-
+    {
+      key: 'requuests', title: 'Requests', component: <Requests />
+    },
     {
       key: 'schedule', title: 'Schedule', component: <Schedule />
     },
-
     {
       key: 'staff', title: 'Staff', component: <Staff />
     },

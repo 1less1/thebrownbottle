@@ -16,16 +16,16 @@ import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
-import ShiftCoverModal from "@/components/admin/Dashboard/ShiftCover/ShiftCoverModal";
+import ListItemDetails from "@/components/calendar/TimeOff/Templates/ListItemDetails";
+import TimeOffModal from "@/components/admin/Requests/TimeOff/TimeOffModal";
 
-import { getShiftCoverRequest } from "@/routes/shift_cover_request";
-import { GetShiftCoverRequest, ShiftCoverRequest, Status } from "@/types/iShiftCover";
+import { getTimeOffRequest } from "@/routes/time_off_request";
+import { GetTimeOffRequest, TimeOffRequest, Status } from "@/types/iTimeOff";
 
 
 import { useSession } from "@/utils/SessionContext";
 
-interface AdminShiftCoverProps {
+interface AdminTimeOffProps {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
@@ -40,7 +40,7 @@ const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefreshDone }) => {
+const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -54,14 +54,14 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
     const { user } = useSession();
 
-    const [requests, setRequests] = useState<ShiftCoverRequest[]>([]);
+    const [requests, setRequests] = useState<TimeOffRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [shiftCoverModalVisible, setShiftCoverModalVisible] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
+    const [shiftCoverModalVisible, setTimeOffModalVisible] = useState(false);
 
-    const toggleShiftCoverModal = () => setShiftCoverModalVisible((prev) => !prev);
+    const toggleTimeOffModal = () => setTimeOffModalVisible((prev) => !prev);
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
@@ -71,8 +71,8 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
     const [localRefresh, setLocalRefresh] = useState(0);
 
-    // Fetch Shift Cover Requests
-    const fetchSCR = async () => {
+    // Fetch Time Off Requests
+    const fetchTOR = async () => {
 
         if (!user?.employee_id) return;
 
@@ -84,7 +84,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
             const statuses: Status[] = [];
 
             if (activeTab === 'Active') {
-                statuses.push("Awaiting Approval" as Status)
+                statuses.push("Pending" as Status)
             }
 
             if (activeTab === "Completed") {
@@ -97,32 +97,32 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 }
             }
 
-            const params: Partial<GetShiftCoverRequest> = {
+            const params: Partial<GetTimeOffRequest> = {
                 status: statuses,
-                date_sort: dateFilter,
+                date_sort: dateFilter
             };
 
             if (roleFilter) {
-                params.requested_primary_role = roleFilter;
-                params.requested_secondary_role = roleFilter;
-                params.requested_tertiary_role = roleFilter;
+                params.primary_role = roleFilter;
+                params.secondary_role = roleFilter;
+                params.tertiary_role = roleFilter;
             }
 
-            const data = await getShiftCoverRequest(params);
+            const data = await getTimeOffRequest(params);
 
             setRequests(data);
 
         } catch (error) {
-            setError('Failed to fetch shift cover requests.');
+            setError('Failed to fetch time off requests.');
             console.log(error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Fetch Shift Cover Requests on Initialization and State Update
+    // Fetch Time Off Requests on Initialization and State Update
     useEffect(() => {
-        fetchSCR();
+        fetchTOR();
         console.log("Refreshing")
     }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
 
@@ -193,7 +193,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
             </View>
 
 
-            {/* Shift Cover Request Feed */}
+            {/* Time Off Request Feed */}
             <ModularListView
                 data={requests}
                 loading={loading}
@@ -203,7 +203,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);
-                    toggleShiftCoverModal();
+                    toggleTimeOffModal();
                 }}
                 renderItem={(req) => (
                     <ListItemDetails request={req} />
@@ -211,10 +211,10 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
             />
 
 
-            <ShiftCoverModal
+            <TimeOffModal
                 visible={shiftCoverModalVisible}
                 request={selectedRequest}
-                onClose={toggleShiftCoverModal}
+                onClose={toggleTimeOffModal}
                 onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 
@@ -223,7 +223,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
     );
 };
 
-export default AdminShiftCover;
+export default AdminTimeOff;
 
 const styles = StyleSheet.create({
     // Filters
