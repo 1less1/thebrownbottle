@@ -10,7 +10,6 @@ import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularButton from '@/components/modular/ModularButton';
 import ModularModal from '@/components/modular/ModularModal';
-import LoadingCard from '@/components/modular/LoadingCard';
 
 import ModularListView from "@/components/modular/ModularListView";
 import Badge from '@/components/modular/Badge';
