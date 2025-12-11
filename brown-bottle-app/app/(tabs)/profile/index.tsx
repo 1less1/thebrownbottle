@@ -37,8 +37,8 @@ export default function Profile() {
   );
 
   return (
-    <DefaultView backgroundColor={Colors.white}>
 
+    <DefaultView backgroundColor={Colors.white}>
 
       <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
@@ -72,8 +72,11 @@ export default function Profile() {
           </View>
 
         </DefaultScrollView>
+        
       </View>
+
     </DefaultView>
+
   );
 }
 

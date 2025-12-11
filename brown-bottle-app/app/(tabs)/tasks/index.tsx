@@ -37,17 +37,24 @@ export default function TaskPage() {
   }, []);
 
   return (
+
     <DefaultView backgroundColor={Colors.white}>
+
       <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
-        <View style={{ width: '100%', paddingTop: 10, backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.altBorderColor }}>
+
+        {/* Tasks Header */}
+        <View style={GlobalStyles.pageHeaderContainer}>
           <Text style={GlobalStyles.pageHeader}>Tasks</Text>
         </View>
 
         <ScrollView style={{ flex: 1 }}>
           <Tasks user={user} sections={sections} />
         </ScrollView>
+
       </View>
+
     </DefaultView>
+
   );
 }
 

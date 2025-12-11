@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { View } from 'react-native';
 import { useSession } from '@/utils/SessionContext';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import SpreadSheet from "@/components/admin/Schedule/SpreadSheet";
+import AdminShiftCover from "@/components/admin/ShiftCover/AdminShiftCover";
 
-const Schedule = () => {
+const ShiftCover = () => {
   const { user } = useSession();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -24,7 +24,7 @@ const Schedule = () => {
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
       <View style={{ marginTop: 16, width: '90%' }}>
-        <SpreadSheet parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+        <AdminShiftCover parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
     </DefaultScrollView>
@@ -33,4 +33,4 @@ const Schedule = () => {
 
 };
 
-export default Schedule;
+export default ShiftCover;
