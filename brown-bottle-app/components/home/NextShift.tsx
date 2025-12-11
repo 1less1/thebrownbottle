@@ -7,6 +7,7 @@ import { to24HourFormat } from '@/utils/dateTimeHelpers';
 import StatCard from '../modular/StatCard';
 import { getShift } from '@/routes/shift';
 import { Shift } from '@/types/iShift';
+import NextShiftSkeleton from '../ui/skeleton/home/NextShiftSkeleton';
 
 interface Props {
   employee_id: number;
@@ -81,17 +82,7 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
 
   // Loading visual
   if (loading) {
-    return (
-      <View>
-        <Text style={GlobalStyles.floatingHeaderText}>Your Next Shift</Text>
-        <StatCard
-          loading={true}
-          title="Finding your next shift..."
-          value=""
-          iconName="time-outline"
-        />
-      </View>
-    );
+    return <NextShiftSkeleton />
   }
 
   //  No shifts upcoming OR current

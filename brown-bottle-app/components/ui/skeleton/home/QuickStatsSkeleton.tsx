@@ -4,7 +4,6 @@ import SkeletonPulse from "../SkeletonPulse";
 import { Colors } from "@/constants/Colors";
 
 const QuickStatsSkeleton = () => {
-    // const { width } = useWindowDimensions();
 
     return (
         <View style={[styles.container, styles.desktop]}>
@@ -12,7 +11,7 @@ const QuickStatsSkeleton = () => {
             {/* 1st Skeleton Card */}
             <View style={[styles.card, styles.pendingCard]}>
                 <View>
-                    <SkeletonPulse width={150} height={16} borderRadius={4} backgroundColor={"#fcba5883"}/>
+                    <SkeletonPulse width={150} height={16} borderRadius={4} backgroundColor={"#fcba5883"} />
                     <SkeletonPulse width={60} height={44} borderRadius={6} backgroundColor={"#fcba5883"} style={{ marginTop: 10 }} />
                 </View>
 
@@ -30,7 +29,7 @@ const QuickStatsSkeleton = () => {
             </View>
 
             {/* 3rd Skeleton Card */}
-            <View style={[styles.card,styles.timeOffCard]}>
+            <View style={[styles.card, styles.timeOffCard]}>
                 <View>
                     <SkeletonPulse width={150} height={16} backgroundColor={"#cab1ccb7"} borderRadius={4} />
                     <SkeletonPulse width={60} height={44} backgroundColor={"#cab1ccb7"} borderRadius={6} style={{ marginTop: 10 }} />
@@ -52,13 +51,14 @@ const styles = StyleSheet.create({
     },
     desktop: {
         flexDirection: 'row',
-        flexWrap: 'nowrap',
+        flexWrap: 'wrap',
         justifyContent: 'space-between',
     },
     // The individual card style needs adjustment for the layout to work smoothly
     card: {
         flex: 1, // Allows cards to take up equal space in a row
         height: 110,
+        minWidth: 215,
         padding: 18,
         marginBottom: 8,
         marginRight: 2,
@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderWidth: 1,
         borderColor: Colors.altBorderColor,
+        flexBasis: '32%'
     },
     pendingCard: {
         backgroundColor: Colors.bgYellow,

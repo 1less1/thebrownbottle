@@ -80,7 +80,6 @@ export default function HomeScreen() {
               <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
               <QuickStats />
             </View>
-            {/* <QuickStatsSkeleton/> */}
             <View style={styles.contentRow}>
 
               {/* Announcements column */}
