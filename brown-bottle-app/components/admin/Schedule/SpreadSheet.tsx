@@ -150,13 +150,13 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   }, [selectedSections, selectedRoles, isToday, currentWeekStart, parentRefresh, localRefresh]);
 
   // Layout Calculations
-  const isMobile = WIDTH < 768;
-  const NAME_COL_WIDTH = isMobile ? 160 : Math.max(160, WIDTH * 0.12);
   const weekDays = getWeekDayList(currentWeekStart, 7);
-  const DAY_COL_WIDTH = isMobile ? 120 : Math.max(120, (WIDTH * 0.70) / weekDays.length);
+  const isMobile = WIDTH < 768;
+  const NAME_COL_WIDTH = isMobile ? 170 : Math.max(160, WIDTH * 0.12);
+  const DAY_COL_WIDTH = isMobile ? 135 : Math.max(120, (WIDTH * 0.75) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
-  const cardHeight = Platform.OS === "web" ? height * 0.8 : height * 0.70;
+  const cardHeight = isMobile ? height * 0.7 : height * 0.8;
 
 
   const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
@@ -238,7 +238,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   return (
 
-    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}> {/* OLD: height: height * 0.67 */}
+    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
 
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>
@@ -353,7 +353,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
       {/* Flat List = Vertical */}
-      <View style={{ flex: 1 }}>
+      <View style={{ alignSelf: "center", flex: 1 }}>
         <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <View>
             {renderHeader()}

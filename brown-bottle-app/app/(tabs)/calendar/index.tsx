@@ -78,7 +78,8 @@ const CalendarPage = () => {
 
       <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
-        <View style={{ backgroundColor: Colors.white }}>
+        {/* Calendar Header */}
+        <View style={GlobalStyles.pageHeaderContainer}>
 
           <Text style={GlobalStyles.pageHeader}>Calendar</Text>
 
@@ -97,6 +98,7 @@ const CalendarPage = () => {
               </TouchableOpacity>
             ))}
           </View>
+
         </View>
 
         {/* Render content based on selected tab */}

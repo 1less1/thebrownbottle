@@ -32,11 +32,11 @@ const Staff = () => {
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <View style={{ marginTop: 16, width: '85%' }}>
+      <View style={{ marginTop: 16, width: '90%' }}>
         <StaffSearch parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
-      <View style={[styles.moduleContainer, { marginVertical: 16, width: '85%' }]}>
+      <View style={[styles.moduleContainer, { marginVertical: 16, width: '90%' }]}>
         
         <Card style={styles.moduleCard}>
           <AddEmp onInsert={handleRefresh}/>

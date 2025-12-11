@@ -57,7 +57,7 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12,
     flexWrap: 'wrap',
   },
   card: {

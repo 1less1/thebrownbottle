@@ -1,22 +1,26 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native'; // <-- Added Platform
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
+import AdminDrawer from '@/components/admin/AdminDrawer';
 
 import Dashboard from "@/components/admin/Dashboard/Dashboard";
-import Requests from '@/components/admin/Requests/Requests';
+import ShiftCover from '@/components/admin/ShiftCover/ShiftCover';
+import TimeOff from '@/components/admin/TimeOff/TimeOff';
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
 
+import { Tab } from '@/components/admin/AdminDrawer';
+
 import { useSession } from '@/utils/SessionContext';
 
-import Sidebar from "@/components/admin/Sidebar";
 
 const Admin = () => {
   // Dynamic Status Bar
@@ -30,32 +34,27 @@ const Admin = () => {
   const { user } = useSession();
 
   const [activeTab, setActiveTab] = useState(0);
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
+
   const TAB_STORAGE_KEY = 'adminActiveTab';
 
   // Save tab index on change
   const handleTabChange = async (index: number) => {
     setActiveTab(index);
     await AsyncStorage.setItem(TAB_STORAGE_KEY, index.toString());
+    setDrawerVisible(false); // auto-close drawer after selecting a tab
   };
 
   // Define available tabs and corresponding components
-  const tabs = [
-    {
-      key: 'dashboard', title: 'Dashboard', component: <Dashboard />
-    },
-    {
-      key: 'requuests', title: 'Requests', component: <Requests />
-    },
-    {
-      key: 'schedule', title: 'Schedule', component: <Schedule />
-    },
-    {
-      key: 'staff', title: 'Staff', component: <Staff />
-    },
-    
+  const tabs: Tab[] = [
+    { key: 'Dashboard', title: 'Dashboard', component: <Dashboard /> },
+    { key: 'Shift Cover', title: 'Shift Cover', component: <ShiftCover /> },
+    { key: 'Time Off', title: 'Time Off', component: <TimeOff /> },
+    { key: 'Schedule', title: 'Schedule', component: <Schedule /> },
+    { key: 'Staff', title: 'Staff', component: <Staff /> },
   ];
 
-  // Load Saved Tab If it Exists, otherwise load tab index 0
+  // Load Saved Tab If it Exists
   useEffect(() => {
     const loadSavedTab = async () => {
       try {
@@ -63,8 +62,6 @@ const Admin = () => {
         const tabIndex = Number(savedTabIndex);
         if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < tabs.length) {
           setActiveTab(tabIndex);
-        } else {
-          setActiveTab(0);
         }
       } catch (error) {
         console.warn('Failed to load saved tab index:', error);
@@ -77,96 +74,52 @@ const Admin = () => {
 
     <DefaultView backgroundColor={Colors.white}>
 
-      {/* Added: flexDirection row only on web to support sidebar */}
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.bgApp,
-          flexDirection: Platform.OS === "web" ? "row" : "column",
-        }}
-      >
+      <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
 
-        {/* Main Content FIRST (Left side) */}
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              backgroundColor: Colors.white,
-              borderBottomWidth: Platform.OS === "web" ? 1 : 0, // add border if web
-              borderBottomColor: Platform.OS === "web" ? Colors.borderColor : "transparent",
-            }}
+        {/* Admin Header */}
+        <View style={[GlobalStyles.pageHeaderContainer, styles.adminHeader]}>
+
+          <Text style={GlobalStyles.pageHeader}>Admin</Text>
+
+          <TouchableOpacity
+            style={styles.drawerIcon}
+            onPress={() => setDrawerVisible(prev => !prev)}
           >
-
-            <Text style={GlobalStyles.pageHeader}>Admin</Text>
-
-            {/* Tab Bar (Mobile Only) */}
-            {Platform.OS !== "web" && (
-              <View style={styles.tabBar}>
-                {tabs.map((tab, index) => (
-                  <TouchableOpacity
-                    key={tab.key}
-                    style={[
-                      styles.tabButton,
-                      activeTab === index && styles.activeTabButton,
-                    ]}
-                    onPress={() => handleTabChange(index)}
-                  >
-                    <Text style={styles.tabText}>{tab.title}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {/* Tab Content */}
-          <View style={styles.tabContent}>
-            {tabs[activeTab]?.component}
-          </View>
+            <Ionicons name="reorder-three-outline" size={35} color={Colors.black} />
+          </TouchableOpacity>
         </View>
 
-        {/* Sidebar (Right side) */}
-        {Platform.OS === "web" && (
-          <Sidebar activeTab={activeTab} setActiveTab={handleTabChange} tabs={tabs} />
-        )}
-
+        {/* Tab Content */}
+        <View style={styles.tabContent}>
+          {tabs[activeTab]?.component}
+        </View>
       </View>
 
+      <AdminDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        tabs={tabs}
+      />
 
     </DefaultView>
 
   );
 };
 
-export default Admin;
-
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: 'black',
-    marginLeft: 20,
-    marginTop: 25,
-    marginBottom: 20,
-  },
-  tabBar: {
+  adminHeader: {
     flexDirection: 'row',
-    borderBottomWidth: 0.5,
-    borderBottomColor: Colors.altBorderColor,
+    justifyContent: 'space-between',
+    paddingRight: 20,
   },
-  tabButton: {
-    flex: 1,
-    padding: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeTabButton: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'black',
-  },
-  tabText: {
-    fontSize: 16,
-    color: 'black',
+  drawerIcon: {
+    padding: 5,
   },
   tabContent: {
     flex: 1,
   },
 });
+
+export default Admin;
