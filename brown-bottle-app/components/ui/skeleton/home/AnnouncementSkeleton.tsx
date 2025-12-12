@@ -10,15 +10,14 @@ const AnnouncementSkeleton = () => {
                 <View style={styles.card}>
 
                     <View style={styles.header}>
-                        <SkeletonPulse width={160} height={18} borderRadius={4} backgroundColor="#d0d0d08b" />
-                        <SkeletonPulse width={70} height={20} borderRadius={6} backgroundColor="#d0d0d08b" />
+                        <SkeletonPulse width={160} height={18} borderRadius={4} backgroundColor="#e3e5e6ff" />
+                        <SkeletonPulse width={50} height={20} borderRadius={4} backgroundColor="#e3e5e6ff" />
                     </View>
 
-                    <SkeletonPulse width="85%" height={24} borderRadius={4} backgroundColor="#d0d0d08b" style={{ marginTop: 10 }} />
-                    {/* <SkeletonPulse width="60%" height={16} borderRadius={4} backgroundColor="#d0d0d0a8" style={{ marginTop: 6 }} /> */}
-                    <SkeletonPulse width={90} height={12} borderRadius={4} backgroundColor="#d0d0d08b" style={{ marginTop: 10 }} />
+                    <SkeletonPulse width="85%" height={24} borderRadius={4} backgroundColor="#e3e5e6ff" style={{ marginTop: 10 }} />
+                    <SkeletonPulse width={90} height={12} borderRadius={4} backgroundColor="#e3e5e6ff" style={{ marginTop: 10 }} />
 
-                    <SkeletonPulse width={100} height={32} borderRadius={6} backgroundColor="#d0d0d08b" style={{ marginTop: 12 }} />
+                    <SkeletonPulse width={110} height={26} borderRadius={6} backgroundColor="#e3e5e6ff" style={{ marginTop: 12 }} />
 
                 </View>
 

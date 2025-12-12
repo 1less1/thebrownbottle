@@ -14,19 +14,30 @@ import { getEmployee } from "@/routes/employee";
 import { Employee } from "@/types/iEmployee";
 import AccountInfo from "@/components/profile/AccountInfo";
 import ProfileStats from "@/components/profile/ProfileStats";
+import ProfileCardSkeleton from "@/components/ui/skeleton/profile/ProfileCardSkeleton";
+import AccountInfoSkeleton from "@/components/ui/skeleton/profile/AccountInfoSkeleton";
+import StatSkeletons from "@/components/ui/skeleton/profile/StatSkeletons";
 
 export default function Profile() {
   // Get signed-in user
   const { user } = useSession();
   const [profile, setProfile] = useState<Employee | null>(null);
+  const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     if (user?.employee_id) {
+      setLoading(true);
+
       getEmployee({ employee_id: user.employee_id })
-        .then((res) => setProfile(res[0] || null))
-        .catch((error) => console.error("Profile fetch error:", error));
+        .then((res) => {
+          setProfile(res[0] || null);
+        })
+        .catch((error) => console.error("Profile fetch error:", error))
+        .finally(() => setLoading(false));
     }
   }, [user]);
+
 
   // Dynamic Status Bar
   useFocusEffect(
@@ -53,19 +64,32 @@ export default function Profile() {
 
             {/* Profile Card */}
             <View style={{ marginTop: 20 }}>
-              <ProfileCard profile={profile} />
+              {loading || !profile ? (
+                <ProfileCardSkeleton />
+              ) : (
+                <ProfileCard profile={profile} />
+              )}
             </View>
+
 
             <View style={[styles.contentRow, { width: '100%' }]}>
 
               {/* Account Info */}
               <Card style={styles.accountInfo}>
-                <AccountInfo profile={profile} />
+                {loading || !profile ? (
+                  <AccountInfoSkeleton />
+                ) :
+                  <AccountInfo profile={profile} />
+                }
               </Card>
 
               {/* Profile Stats */}
               <View style={styles.stats}>
-                <ProfileStats profile={profile} />
+                {loading || !profile ? (
+                  <StatSkeletons />
+                ) :
+                  <ProfileStats profile={profile} />
+                }
               </View>
 
             </View>
