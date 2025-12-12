@@ -48,8 +48,8 @@ const StatCard: React.FC<StatCardProps> = ({
         <AnimatedTouchableWrapper
             onPress={onPress}
             pressScale={0.95}
-            hoverScale={1.03}
-            style={{ flexGrow: 1 }}
+            hoverScale={1.01}
+            style={{ flex: 1 }}
         >
             <View style={[styles.card, { backgroundColor, borderColor }, style]}>
                 <View>

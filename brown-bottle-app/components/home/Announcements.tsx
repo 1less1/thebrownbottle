@@ -3,13 +3,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import Card from "@/components/modular/Card";
-import AltCard from '@/components/modular/AltCard';
-import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
-
-import ModularButton from '@/components/modular/ModularButton';
-import ModularModal from '@/components/modular/ModularModal';
 
 import ModularListView from "@/components/modular/ModularListView";
 import Badge from '@/components/modular/Badge';
@@ -19,6 +13,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { useSession } from "@/utils/SessionContext";
 import { getAcknowledgedAnnouncements } from '@/routes/announcement';
+
+import AnnouncementSkeleton from '../ui/skeleton/home/AnnouncementSkeleton';
 
 const Announcements = () => {
 
@@ -43,6 +39,9 @@ const Announcements = () => {
   const fetchAnnouncements = useCallback(async () => {
     setLoading(true);
     setError(null);
+
+    // LOADING DELAY
+    await new Promise(resolve => setTimeout(resolve, 150));
 
     try {
       const data =
@@ -90,7 +89,6 @@ const Announcements = () => {
     setAcknowledged((prev) => [...prev, announcementId]);
 
     try {
-      console.log("Sending ack:", announcementId, user?.employee_id);
       await acknowledgeAnnouncement(announcementId, user.employee_id);
     } catch (err) {
       console.log("Error acknowledging announcement:", err);
@@ -157,17 +155,23 @@ const Announcements = () => {
 
         {/* ModularListView */}
         <View style={{ height: 375 }}>
-          <ModularListView
-            data={announcements}
-            loading={loading}
-            error={error}
-            emptyText="No announcements available."
-            maxHeight={375}
-            renderItem={renderAnnouncement}
-            keyExtractor={(item) => item.announcement_id.toString()}
-            onRefresh={fetchAnnouncements}
-            refreshing={loading}
-          />
+          {loading ? (
+            <>
+              <AnnouncementSkeleton />
+            </>
+          ) : (
+            <ModularListView
+              data={announcements}
+              loading={false}   // We handle skeletons, not MLV
+              error={error}
+              emptyText="No announcements available."
+              maxHeight={375}
+              renderItem={renderAnnouncement}
+              keyExtractor={(item) => item.announcement_id.toString()}
+              onRefresh={fetchAnnouncements}
+              refreshing={loading}
+            />
+          )}
         </View>
 
       </View>

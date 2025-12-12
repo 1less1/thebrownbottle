@@ -5,6 +5,7 @@ interface SkeletonProps {
   width?: number | string;
   height?: number | string;
   borderRadius?: number;
+  backgroundColor?: string;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -12,6 +13,7 @@ const SkeletonPulse: React.FC<SkeletonProps> = ({
   width = "100%",
   height = 20,
   borderRadius = 6,
+  backgroundColor = "#f1f1f1b6",
   style,
 }) => {
   const opacity = useRef(new Animated.Value(0.3)).current;
@@ -41,7 +43,7 @@ const SkeletonPulse: React.FC<SkeletonProps> = ({
           width,
           height,
           borderRadius,
-          backgroundColor: "#d9d9d96b",
+          backgroundColor: backgroundColor,
           opacity,
         } as ViewStyle,
         style
