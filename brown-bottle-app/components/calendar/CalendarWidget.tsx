@@ -71,6 +71,10 @@ const CalendarWidget: React.FC<{
       initialDate || new Date().toISOString().split("T")[0]
     );
 
+    const today = useMemo(
+      () => new Date().toISOString().split("T")[0],
+      []
+    );
 
     /** ---- FETCH SHIFTS (ONLY IF ALLOWED) ---- */
     // Fetch Shifts on Initialization and State Update
@@ -97,14 +101,17 @@ const CalendarWidget: React.FC<{
 
     const markedDates = useMemo(() => {
       const map: Record<string, any> = {};
-      const today = new Date().toISOString().split("T")[0];
 
       // Mark shift days
       if (showShifts) {
         shifts.forEach((shift) => {
+          const isPast = shift.date < today;
+          const isPicker = mode === "picker";
           map[shift.date] = {
             selected: true,
-            selectedColor: Colors.borderBlue,
+            selectedColor:
+            // Greyed out shifts in the past
+              isPicker && isPast ? Colors.disabledBlue : Colors.borderBlue,
           };
         });
       }
@@ -157,6 +164,7 @@ const CalendarWidget: React.FC<{
           current={selectedDate}
           markedDates={markedDates}
           onDayPress={handleDayPress}
+          minDate={mode === "picker" ? today : undefined} // deactivate dates before today if on picker mode
           theme={{
             backgroundColor: Colors.white,
             calendarBackground: Colors.white,
