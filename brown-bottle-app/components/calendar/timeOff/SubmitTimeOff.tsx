@@ -31,9 +31,6 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [startDateVisible, setStartDateVisible] = useState(false);
-  const [endDateVisible, setEndDateVisible] = useState(false);
-
   const resetForm = () => {
     setReason('');
     setStartDate('');
@@ -88,72 +85,34 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       {/* Modal Title */}
       <Text style={GlobalStyles.modalTitle}>New Time Off Request</Text>
 
-      {/* Start Date */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
-        <ModularButton
-          text="Choose Start Date"
-          style={{ flexGrow: 1, flexShrink: 1, minWidth: 200, flexBasis: '48%', backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
-          textStyle={{ color: Colors.purple }}
-          onPress={() => setStartDateVisible(true)}
+      {/* Inline Range Calendar */}
+      <View style={styles.calendarContainer}>
+        <CalendarWidget
+          mode="picker"
+          pickerType="range"
+          showShifts={false}
+          onSelectRange={({ startDate, endDate }) => {
+            setStartDate(startDate);
+            setEndDate(endDate);
+          }}
         />
+      </View>
 
+      {/* Selected Dates Display */}
+      <View style={{ flexDirection: "row", gap: 10, marginVertical: 15 }}>
         <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>Date: </Text>
+          <Text style={GlobalStyles.text}>From: </Text>
           <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {startDate ? formatDateWithYear(startDate) : ""}
-          </Text>
+          {startDate && endDate
+            ? `${formatDateWithYear(startDate)} → ${formatDateWithYear(endDate)}`
+            : startDate
+              ? `${formatDateWithYear(startDate)} →`
+              : ""}
+        </Text>
         </View>
       </View>
 
-      {/* Start Date Picker Modal */}
-      <ModularModal visible={startDateVisible} onClose={() => setStartDateVisible(false)}>
-        <CalendarWidget
-          mode="picker"
-          showShifts={false}
-          initialDate={startDate}
-          onSelectDate={({ date }) => {
-            setStartDate(date);
-            setStartDateVisible(false);
-          }}
-        />
-
-        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setStartDateVisible(false)} />
-      </ModularModal>
-
-      {/* End Date */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
-        <ModularButton
-          text="Choose End Date"
-          style={{ flexGrow: 1, flexShrink: 1, flexBasis: '48%', minWidth: 200, backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
-          textStyle={{ color: Colors.purple }}
-          onPress={() => setEndDateVisible(true)}
-        />
-
-        <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>Date: </Text>
-          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {endDate ? formatDateWithYear(endDate) : ""}
-          </Text>
-        </View>
-      </View>
-
-      {/* End Date Picker Modal */}
-      <ModularModal visible={endDateVisible} onClose={() => setEndDateVisible(false)}>
-        <CalendarWidget
-          mode="picker"
-          showShifts={false}
-          initialDate={startDate}
-          onSelectDate={({ date }) => {
-            setEndDate(date);
-            setEndDateVisible(false);
-          }}
-        />
-
-        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setEndDateVisible(false)} />
-      </ModularModal>
-
-
-      {/* Reason Field */}
+      {/* Reason */}
       <Text style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}>
         Reason for Time Off
       </Text>
@@ -196,13 +155,20 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     gap: 10,
   },
+  calendarContainer: {
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 12,
+        borderColor: Colors.borderColor,
+        paddingTop: 5,
+        paddingBottom: 5,
+        paddingRight: 10,
+        paddingLeft: 10,
+    },
   dateContainer: {
-    flexShrink: 1,
-    flexGrow: 1,
+    flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    minWidth: 200,
-    flexBasis: '48%',
     borderRadius: 5,
     backgroundColor: 'white',
     borderColor: Colors.borderColor,
@@ -210,11 +176,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     alignItems: 'center',
-    textAlignVertical: 'center',
-  },
-  calendarButton: {
-    flexShrink: 1,
-    minWidth: 200,
-    paddingHorizontal: 15,
   },
 });
