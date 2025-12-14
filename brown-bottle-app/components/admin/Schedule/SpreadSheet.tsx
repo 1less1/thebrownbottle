@@ -152,8 +152,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   // Layout Calculations
   const weekDays = getWeekDayList(currentWeekStart, 7);
   const isMobile = WIDTH < 768;
-  const NAME_COL_WIDTH = isMobile ? 170 : Math.max(160, WIDTH * 0.12);
-  const DAY_COL_WIDTH = isMobile ? 135 : Math.max(120, (WIDTH * 0.75) / weekDays.length);
+  const NAME_COL_WIDTH = isMobile ? 170 : Math.max(170, WIDTH * 0.12);
+  const DAY_COL_WIDTH = isMobile ? 135 : Math.max(135, (WIDTH * 0.75) / weekDays.length);
   const ROW_HEIGHT = 50;
   const HEADER_HEIGHT = 44;
   const cardHeight = isMobile ? height * 0.7 : height * 0.8;
@@ -353,7 +353,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
       {/* Flat List = Vertical */}
-      <View style={{ alignSelf: "center", flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <View>
             {renderHeader()}

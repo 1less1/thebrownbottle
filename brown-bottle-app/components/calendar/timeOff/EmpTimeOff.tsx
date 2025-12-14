@@ -45,12 +45,8 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
   const WIDTH = width;
   const HEIGHT = height;
 
-  const PC_MAX_HEIGHT_FACTOR = 0.65;
-  const MOBILE_MAX_HEIGHT_FACTOR = 0.45;
-
-  const listMaxHeight = Platform.OS === 'web'
-    ? HEIGHT * PC_MAX_HEIGHT_FACTOR  // Use a larger fraction of screen height for web
-    : HEIGHT * MOBILE_MAX_HEIGHT_FACTOR; // Use a smaller fraction for mobile
+  const isMobile = WIDTH < 768;
+  const cardHeight = isMobile ? height * 0.65 : height * 0.7;
 
   const { user } = useSession();
 
@@ -120,7 +116,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
 
   return (
 
-    <Card>
+    <Card style={{ height: cardHeight }}>
 
       {/* Header Row */}
       <View style={styles.headerContainer}>
@@ -171,7 +167,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         loading={loading}
         error={error}
         emptyText="No requests found."
-        maxHeight={listMaxHeight}
+        maxHeight={HEIGHT * 0.625}
         onItemPress={(req) => {
           setSelectedRequest(req);
           toggleTimeOffDetails();

@@ -1,85 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import StatCard from '@/components/modular/StatCard';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-import { getShift } from '@/routes/shift';
+import StatCard from '@/components/modular/StatCard';
+
 import { getTasks } from '@/routes/task';
+import { getShift } from '@/routes/shift';
+import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
 import { useSession } from '@/utils/SessionContext';
 
-const QuickStats = () => {
+interface Props {
+  parentRefresh?: number;
+  onRefreshDone?: () => void;
+}
+
+const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [loading, setLoading] = useState(true);
 
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [taskCount, setTaskCount] = useState(0);
+    const [shiftCoverCount, setShiftCoverCount] = useState(0);
     const [pendingTimeOffCount, setPendingTimeOffCount] = useState(0);
 
     const { width } = useWindowDimensions();
     const { user } = useSession();
 
-    const isMobile = width < 750;
+    const isMobile = width < 768;
 
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
-     * - Upcoming Shifts Count
      * - Pending Tasks Count (incomplete)
+     * - Pending/Awaiting Approval Shift Cover Requests
      * - Pending Time Off Requests
      */
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const employeeId = Number(user?.employee_id);
-                if (!employeeId) return;
+    const fetchData = useCallback(async () => {
+        try {
+            const employeeId = Number(user?.employee_id);
+            if (!employeeId) return;
 
-                const now = new Date();
+            // Fetch PENDING and AWAITING APPROVAL Shift Cover Requests
+            const shiftCoverData = await getShiftCoverRequest({
+                requested_employee_id: employeeId,
+                status: ["Pending", "Awaiting Approval"]
+            })
+            setShiftCoverCount(shiftCoverData.length)
 
-                // FETCH UPCOMING SHIFTS >> Change to Shift Cover Requests!!!!
-                const shiftData = await getShift({ employee_id: employeeId });
+            // Fetch PENDING Tasks
+            const todaysShift = await getShift({
+                employee_id: employeeId,
+                is_today: 1,
+            });
 
-                const futureShifts = shiftData.filter((shift: any) => {
-                    const shiftDate = new Date(`${shift.date}T00:00:00`);
-                    return shiftDate > now;
-                });
-
-                setUpcomingCount(futureShifts.length);
-
-                // FETCH PENDING TASKS
-                const todaysShift = await getShift({
-                    employee_id: employeeId,
-                    is_today: 1,
-                });
-
-                if (!todaysShift || todaysShift.length === 0) {
-                    setTaskCount(0);
-                } else {
-                    const section_id = todaysShift[0].section_id;
-                    const tasks = await getTasks({
-                        section_id,
-                        complete: 0,
-                    });
-                    setTaskCount(tasks.length);
-                }
-
-                // FETCH PENDING TIME OFF REQs
-                const tor = await getTimeOffRequest({
-                    employee_id: employeeId,
-                    status: ["Pending"],
-                });
-
-                setPendingTimeOffCount(tor.length);
-
-            } catch (err) {
-                console.error("QuickStats error:", err);
-                setUpcomingCount(0);
+            if (!todaysShift || todaysShift.length === 0) {
                 setTaskCount(0);
-                setPendingTimeOffCount(0);
-            } finally {
-                setLoading(false);
+            } else {
+                const section_id = todaysShift[0].section_id;
+                const tasks = await getTasks({
+                    section_id,
+                    complete: 0,
+                });
+                setTaskCount(tasks.length);
             }
-        };
 
-        // **Run immediately**
+            // Fetch PENDING Time Off Requests
+            const tor = await getTimeOffRequest({
+                employee_id: employeeId,
+                status: ["Pending"],
+            });
+
+            setPendingTimeOffCount(tor.length);
+
+        } catch (error: any) {
+            console.log("There was an error fetching Quick Stats: " + error.message)
+            setUpcomingCount(0);
+            setTaskCount(0);
+            setPendingTimeOffCount(0);
+        } finally {
+            setLoading(false);
+        }
+    }, [user?.employee_id]);
+
+    // Fetch data on initalization and state update
+    useEffect(() => {
         fetchData();
 
         //POLLING INTERVAL — Refresh every 10 seconds
@@ -90,10 +95,11 @@ const QuickStats = () => {
         // Cleanup when component unmounts
         return () => clearInterval(interval);
 
-    }, [user?.employee_id]);
+    }, [parentRefresh, fetchData]);
 
 
     return (
+
         <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
 
             <StatCard
@@ -113,7 +119,7 @@ const QuickStats = () => {
             <StatCard
                 loading={loading}
                 title="Shift Cover Requests"
-                value={upcomingCount} // Fix THIS!!!
+                value={shiftCoverCount}
                 iconName="repeat-outline"
                 backgroundColor={Colors.bgBlue}
                 iconColor={Colors.blue}
@@ -124,7 +130,6 @@ const QuickStats = () => {
                 style={{ marginLeft: 8, marginRight: 8 }}
             />
 
-            {/* DISPLAY LIVE PENDING TOR COUNT */}
             <StatCard
                 loading={loading}
                 title="Time Off Requests"
@@ -140,10 +145,9 @@ const QuickStats = () => {
             />
 
         </View>
+
     );
 };
-
-export default QuickStats;
 
 const styles = StyleSheet.create({
     container: {
@@ -159,3 +163,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
 });
+
+export default QuickStats;

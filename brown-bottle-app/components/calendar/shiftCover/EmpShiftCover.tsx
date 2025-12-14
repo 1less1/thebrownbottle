@@ -51,12 +51,8 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
     const WIDTH = width;
     const HEIGHT = height;
 
-    const PC_MAX_HEIGHT_FACTOR = 0.58;
-    const MOBILE_MAX_HEIGHT_FACTOR = 0.4;
-
-    const listMaxHeight = Platform.OS === 'web'
-        ? HEIGHT * PC_MAX_HEIGHT_FACTOR  // Use a larger fraction of screen height for web
-        : HEIGHT * MOBILE_MAX_HEIGHT_FACTOR; // Use a smaller fraction for mobile
+    const isMobile = WIDTH < 768;
+    const cardHeight = isMobile ? height * 0.65 : height * 0.7;
 
     const { user } = useSession();
 
@@ -135,7 +131,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
     return (
 
-        <Card>
+        <Card style={{ height: cardHeight }}>
 
             {/* New Request Button */}
             <ModularButton
@@ -195,7 +191,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                         ? "No requests found."
                         : "No available shifts right now."
                 }
-                maxHeight={listMaxHeight}
+                maxHeight={HEIGHT * 0.625}
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);

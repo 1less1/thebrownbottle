@@ -240,14 +240,14 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                     <ModularButton
                         text="Delete"
                         textStyle={{ color: 'white' }}
-                        style={GlobalStyles.submitButton}
+                        style={[GlobalStyles.submitButton, { flex: 1 }]}
                         onPress={handleRemove}
                         enabled={!loading}
                     />
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={GlobalStyles.cancelButton}
+                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
                         onPress={onClose}
                     />
                 </View>

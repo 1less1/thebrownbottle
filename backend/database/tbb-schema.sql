@@ -163,7 +163,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
   `author_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(500) NOT NULL,
   `description` TEXT NOT NULL,
-  `role_id` INT UNSIGNED NOT NULL DEFAULT 1,
+  `role_id` INT UNSIGNED NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`announcement_id`),
   UNIQUE INDEX `announcement_id_UNIQUE` (`announcement_id` ASC) VISIBLE,
@@ -181,10 +181,10 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`announcement` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`announcement_acknowledgment`
 -- -----------------------------------------------------
-
 CREATE TABLE announcement_acknowledgment (
     id INT AUTO_INCREMENT PRIMARY KEY,
     announcement_id INT NOT NULL,
@@ -192,6 +192,7 @@ CREATE TABLE announcement_acknowledgment (
     acknowledged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (announcement_id, employee_id )
 );
+
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`shift`

@@ -39,16 +39,23 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
   const [startTime, setStartTime] = useState<string>("");
   const [sectionId, setSectionId] = useState<number | null>(null);
 
+  const [edit, setEdit] = useState(false);
+  const handleEdit = () => setEdit(!edit);
+
   const { confirm } = useConfirm();
 
   useEffect(() => {
     if (visible) {
-      setEmployeeId(employeeData?.employee_id ?? null)
-      setShiftId(shiftData?.shift_id ?? null)
+      setEmployeeId(employeeData?.employee_id ?? null);
+      setShiftId(shiftData?.shift_id ?? null);
       setStartTime(shiftData?.start_time ?? "");
       setSectionId(shiftData?.section_id ?? null);
+
+      // Correct edit mode initialization
+      setEdit(shiftData ? false : true);
     }
   }, [visible, shiftData, employeeData]);
+
 
 
   const buildFormData = (): Partial<Shift> => ({
@@ -168,6 +175,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
           <TimeDropdown
             time={startTime}
             onTimeChange={(value) => setStartTime(value)}
+            disabled={!edit}
           />
 
           <Text style={GlobalStyles.inputLabelText}>Section</Text>
@@ -176,29 +184,62 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
             onSectionSelect={(value) => setSectionId(value as number)}
             labelText=""
             containerStyle={{ marginBottom: 10, backgroundColor: Colors.inputBG }}
+            disabled={!edit}
           />
 
           {/* Buttons */}
-          <View style={styles.buttonRowContainer}>
-            <ModularButton
-              textStyle={{ color: 'white' }}
-              style={GlobalStyles.submitButton}
-              text={shiftData ? 'Save Changes' : 'Add Shift'}
-              onPress={handleSave}
-            />
-            {shiftData && (
-              <ModularButton
-                text="Remove Shift"
-                onPress={handleDelete}
-                style={GlobalStyles.deleteButton}
-              />
+          <View style={GlobalStyles.buttonRowContainer}>
+            {/* CASE 1: shiftData is null → Add mode */}
+            {!shiftData && (
+              <>
+                <ModularButton
+                  textStyle={{ color: 'white' }}
+                  style={[GlobalStyles.submitButton, { flex: 1 }]}
+                  text="Add"
+                  onPress={handleSave}
+                />
+
+                <ModularButton
+                  text="Cancel"
+                  textStyle={{ color: 'gray' }}
+                  style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                  onPress={onClose}
+                />
+              </>
             )}
-            <ModularButton
-              text="Cancel"
-              textStyle={{ color: 'gray' }}
-              style={GlobalStyles.cancelButton}
-              onPress={onClose}
-            />
+
+            {/* CASE 2: shiftData exists → Edit mode */}
+            {shiftData && (
+              <>
+                {edit ? (
+                  <ModularButton
+                    textStyle={{ color: 'white' }}
+                    style={[GlobalStyles.submitButton, { flex: 1 }]}
+                    text="Update"
+                    onPress={handleSave}
+                  />
+                ) : (
+                  <ModularButton
+                    text="Edit"
+                    style={{ flex: 1 }}
+                    onPress={() => setEdit(true)}
+                  />
+                )}
+
+                <ModularButton
+                  text="Remove"
+                  onPress={handleDelete}
+                  style={[GlobalStyles.deleteButton, { flex: 1.25 }]}
+                />
+
+                <ModularButton
+                  text="Cancel"
+                  textStyle={{ color: 'gray' }}
+                  style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                  onPress={onClose}
+                />
+              </>
+            )}
           </View>
 
         </View>
@@ -221,12 +262,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
-  },
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-    marginTop: 20,
   },
 });
 

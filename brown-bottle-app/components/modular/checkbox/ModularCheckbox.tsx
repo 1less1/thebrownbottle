@@ -158,13 +158,13 @@ const ModularCheckbox = <T extends string | number>({
                                         <View style={[GlobalStyles.buttonRowContainer, { marginTop: 0, padding: 20 }]}>
                                             <ModularButton
                                                 onPress={handleConfirm}
-                                                style={GlobalStyles.submitButton}
+                                                style={[GlobalStyles.submitButton, { flex: 1 }]}
                                                 textStyle={{ color: "white" }}
                                                 text="Confirm"
                                             />
                                             <ModularButton
                                                 onPress={handleSelectAll}
-                                                style={{ backgroundColor: Colors.buttonBlue }}
+                                                style={{ backgroundColor: Colors.buttonBlue, flex: 1 }}
                                                 textStyle={{ color: "white" }}
                                                 text="Select All"
                                             />

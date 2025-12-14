@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, useWindowDimensions } from 'react-native';
+
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
@@ -13,20 +14,33 @@ import ModularModal from '@/components/modular/ModularModal';
 
 import ModularListView from "@/components/modular/ModularListView";
 import Badge from '@/components/modular/Badge';
-import { getAllAnnouncements, getAnnouncementsByRole, acknowledgeAnnouncement } from '@/routes/announcement';
-import { Announcement } from '@/types/iAnnouncement';
+import ListItemDetails from '@/components/home/Templates/ListItemDetails';
+
+import { getAnnouncement, acknowledgeAnnouncement } from '@/routes/announcement';
+import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useSession } from "@/utils/SessionContext";
 import { getAcknowledgedAnnouncements } from '@/routes/announcement';
 
-const Announcements = () => {
+interface Props {
+  parentRefresh?: number;
+  onRefreshDone?: () => void;
+}
+
+const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+  const { width, height } = useWindowDimensions();
+  const WIDTH = width;
+  const HEIGHT = height;
+
+  const isMobile = WIDTH < 768;
+  const listHeight = isMobile ? height * 0.5 : height * 0.6;
 
   // All announcements for listview
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   // Store selected role (null = All)
-  const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const [roleFilter, setRoleFilter] = useState<number | null>(null);
 
   // Local list of announcement IDs the user acknowledged
   const [acknowledged, setAcknowledged] = useState<number[]>([]);
@@ -36,39 +50,29 @@ const Announcements = () => {
 
   const { user } = useSession();
 
-  /**
-   * Fetch announcements filtered by role
-   * If selectedRoleId === null -> Get ALL
-   */
   const fetchAnnouncements = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const data =
-        selectedRoleId === null
-          ? await getAllAnnouncements()
-          : await getAnnouncementsByRole(selectedRoleId);
+      setLoading(true);
+      setError(null);
 
-      const sorted = (data as Announcement[]).sort(
-        (a, b) => b.announcement_id - a.announcement_id
-      );
+      const params: Partial<GetAnnouncement> = {
+        role_id: roleFilter as number
+      };
+      const data = await getAnnouncement(params);
+      setAnnouncements(data);
 
-      setAnnouncements(sorted);
-
-    } catch (err) {
-      console.error("Error fetching announcements:", err);
-      setError("Unable to load announcements.");
+    } catch (error) {
+      setError('Failed to fetch announcements.');
+      console.log(error);
     } finally {
       setLoading(false);
     }
-  }, [selectedRoleId]);
+  }, [roleFilter]);
 
-  // Trigger fetch anytime the filter changes
-  // Fetch announcements when role filter changes
+  // Fetch announcements on initialization and state update
   useEffect(() => {
     fetchAnnouncements();
-  }, [fetchAnnouncements]);
+  }, [parentRefresh, fetchAnnouncements]);
 
   // Fetch acknowledged announcements ONLY once user is present
   useEffect(() => {
@@ -81,59 +85,31 @@ const Announcements = () => {
   }, [user]);
 
 
-  /**
-   * Handle "Acknowledge" click — backend + optimistic UI
-   */
   const handleAcknowledge = async (announcementId: number) => {
     if (!user) return;
     // This already updates local state correctly
     setAcknowledged((prev) => [...prev, announcementId]);
 
     try {
-      console.log("Sending ack:", announcementId, user?.employee_id);
       await acknowledgeAnnouncement(announcementId, user.employee_id);
-    } catch (err) {
-      console.log("Error acknowledging announcement:", err);
+    } catch (error: any) {
+      console.log("Error acknowledging announcement:" + error.message);
     }
   };
 
-  /**
-   * Render each announcement row for ModularListView
-   */
   const renderAnnouncement = (announcement: Announcement) => {
     //  use local `acknowledged` state so UI updates immediately
     const isAcknowledged = acknowledged.includes(announcement.announcement_id);
 
     return (
-      <View style={styles.announcementContainer}>
-        <View style={styles.headerContainer}>
-          <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
-
-          <View style={styles.badgeWrapper}>
-            <Badge text={announcement.role_name} />
-          </View>
-        </View>
-
-        <Text style={GlobalStyles.text}>{announcement.description}</Text>
-        <Text style={GlobalStyles.semiBoldSmallAltText}>- {announcement.author}</Text>
-
-        {/* Acknowledge Button */}
-        {isAcknowledged ? (
-          <Text style={styles.acknowledged}>Acknowledged</Text>
-        ) : (
-          <TouchableOpacity
-            onPress={() => handleAcknowledge(announcement.announcement_id)}
-            style={styles.ackBtn}
-          >
-            <Text style={styles.ackBtnText}>Acknowledge</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      <ListItemDetails announcement={announcement} isAcknowledged={isAcknowledged} handleAcknowledge={handleAcknowledge} />
     );
   };
 
   return (
+
     <View style={styles.container}>
+
       <View style={styles.scrollContainer}>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -145,8 +121,8 @@ const Announcements = () => {
 
           <View style={{ width: '40%' }}>
             <RoleDropdown
-              selectedRole={selectedRoleId}
-              onRoleSelect={(value) => setSelectedRoleId(value as number)}
+              selectedRole={roleFilter}
+              onRoleSelect={(value) => setRoleFilter(value as number)}
               labelText=""
               usePlaceholder={true}
               placeholderText="All Roles"
@@ -155,14 +131,14 @@ const Announcements = () => {
 
         </View>
 
-        {/* ModularListView */}
-        <View style={{ height: 375 }}>
+        {/* Announcment Feed */}
+        <View style={{ height: listHeight }}>
           <ModularListView
             data={announcements}
             loading={loading}
             error={error}
             emptyText="No announcements available."
-            maxHeight={375}
+            listHeight={375}
             renderItem={renderAnnouncement}
             keyExtractor={(item) => item.announcement_id.toString()}
             onRefresh={fetchAnnouncements}
@@ -171,7 +147,9 @@ const Announcements = () => {
         </View>
 
       </View>
+
     </View>
+
   );
 };
 
@@ -182,7 +160,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   scrollContainer: {
-    maxHeight: 375,
+    maxHeight: 400,
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -193,7 +171,6 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     marginBottom: 5,
     marginRight: 10
-
   },
   badgeWrapper: {
     flexShrink: 0,

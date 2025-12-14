@@ -235,6 +235,22 @@ def update_announcement(announcement_id):
         return announcement.update_announcement(get_db_connection(), request, announcement_id)
 
 
+@app.route('/announcement/delete/<int:announcement_id>', methods=['DELETE'])
+def delete_announcement(announcement_id):
+    """
+    DELETE announcement by id
+    """
+    with request_lock:
+        return announcement.delete_announcement(get_db_connection(), announcement_id)
+
+
+@app.route('/announcement/acknowledgement', methods=['GET'])
+def get_acknowledged_announcements():
+    """
+    GET acknowledgment records
+    """
+    return announcement.get_acknowledged_announcements(get_db_connection(), request)
+
 @app.route('/announcement/acknowledge', methods=['POST'])
 def acknowledge_announcement():
     """
@@ -242,16 +258,6 @@ def acknowledge_announcement():
     """
     return announcement.acknowledge_announcement(get_db_connection(), request)
 
-
-@app.route('/announcement/acknowledged', methods=['GET'])
-def get_acknowledged_announcements_route():
-    """
-    GET acknowledgment records
-    Optional params:
-        ?employee_id=#
-        ?announcement_id=#
-    """
-    return announcement.get_acknowledged_announcements(get_db_connection(), request)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
