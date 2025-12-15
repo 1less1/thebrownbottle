@@ -36,17 +36,12 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const isMobile = WIDTH < 768;
   const listHeight = isMobile ? height * 0.5 : height * 0.6;
 
-  // All announcements for listview
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-
-  // Store selected role (null = All)
-  const [roleFilter, setRoleFilter] = useState<number | null>(null);
-
-  // Local list of announcement IDs the user acknowledged
-  const [acknowledged, setAcknowledged] = useState<number[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [acknowledged, setAcknowledged] = useState<number[]>([]);
+  const [roleFilter, setRoleFilter] = useState<number | null>(null);
 
   const { user } = useSession();
 
