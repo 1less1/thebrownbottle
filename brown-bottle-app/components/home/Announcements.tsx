@@ -39,11 +39,12 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
   const { user } = useSession();
 
+  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
   const fetchAnnouncements = useCallback(async () => {
-    setLoading(true);
     setError(null);
-    // LOADING DELAY
-    await new Promise(resolve => setTimeout(resolve, 500));
+    setLoading(true);
+    await delay(500);
 
     try {
       const params: Partial<GetAnnouncement> = {

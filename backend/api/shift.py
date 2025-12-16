@@ -26,7 +26,8 @@ def get_shifts(db, request):
             'date': str,
             'start_date': str,
             'end_date': str,
-            'is_today': int
+            'is_today': int, # 1=True, 0=False
+            'next_shift': int # 1=True, 0=False
         }
 
         # Validate and parse parameters
@@ -45,6 +46,7 @@ def get_shifts(db, request):
         start_date = params.get('start_date')
         end_date = params.get('end_date')
         is_today = params.get('is_today')
+        next_shift=params.get('next_shift')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -76,7 +78,27 @@ def get_shifts(db, request):
 
         query_params = []
 
+        # -----------------------------
+        # Next Shift Logic (returns early if criteria is met!)
+        # -----------------------------
+        if str(next_shift) == "1" and employee_id:
+
+            # Only filter by employee and date — nothing else
+            query += " AND sh.employee_id = %s"
+            query_params.append(employee_id)
+
+            # Correct next-shift logic (time-aware)
+            query += " AND sh.date >= CURDATE()"
+            query += " ORDER BY sh.date ASC, sh.start_time ASC LIMIT 1"
+
+            cursor.execute(query, tuple(query_params))
+            result = cursor.fetchall()
+            return jsonify(result), 200
+
+    
+        # -----------------------------
         # Build Dynamic Query 
+        # -----------------------------
         if shift_id is not None:
             query += " AND sh.shift_id = %s"
             query_params.append(shift_id)
@@ -110,7 +132,10 @@ def get_shifts(db, request):
             query += " AND (" + " OR ".join(role_clauses) + ")"
             query_params.extend(role_values)
 
-        # If filtering by today's date, skip all date logic
+
+        # -----------------------------
+        # Date Sorting Logic
+        # -----------------------------
         if str(is_today) == "1":
             query += " AND sh.date = CURDATE()"
 

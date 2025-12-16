@@ -42,8 +42,6 @@ const QuickStatsSkeleton = () => {
     );
 };
 
-export default QuickStatsSkeleton;
-
 const styles = StyleSheet.create({
     container: {
         gap: 8,
@@ -83,3 +81,5 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderPurple
     }
 });
+
+export default QuickStatsSkeleton;

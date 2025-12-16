@@ -91,7 +91,7 @@ export default function HomeScreen() {
               <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
               <QuickStats parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
-            
+
             <View style={styles.contentRow}>
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>
@@ -99,7 +99,7 @@ export default function HomeScreen() {
               </View>
               {/* Next Shift column */}
               <View style={styles.nextShiftColumn}>
-                <NextShift employee_id={Number(user?.employee_id) || 0} />
+                <NextShift />
               </View>
             </View>
 

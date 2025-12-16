@@ -16,7 +16,7 @@ import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 import { CheckboxOption } from "@/types/iCheckbox";
 import { yesNoDropdownOptions } from '@/types/iDropdown';
 
-import { formatSQLDate, formatDateNoTZ } from "@/utils/dateTimeHelpers";
+import { convertToSQLDate, formatDateToCellHeader } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
 import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeString, getWeekDayList } from "@/routes/schedule";
 import { getTimeOffRequest } from "@/routes/time_off_request";
@@ -164,7 +164,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
     setSelectedEmployee(employee);
     setSelectedShift(shift);
-    const sqlDate = formatSQLDate(clickedDate); // "2025-11-06"
+    const sqlDate = convertToSQLDate(clickedDate); // "2025-11-06"
     setSelectedDate(sqlDate);
     setModalVisible(true);
   };
@@ -178,7 +178,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       {weekDays.map((d, i) => (
         <View key={i} style={[styles.headerCell, { width: DAY_COL_WIDTH, height: HEADER_HEIGHT }]}>
           <Text style={styles.headerText}>{d.dayName}</Text>
-          <Text style={styles.subHeaderText}>{formatDateNoTZ(d.date)}</Text>
+          <Text style={styles.subHeaderText}>{formatDateToCellHeader(d.date)}</Text>
         </View>
       ))}
     </View>

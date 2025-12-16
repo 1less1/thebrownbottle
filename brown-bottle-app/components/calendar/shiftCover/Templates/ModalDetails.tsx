@@ -5,7 +5,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import { ShiftCoverRequest } from '@/types/iShiftCover';
-import { formatDateTime, formatShiftDate, formatTime } from '@/utils/dateTimeHelpers';
+import { formatDateTime } from '@/utils/dateTimeHelpers';
 
 interface Props {
     request: ShiftCoverRequest | null;
@@ -56,14 +56,14 @@ const ModalDetails: React.FC<Props> = ({ request }) => {
             <View style={styles.row}>
                 <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
                 <Text style={GlobalStyles.mediumText}>
-                    {formatShiftDate(request.shift_date)}
+                    {request.shift_date}
                 </Text>
             </View>
 
             <View style={styles.row}>
                 <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
                 <Text style={GlobalStyles.mediumText}>
-                    {formatTime(request.shift_start)}
+                    {request.shift_start}
                 </Text>
             </View>
 

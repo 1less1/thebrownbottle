@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-import { formatDateTime, formatShiftDate, formatTime } from '@/utils/dateTimeHelpers';
+import { formatDateTime } from '@/utils/dateTimeHelpers';
 
 import StatusBadge from '@/components/modular/StatusBadge';
 import { ShiftCoverRequest, Status } from "@/types/iShiftCover";
@@ -55,7 +55,7 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
                     {/* Shift Details */}
                     <View style={styles.row}>
                         <Text style={GlobalStyles.semiBoldText}>
-                            {formatShiftDate(request.shift_date)} {"@"} {formatTime(request.shift_start)}
+                            {request.shift_date} {"@"} {request.shift_start}
                         </Text>
                         {/* <Text style={GlobalStyles.altText}>Section: {request.section_name}</Text> */}
                     </View>

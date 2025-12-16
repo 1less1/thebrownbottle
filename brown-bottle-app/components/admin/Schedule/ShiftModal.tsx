@@ -15,7 +15,7 @@ import SectionDropdown from "@/components/modular/dropdown/SectionDropdown";
 
 import { insertShift, updateShift, deleteShift } from '@/routes/shift';
 import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iShift';
-import { formatSQLTime, isValidTime } from '@/utils/dateTimeHelpers';
+import { convertToSQL24HRTime, isValidTime } from '@/utils/dateTimeHelpers';
 
 import { useConfirm } from '@/hooks/useConfirm';
 
@@ -62,7 +62,7 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
     employee_id: employeeData?.employee_id,
     section_id: sectionId ?? shiftData?.section_id,
     date: date,   // YYYY-MM-DD
-    start_time: formatSQLTime(startTime), // HH:MM AM/PM
+    start_time: convertToSQL24HRTime(startTime), // HH:MM AM/PM
   });
 
 
