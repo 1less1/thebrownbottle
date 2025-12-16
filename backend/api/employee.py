@@ -75,7 +75,7 @@ def get_employees(db, request):
                 e.tertiary_role,
                 tr.role_name AS tertiary_role_name,
                 e.is_active,
-                e.timestamp AS joined_date
+                DATE_FORMAT(e.timestamp, '%Y-%m-%d %H:%i') AS timestamp
             FROM employee e
             LEFT JOIN role pr ON e.primary_role = pr.role_id
             LEFT JOIN role sr ON e.secondary_role = sr.role_id

@@ -1,105 +1,122 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import StatCard from '@/components/modular/StatCard';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-import { getShift } from '@/routes/shift';
+import StatCard from '@/components/modular/StatCard';
+import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
+
 import { getTasks } from '@/routes/task';
+import { getShift } from '@/routes/shift';
+import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
+
 import { useSession } from '@/utils/SessionContext';
 
-import QuickStatsSkeleton from '../ui/skeleton/home/QuickStatsSkeleton';
+interface Props {
+    parentRefresh?: number;
+    onRefreshDone?: () => void;
+}
 
-const QuickStats = () => {
+const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [taskCount, setTaskCount] = useState(0);
+    const [shiftCoverCount, setShiftCoverCount] = useState(0);
     const [pendingTimeOffCount, setPendingTimeOffCount] = useState(0);
 
     const { width } = useWindowDimensions();
     const { user } = useSession();
 
-    const isMobile = width < 750;
+    const isMobile = width < 768;
+
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
-     * (Logic omitted for brevity)
+     * - Pending Tasks Count (incomplete)
+     * - Pending/Awaiting Approval Shift Cover Requests
+     * - Pending Time Off Requests
      */
-    useEffect(() => {
-        const fetchData = async () => {
-            // ... (keep your existing fetchData logic)
-            try {
-                const employeeId = Number(user?.employee_id);
-                if (!employeeId) return;
+    const fetchData = useCallback(async (isInitial = false) => {
+        const employeeId = Number(user?.employee_id);
+        if (!employeeId) return;
 
-                const now = new Date();
+        if (isInitial) {
+            setLoading(true);
+            await delay(500);
+        } else {
+            setRefreshing(true);
+        }
 
-                // FETCH UPCOMING SHIFTS >> Change to Shift Cover Requests!!!!
-                const shiftData = await getShift({ employee_id: employeeId });
+        try {
+            // Fetch PENDING and AWAITING APPROVAL Shift Cover Requests
+            const shiftCoverData = await getShiftCoverRequest({
+                requested_employee_id: employeeId,
+                status: ["Pending", "Awaiting Approval"]
+            })
+            setShiftCoverCount(shiftCoverData.length)
 
-                const futureShifts = shiftData.filter((shift: any) => {
-                    const shiftDate = new Date(`${shift.date}T00:00:00`);
-                    return shiftDate > now;
-                });
+            // Fetch PENDING Tasks
+            const todaysShift = await getShift({
+                employee_id: employeeId,
+                is_today: 1,
+            });
 
-                setUpcomingCount(futureShifts.length);
-
-                // FETCH PENDING TASKS
-                const todaysShift = await getShift({
-                    employee_id: employeeId,
-                    is_today: 1,
-                });
-
-                if (!todaysShift || todaysShift.length === 0) {
-                    setTaskCount(0);
-                } else {
-                    const section_id = todaysShift[0].section_id;
-                    const tasks = await getTasks({
-                        section_id,
-                        complete: 0,
-                    });
-                    setTaskCount(tasks.length);
-                }
-
-                // FETCH PENDING TIME OFF REQs
-                const tor = await getTimeOffRequest({
-                    employee_id: employeeId,
-                    status: ["Pending"],
-                });
-
-                setPendingTimeOffCount(tor.length);
-
-            } catch (err) {
-                console.error("QuickStats error:", err);
-                setUpcomingCount(0);
+            if (!todaysShift || todaysShift.length === 0) {
                 setTaskCount(0);
-                setPendingTimeOffCount(0);
-            } finally {
-                setLoading(false);
+            } else {
+                const section_id = todaysShift[0].section_id;
+                const tasks = await getTasks({
+                    section_id,
+                    complete: 0,
+                });
+                setTaskCount(tasks.length);
             }
-        };
 
-        // **Run immediately**
-        fetchData();
+            // Fetch PENDING Time Off Requests
+            const tor = await getTimeOffRequest({
+                employee_id: employeeId,
+                status: ["Pending"],
+            });
 
-        //POLLING INTERVAL — Refresh every 10 seconds
-        const interval = setInterval(() => {
-            fetchData();
-        }, 10000); // 10,000 ms = 10 seconds
+            setPendingTimeOffCount(tor.length);
 
-        // Cleanup when component unmounts
-        return () => clearInterval(interval);
-
+        } catch (error: any) {
+            console.log("There was an error fetching quick stats:", error.message)
+            setUpcomingCount(0);
+            setTaskCount(0);
+            setPendingTimeOffCount(0);
+        } finally {
+            if (isInitial) {
+                setLoading(false);
+            } else {
+                setRefreshing(false);
+            }
+        }
     }, [user?.employee_id]);
 
+    // Fetch data on initalization and state update
+    useEffect(() => {
+        fetchData(true); // Initial Load
+
+        const interval = setInterval(() => {
+            fetchData(false); // SILENT Polling
+        }, 20000); // Every 20 seconds
+
+        return () => clearInterval(interval);
+    }, [parentRefresh, fetchData]);
+
+
     if (loading) {
-        // Render the skeleton when data is still loading
         return <QuickStatsSkeleton />;
     }
 
-
     return (
+
         <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
 
             <StatCard
@@ -113,13 +130,13 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
                 titleStyle={{ color: Colors.pendingYellow }}
                 valueStyle={{ color: Colors.pendingYellow }}
-                style={styles.card} 
+                style={styles.card}
             />
 
             <StatCard
                 loading={loading}
                 title="Shift Cover Requests"
-                value={upcomingCount}
+                value={shiftCoverCount}
                 iconName="repeat-outline"
                 backgroundColor={Colors.bgBlue}
                 iconColor={Colors.blue}
@@ -127,10 +144,9 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconBlue }}
                 titleStyle={{ color: Colors.blue }}
                 valueStyle={{ color: Colors.blue }}
-                style={styles.card} 
+                style={styles.card}
             />
 
-            {/* DISPLAY LIVE PENDING TOR COUNT */}
             <StatCard
                 loading={loading}
                 title="Time Off Requests"
@@ -142,14 +158,13 @@ const QuickStats = () => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconPurple }}
                 titleStyle={{ color: Colors.purple }}
                 valueStyle={{ color: Colors.purple }}
-                style={styles.card} 
+                style={styles.card}
             />
 
         </View>
+
     );
 };
-
-export default QuickStats;
 
 const styles = StyleSheet.create({
     container: {
@@ -165,7 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     card: {
-        flex: 1, 
+        flex: 1,
         height: 110,
         padding: 18,
         marginBottom: 8,
@@ -176,3 +191,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     }
 });
+
+export default QuickStats;

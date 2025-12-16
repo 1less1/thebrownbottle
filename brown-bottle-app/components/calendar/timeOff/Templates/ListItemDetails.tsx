@@ -22,7 +22,7 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
 
         <View style={styles.badgeView}>
 
-            <View style={{ flex: 1, paddingRight: 8 }}>
+            <View style={{ flex: 1 }}>
 
                 {/* Top Section + Badge */}
                 <View style={styles.topRow}>

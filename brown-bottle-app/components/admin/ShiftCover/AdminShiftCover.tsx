@@ -45,12 +45,8 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
     const WIDTH = width;
     const HEIGHT = height;
 
-    const PC_MAX_HEIGHT_FACTOR = 0.58;
-    const MOBILE_MAX_HEIGHT_FACTOR = 0.4;
-
-    const listMaxHeight = Platform.OS === 'web'
-        ? HEIGHT * PC_MAX_HEIGHT_FACTOR  // Use a larger fraction of screen height for web
-        : HEIGHT * MOBILE_MAX_HEIGHT_FACTOR; // Use a smaller fraction for mobile
+    const isMobile = WIDTH < 768;
+    const cardHeight = isMobile ? height * 0.68 : height * 0.7;
 
     const { user } = useSession();
 
@@ -137,7 +133,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
     return (
 
-        <Card>
+        <Card style={{ height: cardHeight }}>
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
@@ -198,8 +194,8 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 data={requests}
                 loading={loading}
                 error={error}
-                emptyText="No requests available."
-                maxHeight={listMaxHeight}
+                emptyText="No requests found."
+                maxHeight={HEIGHT * 0.625}
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);

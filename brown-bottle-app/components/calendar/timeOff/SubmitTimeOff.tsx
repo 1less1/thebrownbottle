@@ -116,28 +116,37 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       <Text style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}>
         Reason for Time Off
       </Text>
+      */}
       <TextInput
         placeholder="Enter A Reason"
         placeholderTextColor={Colors.gray}
         value={reason}
-        onChangeText={setReason}
+        onChangeText={(text) => {
+          if (text.length <= MAX_CHARS) {
+            setReason(text);
+          }
+        }}
         multiline
         numberOfLines={4}
-        style={[GlobalStyles.input, { marginBottom: 15 }]}
+        style={[GlobalStyles.input, { marginBottom: 5 }]}
       />
+      <Text style={{ color: Colors.gray }}>
+        {reason.length}/{MAX_CHARS}
+      </Text>
+
 
       {/* Buttons */}
-      <View style={styles.buttonRowContainer}>
+      <View style={GlobalStyles.buttonRowContainer}>
         <ModularButton
           text="Submit"
           textStyle={{ color: 'white' }}
-          style={GlobalStyles.submitButton}
+          style={[GlobalStyles.submitButton, { flex: 1 }]}
           onPress={handleSubmit}
         />
         <ModularButton
           text="Cancel"
           textStyle={{ color: 'gray' }}
-          style={GlobalStyles.cancelButton}
+          style={[GlobalStyles.cancelButton, { flex: 1 }]}
           onPress={handleClose}
         />
       </View>

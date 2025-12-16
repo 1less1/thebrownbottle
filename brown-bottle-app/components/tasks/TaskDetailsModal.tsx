@@ -60,18 +60,19 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
           </View>
         )}
 
-        <View style={styles.buttonRowContainer}>
+        {/* Buttons */}
+        <View style={GlobalStyles.buttonRowContainer}>
           <ModularButton
             text={actionLabel || "Submit"}
             textStyle={{ color: "white" }}
-            style={GlobalStyles.submitButton}
+            style={[GlobalStyles.submitButton, { flex: 1 }]}
             onPress={() => onComplete && onComplete(task)}
           />
 
           <ModularButton
             text="Cancel"
             textStyle={{ color: 'gray' }}
-            style={GlobalStyles.cancelButton}
+            style={[GlobalStyles.cancelButton, { flex: 1 }]}
             onPress={onClose}
           />
         </View>
@@ -84,11 +85,6 @@ const TaskDetailsModal: React.FC<TaskDetailsModalProps> = ({
 export default TaskDetailsModal;
 
 const styles = StyleSheet.create({
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
   recurring: {
     backgroundColor: Colors.bgGreen,
     padding: 6,

@@ -76,7 +76,7 @@ def get_scr(db, request):
                 sec.section_name AS section_name,
 
                 DATE_FORMAT(s.date, '%Y-%m-%d') AS shift_date,
-                TIME_FORMAT(s.start_time, '%H:%i %p') AS shift_start,
+                TIME_FORMAT(s.start_time, '%h:%i %p') AS shift_start,
 
                 DATE_FORMAT(scr.timestamp, '%Y-%m-%d %H:%i') AS timestamp,
                 scr.status

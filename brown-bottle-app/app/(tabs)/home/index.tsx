@@ -30,6 +30,18 @@ export default function HomeScreen() {
   // Get session data
   const { user } = useSession();
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setRefreshTrigger(prev => prev + 1);
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
   const full_name = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim();
 
   return (
@@ -46,7 +58,7 @@ export default function HomeScreen() {
         <Text style={{ position: 'absolute', top: '75%', width: '100%', textAlign: 'center', padding: 5 }}>Hey Jahmen ;)</Text>
 
 
-        <DefaultScrollView>
+        <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
 
           {/* First Strip */}
@@ -72,26 +84,23 @@ export default function HomeScreen() {
           </View>
 
           {/* CONTENT */}
-
           <View style={{ width: '90%' }}>
 
             {/* Quick Stats */}
             <View>
               <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
-              <QuickStats />
+              <QuickStats parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
-            <View style={styles.contentRow}>
 
+            <View style={styles.contentRow}>
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>
-                <Announcements />
+                <Announcements parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
               </View>
-
               {/* Next Shift column */}
               <View style={styles.nextShiftColumn}>
-                <NextShift employee_id={Number(user?.employee_id) || 0} />
+                <NextShift />
               </View>
-
             </View>
 
           </View>

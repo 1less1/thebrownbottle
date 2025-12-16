@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Employee } from "@/types/iEmployee";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
-import { formatShiftDate } from "@/utils/dateTimeHelpers";
+import { parseDateFromDateTime } from "@/utils/dateTimeHelpers";
 
 interface Props {
   profile: Employee | null;
@@ -50,7 +50,7 @@ const AccountInfo: React.FC<Props> = ({ profile }) => {
         <View style={[styles.infoBlock, isMobile ? styles.mobileWidth : styles.desktopWidth]}>
           <Text style={styles.titleText}>Member Since</Text>
           <Text style={styles.text}>
-            {profile.joined_date ? formatShiftDate(profile.joined_date) : "N/A"}
+            {profile.timestamp ? parseDateFromDateTime(profile.timestamp) : "N/A"}
           </Text>
         </View>
 

@@ -1,92 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { to24HourFormat } from '@/utils/dateTimeHelpers';
+import { formatDate, convertSQLDate, normalizeDateObject } from '@/utils/dateTimeHelpers';
 
 import StatCard from '../modular/StatCard';
 import { getShift } from '@/routes/shift';
 import { Shift } from '@/types/iShift';
 import NextShiftSkeleton from '../ui/skeleton/home/NextShiftSkeleton';
 
+import { useSession } from '@/utils/SessionContext';
+
 interface Props {
-  employee_id: number;
   showRole?: boolean;
   showSection?: boolean;
+  parentRefresh?: number;
 }
 
-/**
- * Default Shift Length (NO stored end_time)
- */
-const SHIFT_LENGTH_HOURS = 6;
+const NextShift: React.FC<Props> = ({
+  showRole = true,
+  showSection = true,
+  parentRefresh,
+}) => {
 
-/**
- * Helper to compute temporary end time
- * (Adds 6 hours to start time for NOW)
- */
-const addHours = (date: Date, hours: number) => {
-  const result = new Date(date);
-  result.setHours(result.getHours() + hours);
-  return result;
-};
-
-const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection = true }) => {
-  const [shifts, setShifts] = useState<Shift[]>([]);
   const [loading, setLoading] = useState(true);
+  const [nextShift, setNextShift] = useState<Shift | null>(null);
 
-  useEffect(() => {
-    const fetchShifts = async () => {
-      try {
-        const data = await getShift({ employee_id });
-        setShifts(data);
-      } catch {
-        setShifts([]);
-      } finally {
-        setLoading(false);
+  const { user } = useSession();
+
+  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+  const fetchNextShift = useCallback(async () => {
+    const employeeId = Number(user?.employee_id);
+    if (!employeeId) return;
+
+    setLoading(true);
+    await delay(500);
+
+    try {
+      const data = await getShift({
+        next_shift: 1,
+        employee_id: employeeId,
+      });
+
+      if (Array.isArray(data) && data.length > 0) {
+        setNextShift(data[0] as Shift);
+      } else {
+        setNextShift(null);
       }
-    };
+    } catch (error: any) {
+      console.log("Error fetching next shift:", error.message);
+      setNextShift(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.employee_id]);
 
-    fetchShifts();
-  }, [employee_id]);
 
-  const now = new Date();
+  // Initialization and state update
+  useEffect(() => {
+    fetchNextShift();
+  }, [parentRefresh, fetchNextShift]);
 
-  /**
-   * PROCESS SHIFT DATE + ADD TEMP END TIME
-   * - Convert backend AM/PM → 24h
-   * - Construct ISO Date → Required for Mobile (iOS/Android)
-   * - Add temporary 4 hr end time
-   */
-  const nextOrCurrentShift = shifts
-    .map((shift) => {
-      const time24 = to24HourFormat(shift.start_time);
-      const start = new Date(`${shift.date}T${time24}:00`); // ISO string for mobile
-      const end = addHours(start, SHIFT_LENGTH_HOURS);      // Temporary end
 
-      return { ...shift, start, end };
-    })
-    /**
-     * Keep ONLY shifts that are either:
-     * - CURRENT (start <= now < end)
-     * - FUTURE (start > now)
-     */
-    .filter((shift) => shift.end > now)
-    /**
-     * Sort so current shift appears first,
-     * OR future next soonest shift
-     */
-    .sort((a, b) => a.start.getTime() - b.start.getTime())[0];
+  if (loading) return <NextShiftSkeleton />;
 
-  const isCurrentShift =
-    nextOrCurrentShift && nextOrCurrentShift.start <= now && nextOrCurrentShift.end > now;
-
-  // Loading visual
-  if (loading) {
-    return <NextShiftSkeleton />
-  }
-
-  //  No shifts upcoming OR current
-  if (!nextOrCurrentShift) {
+  // NO Upcoming Shift
+  if (!nextShift) {
     return (
       <View>
         <Text style={GlobalStyles.floatingHeaderText}>Your Next Shift</Text>
@@ -105,20 +85,20 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
     );
   }
 
-  //  If CURRENTLY working (within temporary 6 hr window)
-  if (isCurrentShift) {
-    const dateDisplay = nextOrCurrentShift.start.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
+  // Date comparison
+  const apiDate = convertSQLDate(nextShift.date);
+  const today = normalizeDateObject(new Date());
+  const isToday = apiDate.getTime() === today.getTime();
+
+
+  // Shift Today
+  if (isToday) {
     return (
       <View>
-        <Text style={GlobalStyles.floatingHeaderText}>Current Shift</Text>
+        <Text style={GlobalStyles.floatingHeaderText}>Shift Today</Text>
         <StatCard
-
-          title={dateDisplay}
-          value={`${nextOrCurrentShift.start_time} - Active Now`}
+          title={formatDate(nextShift.date)}
+          value={nextShift.start_time}
           iconName="time"
           backgroundColor={Colors.bgYellow}
           iconColor={Colors.pendingYellow}
@@ -126,31 +106,23 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
           iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
           valueStyle={{ fontWeight: "600", fontSize: 17 }}
           titleStyle={{ fontSize: 15 }}
-          footerText={`${showSection ? nextOrCurrentShift.section_name : ''} ${showRole && nextOrCurrentShift.primary_role_name
-            ? `• ${nextOrCurrentShift.primary_role_name}`
-            : ''
+          footerText={`${showSection ? nextShift.section_name : ""} ${showRole && nextShift.primary_role_name
+            ? `• ${nextShift.primary_role_name}`
+            : ""
             }`}
-          footerTextStyle={{ color: "#4c4e4f", fontSize: 14 }}
+          footerTextStyle={{ color: Colors.darkGray, fontSize: 14 }}
         />
       </View>
     );
   }
 
-  //  NEXT upcoming shift
-  const dateDisplay = nextOrCurrentShift.start.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
-
-  const timeDisplay = nextOrCurrentShift.start_time;
-
+  // Upcoming Shift
   return (
     <View>
       <Text style={GlobalStyles.floatingHeaderText}>Your Next Shift</Text>
       <StatCard
-        title={dateDisplay} // Top row
-        value={`${timeDisplay}`} // Middle row
+        title={formatDate(nextShift.date)}
+        value={nextShift.start_time}
         iconName="calendar-outline"
         backgroundColor={Colors.bgGray}
         iconColor={Colors.darkGray}
@@ -158,17 +130,16 @@ const NextShift: React.FC<Props> = ({ employee_id, showRole = true, showSection 
         iconContainerStyle={{ backgroundColor: Colors.bgIconGray }}
         valueStyle={{ fontSize: 18 }}
         titleStyle={{ fontSize: 15 }}
-        footerText={`${showSection ? nextOrCurrentShift.section_name : ''} ${showRole && nextOrCurrentShift.primary_role_name
-          ? `• ${nextOrCurrentShift.primary_role_name}`
-          : ''
+        footerText={`${showSection ? nextShift.section_name : ""} ${showRole && nextShift.primary_role_name
+          ? `• ${nextShift.primary_role_name}`
+          : ""
           }`}
-        footerTextStyle={{ color: "#6c6e70", fontSize: 14 }}
+        footerTextStyle={{ color: Colors.darkGray, fontSize: 14 }}
       />
     </View>
+
+
   );
 };
-
-const styles = StyleSheet.create({
-});
 
 export default NextShift;

@@ -1,8 +1,9 @@
 services:
-  # MySQL Container
+
+  # MySQL Database
   db:
+    build: ./db-setup
     container_name: bb-db
-    image: mysql:8.0
     restart: unless-stopped
     env_file: .env
     environment:
@@ -12,23 +13,21 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       TZ: America/Chicago
     ports:
-      - "3306:3306" # Maps localhost 3306 to container port 3306 
+      - "3306:3306"
     volumes:
-      # This is storage from the mysql container that is mapped to dbdata in the docker local storage (volume)
       - dbdata:/var/lib/mysql
-      
-      # Mounting the local .sql dump file into the docker container as 'read only'
-      - ./database/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro 
-      - ./database/sample.sql:/docker-entrypoint-initdb.d/02-sample.sql:ro
-      - ./database/triggers.sql:/docker-entrypoint-initdb.d/03-triggers.sql:ro
-      - ./database/procedures.sql:/docker-entrypoint-initdb.d/04-procedures.sql:ro
-      - ./database/events.sql:/docker-entrypoint-initdb.d/05-events.sql:ro
+
+      # SQL initialization files
+      - ./db-setup/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db-setup/triggers.sql:/docker-entrypoint-initdb.d/02-triggers.sql:ro
+      - ./db-setup/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql:ro
+      - ./db-setup/events.sql:/docker-entrypoint-initdb.d/04-events.sql:ro
+      - ./db-setup/sample.sql:/docker-entrypoint-initdb.d/05-sample.sql:ro
     networks:
-     - internal # The mysql container operates on the internal docker network 
+     - internal
+
   
-
-
-  # Python Backend API Container 
+  # Backend API 
   api:
     build: ./api # Looks for Dockerfile in this directory
     container_name: bb-api

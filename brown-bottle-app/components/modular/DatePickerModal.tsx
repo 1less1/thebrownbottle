@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Colors } from '@/constants/Colors';
@@ -37,13 +37,24 @@ const DatePickerModal: React.FC<Props> = ({ visible, onClose, dateString, onChan
   };
 
   return (
+
     <ModularModal visible={visible} onClose={onClose}>
+      
       <UniversalDatePicker
         dateString={selectedDate}
         onChange={handleDateChange}
       />
-      <ModularButton text="Close" onPress={onClose} />
+
+      {/* Close Button */}
+      <View style={GlobalStyles.buttonRowContainer}>
+        <ModularButton
+          text="Close"
+          style={{ flex: 1 }}
+          onPress={onClose} />
+      </View>
+
     </ModularModal>
+
   );
 };
 

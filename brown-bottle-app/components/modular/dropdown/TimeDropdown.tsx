@@ -13,6 +13,7 @@ import { breakUpTime } from "@/utils/dateTimeHelpers";
 interface TimeDropdownProps {
     time: string;
     onTimeChange: (time: string) => void;
+    disabled?: boolean;
 }
 
 const hourOptions = [
@@ -42,7 +43,7 @@ const meridiemOptions = [
     { key: 'PM', value: 'PM' },
 ];
 
-const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
+const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange, disabled = false}) => {
     const { hours, minutes, meridiem } = breakUpTime(time || "");
 
     return (
@@ -58,6 +59,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
                 placeholderText="HH"
                 containerStyle={styles.dropdownButton}
                 buttonStyle={GlobalStyles.input}
+                disabled={disabled}
             />
 
             <ModularDropdown
@@ -69,6 +71,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
                 placeholderText="MM"
                 labelText=":"
                 containerStyle={styles.dropdownButton}
+                disabled={disabled}
             />
 
             <ModularDropdown
@@ -79,6 +82,7 @@ const TimeDropdown: React.FC<TimeDropdownProps> = ({ time, onTimeChange }) => {
                 }
                 placeholderText="AM/PM"
                 containerStyle={styles.dropdownButton}
+                disabled={disabled}
             />
 
         </View>

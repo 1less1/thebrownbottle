@@ -136,14 +136,14 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
                 <ModularButton
                     text={"Submit"}
                     textStyle={{ color: 'white' }}
-                    style={GlobalStyles.submitButton}
+                    style={[GlobalStyles.submitButton, { flex: 1 }]}
                     onPress={handleSubmit}
                     enabled={!loading && !loadingShifts && selectedShift !== null}
                 />
                 <ModularButton
                     text="Cancel"
                     textStyle={{ color: 'gray' }}
-                    style={GlobalStyles.cancelButton}
+                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
                     onPress={handleClose}
                 />
             </View>

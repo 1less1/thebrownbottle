@@ -232,19 +232,20 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                     <ModularButton
                         text="Add"
                         textStyle={{ color: 'white' }}
-                        style={GlobalStyles.submitButton}
+                        style={[GlobalStyles.submitButton, { flex: 1 }]}
                         onPress={handleInsert}
                         enabled={!loading}
                     />
                     <ModularButton
                         text="Reset "
+                        style={{ flex: 1 }}
                         onPress={resetForm}
                         enabled={!loading}
                     />
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={GlobalStyles.cancelButton}
+                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
                         onPress={onClose}
                     />
                 </View>

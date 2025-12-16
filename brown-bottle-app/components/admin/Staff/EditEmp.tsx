@@ -295,20 +295,21 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
               <ModularButton
                 text="Update"
                 textStyle={{ color: 'white' }}
-                style={GlobalStyles.submitButton}
+                style={[GlobalStyles.submitButton, { flex: 1 }]}
                 onPress={handleUpdate}
                 enabled={!loading}
               />
             ) : (
               <ModularButton
                 text="Edit"
+                style={{ flex: 1 }}
                 onPress={handleEdit}
               />
             )}
             <ModularButton
               text="Cancel"
               textStyle={{ color: 'gray' }}
-              style={GlobalStyles.cancelButton}
+              style={[GlobalStyles.cancelButton, { flex: 1 }]}
               onPress={onClose}
             />
           </View>
