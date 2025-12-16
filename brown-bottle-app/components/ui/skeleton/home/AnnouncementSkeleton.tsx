@@ -17,8 +17,8 @@ const AnnouncementSkeleton = () => {
                     <SkeletonPulse width="85%" height={24} borderRadius={4} backgroundColor="#e3e5e6ff" style={{ marginTop: 10 }} />
                     <SkeletonPulse width={90} height={12} borderRadius={4} backgroundColor="#e3e5e6ff" style={{ marginTop: 10 }} />
 
-                    <SkeletonPulse width={110} height={26} borderRadius={6} backgroundColor="#e3e5e6ff" style={{ marginTop: 12 }} />
-
+                    <SkeletonPulse width={110} height={26} borderRadius={6} backgroundColor="#e3e5e6ff" style={{ marginTop: 12, alignSelf: "flex-end" }}
+ />
                 </View>
 
             </View>

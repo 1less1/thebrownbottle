@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, StyleSheet, ScrollView } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
@@ -30,9 +30,6 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
   const [reason, setReason] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  const [startDateVisible, setStartDateVisible] = useState(false);
-  const [endDateVisible, setEndDateVisible] = useState(false);
 
   const MAX_CHARS = 450;
 
@@ -90,69 +87,32 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       {/* Modal Title */}
       <Text style={GlobalStyles.modalTitle}>New Time Off Request</Text>
 
-      {/* Start Date */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
-        <ModularButton
-          text="Choose Start Date"
-          style={{ flexGrow: 1, flexShrink: 1, minWidth: 200, flexBasis: '48%', backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
-          textStyle={{ color: Colors.purple }}
-          onPress={() => setStartDateVisible(true)}
+      {/* Date Range Picker */}
+      <View style={styles.calendarContainer}>
+        <CalendarWidget
+          mode="picker"
+          pickerType="range"
+          showShifts={false}
+          onSelectRange={({ startDate, endDate }) => {
+            setStartDate(startDate);
+            setEndDate(endDate);
+          }}
         />
+      </View>
 
+      {/* Selected Dates Display */}
+      <View style={{ flexDirection: "row", gap: 10, marginVertical: 15 }}>
         <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>Date: </Text>
+          <Text style={GlobalStyles.text}>From: </Text>
           <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {startDate ? formatDateWithYear(startDate) : ""}
+            {startDate && endDate
+              ? `${formatDateWithYear(startDate)} → ${formatDateWithYear(endDate)}`
+              : startDate
+                ? `${formatDateWithYear(startDate)} →`
+                : ""}
           </Text>
         </View>
       </View>
-
-      {/* Start Date Picker Modal */}
-      <ModularModal visible={startDateVisible} onClose={() => setStartDateVisible(false)}>
-        <CalendarWidget
-          mode="picker"
-          showShifts={false}
-          initialDate={startDate}
-          onSelectDate={({ date }) => {
-            setStartDate(date);
-            setStartDateVisible(false);
-          }}
-        />
-
-        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setStartDateVisible(false)} />
-      </ModularModal>
-
-      {/* End Date */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 5, marginBottom: 15 }}>
-        <ModularButton
-          text="Choose End Date"
-          style={{ flexGrow: 1, flexShrink: 1, flexBasis: '48%', minWidth: 200, backgroundColor: Colors.bgPurple, borderWidth: 1, borderColor: Colors.borderPurple }}
-          textStyle={{ color: Colors.purple }}
-          onPress={() => setEndDateVisible(true)}
-        />
-
-        <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>Date: </Text>
-          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {endDate ? formatDateWithYear(endDate) : ""}
-          </Text>
-        </View>
-      </View>
-
-      {/* End Date Picker Modal */}
-      <ModularModal visible={endDateVisible} onClose={() => setEndDateVisible(false)}>
-        <CalendarWidget
-          mode="picker"
-          showShifts={false}
-          initialDate={startDate}
-          onSelectDate={({ date }) => {
-            setEndDate(date);
-            setEndDateVisible(false);
-          }}
-        />
-
-        <ModularButton style={GlobalStyles.cancelButton} text='Cancel' onPress={() => setEndDateVisible(false)} />
-      </ModularModal>
 
 
       {/* Reason Field
@@ -222,6 +182,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignItems: 'center',
     textAlignVertical: 'center',
+  },
+  calendarContainer: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 12,
+    borderColor: Colors.borderColor,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 10,
+    paddingLeft: 10,
   },
   calendarButton: {
     flexShrink: 1,
