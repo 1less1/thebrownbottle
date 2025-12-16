@@ -1,27 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Text, StyleSheet, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 
+import { Ionicons } from '@expo/vector-icons';
+
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import Card from "@/components/modular/Card";
-import AltCard from '@/components/modular/AltCard';
-import DefaultScrollView from '@/components/DefaultScrollView';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
-import ModularButton from '@/components/modular/ModularButton';
-import ModularModal from '@/components/modular/ModularModal';
-
 import ModularListView from "@/components/modular/ModularListView";
-import Badge from '@/components/modular/Badge';
 import ListItemDetails from '@/components/home/Templates/ListItemDetails';
+import AnnouncementSkeleton from '@/components/ui/skeleton/home/AnnouncementSkeleton';
 
-import { getAnnouncement, acknowledgeAnnouncement } from '@/routes/announcement';
+import { getAnnouncement, getAcknowledgedAnnouncements, acknowledgeAnnouncement } from '@/routes/announcement';
 import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
-import { Ionicons } from '@expo/vector-icons';
 
 import { useSession } from "@/utils/SessionContext";
-import { getAcknowledgedAnnouncements } from '@/routes/announcement';
 
 interface Props {
   parentRefresh?: number;
@@ -46,19 +40,21 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const { user } = useSession();
 
   const fetchAnnouncements = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
+    // LOADING DELAY
+    await new Promise(resolve => setTimeout(resolve, 500));
 
+    try {
       const params: Partial<GetAnnouncement> = {
         role_id: roleFilter as number
       };
       const data = await getAnnouncement(params);
       setAnnouncements(data);
 
-    } catch (error) {
+    } catch (error: any) {
       setError('Failed to fetch announcements.');
-      console.log(error);
+      console.log('Failed to fetch announcements', error.message);
     } finally {
       setLoading(false);
     }
@@ -128,17 +124,23 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
         {/* Announcment Feed */}
         <View style={{ height: listHeight }}>
-          <ModularListView
-            data={announcements}
-            loading={loading}
-            error={error}
-            emptyText="No announcements available."
-            listHeight={375}
-            renderItem={renderAnnouncement}
-            keyExtractor={(item) => item.announcement_id.toString()}
-            onRefresh={fetchAnnouncements}
-            refreshing={loading}
-          />
+          {loading ? (
+            <>
+              <AnnouncementSkeleton />
+            </>
+          ) : (
+            <ModularListView
+              data={announcements}
+              loading={false} // Render skeleton instead!
+              error={error}
+              emptyText="No announcements available."
+              listHeight={375}
+              renderItem={renderAnnouncement}
+              keyExtractor={(item) => item.announcement_id.toString()}
+              onRefresh={fetchAnnouncements}
+              refreshing={loading}
+            />
+          )}
         </View>
 
       </View>

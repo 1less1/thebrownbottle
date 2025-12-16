@@ -91,7 +91,7 @@ export default function HomeScreen() {
               <Text style={GlobalStyles.floatingHeaderText}>Quick Stats</Text>
               <QuickStats parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
-
+            
             <View style={styles.contentRow}>
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>

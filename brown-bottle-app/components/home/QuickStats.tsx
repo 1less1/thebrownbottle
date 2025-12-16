@@ -5,20 +5,23 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import StatCard from '@/components/modular/StatCard';
+import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
 
 import { getTasks } from '@/routes/task';
 import { getShift } from '@/routes/shift';
 import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
+
 import { useSession } from '@/utils/SessionContext';
 
 interface Props {
-  parentRefresh?: number;
-  onRefreshDone?: () => void;
+    parentRefresh?: number;
+    onRefreshDone?: () => void;
 }
 
 const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const [upcomingCount, setUpcomingCount] = useState(0);
     const [taskCount, setTaskCount] = useState(0);
@@ -30,17 +33,26 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
     const isMobile = width < 768;
 
+    const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
      * - Pending Tasks Count (incomplete)
      * - Pending/Awaiting Approval Shift Cover Requests
      * - Pending Time Off Requests
      */
-    const fetchData = useCallback(async () => {
-        try {
-            const employeeId = Number(user?.employee_id);
-            if (!employeeId) return;
+    const fetchData = useCallback(async (isInitial = false) => {
+        const employeeId = Number(user?.employee_id);
+        if (!employeeId) return;
 
+        if (isInitial) {
+            setLoading(true);
+            await delay(500);
+        } else {
+            setRefreshing(true);
+        }
+
+        try {
             // Fetch PENDING and AWAITING APPROVAL Shift Cover Requests
             const shiftCoverData = await getShiftCoverRequest({
                 requested_employee_id: employeeId,
@@ -74,29 +86,34 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
             setPendingTimeOffCount(tor.length);
 
         } catch (error: any) {
-            console.log("There was an error fetching Quick Stats: " + error.message)
+            console.log("There was an error fetching quick stats:", error.message)
             setUpcomingCount(0);
             setTaskCount(0);
             setPendingTimeOffCount(0);
         } finally {
-            setLoading(false);
+            if (isInitial) {
+                setLoading(false);
+            } else {
+                setRefreshing(false);
+            }
         }
     }, [user?.employee_id]);
 
     // Fetch data on initalization and state update
     useEffect(() => {
-        fetchData();
+        fetchData(true); // Initial Load
 
-        //POLLING INTERVAL — Refresh every 10 seconds
         const interval = setInterval(() => {
-            fetchData();
-        }, 10000); // 10,000 ms = 10 seconds
+            fetchData(false); // SILENT Polling
+        }, 20000); // Every 20 seconds
 
-        // Cleanup when component unmounts
         return () => clearInterval(interval);
-
     }, [parentRefresh, fetchData]);
 
+
+    if (loading) {
+        return <QuickStatsSkeleton />;
+    }
 
     return (
 
@@ -113,7 +130,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconYellow }}
                 titleStyle={{ color: Colors.pendingYellow }}
                 valueStyle={{ color: Colors.pendingYellow }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card}
             />
 
             <StatCard
@@ -127,7 +144,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconBlue }}
                 titleStyle={{ color: Colors.blue }}
                 valueStyle={{ color: Colors.blue }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card}
             />
 
             <StatCard
@@ -141,7 +158,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 iconContainerStyle={{ backgroundColor: Colors.bgIconPurple }}
                 titleStyle={{ color: Colors.purple }}
                 valueStyle={{ color: Colors.purple }}
-                style={{ marginLeft: 8, marginRight: 8 }}
+                style={styles.card}
             />
 
         </View>
@@ -151,7 +168,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
 const styles = StyleSheet.create({
     container: {
-        gap: 5,
+        gap: 8,
         width: '100%',
     },
     mobile: {
@@ -162,6 +179,17 @@ const styles = StyleSheet.create({
         flexWrap: 'nowrap',
         justifyContent: 'space-between',
     },
+    card: {
+        flex: 1,
+        height: 110,
+        padding: 18,
+        marginBottom: 8,
+        marginRight: 2,
+        borderRadius: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    }
 });
 
 export default QuickStats;
