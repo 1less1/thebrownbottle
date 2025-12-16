@@ -49,7 +49,6 @@ export const Colors = {
 
   blue: '#2e86de',
   borderBlue: '#acc4faff',
-  disabledBlue:'#dfe9ffff' ,
   bgBlue: '#eef6ff',
   bgIconBlue: '#dbeaff',
 
