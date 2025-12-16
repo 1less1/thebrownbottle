@@ -45,35 +45,51 @@ LocaleConfig.locales["en"] = {
 };
 LocaleConfig.defaultLocale = "en";
 
+type PickerType = "single" | "range";
+
 const CalendarWidget: React.FC<{
   mode?: "calendar" | "picker";
+  pickerType?: PickerType;
   requireShiftSelection?: boolean;
   showShifts?: boolean;
   onSelectDate?: (payload: { date: string; shift: Shift | null }) => void;
+  onSelectRange?: (payload: { startDate: string; endDate: string }) => void;
   initialDate?: string;
   onLoadingChange?: (loading: boolean) => void;
 }> = ({
   mode = "calendar",
+  pickerType = "single",
   requireShiftSelection = false,
   showShifts = true,
   onSelectDate,
+  onSelectRange,
   initialDate,
   onLoadingChange
 }) => {
-
 
     const { user } = useSession();
 
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
+    const [rangeStart, setRangeStart] = useState<string | null>(null);
+    const [rangeEnd, setRangeEnd] = useState<string | null>(null);
+
     const [selectedDate, setSelectedDate] = useState(
       initialDate || new Date().toISOString().split("T")[0]
     );
 
+    // Returns today's date in local time (YYYY-MM-DD)
+    const today = useMemo(() => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }, []);
+
 
     /** ---- FETCH SHIFTS (ONLY IF ALLOWED) ---- */
-    // Fetch Shifts on Initialization and State Update
     useEffect(() => {
       if (!showShifts || !user?.employee_id) {
         console.log("Exiting early: no user or shifts not enabled");
@@ -94,51 +110,103 @@ const CalendarWidget: React.FC<{
       })();
     }, [showShifts, user?.employee_id]);
 
-
     const markedDates = useMemo(() => {
-      const map: Record<string, any> = {};
-      const today = new Date().toISOString().split("T")[0];
 
-      // Mark shift days
+      // RANGE PICKER (period)
+      if (mode === "picker" && pickerType === "range" && rangeStart) {
+        const range: Record<string, any> = {};
+
+        // Single-day selection
+        if (!rangeEnd) {
+          range[rangeStart] = {
+            startingDay: true,
+            endingDay: true,
+            color: Colors.borderBlue,
+            textColor: "white",
+          };
+          return range;
+        }
+
+        let current = new Date(rangeStart);
+        const end = new Date(rangeEnd);
+
+        while (current <= end) {
+          const date = current.toISOString().split("T")[0];
+          range[date] = {
+            color: Colors.borderBlue,
+            textColor: "white",
+          };
+          current.setDate(current.getDate() + 1);
+        }
+
+        range[rangeStart].startingDay = true;
+        range[rangeEnd].endingDay = true;
+
+        return range;
+      }
+
+      const map: Record<string, any> = {};
+
       if (showShifts) {
         shifts.forEach((shift) => {
+          const isPast = shift.date < today;
+          const isPicker = mode === "picker";
+
           map[shift.date] = {
             selected: true,
-            selectedColor: Colors.borderBlue,
+            selectedColor:
+              isPicker && isPast ? Colors.disabledBlue : Colors.borderBlue,
           };
         });
       }
-      // Always show dot on today
+
       if (!map[today]) map[today] = {};
       map[today].marked = true;
       map[today].dotColor = "white";
 
       return map;
-    }, [shifts, selectedDate, showShifts]);
+    }, [mode, pickerType, rangeStart, rangeEnd, shifts, showShifts, today]);
 
-    /** ---- HANDLE DAY PRESS ---- */
-    const handleDayPress = (day: { dateString: string }) => {
-      const isShiftDay = shifts.some((s) => s.date === day.dateString);
-
-      // Only allow selecting dates that have shifts when enabled
-      if (mode === "picker" && requireShiftSelection && !isShiftDay) {
+    /** ---- RANGE PRESS HANDLER ---- */
+    const handleRangePress = (date: string) => {
+      if (!rangeStart || (rangeStart && rangeEnd)) {
+        setRangeStart(date);
+        setRangeEnd(null);
         return;
       }
 
+      if (date < rangeStart) {
+        setRangeStart(date);
+        setRangeEnd(null);
+        return;
+      }
+
+      setRangeEnd(date);
+      onSelectRange?.({ startDate: rangeStart, endDate: date });
+    };
+
+    /** ---- DAY PRESS ---- */
+    const handleDayPress = (day: { dateString: string }) => {
+      const isShiftDay = shifts.some((s) => s.date === day.dateString);
+
+      if (mode === "picker" && requireShiftSelection && !isShiftDay) return;
+
       setSelectedDate(day.dateString);
 
-      if (mode === "picker") {
-        const selectedShift = shifts.find(s => {
-          const normalized = new Date(s.date).toISOString().split("T")[0];
-          return normalized === day.dateString;
-        });
+      if (mode === "picker" && pickerType === "range") {
+        handleRangePress(day.dateString);
+        return;
+      }
 
-        // return BOTH: the selected date and shift object if exists
+      if (mode === "picker") {
+        const selectedShift = shifts.find(
+          (s) => s.date === day.dateString
+        );
+
         onSelectDate?.({
           date: day.dateString,
           shift: selectedShift || null
         });
-
         return;
       }
 
@@ -150,13 +218,14 @@ const CalendarWidget: React.FC<{
     const baseWidth = 380;
     const scale = Math.min(screenWidth / baseWidth, 1.1);
 
-
     return (
       <View style={styles.container}>
         <Calendar
           current={selectedDate}
+          markingType={pickerType === "range" ? "period" : undefined}
           markedDates={markedDates}
           onDayPress={handleDayPress}
+          minDate={mode === "picker" ? today : undefined}
           theme={{
             backgroundColor: Colors.white,
             calendarBackground: Colors.white,
@@ -176,7 +245,6 @@ const CalendarWidget: React.FC<{
           }}
         />
 
-        {/* Only show shift modal when used as the schedule calendar */}
         {mode === "calendar" && selectedShift && (
           <CalendarModal
             visible

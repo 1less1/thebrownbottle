@@ -88,27 +88,32 @@ export function formatDateTime(timestamp: string): string {
 // Output: date string (Day, DD Month)
 // Ex: 2025-03-02 → Sun, 02 Mar
 export const formatDate = (dateString: string): string => {
+  // Guard against empty values
   if (!dateString) return '';
 
+  // Validate YYYY-MM-DD
   const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return dateString;
 
-  const [, year, month, day] = match;
+  const [, year, month, day] = match.map(Number);
 
-  // Normalize Date
-  const localDate = new Date(Number(year), Number(month) - 1, Number(day));
-  const dateObj = normalizeDateUTC(localDate);
+  // Create a UTC date to avoid timezone drift
+  const dateObj = new Date(Date.UTC(year, month - 1, day));
 
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
 
-  const weekdayName = weekdays[dateObj.getDay()];
-  const dayNum = String(dateObj.getDate()).padStart(2, '0');
-  const monthName = months[dateObj.getMonth()];
+  // Use UTC getters ONLY
+  const weekdayName = weekdays[dateObj.getUTCDay()];
+  const dayNum = String(dateObj.getUTCDate()).padStart(2, '0');
+  const monthName = months[dateObj.getUTCMonth()];
 
   return `${weekdayName}, ${dayNum} ${monthName}`;
 };
+
 
 
 // Input: date string (YYYY-MM-DD)
@@ -120,21 +125,23 @@ export const formatDateWithYear = (dateString: string): string => {
   const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return dateString;
 
-  const [, year, month, day] = match;
+  const [, year, month, day] = match.map(Number);
 
-  // Normalize Date
-  const localDate = new Date(Number(year), Number(month) - 1, Number(day));
-  const dateObj = normalizeDateUTC(localDate);
+  // Create a UTC date explicitly to avoid timezone drift
+  // Date.UTC ensures this represents the calendar day, not a local timestamp
+  const dateObj = new Date(Date.UTC(year, month - 1, day));
 
+  // Weekday and month labels
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ];
 
-  const weekdayName = weekdays[dateObj.getDay()];
-  const dayNum = String(dateObj.getDate()).padStart(2, '0');
-  const monthName = months[dateObj.getMonth()];
+  // Extract values in UTC (NOT local time)
+  const weekdayName = weekdays[dateObj.getUTCDay()];
+  const dayNum = String(dateObj.getUTCDate()).padStart(2, '0');
+  const monthName = months[dateObj.getUTCMonth()];
 
   return `${weekdayName}, ${dayNum} ${monthName} ${year}`;
 };

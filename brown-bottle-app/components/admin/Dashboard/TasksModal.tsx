@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
 
@@ -11,6 +11,7 @@ import HorizontalCheckboxList from '@/components/modular/HorizontalCheckboxList'
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 import DatePickerModal from '@/components/modular/DatePickerModal';
+import CalendarWidget from '@/components/calendar/CalendarWidget';
 
 import { User } from '@/utils/SessionContext';
 import { insertRecurringTask, insertTask } from '@/routes/task';
@@ -43,8 +44,14 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
   const [end_date, setEndDate] = useState<string | null>(dayjs().add(1, 'day').format('YYYY-MM-DD')); // Default to tomorrow's date
   const [noEndDate, setNoEndDate] = useState(false);
 
-  const [DPVisibleOne, setDPVisibleOne] = useState(false);
-  const [DPVisibleTwo, setDPVisibleTwo] = useState(false);
+  const [duePickerVisible, setDuePickerVisible] = useState(false);
+  const [rangePickerVisible, setRangePickerVisible] = useState(false);
+
+  /* temp state for confirm flow */
+  const [tempDueDate, setTempDueDate] = useState(due_date);
+  const [tempStartDate, setTempStartDate] = useState(start_date);
+  const [tempEndDate, setTempEndDate] = useState<string | null>(end_date);
+
   const [DPVisibleThree, setDPVisibleThree] = useState(false);
 
   const dayMappings = {
@@ -69,8 +76,6 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
     setEndDate(dayjs().add(1, 'day').format('YYYY-MM-DD'));
     setIsRecurring(false);
     setNoEndDate(false);
-    setDPVisibleOne(false);
-    setDPVisibleTwo(false);
     setDPVisibleThree(false);
   };
 
@@ -184,11 +189,12 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
         <ScrollView>
 
           {/* Title Input */}
-          <TextInput placeholder="Title" value={title} onChangeText={setTitle} style={[GlobalStyles.input, { marginBottom: 15 }]} />
+          <TextInput placeholder="Title" placeholderTextColor={'gray'} value={title} onChangeText={setTitle} style={[GlobalStyles.input, { marginBottom: 15 }]} />
 
           {/* Description Input */}
           <TextInput
             placeholder="Description"
+            placeholderTextColor={'gray'}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -202,11 +208,12 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
                 <ModularButton
                   text='Choose Due Date'
-                  textStyle={{ color: 'black' }}
-                  style={[
-                    { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
-                  ]}
-                  onPress={() => setDPVisibleOne(true)}
+                  textStyle={{ color: Colors.blue }}
+                  style={[{ backgroundColor: Colors.bgBlue, borderColor: Colors.borderBlue, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }]}
+                  onPress={() => {
+                    setTempDueDate(due_date);
+                    setDuePickerVisible(true);
+                  }}
                 />
                 <View style={styles.dateContainer}>
                   <Text style={GlobalStyles.text}>Date: </Text>
@@ -214,15 +221,32 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                 </View>
               </View>
 
-              <DatePickerModal
-                visible={DPVisibleOne}
-                onClose={() => setDPVisibleOne(false)}
-                dateString={due_date}
-                onChange={(newDate) => {
-                  setDueDate(newDate);
-                  setDPVisibleOne(false);
+              <ModularModal
+                visible={duePickerVisible}
+                onClose={() => {
+                  setTempDueDate(due_date);
+                  setDuePickerVisible(false);
                 }}
-              />
+              >
+                <CalendarWidget
+                  mode="picker"
+                  pickerType="single"
+                  showShifts={false}
+                  initialDate={due_date}
+                  onSelectDate={({ date }) => { setDueDate(date), setDuePickerVisible(false) }}
+                />
+                <View>
+                  <ModularButton
+                    text="Cancel"
+                    style={GlobalStyles.cancelButton}
+                    textStyle={{ color: 'gray' }}
+                    onPress={() => {
+                      setTempDueDate(due_date);
+                      setDuePickerVisible(false);
+                    }}
+                  />
+                </View>
+              </ModularModal>
             </>
           )}
 
@@ -232,7 +256,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               selectedSection={selectedSection}
               onSectionSelect={setSelectedSection}
               labelText="Assign To:"
-              usePlaceholder={false} 
+              usePlaceholder={false}
             />
           </View>
 
@@ -263,53 +287,85 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
               </View>
 
               <>
-                {/* Start Date Input */}
+                {/* Date Range */}
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
                   <ModularButton
-                    text='Choose Start Date'
-                    textStyle={{ color: 'black' }}
+                    text="Choose Range"
+                    textStyle={{ color: Colors.blue }}
                     style={[
-                      { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
+                      { backgroundColor: Colors.bgBlue, borderColor: Colors.borderBlue, borderWidth: 1, flexShrink: 1, }
                     ]}
-                    onPress={() => setDPVisibleTwo(true)}
+                    onPress={() => {
+                      setTempStartDate(start_date);
+                      setTempEndDate(end_date);
+                      setRangePickerVisible(true);
+                    }}
                   />
+
                   <View style={styles.dateContainer}>
-                    <Text style={GlobalStyles.text}>Date: </Text>
-                    <Text style={[GlobalStyles.text, { color: Colors.blue }]}>{formatDateWithYear(start_date)}</Text>
+                    <Text style={[GlobalStyles.text, {color: Colors.blue}]}>
+                      {start_date && end_date
+                        ? `${formatDateWithYear(start_date)} → ${formatDateWithYear(end_date)}`
+                        : `${formatDateWithYear(start_date)} →`}
+                    </Text>
                   </View>
+
+                  <ModularModal
+                    visible={rangePickerVisible}
+                    onClose={() => {
+                      setTempStartDate(start_date);
+                      setTempEndDate(end_date);
+                      setRangePickerVisible(false);
+                    }}
+                  >
+                    <CalendarWidget
+                      mode="picker"
+                      pickerType="range"
+                      showShifts={false}
+                      onSelectRange={({ startDate, endDate }) => {
+                        setTempStartDate(startDate);
+                        setTempEndDate(endDate);
+                      }}
+                    />
+                    <View style={[styles.dateContainer, { marginTop: 10 }]}>
+                      <Text style={GlobalStyles.text}>Selected: </Text>
+                      <Text style={[GlobalStyles.semiBoldText, { color: Colors.blue }]}>
+                        {tempStartDate && tempEndDate
+                          ? `${formatDateWithYear(tempStartDate)} → ${formatDateWithYear(tempEndDate)}`
+                          : tempStartDate
+                            ? `${formatDateWithYear(tempStartDate)} →`
+                            : ''}
+                      </Text>
+                    </View>
+
+                    <View style={styles.buttonRowContainer}>
+                      <ModularButton
+                        text="Confirm"
+                        style={GlobalStyles.submitButton}
+                        textStyle={{ color: 'white' }}
+                        onPress={() => {
+                          setStartDate(tempStartDate);
+                          setEndDate(noEndDate ? null : tempEndDate);
+                          setRangePickerVisible(false);
+                        }}
+                      />
+                      <ModularButton
+                        text="Cancel"
+                        style={GlobalStyles.cancelButton}
+                        textStyle={{ color: 'gray' }}
+                        onPress={() => {
+                          setTempStartDate(start_date);
+                          setTempEndDate(end_date);
+                          setRangePickerVisible(false);
+                        }}
+                      />
+                    </View>
+                  </ModularModal>
                 </View>
-
-                <DatePickerModal
-                  visible={DPVisibleTwo}
-                  onClose={() => setDPVisibleTwo(false)}
-                  dateString={start_date}
-                  onChange={(newDate) => {
-                    setStartDate(newDate);
-                    setDPVisibleTwo(false);
-                  }}
-                />
               </>
-
-
 
               {!noEndDate && (
                 <>
-                  {/* End Date Input */}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
-                    <ModularButton
-                      text='Choose End Date'
-                      textStyle={{ color: 'black' }}
-                      style={[
-                        { backgroundColor: 'white', borderColor: Colors.darkTan, borderWidth: 1, flexShrink: 1, paddingHorizontal: 15, }
-                      ]}
-                      onPress={() => setDPVisibleThree(true)}
-                    />
-                    <View style={styles.dateContainer}>
-                      <Text style={GlobalStyles.text}>Date: </Text>
-                      <Text style={[GlobalStyles.text, { color: Colors.blue }]}> {end_date ? formatDateWithYear(end_date) : null}</Text>
-                    </View>
-                  </View>
-
                   {end_date && (
                     <DatePickerModal
                       visible={DPVisibleThree}
@@ -374,7 +430,7 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
       </View>
 
 
-    </ModularModal>
+    </ModularModal >
 
   );
 };
@@ -383,6 +439,12 @@ const styles = StyleSheet.create({
   formContainer: {
     gap: 12,
     marginTop: 10,
+  },
+  buttonRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 15,
   },
   dateContainer: {
     flexShrink: 1,
