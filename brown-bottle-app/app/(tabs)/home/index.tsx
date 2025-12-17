@@ -99,7 +99,7 @@ export default function HomeScreen() {
               </View>
               {/* Next Shift column */}
               <View style={styles.nextShiftColumn}>
-                <NextShift />
+                <NextShift parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
               </View>
             </View>
 

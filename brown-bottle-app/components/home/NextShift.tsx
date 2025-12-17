@@ -15,12 +15,14 @@ interface Props {
   showRole?: boolean;
   showSection?: boolean;
   parentRefresh?: number;
+  onRefreshDone?: () => void;
 }
 
 const NextShift: React.FC<Props> = ({
   showRole = true,
   showSection = true,
   parentRefresh,
+  onRefreshDone
 }) => {
 
   const [loading, setLoading] = useState(true);
