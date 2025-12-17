@@ -1,6 +1,13 @@
 {
   "expo": {
     "name": "brown-bottle-app",
-    "slug": "brown-bottle-app"
+    "slug": "brown-bottle-app",
+    "extra": {
+      "API_BASE_URL": "http://134.161.225.104:5000",
+      "router": {},
+      "eas": {
+        "projectId": "58d479aa-c290-42d1-80db-63041542ec3c"
+      }
+    }
   }
 }
