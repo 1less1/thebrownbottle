@@ -36,7 +36,7 @@ const ListItemDetails: React.FC<Props> = ({ announcement, isAcknowledged, handle
         </View>
 
         {/* Bottom Section (Free Flowing Text) */}
-        <>
+        <View>
           {/* Description */}
           <ExpandableText text={announcement.description} />
 
@@ -51,7 +51,9 @@ const ListItemDetails: React.FC<Props> = ({ announcement, isAcknowledged, handle
 
           {/* Acknowledge Button */}
           {isAcknowledged ? (
-            <Text style={styles.acknowledged}>Acknowledged</Text>
+            <View style={styles.acknowledgedContainer}>
+              <Text style={styles.acknowledgedText}>Acknowledged</Text>
+            </View>
           ) : (
             <TouchableOpacity
               onPress={() => handleAcknowledge(announcement.announcement_id)}
@@ -60,7 +62,7 @@ const ListItemDetails: React.FC<Props> = ({ announcement, isAcknowledged, handle
               <Text style={styles.ackBtnText}>Acknowledge</Text>
             </TouchableOpacity>
           )}
-        </>
+        </View>
 
       </View>
 
@@ -105,13 +107,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.buttonBlue,
     borderRadius: 6,
   },
-  acknowledged: {
+  acknowledgedContainer: {
     marginTop: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
     alignSelf: 'flex-end',
     backgroundColor: Colors.badgeGray,
     borderRadius: 6,
+  },
+  acknowledgedText: {
     fontWeight: '500',
   },
   ackBtnText: {

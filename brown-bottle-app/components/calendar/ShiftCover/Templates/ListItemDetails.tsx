@@ -31,10 +31,10 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
                         {request.status !== 'Pending' && request.accepted_first_name && request.accepted_last_name ? (
                             <>
                                 <Text style={GlobalStyles.boldText}>
-                                    {request.accepted_first_name} {request.accepted_last_name} { }
+                                    {request.accepted_first_name} {request.accepted_last_name} {' '}
                                 </Text>
                                 <Text style={GlobalStyles.text}>
-                                    ({request.accepted_primary_role_name}) { }
+                                    ({request.accepted_primary_role_name}) {' '}
                                 </Text>
                                 <Text style={GlobalStyles.altText}>covering...</Text>
                             </>
@@ -64,7 +64,7 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
                     <View style={[styles.row, { marginTop: 2 }]}>
                         <Text style={GlobalStyles.text}>From: </Text>
                         <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
-                            {request.requested_first_name} {request.requested_last_name} { }
+                            {request.requested_first_name} {request.requested_last_name} {' '}
                         </Text>
                         <Text style={GlobalStyles.text}>
                             ({request.requested_primary_role_name})

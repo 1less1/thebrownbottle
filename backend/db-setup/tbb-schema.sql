@@ -191,7 +191,7 @@ CREATE TABLE `thebrownbottle`.`announcement_acknowledgment` (
     employee_id INT NOT NULL,
     acknowledged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (announcement_id, employee_id)
-);
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 

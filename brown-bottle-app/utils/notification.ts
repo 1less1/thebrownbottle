@@ -1,12 +1,18 @@
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 
+// const web
+
 // Registers the current device for push notifications
 export async function registerForPushNotificationsAsync() {
-
-  // Push notifications do not work on simulators
+  // Push notifications do not work on simulators and ignore on web
   if (!Device.isDevice) {
+    return null;
+  }
+
+  if (Platform.OS === "web") {
     return null;
   }
 

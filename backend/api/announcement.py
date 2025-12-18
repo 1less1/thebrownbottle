@@ -1,5 +1,6 @@
 from flask import jsonify
-from push_notifications import send_push_notification
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -178,37 +179,16 @@ def insert_announcement(db, request):
 
         conn.commit()
 
-        # Determine who should receive this announcement
-        cursor.execute("""
-            SELECT DISTINCT pt.expo_push_token
-            FROM push_token pt
-            JOIN employee e ON e.employee_id = pt.user_id
-            WHERE e.is_active = 1
-              AND e.primary_role = %s;
-        """, (role_id,))
-
-        tokens = cursor.fetchall()
-
-        # --- Start Debug Logging ---
-        print(f"Announcement created for role_id: {role_id}")
-        print(f"Found {len(tokens)} tokens for this role.")
-        if len(tokens) > 0:
-            print(f"Tokens: {[row['expo_push_token'] for row in tokens]}")
-        # --- End Debug Logging ---
-
-        # Extract just the token strings into a list
-        token_list = [row['expo_push_token'] for row in tokens]
-
-        # Send in batches of 100 (Expo's limit per request)
-        chunk_size = 100
-        for i in range(0, len(token_list), chunk_size):
-            chunk = token_list[i:i + chunk_size]
-            send_push_notification(
-                expo_push_token=chunk,
-                title="New Announcement",
-                body=title,
-                data={"announcement_id": inserted_id}
-            )
+        # Emit notification event
+        dispatch_notification(
+            db,
+            NotificationEvent.ANNOUNCEMENT_CREATED,
+            {
+                "announcement_id": inserted_id,
+                "role_id": role_id,
+                "title": title
+            }
+        )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
