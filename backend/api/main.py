@@ -15,6 +15,7 @@ import shift
 import shift_cover_request
 import time_off_request
 import schedule
+import push_token
 
 
 # Initialize environment variables
@@ -251,6 +252,7 @@ def get_acknowledged_announcements():
     """
     return announcement.get_acknowledged_announcements(get_db_connection(), request)
 
+
 @app.route('/announcement/acknowledge', methods=['POST'])
 def acknowledge_announcement():
     """
@@ -346,7 +348,7 @@ def update_time_off_request(request_id):
     """
     with request_lock:
         return time_off_request.update_tor(get_db_connection(), request, request_id)
-    
+
 
 @app.route('/tor/delete/<int:request_id>', methods=['DELETE'])
 def delete_time_off_request(request_id):
@@ -405,6 +407,28 @@ def approve_shift_request(cover_request_id):
     """
     with request_lock:
         return shift_cover_request.approve_scr(get_db_connection(), cover_request_id)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+# Push Token Routes ---------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+@app.route('/push-token/register', methods=['POST'])
+def register_push_token():
+    """
+    POST Expo push token for a user device
+    """
+    return push_token.register_push_token(get_db_connection(), request)
+
+
+@app.route('/push-token/delete', methods=['DELETE'])
+def delete_push_token():
+    """
+    DELETE Expo push token for a user device
+    """
+    return push_token.delete_push_token(get_db_connection(), request)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------

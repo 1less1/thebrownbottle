@@ -1,4 +1,5 @@
 from flask import jsonify
+from push_notifications import send_push_notification
 import mysql.connector
 import os
 import request_helper
@@ -23,8 +24,8 @@ def get_announcements(db, request):
             'author_id': int,
             'role_id': int,
             'title': str,
-            'recent_only': int, # 1=True, 0=False
-            'timestamp_sort': str # "Newest", "Oldest"
+            'recent_only': int,  # 1=True, 0=False
+            'timestamp_sort': str  # "Newest", "Oldest"
         }
 
         # Validate and parse parameters
@@ -82,12 +83,12 @@ def get_announcements(db, request):
         if (recent_only is not None) and (recent_only == 1):
             # Filter announcements inserted within the last 14 days
             query += " AND a.timestamp >= NOW() - INTERVAL 14 DAY"
-        
+
         # -----------------------------
         # Time Sorting Logic
         # -----------------------------
         order_clauses = []
-        
+
         # TIMESTAMP SORTING
         if timestamp_sort == "Newest":
             order_clauses.append("a.timestamp DESC")
@@ -176,6 +177,38 @@ def insert_announcement(db, request):
         inserted_id = cursor.lastrowid
 
         conn.commit()
+
+        # Determine who should receive this announcement
+        cursor.execute("""
+            SELECT DISTINCT pt.expo_push_token
+            FROM push_token pt
+            JOIN employee e ON e.employee_id = pt.user_id
+            WHERE e.is_active = 1
+              AND e.primary_role = %s;
+        """, (role_id,))
+
+        tokens = cursor.fetchall()
+
+        # --- Start Debug Logging ---
+        print(f"Announcement created for role_id: {role_id}")
+        print(f"Found {len(tokens)} tokens for this role.")
+        if len(tokens) > 0:
+            print(f"Tokens: {[row['expo_push_token'] for row in tokens]}")
+        # --- End Debug Logging ---
+
+        # Extract just the token strings into a list
+        token_list = [row['expo_push_token'] for row in tokens]
+
+        # Send in batches of 100 (Expo's limit per request)
+        chunk_size = 100
+        for i in range(0, len(token_list), chunk_size):
+            chunk = token_list[i:i + chunk_size]
+            send_push_notification(
+                expo_push_token=chunk,
+                title="New Announcement",
+                body=title,
+                data={"announcement_id": inserted_id}
+            )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
@@ -315,7 +348,6 @@ def delete_announcement(db, announcement_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Announcement Acknowledgement --------------------------------------------------------------------------
 
 # POST Acknowledge Announcement -------------------------------------------------------------------------
@@ -400,7 +432,7 @@ def get_acknowledged_announcements(db, request):
         param_types = {
             'announcement_id': int,
             'employee_id': int,
-            'recent_only': int, # 1=True, 0=False
+            'recent_only': int,  # 1=True, 0=False
         }
 
         # Validate and parse parameters
@@ -441,13 +473,13 @@ def get_acknowledged_announcements(db, request):
         if employee_id is not None:
             query += " AND aa.employee_id = %s"
             query_params.append(employee_id)
-        
+
         if (recent_only is not None) and (recent_only == 1):
             # Filter announcements inserted within the last 14 days
             query += " AND a.timestamp >= NOW() - INTERVAL 14 DAY"
 
         # Last Query Line
-        query += " ORDER BY a.timestamp DESC;" # Shows newest acknowledgements first
+        query += " ORDER BY a.timestamp DESC;"  # Shows newest acknowledgements first
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

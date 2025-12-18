@@ -1,0 +1,50 @@
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import Constants from "expo-constants";
+
+// Registers the current device for push notifications
+export async function registerForPushNotificationsAsync() {
+
+  // Push notifications do not work on simulators
+  if (!Device.isDevice) {
+    return null;
+  }
+
+  // Check existing notification permissions
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+
+  let finalStatus = existingStatus;
+
+  // Request permission if not already granted
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  // Exit early if permission denied
+  if (finalStatus !== "granted") {
+    return null;
+  }
+
+  // REQUIRED: explicitly provide projectId
+  const projectId =
+    Constants?.expoConfig?.extra?.eas?.projectId ??
+    Constants?.easConfig?.projectId ??
+    "830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4"; // Hardcode as last resort for local dev
+
+  if (!projectId) {
+    throw new Error("Expo projectId not found");
+  }
+
+  // Get Expo push token for this device
+  try {
+    const tokenResponse = await Notifications.getExpoPushTokenAsync({
+      projectId,
+    });
+    console.log(`--> SUCCESS! Token: ${tokenResponse.data}`);
+    return tokenResponse.data;
+  } catch (e) {
+    console.error("--> ERROR: Failed to get token:", e);
+    return null;
+  }
+}
