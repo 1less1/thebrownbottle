@@ -6,6 +6,8 @@ import { Platform } from 'react-native';
 
 import { Employee } from '@/types/iEmployee';
 
+import { registerForPushNotificationsAsync } from './notification';
+
 export type User = Employee;
 
 type SessionContextType = {
@@ -77,6 +79,44 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     };
     loadUser();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const setupPushNotifications = async () => {
+      try {
+        // Request permission + get Expo push token
+        const expoPushToken =
+          await registerForPushNotificationsAsync();
+
+        // Exit if token was not created (denied or unsupported device)
+        if (!expoPushToken) return;
+
+        const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+        // console.log("Attempting fetch to:", `${apiUrl}/push-token/register`); // Debug log
+        await fetch(`${apiUrl}/push-token/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: user.employee_id,
+            expo_push_token: expoPushToken,
+          }),
+        }).catch(err => {
+          console.error("Network Error Details:", err.message);
+          // This will confirm if it's a timeout or a rejected connection
+        });
+
+      } catch (err) {
+        console.error('Push notification setup failed:', err);
+      }
+    };
+
+    setupPushNotifications();
+  }, [user]);
+
 
   const setUser = async (newUser: User | null) => {
     try {

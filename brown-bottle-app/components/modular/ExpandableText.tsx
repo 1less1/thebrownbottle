@@ -7,7 +7,7 @@ import { Colors } from '@/constants/Colors';
 
 
 type Props = {
-    text: string;
+    text: string | null | undefined;
     numberOfLines?: number;
     readMoreLabel?: string;
     showLessLabel?: string;
@@ -26,12 +26,14 @@ const ExpandableText: React.FC<Props> = ({
     const [expanded, setExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);
 
+    const safeText = String(text || '');
+
     const lineHeight = (textStyle as TextStyle).lineHeight ?? 20;
     const BUFFER = 2;
     const maxHeight = numberOfLines * lineHeight + BUFFER;
 
     return (
-        <>
+        <View>
             {/* Hidden measurement */}
             <View style={{ position: 'absolute', opacity: 0, width: '100%' }}>
                 <Text
@@ -41,7 +43,7 @@ const ExpandableText: React.FC<Props> = ({
                         setIsOverflowing(height > maxHeight);
                     }}
                 >
-                    {text}
+                    {safeText}
                 </Text>
             </View>
 
@@ -52,7 +54,11 @@ const ExpandableText: React.FC<Props> = ({
                     overflow: 'hidden',
                 }}
             >
-                <Text style={textStyle}>{text}</Text> {/* 🔥 no insertBreaks */}
+                {safeText ? (
+                    <Text style={textStyle}>{safeText}</Text>
+                ) : (
+                    <Text style={{ fontStyle: 'italic', color: Colors.gray }}>No description</Text>
+                )}
             </View>
 
             {isOverflowing && (
@@ -64,7 +70,7 @@ const ExpandableText: React.FC<Props> = ({
                     </TouchableOpacity>
                 </View>
             )}
-        </>
+        </View>
     );
 };
 

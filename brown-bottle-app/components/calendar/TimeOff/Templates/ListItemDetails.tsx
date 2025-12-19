@@ -47,7 +47,7 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
                         <Text
                             style={[GlobalStyles.boldText, { color: Colors.purple }]}
                         >
-                            {request.first_name} {request.last_name} { }
+                            {request.first_name} {request.last_name} {' '}
                         </Text>
                         <Text>
                             ({request.primary_role_name})

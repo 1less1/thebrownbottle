@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -6,6 +8,7 @@ from datetime import datetime
 
 # GET Shifts --------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def get_shifts(db, request):
     """
@@ -26,8 +29,8 @@ def get_shifts(db, request):
             'date': str,
             'start_date': str,
             'end_date': str,
-            'is_today': int, # 1=True, 0=False
-            'next_shift': int # 1=True, 0=False
+            'is_today': int,  # 1=True, 0=False
+            'next_shift': int  # 1=True, 0=False
         }
 
         # Validate and parse parameters
@@ -46,7 +49,7 @@ def get_shifts(db, request):
         start_date = params.get('start_date')
         end_date = params.get('end_date')
         is_today = params.get('is_today')
-        next_shift=params.get('next_shift')
+        next_shift = params.get('next_shift')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -95,9 +98,8 @@ def get_shifts(db, request):
             result = cursor.fetchall()
             return jsonify(result), 200
 
-    
         # -----------------------------
-        # Build Dynamic Query 
+        # Build Dynamic Query
         # -----------------------------
         if shift_id is not None:
             query += " AND sh.shift_id = %s"
@@ -107,11 +109,10 @@ def get_shifts(db, request):
             query += " AND sh.employee_id = %s"
             query_params.append(employee_id)
 
-
         if section_id is not None:
             query += " AND sh.section_id = %s"
             query_params.append(section_id)
-        
+
         # Handle multiple Role Clauses
         role_clauses = []
         role_values = []
@@ -132,7 +133,6 @@ def get_shifts(db, request):
             query += " AND (" + " OR ".join(role_clauses) + ")"
             query_params.extend(role_values)
 
-
         # -----------------------------
         # Date Sorting Logic
         # -----------------------------
@@ -147,7 +147,7 @@ def get_shifts(db, request):
                     datetime.strptime(end_date, '%Y-%m-%d')
                 except ValueError:
                     return jsonify({"error": "Invalid date range format. Expected YYYY-MM-DD."}), 400
-                
+
                 query += " AND sh.date BETWEEN %s AND %s"
                 query_params.append(start_date)
                 query_params.append(end_date)
@@ -158,7 +158,7 @@ def get_shifts(db, request):
                     datetime.strptime(date, '%Y-%m-%d')
                 except ValueError:
                     return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
-                
+
                 query += " AND sh.date = %s"
                 query_params.append(date)
 
@@ -184,10 +184,10 @@ def get_shifts(db, request):
             cursor.close()
         if conn:
             conn.close()
-    
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-    
+
 
 #  POST Shift -------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -207,13 +207,14 @@ def insert_shift(db, request):
         # Define Expected Field Types
         field_types = {
             'employee_id': int,
-            'start_time': str, # HH:MM:SS
-            'date': str, # YYYY-MM-DD
+            'start_time': str,  # HH:MM:SS
+            'date': str,  # YYYY-MM-DD
             'section_id': int,
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -233,10 +234,19 @@ def insert_shift(db, request):
             (employee_id, start_time, date, section_id)
             VALUES (%s, %s, %s, %s);
         """, (employee_id, start_time, date, section_id))
-        
+
         inserted_id = cursor.lastrowid
 
         conn.commit()
+
+        dispatch_notification(
+            db,
+            NotificationEvent.SHIFT_CREATED,
+            {
+                "employee_id": employee_id,
+                "shift_id": inserted_id
+            }
+        )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
@@ -247,13 +257,13 @@ def insert_shift(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
-    
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -288,23 +298,45 @@ def update_shift(db, request, shift_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(shift_id)  # WHERE parameter at the end -> WHERE shift_id = %s
+        # WHERE parameter at the end -> WHERE shift_id = %s
+        values.append(shift_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
+
+        # Grab employee id before update
+        cursor.execute(
+            "SELECT employee_id FROM shift WHERE shift_id = %s",
+            (shift_id,)
+        )
+        shift = cursor.fetchone()
+
+        if not shift:
+            return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+
+        employee_id = shift["employee_id"]
 
         query = f"""
             UPDATE shift
             SET {set_clause}
             WHERE shift_id = %s;
         """
-        
+
         cursor.execute(query, tuple(values))
         conn.commit()
         rowcount = cursor.rowcount
 
         if rowcount == 0:
             return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+
+        dispatch_notification(
+            db,
+            NotificationEvent.SHIFT_UPDATED,
+            {
+                "shift_id": shift_id,
+                "employee_id": employee_id
+            }
+        )
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 
@@ -326,7 +358,6 @@ def update_shift(db, request, shift_id):
 # --------------------------------------------------------------------------------------
 
 
-
 # DELETE Shift -------------------------------------------------------------------------
 # --------------------------------------------------------------------------------------
 
@@ -341,15 +372,26 @@ def delete_shift(db, shift_id):
         cursor = conn.cursor(dictionary=True)
 
         # Check if shift exists
-        cursor.execute("SELECT shift_id FROM shift WHERE shift_id = %s", (shift_id,))
-        result = cursor.fetchone()
-        
-        if not result:
+        cursor.execute(
+            "SELECT shift_id, employee_id FROM shift WHERE shift_id = %s",
+            (shift_id,)
+        )
+        shift = cursor.fetchone()
+
+        if not shift:
             return jsonify({"status": "error", "message": "Shift not found"}), 404
 
-        # Delete the shift
         cursor.execute("DELETE FROM shift WHERE shift_id = %s", (shift_id,))
         conn.commit()
+
+        dispatch_notification(
+            db,
+            NotificationEvent.SHIFT_DELETED,
+            {
+                "employee_id": shift["employee_id"],
+                "shift_id": shift_id
+            }
+        )
 
         return jsonify({"status": "success", "message": "Shift deleted"}), 200
 

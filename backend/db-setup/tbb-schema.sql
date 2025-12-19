@@ -185,13 +185,36 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`announcement_acknowledgment`
 -- -----------------------------------------------------
-CREATE TABLE announcement_acknowledgment (
+CREATE TABLE `thebrownbottle`.`announcement_acknowledgment` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     announcement_id INT NOT NULL,
-    employee_id  INT NOT NULL,
+    employee_id INT NOT NULL,
     acknowledged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (announcement_id, employee_id )
-);
+    UNIQUE (announcement_id, employee_id)
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`push_token`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`push_token` (
+  `push_token_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `expo_push_token` VARCHAR(255) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`push_token_id`),
+  UNIQUE INDEX `expo_push_token_UNIQUE` (`expo_push_token` ASC) VISIBLE,
+  INDEX `fk_push_token_user_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_push_token_user`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
 
 
 -- -----------------------------------------------------

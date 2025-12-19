@@ -80,6 +80,7 @@ const AnnouncementsModal: React.FC<ModalProps> = ({ visible, onClose, user }) =>
 
           <TextInput
             placeholder="Title"
+            placeholderTextColor={'gray'}
             value={title}
             onChangeText={setTitle}
             style={[GlobalStyles.input, { marginBottom: 15 }]}
@@ -87,6 +88,7 @@ const AnnouncementsModal: React.FC<ModalProps> = ({ visible, onClose, user }) =>
 
           <TextInput
             placeholder="Description"
+            placeholderTextColor={'gray'}
             value={description}
             onChangeText={(text) => {
               if (text.length <= MAX_CHARS) {

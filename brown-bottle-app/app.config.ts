@@ -45,6 +45,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     typedRoutes: true,
   },
   extra: {
-    API_BASE_URL: process.env.API_BASE_URL,
+    // This allows Constants.expoConfig.extra.eas.projectId to work
+    eas: {
+      projectId: process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? "830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4",
+    },
+    // This passes your URL to Constants
+    API_BASE_URL: process.env.EXPO_PUBLIC_API_URL,
   },
 });

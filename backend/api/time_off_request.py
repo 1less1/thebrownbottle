@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -28,8 +30,8 @@ def get_tor(db, request):
             'end_date': str,
             'reason': str,
             'status': List[str],
-            'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
-            'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
+            'date_sort': str,  # "Newest" or "Oldest" - Sorts by date in relation to the current day
+            'timestamp_sort': str  # "Newest" or "Oldest" - Sorts by timestamp
         }
 
         # Validate and parse parameters
@@ -46,9 +48,9 @@ def get_tor(db, request):
         start_date = params.get('start_date')
         end_date = params.get('end_date')
         reason = params.get('reason')
-        statuses = params.get('status', []) # List of statuses
-        date_sort = params.get ("date_sort")
-        timestamp_sort = params.get ("timestamp_sort")
+        statuses = params.get('status', [])  # List of statuses
+        date_sort = params.get("date_sort")
+        timestamp_sort = params.get("timestamp_sort")
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -90,7 +92,7 @@ def get_tor(db, request):
         if employee_id is not None:
             query += " AND tor.employee_id = %s"
             query_params.append(employee_id)
-        
+
         if start_date:
             try:
                 datetime.strptime(start_date, '%Y-%m-%d')
@@ -110,7 +112,7 @@ def get_tor(db, request):
         if reason is not None:
             query += " AND tor.reason = %s"
             query_params.append(reason)
-        
+
         # Handle multiple Role Clauses
         role_clauses = []
         role_values = []
@@ -228,6 +230,24 @@ def insert_tor(db, request):
 
         conn.commit()
 
+        # Close cursor immediately before notifications
+        cursor.close()
+        cursor = None
+
+        # --- NOTIFICATION TRIGGER ---
+        try:
+            dispatch_notification(
+                db,
+                NotificationEvent.TIME_OFF_CREATED,
+                {
+                    "request_id": inserted_id,
+                    "employee_id": employee_id
+                }
+            )
+        except Exception as e:
+            print(f"Notification Error: {e}")
+        # ----------------------------
+
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
@@ -243,12 +263,12 @@ def insert_tor(db, request):
             cursor.close()
         if conn:
             conn.close()
-
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 # PATCH Time Off Request --------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def update_tor(db, request, request_id):
     """
@@ -280,6 +300,19 @@ def update_tor(db, request, request_id):
         conn = db
         cursor = conn.cursor(dictionary=True)
 
+        # --- FETCH CURRENT DETAILS (Needed for notifications) ---
+        cursor.execute(
+            "SELECT status, employee_id FROM time_off_request WHERE request_id = %s", (request_id,))
+        current = cursor.fetchone()
+
+        if not current:
+            cursor.close()
+            return jsonify({"status": "error", "message": "Time Off Request not found"}), 404
+
+        old_status = current["status"]
+        employee_id = current["employee_id"]
+        # --------------------------------------------------------
+
         query = f"""
             UPDATE time_off_request
             SET {set_clause}
@@ -290,8 +323,38 @@ def update_tor(db, request, request_id):
         conn.commit()
         rowcount = cursor.rowcount
 
+        # Close cursor immediately before notifications
+        cursor.close()
+        cursor = None
+
         if rowcount == 0:
             return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+
+        # --- NOTIFICATION TRIGGERS ---
+        new_status = fields.get("status")
+
+        if new_status and new_status != old_status:
+            try:
+                event = None
+                if new_status == "Accepted":
+                    event = NotificationEvent.TIME_OFF_APPROVED
+                elif new_status == "Denied":
+                    event = NotificationEvent.TIME_OFF_DENIED
+
+                if event:
+                    dispatch_notification(
+                        db,
+                        event,
+                        {
+                            "request_id": request_id,
+                            "employee_id": employee_id,
+                            "status": new_status
+                        }
+                    )
+            except Exception as e:
+                # Log the error, but do not fail the request
+                print(f"Notification Error in update_tor: {e}")
+        # -----------------------------
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 
@@ -314,6 +377,7 @@ def update_tor(db, request, request_id):
 
 # DELETE Time Off Request -------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def delete_tor(db, request_id):
     """
@@ -360,4 +424,3 @@ def delete_tor(db, request_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-
