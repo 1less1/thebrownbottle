@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -6,6 +8,7 @@ from datetime import datetime
 
 # GET Requests ------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def get_tasks(db, request):
     """
@@ -20,7 +23,7 @@ def get_tasks(db, request):
         param_types = {
             'task_id': int,
             'author_id': int,
-            'section_id': int, 
+            'section_id': int,
             'complete': int,  # 0 or 1
             'today': bool,
             'recurring': bool,
@@ -39,7 +42,7 @@ def get_tasks(db, request):
         complete = params.get('complete')
         today = params.get('today', False)
         recurring = params.get('recurring', False)
-        due_date = params.get('due_date') # 'YYYY-MM-DD'
+        due_date = params.get('due_date')  # 'YYYY-MM-DD'
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -70,7 +73,7 @@ def get_tasks(db, request):
 
         query_params = []
 
-        # Build Dynamic Query 
+        # Build Dynamic Query
         if task_id is not None:
             query += " AND t.task_id = %s"
             query_params.append(task_id)
@@ -83,7 +86,7 @@ def get_tasks(db, request):
             query += " AND t.section_id = %s"
             query_params.append(section_id)
 
-        if complete is not None and complete in (0,1):
+        if complete is not None and complete in (0, 1):
             query += " AND t.complete = %s"
             query_params.append(complete)
 
@@ -102,7 +105,7 @@ def get_tasks(db, request):
 
             query += " AND t.due_date = %s"
             query_params.append(due_date)
-        
+
         # Last Query Line
         query += " ORDER BY t.due_date ASC;"
 
@@ -119,7 +122,7 @@ def get_tasks(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -141,7 +144,8 @@ def insert_task(db, request):
     cursor = None
     try:
         # Define Required Fields
-        required_fields = ['title', 'description', 'author_id', 'section_id', 'due_date']
+        required_fields = ['title', 'description',
+                           'author_id', 'section_id', 'due_date']
 
         # Define Expected Field Types
         field_types = {
@@ -153,7 +157,8 @@ def insert_task(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -177,6 +182,15 @@ def insert_task(db, request):
 
         conn.commit()
 
+        # Emit Notification Event
+        dispatch_notification(
+            db,
+            NotificationEvent.TASK_CREATED,
+            {
+                "task_id": inserted_id
+            }
+        )
+
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
@@ -186,13 +200,12 @@ def insert_task(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
-    
 
 
 def insert_recurring_task(db, request):
@@ -210,7 +223,7 @@ def insert_recurring_task(db, request):
             'title', 'description', 'author_id', 'section_id',
             'start_date', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
         ]
-        
+
         # Define Expected Field Types
         field_types = {
             'title': str,
@@ -224,7 +237,8 @@ def insert_recurring_task(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -243,7 +257,7 @@ def insert_recurring_task(db, request):
         fri = fields['fri']
         sat = fields['sat']
         sun = fields['sun']
-        
+
         # Check optional end_date field
         end_date = fields.get('end_date')
         if not end_date or end_date.lower() == 'none':
@@ -263,16 +277,36 @@ def insert_recurring_task(db, request):
             title, description, author_id, section_id, start_date, end_date,
             mon, tue, wed, thu, fri, sat, sun
         ))
-            
 
         inserted_id = cursor.lastrowid
-        
+
         conn.commit()
 
         # Call the Stored Procedure to insert today's recurring tasks into 'task' table
         proc_cursor = conn.cursor(dictionary=True)
         proc_cursor.callproc("insert_recurring_tasks")
         conn.commit()
+
+        # Fetch task instances created TODAY by this recurring task
+        cursor.execute("""
+            SELECT task_id
+            FROM task
+            WHERE
+                recurring_task_id = %s
+                AND DATE(timestamp) = CURDATE();
+        """, (inserted_id,))
+
+        created_tasks = cursor.fetchall()
+
+        # Dispatch notifications for each real task
+        for row in created_tasks:
+            dispatch_notification(
+                db,
+                NotificationEvent.TASK_CREATED,
+                {
+                    "task_id": row["task_id"]
+                }
+            )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 200
 
@@ -283,7 +317,7 @@ def insert_recurring_task(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -291,6 +325,7 @@ def insert_recurring_task(db, request):
             proc_cursor.close()
         if conn:
             conn.close()
+
 
 def handle_new_task(db, request):
     """
@@ -304,13 +339,12 @@ def handle_new_task(db, request):
         start_date = data.get("start_date")
     else:
         return jsonify({"status": "error", "message": "Invalid or missing JSON body"}), 400
-    
 
     if start_date and all(day in data for day in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']):
         return insert_recurring_task(db, request)
     else:
         return insert_task(db, request)
-    
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -333,9 +367,9 @@ def update_task(db, request, task_id):
             'author_id': int,
             'section_id': int,
             'due_date': str,  # YYYY-MM-DD
-            'complete': int, # 1 or 0
-            'recurring_task_id': int, # Foreign Key
-            'last_modified_by': int, # Employee ID
+            'complete': int,  # 1 or 0
+            'recurring_task_id': int,  # Foreign Key
+            'last_modified_by': int,  # Employee ID
         }
 
         # Validate the fields in JSON body (only optional fields here)
@@ -360,7 +394,8 @@ def update_task(db, request, task_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(task_id)  # WHERE parameter at the end -> WHERE task_id = %s
+        # WHERE parameter at the end -> WHERE task_id = %s
+        values.append(task_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -396,4 +431,3 @@ def update_task(db, request, task_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
-

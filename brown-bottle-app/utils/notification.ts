@@ -47,7 +47,7 @@ export async function registerForPushNotificationsAsync() {
     const tokenResponse = await Notifications.getExpoPushTokenAsync({
       projectId,
     });
-    console.log(`--> SUCCESS! Token: ${tokenResponse.data}`);
+    // console.log(`--> SUCCESS! Token: ${tokenResponse.data}`);
     return tokenResponse.data;
   } catch (e) {
     console.error("--> ERROR: Failed to get token:", e);

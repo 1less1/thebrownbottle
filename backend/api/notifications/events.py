@@ -8,3 +8,8 @@ class NotificationEvent(Enum):
     """
 
     ANNOUNCEMENT_CREATED = "announcement.created"
+    TASK_CREATED = "task.created"
+
+    SHIFT_CREATED = "shift.created"
+    SHIFT_UPDATED = "shift.updated"
+    SHIFT_DELETED = "shift.deleted"

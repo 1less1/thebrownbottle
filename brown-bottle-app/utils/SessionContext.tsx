@@ -94,7 +94,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
 
         const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
-        console.log("Attempting fetch to:", `${apiUrl}/push-token/register`); // Debug log
+        // console.log("Attempting fetch to:", `${apiUrl}/push-token/register`); // Debug log
         await fetch(`${apiUrl}/push-token/register`, {
           method: 'POST',
           headers: {

@@ -19,7 +19,7 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldShowBanner: true,
     shouldShowList: true,
-    shouldPlaySound: true, // or false if you don't want sound
+    shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
@@ -42,16 +42,12 @@ export default function RootLayout() {
   useEffect(() => {
     // This listener is fired whenever a notification is received while the app is foregrounded
     const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log('--- Notification Received ---');
-      console.log(notification);
-      console.log('---------------------------');
+      console.log("Notification Data: ", notification);
     });
 
     // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
     const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('--- Notification Tapped ---');
-      console.log(response);
-      console.log('-------------------------');
+      console.log("Notification Response: ", response);
       // Here you could navigate to a specific screen based on the notification data
       // For example: router.push(`/announcement/${response.notification.request.content.data.announcement_id}`);
     });
