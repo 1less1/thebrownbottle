@@ -11,7 +11,7 @@ export interface Employee {
   secondary_role: number | null;
   tertiary_role: number | null;
   is_active: number;
-  timestamp: string;
+  timestamp?: string;
 
   // Only Used for JSON Responses:
   full_name?: string;

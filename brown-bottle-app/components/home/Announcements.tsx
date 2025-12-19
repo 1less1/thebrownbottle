@@ -9,7 +9,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularListView from "@/components/modular/ModularListView";
-import ListItemDetails from '@/components/home/Templates/ListItemDetails';
+import AnnouncementListItem from '@/components/home/Templates/AnnouncementListItem';
 import AnnouncementSkeleton from '@/components/ui/skeleton/home/AnnouncementSkeleton';
 
 import { getAnnouncement, getAcknowledgedAnnouncements, acknowledgeAnnouncement } from '@/routes/announcement';
@@ -94,7 +94,7 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const isAcknowledged = acknowledged.includes(announcement.announcement_id);
 
     return (
-      <ListItemDetails announcement={announcement} isAcknowledged={isAcknowledged} handleAcknowledge={handleAcknowledge} />
+      <AnnouncementListItem announcement={announcement} isAcknowledged={isAcknowledged} handleAcknowledge={handleAcknowledge} />
     );
   };
 
@@ -162,27 +162,6 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-  },
-  announcementContainer: {
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    paddingLeft: 5,
-    marginBottom: 5,
-    marginRight: 10
-  },
-  badgeWrapper: {
-    flexShrink: 0,
-    alignItems: "flex-end",
-  },
-  roleContainer: {
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    borderRadius: 3
-  },
-  roleName: {
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    padding: 8
   },
   headerContainer: {
     flexDirection: 'row',

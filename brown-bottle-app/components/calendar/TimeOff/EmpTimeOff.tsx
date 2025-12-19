@@ -17,7 +17,7 @@ import { DropdownOption, DateSortType } from '@/types/iDropdown';
 
 import ListItemDetails from '@/components/calendar/TimeOff/Templates/ListItemDetails';
 import SubmitTimeOff from '@/components/calendar/TimeOff/SubmitTimeOff';
-import TimeOffDetails from '@/components/calendar/TimeOff/TimeOffDetails';
+import TORInfo from '@/components/calendar/TimeOff/TORInfo';
 
 import { getTimeOffRequest } from '@/routes/time_off_request';
 import { TimeOffRequest, Status, GetTimeOffRequest } from '@/types/iTimeOff';
@@ -56,10 +56,10 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
 
   const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
   const [submitTimeOffVisible, setSubmitTimeOffVisible] = useState(false);
-  const [timeOffDetailsVisible, setTimeOffDetailsVisible] = useState(false);
+  const [timeOffDetailsVisible, setTORInfoVisible] = useState(false);
 
   const toggleSubmitTimeOff = () => setSubmitTimeOffVisible((prev) => !prev);
-  const toggleTimeOffDetails = () => setTimeOffDetailsVisible((prev) => !prev);
+  const toggleTORInfo = () => setTORInfoVisible((prev) => !prev);
 
   const [statusFilter, setStatusFilter] = useState<Status | null>(null);
   const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -103,7 +103,6 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
   // Fetch Time Off Requests Data on Initialization and State Update
   useEffect(() => {
     fetchTOR();
-    console.log("Refreshing")
   }, [user, parentRefresh, localRefresh, statusFilter, dateFilter]);
 
   if (!user) {
@@ -170,7 +169,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         maxHeight={HEIGHT * 0.625}
         onItemPress={(req) => {
           setSelectedRequest(req);
-          toggleTimeOffDetails();
+          toggleTORInfo();
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         renderItem={(req) => (
@@ -179,10 +178,10 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
       />
 
 
-      <TimeOffDetails
+      <TORInfo
         visible={timeOffDetailsVisible}
         request={selectedRequest}
-        onClose={toggleTimeOffDetails}
+        onClose={toggleTORInfo}
         onSubmitted={() => setLocalRefresh(prev => prev + 1)}
       />
 

@@ -7,13 +7,10 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import CircularImage from '@/components/CircularImage';
 import Announcements from '@/components/home/Announcements';
 import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/QuickStats';
 import ProfileAvatar from '@/components/ProfileAvatar';
-import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
-
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';

@@ -17,7 +17,7 @@ import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
 import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
-import ShiftCoverModal from "@/components/admin/ShiftCover/ShiftCoverModal";
+import SCRModal from "@/components/admin/ShiftCover/SCRModal";
 
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { GetShiftCoverRequest, ShiftCoverRequest, Status } from "@/types/iShiftCover";
@@ -55,9 +55,9 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
     const [error, setError] = useState<string | null>(null);
 
     const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [shiftCoverModalVisible, setShiftCoverModalVisible] = useState(false);
+    const [shiftCoverModalVisible, setSCRModalVisible] = useState(false);
 
-    const toggleShiftCoverModal = () => setShiftCoverModalVisible((prev) => !prev);
+    const toggleSCRModal = () => setSCRModalVisible((prev) => !prev);
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
@@ -119,7 +119,6 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
     // Fetch Shift Cover Requests on Initialization and State Update
     useEffect(() => {
         fetchSCR();
-        console.log("Refreshing")
     }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
 
 
@@ -199,7 +198,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);
-                    toggleShiftCoverModal();
+                    toggleSCRModal();
                 }}
                 renderItem={(req) => (
                     <ListItemDetails request={req} />
@@ -207,10 +206,10 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
             />
 
 
-            <ShiftCoverModal
+            <SCRModal
                 visible={shiftCoverModalVisible}
                 request={selectedRequest}
-                onClose={toggleShiftCoverModal}
+                onClose={toggleSCRModal}
                 onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 

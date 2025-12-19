@@ -30,7 +30,7 @@ const TimeOff = () => {
 
         <DefaultScrollView scrollEnabled={false} refreshing={refreshing} onRefresh={handleRefresh}>
 
-            <View style={{ flex: 1, width: '85%', marginTop: 16 }}>
+            <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
                 <EmpTimeOff parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
 

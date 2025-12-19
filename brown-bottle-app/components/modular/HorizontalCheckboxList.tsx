@@ -25,7 +25,7 @@ const HorizontalCheckboxList: React.FC<HorizontalCheckboxListProps> = ({
   );
 
   useEffect(() => {
-  setSelected(selectedValues.map(valueToDisplay));
+    setSelected(selectedValues.map(valueToDisplay));
   }, []);
 
   const toggleSelection = (item: string) => {
@@ -57,13 +57,9 @@ const HorizontalCheckboxList: React.FC<HorizontalCheckboxListProps> = ({
               ]}
             >
               <Ionicons
-                name={isSelected ? 'checkbox' : 'square-outline'}
-                size={24}
-                color={
-                  isSelected
-                    ? Colors.selectedBox
-                    : Colors.unselectedBox
-                }
+                name={isSelected ? "checkbox-outline" : "square-outline"}
+                size={20}
+                color={isSelected ? Colors.blue : Colors.gray}
               />
               <Text style={styles.optionText}>{item}</Text>
             </Pressable>
@@ -96,6 +92,7 @@ const styles = StyleSheet.create({
   optionText: {
     marginLeft: 8,
     fontSize: 14,
+    color: Colors.black,
   },
   label: {
     fontSize: 16,

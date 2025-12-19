@@ -25,7 +25,7 @@ interface ModalProps {
     onSubmitted?: () => void;
 }
 
-const TimeOffDetails: React.FC<ModalProps> = ({
+const TORInfo: React.FC<ModalProps> = ({
     visible,
     onClose,
     request,
@@ -90,7 +90,7 @@ const TimeOffDetails: React.FC<ModalProps> = ({
     );
 };
 
-export default TimeOffDetails;
+export default TORInfo;
 
 const styles = StyleSheet.create({
     row: {

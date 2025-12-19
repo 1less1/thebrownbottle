@@ -1,48 +1,146 @@
 import Constants from "expo-constants";
-import { UpdateTaskFields } from "@/types/iTask";
 
-// POST Request that INSERTS a task into the database - **Works**
-export async function insertTask(
-  author_id: number,
-  title: string,
-  description: string,
-  section_id: number,
-  due_date: string
-) {
-  // Retrieve Environment Variables
+import { buildQueryString } from "@/utils/apiHelpers";
+import {
+  Task,
+  GetTask,
+  InsertTask,
+  UpdateTask
+} from "@/types/iTask";
+
+
+// GET: Fetches data from the task table
+export async function getTask(params?: Partial<GetTask>) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
-  const baseURL = API_BASE_URL;
+  const queryString = buildQueryString(params || {});
+
+  const url = `${API_BASE_URL}/task?${queryString}`;
 
   try {
-    const taskData = {
-      title,
-      description,
-      author_id,
-      section_id,
-      due_date,
-    };
-
-    const response = await fetch(`${baseURL}/task/insert`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(taskData),
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`[Task API] Failed to GET: ${response.status}`);
     }
 
     const data = await response.json();
-
-    return data;
+    return data as Task[];
   } catch (error) {
-    console.error("Failed to insert task:", error);
+    console.error("Failed to fetch task data:", error);
     throw error;
   }
+
 }
+
+// POST: Inserts a task record
+export async function insertTask(fields: InsertTask) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/task/insert`;
+
+  // Required db fields for POST
+  const requiredFields: (keyof InsertTask)[] = [
+    "title",
+    "description",
+    "author_id",
+    "section_id",
+    "due_date",
+  ];
+
+  try {
+    for (const key of requiredFields) {
+      if (fields[key] === undefined || fields[key] === null) {
+        throw new Error(`Missing required field: ${key}`);
+      }
+    }
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+
+    if (!response.ok) {
+      throw new Error(`[Task API] Failed to POST: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to insert task data:", error);
+    throw error;
+  }
+
+}
+
+// PATCH: Updates a task record
+export async function updateTask(task_id: number, fields: Partial<UpdateTask>) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  if (!task_id) {
+    throw new Error("Updating a task requires a task_id!");
+  }
+
+  const url = `${API_BASE_URL}/task/update/${task_id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+
+    if (!response.ok) {
+      throw new Error(`[Task API] Failed to PATCH: ${task_id} - ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to update task data:", error);
+    throw error;
+  }
+
+}
+
+// DELETE: Deletes a task record (irreversible)
+export async function deleteTask(task_id: number) {
+
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/task/delete/${task_id}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`[Task API] Failed to DELETE Task: ${task_id} - ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete task:", error);
+    throw error;
+  }
+
+}
+
+
+
+
+
+
+
+
+
 
 // POST Request that INSERTS recurring task(s) into the database - **Works**
 // Loops through all selected recurrence_days and sends a separate request
@@ -116,234 +214,6 @@ export async function insertRecurringTask(
     return data;
   } catch (error) {
     console.error("Failed to insert recurring task:", error);
-    throw error;
-  }
-}
-
-// Flexible GET Request for task - **Works**
-export async function getTasks(options: {
-  section_id?: number;
-  complete?: 0 | 1;
-  today?: boolean;
-  recurring?: boolean;
-  due_date?: string;
-}) {
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-  const baseURL = API_BASE_URL;
-
-  const params = new URLSearchParams();
-
-  if (options.section_id !== undefined)
-    params.append("section_id", options.section_id.toString());
-  if (options.complete !== undefined)
-    params.append("complete", options.complete.toString());
-  if (options.today !== undefined)
-    params.append("today", options.today.toString());
-  if (options.recurring !== undefined)
-    params.append("recurring", options.recurring.toString());
-  if (options.due_date !== undefined)
-    params.append("due_date", options.due_date.toString());
-
-  try {
-    const response = await fetch(`${baseURL}/task?${params.toString()}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch tasks:", error);
-    throw error;
-  }
-}
-
-// Flexible PATCH (Update) Request for task
-export async function updateTask(task_id: number, updates: UpdateTaskFields) {
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(`${baseURL}/task/update/${task_id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updates),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        `Failed to update task: ${errorData.message || response.statusText}`
-      );
-    }
-
-    const data = await response.json();
-    return data; // The backend success message JSON
-  } catch (error) {
-    console.error("Error updating task:", error);
-    throw error;
-  }
-}
-
-// GET Request that fetches today's COMPLETE tasks filtered by section_id
-export async function getTodayTasksComplete(section_id: number) {
-  // Retrieve Environment Variables
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(
-      `${baseURL}/task/today-complete?section_id=${section_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user announcements:", error);
-    throw error;
-  }
-}
-
-// GET Request that fetches today's INCOMPLETE tasks filtered by section_id
-export async function getTodayTasksIncomplete(section_id: number) {
-  // Retrieve Environment Variables
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(
-      `${baseURL}/task/today-incomplete?section_id=${section_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user announcements:", error);
-    throw error;
-  }
-}
-
-// GET Request that fetches ALL COMPLETE tasks filtered by section_id
-export async function getAllTasksComplete(section_id: number) {
-  // Retrieve Environment Variables
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(
-      `${baseURL}/task/all-complete?section_id=${section_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user announcements:", error);
-    throw error;
-  }
-}
-
-// GET Request that fetches ALL INCOMPLETE tasks filtered by section_id
-export async function getAllTasksIncomplete(section_id: number) {
-  // Retrieve Environment Variables
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(
-      `${baseURL}/task/all-incomplete?section_id=${section_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user announcements:", error);
-    throw error;
-  }
-}
-
-// GET Request that fetches nonrecurring tasks filtered by section_id
-export async function getTasksBySection(section_id: number) {
-  // Retrieve Environment Variables
-  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-
-  const baseURL = API_BASE_URL;
-
-  try {
-    const response = await fetch(
-      `${baseURL}/task/tasks-by-section?section_id=${section_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch user announcements:", error);
     throw error;
   }
 }

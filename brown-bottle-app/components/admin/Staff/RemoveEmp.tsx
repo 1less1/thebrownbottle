@@ -80,7 +80,6 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
             console.error("Search failed:", error.message);
         } finally {
             setLoading(false);
-            onRemove?.(); // Notify parent refresh is complete
         }
     };
 
@@ -216,7 +215,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                     </ModularButton>
                 </View>
 
-                {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
+                {loading ? <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} /> : null}
 
                 {/* Search Results (Scrollable) */}
                 <View style={{ height: HEIGHT * 0.42 }}>
@@ -227,11 +226,11 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                         showsVerticalScrollIndicator={true}
                     />
 
-                    {!loading && results.length === 0 && query.length > 0 && (
+                    {!loading && results.length === 0 && query.length > 0 ? (
                         <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
                             No results found...
                         </Text>
-                    )}
+                    ) : null}
 
                 </View>
 

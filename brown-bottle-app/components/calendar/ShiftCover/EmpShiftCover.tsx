@@ -17,7 +17,7 @@ import { DropdownOption, DateSortType } from "@/types/iDropdown";
 
 import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
 import SubmitShiftCover from "@/components/calendar/ShiftCover/SubmitShiftCover";
-import ShiftDetails from "@/components/calendar/ShiftCover/ShiftDetails";
+import SCRInfo from "@/components/calendar/ShiftCover/SCRInfo";
 
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { ShiftCoverRequest, Status, GetShiftCoverRequest } from "@/types/iShiftCover";
@@ -62,10 +62,10 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
     const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
     const [shiftCoverModalVisible, setSubmitShiftCoverVisible] = useState(false);
-    const [shiftDetailsModalVisible, setShiftDetailsModalVisible] = useState(false);
+    const [shiftDetailsModalVisible, setSCRInfoModalVisible] = useState(false);
 
     const toggleSubmitShiftCover = () => setSubmitShiftCoverVisible((prev) => !prev);
-    const toggleShiftDetailsModal = () => setShiftDetailsModalVisible((prev) => !prev);
+    const toggleSCRInfoModal = () => setSCRInfoModalVisible((prev) => !prev);
 
     const [requestType, setRequestType] = useState<string>("Available");
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -117,7 +117,6 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
     // Fetch Shift Cover Requests on Initialization and State Update
     useEffect(() => {
         fetchSCR();
-        console.log("Refreshing")
     }, [user, parentRefresh, localRefresh, requestType, dateFilter, statusFilter]);
 
 
@@ -195,7 +194,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);
-                    toggleShiftDetailsModal();
+                    toggleSCRInfoModal();
                 }}
                 renderItem={(req) => (
                     <ListItemDetails request={req} />
@@ -203,10 +202,10 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
             />
 
 
-            <ShiftDetails
+            <SCRInfo
                 visible={shiftDetailsModalVisible}
                 request={selectedRequest}
-                onClose={toggleShiftDetailsModal}
+                onClose={toggleSCRInfoModal}
                 onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 

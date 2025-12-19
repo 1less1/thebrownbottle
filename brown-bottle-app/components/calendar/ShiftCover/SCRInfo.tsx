@@ -21,7 +21,7 @@ interface ModalProps {
     onSubmitted?: () => void;
 }
 
-const ShiftDetails: React.FC<ModalProps> = ({
+const SCRInfo: React.FC<ModalProps> = ({
     visible,
     onClose,
     request,
@@ -134,7 +134,7 @@ const ShiftDetails: React.FC<ModalProps> = ({
     );
 };
 
-export default ShiftDetails;
+export default SCRInfo;
 
 const styles = StyleSheet.create({
     row: {

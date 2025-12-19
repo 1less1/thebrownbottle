@@ -348,7 +348,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         />
       </View>
 
-      {loading && <LoadingCircle size={"small"} />}
+      {loading ? <LoadingCircle size={"small"} /> : null}
 
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
@@ -372,11 +372,11 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       </View>
 
       {/* Fallback */}
-      {!loading && scheduleData.length === 0 && query.length > 0 && (
+      {!loading && scheduleData.length === 0 && query.length > 0 ? (
         <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
           No results found...
         </Text>
-      )}
+      ) : null}
 
       {/* Shift Modal - Add, Update, Delete */}
       <ShiftModal

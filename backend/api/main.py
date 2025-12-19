@@ -158,7 +158,7 @@ def handle_new_task():
     POST new tasks to the 'task' or 'recurring_task' table
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple task inserts from different clients
-        return task.handle_new_task(get_db_connection(), request)
+        return task.insert_task(get_db_connection(), request)
 
 
 @app.route('/task/update/<int:task_id>', methods=['PATCH'])
@@ -168,6 +168,15 @@ def update_task(task_id):
     """
     with request_lock:
         return task.update_task(get_db_connection(), request, task_id)
+
+
+@app.route('/task/delete/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    """
+    DELETE task by id
+    """
+    with request_lock:
+        return task.delete_task(get_db_connection(), task_id)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -201,6 +210,15 @@ def update_recurring_task(recurring_task_id):
     """
     with request_lock:
         return recurring_task.update_recurring_task(get_db_connection(), request, recurring_task_id)
+
+
+@app.route('/recurring-task/delete/<int:recurring_task_id>', methods=['DELETE'])
+def delete_recurring_task(recurring_task_id):
+    """
+    DELETE recurring task by id
+    """
+    with request_lock:
+        return recurring_task.delete_recurring_task(get_db_connection(), recurring_task_id)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------

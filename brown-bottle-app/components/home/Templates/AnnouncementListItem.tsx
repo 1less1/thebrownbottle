@@ -15,7 +15,7 @@ interface Props {
   handleAcknowledge: (announcement_id: number) => void;
 }
 
-const ListItemDetails: React.FC<Props> = ({ announcement, isAcknowledged, handleAcknowledge }) => {
+const AnnouncementListItem: React.FC<Props> = ({ announcement, isAcknowledged, handleAcknowledge }) => {
 
   return (
 
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListItemDetails;
+export default AnnouncementListItem;

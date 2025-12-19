@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     elevation: 5,
-    maxHeight: '85%',
+    maxHeight: '90%',
   },
   scrollView: {
     flexGrow: 1,

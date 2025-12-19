@@ -17,7 +17,7 @@ import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
 import ListItemDetails from "@/components/calendar/TimeOff/Templates/ListItemDetails";
-import TimeOffModal from "@/components/admin/TimeOff/TimeOffModal";
+import TORModal from "@/components/admin/TimeOff/TORModal";
 
 import { getTimeOffRequest } from "@/routes/time_off_request";
 import { GetTimeOffRequest, TimeOffRequest, Status } from "@/types/iTimeOff";
@@ -55,9 +55,9 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
     const [error, setError] = useState<string | null>(null);
 
     const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
-    const [shiftCoverModalVisible, setTimeOffModalVisible] = useState(false);
+    const [shiftCoverModalVisible, setTORModalVisible] = useState(false);
 
-    const toggleTimeOffModal = () => setTimeOffModalVisible((prev) => !prev);
+    const toggleTORModal = () => setTORModalVisible((prev) => !prev);
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
@@ -119,7 +119,6 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
     // Fetch Time Off Requests on Initialization and State Update
     useEffect(() => {
         fetchTOR();
-        console.log("Refreshing")
     }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
 
 
@@ -199,7 +198,7 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);
-                    toggleTimeOffModal();
+                    toggleTORModal();
                 }}
                 renderItem={(req) => (
                     <ListItemDetails request={req} />
@@ -207,10 +206,10 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
             />
 
 
-            <TimeOffModal
+            <TORModal
                 visible={shiftCoverModalVisible}
                 request={selectedRequest}
-                onClose={toggleTimeOffModal}
+                onClose={toggleTORModal}
                 onSubmitted={() => setLocalRefresh(prev => prev + 1)}
             />
 

@@ -1,91 +1,97 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextStyle } from 'react-native';
-import { useWindowDimensions } from 'react-native';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-
 type Props = {
-    text: string;
-    numberOfLines?: number;
-    readMoreLabel?: string;
-    showLessLabel?: string;
-    textStyle?: TextStyle;
-    actionTextStyle?: TextStyle;
+  text: string;   // allow wider input types safely
+  numberOfLines?: number;
+  readMoreLabel?: string;
+  showLessLabel?: string;
+  textStyle?: TextStyle;
+  actionTextStyle?: TextStyle;
 };
 
 const ExpandableText: React.FC<Props> = ({
-    text,
-    numberOfLines = 1,
-    readMoreLabel = 'Read more',
-    showLessLabel = 'Show less',
-    textStyle = styles.descriptionText,
-    actionTextStyle = styles.actionText
+  text,
+  numberOfLines = 1,
+  readMoreLabel = 'Read more',
+  showLessLabel = 'Show less',
+  textStyle = styles.descriptionText,
+  actionTextStyle = styles.actionText,
 }) => {
-    const [expanded, setExpanded] = useState(false);
-    const [isOverflowing, setIsOverflowing] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
-    const lineHeight = (textStyle as TextStyle).lineHeight ?? 20;
-    const BUFFER = 2;
-    const maxHeight = numberOfLines * lineHeight + BUFFER;
+  // Normalize text into a safe string
+  const safeText: string = text != null ? String(text) : '';
 
-    return (
-        <>
-            {/* Hidden measurement */}
-            <View style={{ position: 'absolute', opacity: 0, width: '100%' }}>
-                <Text
-                    style={[textStyle, { includeFontPadding: false }]}
-                    onLayout={(e) => {
-                        const height = e.nativeEvent.layout.height;
-                        setIsOverflowing(height > maxHeight);
-                    }}
-                >
-                    {text}
-                </Text>
-            </View>
+  const lineHeight = (textStyle as TextStyle).lineHeight ?? 20;
+  const BUFFER = 2;
+  const maxHeight = numberOfLines * lineHeight + BUFFER;
 
-            {/* Visible clipped text */}
-            <View
-                style={{
-                    maxHeight: expanded ? undefined : maxHeight,
-                    overflow: 'hidden',
-                }}
-            >
-                <Text style={textStyle}>{text}</Text> {/* 🔥 no insertBreaks */}
-            </View>
+  return (
+    <>
+      {/* Hidden measurement */}
+      <View style={{ position: 'absolute', opacity: 0, width: '100%' }}>
+        <Text
+          style={[textStyle, { includeFontPadding: false }]}
+          onLayout={(e) => {
+            const height = e.nativeEvent.layout.height;
+            setIsOverflowing(height > maxHeight);
+          }}
+          numberOfLines={undefined} // ensure full measurement
+        >
+          {safeText}
+        </Text>
+      </View>
 
-            {isOverflowing && (
-                <View style={styles.actionContainer}>
-                    <TouchableOpacity onPress={() => setExpanded(prev => !prev)}>
-                        <Text style={actionTextStyle}>
-                            {expanded ? showLessLabel : readMoreLabel}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </>
-    );
+      {/* Visible clipped text */}
+      <View
+        style={{
+          maxHeight: expanded ? undefined : maxHeight,
+          overflow: 'hidden',
+        }}
+      >
+        <Text
+          style={textStyle}
+          numberOfLines={expanded ? undefined : numberOfLines}
+          ellipsizeMode="tail"
+        >
+          {safeText}
+        </Text>
+      </View>
+
+      {isOverflowing ? (
+        <View style={styles.actionContainer}>
+          <TouchableOpacity onPress={() => setExpanded((prev) => !prev)}>
+            <Text style={actionTextStyle}>
+              {expanded ? showLessLabel : readMoreLabel}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
+    </>
+  );
 };
 
-
 const styles = StyleSheet.create({
-    actionContainer: {
-        width: '100%',
-        alignItems: 'flex-start',   // pushes button to the right
-        marginBottom: 2,
-    },
-    descriptionText: {
-        ...GlobalStyles.text,
-        width: '100%',
-        flexWrap: 'wrap',
-        overflow: 'hidden',
-    },
-
-    actionText: {
-        ...GlobalStyles.semiBoldSmallText,
-        color: Colors.buttonBlue
-    },
+  actionContainer: {
+    width: '100%',
+    alignItems: 'flex-start', // left align; change to 'flex-end' if you want right
+    marginBottom: 2,
+  },
+  descriptionText: {
+    ...GlobalStyles.text,
+    width: '100%',
+    flexWrap: 'wrap',
+    overflow: 'hidden',
+  },
+  actionText: {
+    ...GlobalStyles.semiBoldSmallText,
+    color: Colors.buttonBlue,
+  },
 });
 
 export default ExpandableText;

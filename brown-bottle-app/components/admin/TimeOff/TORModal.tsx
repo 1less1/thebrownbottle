@@ -21,7 +21,7 @@ interface ModalProps {
     onSubmitted?: () => void;
 }
 
-const TimeOffModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted }) => {
+const TORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted }) => {
     if (!request) return null;
 
     const { user } = useSession();
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default TimeOffModal;
+export default TORModal;

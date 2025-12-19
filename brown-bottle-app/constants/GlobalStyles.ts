@@ -214,7 +214,7 @@ export const GlobalStyles = StyleSheet.create({
     },
     buttonRowContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        //justifyContent: 'flex-end',
         gap: 10,
         marginTop: 20,
     },

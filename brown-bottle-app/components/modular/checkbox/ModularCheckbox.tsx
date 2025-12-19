@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
     View, Text, TouchableOpacity, StyleSheet, Modal,
     FlatList, TouchableWithoutFeedback, StyleProp,
-    ViewStyle, TextStyle
+    ViewStyle, TextStyle, useWindowDimensions
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -41,6 +41,11 @@ const ModularCheckbox = <T extends string | number>({
     containerStyle,
     buttonStyle,
 }: CheckboxProps<T>) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
+    const isMobile = WIDTH < 768;
 
     const [visible, setVisible] = useState(false);
     const [tempSelected, setTempSelected] = useState<CheckboxOption<T>[]>(selectedData);
@@ -155,25 +160,41 @@ const ModularCheckbox = <T extends string | number>({
                                         />
 
                                         {/* Button Container */}
-                                        <View style={[GlobalStyles.buttonRowContainer, { marginTop: 0, padding: 20 }]}>
+                                        <View
+                                            style={[
+                                                GlobalStyles.buttonRowContainer,
+                                                {
+                                                    marginTop: 0,
+                                                    padding: 20,
+                                                    flexDirection: isMobile ? 'column' : 'row', // 👈 responsive switch
+                                                }
+                                            ]}
+                                        >
                                             <ModularButton
                                                 onPress={handleConfirm}
-                                                style={[GlobalStyles.submitButton, { flex: 1 }]}
+                                                style={[
+                                                    GlobalStyles.submitButton,
+                                                    !isMobile && { flex: 1 } // only flex in row mode
+                                                ]}
                                                 textStyle={{ color: "white" }}
                                                 text="Confirm"
                                             />
                                             <ModularButton
                                                 onPress={handleSelectAll}
-                                                style={{ backgroundColor: Colors.buttonBlue, flex: 1 }}
+                                                style={[
+                                                    { backgroundColor: Colors.buttonBlue },
+                                                    !isMobile && { flex: 1 }
+                                                ]}
                                                 textStyle={{ color: "white" }}
                                                 text="Select All"
                                             />
                                             <ModularButton
                                                 onPress={handleReset}
+                                                style={!isMobile ? { flex: 1 } : {}}
                                                 text=""
                                                 textStyle={{ marginRight: 4 }}
                                             >
-                                                <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }}/>
+                                                <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
                                             </ModularButton>
                                         </View>
                                     </>
@@ -216,7 +237,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         minWidth: "55%",
         maxWidth: "80%",
-        maxHeight: "65%",
+        maxHeight: "80%",
         backgroundColor: Colors.white,
         elevation: 5,
         borderRadius: 10,

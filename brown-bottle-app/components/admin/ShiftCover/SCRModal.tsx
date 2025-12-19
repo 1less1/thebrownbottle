@@ -21,7 +21,7 @@ interface ModalProps {
     onSubmitted?: () => void;
 }
 
-const ShiftCoverModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted }) => {
+const SCRModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted }) => {
     if (!request) return null;
 
     const { user } = useSession();
@@ -43,11 +43,11 @@ const ShiftCoverModal: React.FC<ModalProps> = ({ visible, request, onClose, onSu
 
         try {
             await approveShiftCoverRequest(request.cover_request_id);
-            alert("Request successfully accepted!");
+            alert("Request successfully approved!");
             onSubmitted?.();
             onClose?.();
         } catch (error: any) {
-            alert("Failed to accept request: " + error.message);
+            alert("Failed to approve request: " + error.message);
         } finally {
             setLoading(false);
         }
@@ -132,4 +132,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default ShiftCoverModal;
+export default SCRModal;

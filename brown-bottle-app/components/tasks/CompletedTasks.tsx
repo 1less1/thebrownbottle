@@ -1,26 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import ModularListView from "@/components/modular/ModularListView";
-import { getTasks } from "@/routes/task";
-import { getShift } from "@/routes/shift";
-import { User } from "@/utils/SessionContext";
-import { Task } from "@/types/iTask";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, Alert, StyleSheet, useWindowDimensions } from "react-native";
+
+import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
-import LoadingCircle from "../modular/LoadingCircle";
-import { formatDateTime } from "@/utils/dateTimeHelpers";
-import ModularModal from "../modular/ModularModal";
-import TaskDetailsModal from "./TaskDetailsModal";
-import { updateTask } from "@/routes/task";
-import { Alert } from "react-native";
+
+import ModularListView from "@/components/modular/ModularListView";
+
+import TaskListItem from "@/components/tasks/Templates/TaskListItem";
+import TaskInfoModal from "@/components/tasks/TaskActionModal";
+
+import { Shift, GetShift } from "@/types/iShift";
+import { getShift } from "@/routes/shift";
+
+import { Task, GetTask } from "@/types/iTask";
+import { getTask, updateTask } from "@/routes/task";
+
+import { User } from "@/utils/SessionContext";
 
 interface CompletedTasksProps {
     user: User;
-    refreshKey: number;
-    onRefresh: () => void;
+    parentRefresh?: number;
+    onRefreshDone?: () => void;
 }
 
-const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, refreshKey, onRefresh }) => {
-    const [tasks, setTasks] = useState<Task[]>([]);
+const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, onRefreshDone }) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
+    const isMobile = WIDTH < 768;
+    const listHeight = isMobile ? height * 0.6 : height * 0.6;
+
+    const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,154 +39,144 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, refreshKey, onRef
     const [hasShiftToday, setHasShiftToday] = useState<boolean | null>(null);
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [completedTasks, setCompletedTasks] = useState<Task[]>([]);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
+    // Check if user has a shift today...
+    const fetchTodayShift = useCallback(async () => {
+        setError(null);
+        setLoading(true);
 
-    // Get user's shift today
-    useEffect(() => {
-        const loadShift = async () => {
-            setLoading(true);
-
-            const result = await getShift({
+        try {
+            const params: Partial<GetShift> = {
                 employee_id: user.employee_id,
                 is_today: 1,
-            });
+            };
+            const shift = await getShift(params);
 
-            if (!result || result.length === 0) {
+            if (!shift || shift.length === 0) {
                 setHasShiftToday(false);
-                setLoading(false);
-                return;
+                setSectionId(null);
+            } else {
+                setHasShiftToday(true);
+                setSectionId(shift[0].section_id);
             }
 
-            setSectionId(result[0].section_id);
-            setHasShiftToday(true);
-        };
-
-        loadShift();
+        } catch (error: any) {
+            setError("Failed to fetch user shift.");
+            console.log("Failed to fetch user shift", error.message);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    // Fetch completed tasks only if user has shift
-    useEffect(() => {
-        if (!sectionId) return;
+    // Fetch Completed Tasks (tasks with complete=1)
+    const fetchCompletedTasks = useCallback(async () => {
+        setError(null);
+        setLoading(true);
 
-        const fetchTasks = async () => {
-            try {
-                setLoading(true);
-                setError(null);
+        try {
+            if (!sectionId) return;
 
-                const data = await getTasks({
-                    section_id: sectionId,
-                    complete: 1, // <-- Completed tasks only
-                });
+            const params: Partial<GetTask> = {
+                section_id: sectionId,
+                complete: 1, // <-- Completed tasks only
+            };
+            const data = await getTask(params);
+            setCompletedTasks(data);
 
-                setTasks(data);
-            } catch {
-                setError("Failed to load completed tasks.");
-            } finally {
-                setLoading(false);
-            }
-        };
+        } catch (error: any) {
+            setError("Failed to fetch completed tasks.");
+            console.log("Failed to fetch completed tasks", error.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [sectionId, hasShiftToday]);
 
-        fetchTasks();
-    }, [sectionId, refreshKey, hasShiftToday]);
-
-    const handlePress = (task: Task) => {
-        setSelectedTask(task);
-        setModalVisible(true);
-    };
-
+    // Undo completion of a task
     const handleUndo = async (task: Task) => {
+        setLoading(true);
+
         try {
             await updateTask(task.task_id, {
                 complete: 0,
                 last_modified_by: user.employee_id,
             });
             setModalVisible(false);
-            onRefresh();
-            Alert.alert("Completion has been Undone")
-        } catch (err) {
-            console.error("Error undoing task:", err);
+            alert("Task completion has been undone!");
+            setLocalRefresh((prev) => prev + 1);
+        } catch (error: any) {
+            alert("Failed to undo completion. Try again later.");
+            console.error("Undo completion failed:", error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
 
-    // UI: Loading
-    if (loading) {
-        return (
-            <LoadingCircle />
-        );
-    }
+    // Only fetch shift when refresh changes
+    useEffect(() => {
+        fetchTodayShift();
+    }, [localRefresh, parentRefresh]);
 
-    // UI: No shift today
+    // Fetch completed tasks when sectionId changes
+    useEffect(() => {
+        if (sectionId) {
+            fetchCompletedTasks();
+        }
+    }, [sectionId, localRefresh]);
+
+
     if (hasShiftToday === false) {
         return (
             <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 18, fontWeight: "600" }}>
+                <Text style={GlobalStyles.floatingHeaderText}>
                     No Shift Today
                 </Text>
-                <Text style={{ opacity: 0.6, marginTop: 4 }}>
-                    No completed tasks assigned.
+                <Text style={GlobalStyles.semiBoldAltText}>
+                    No completed tasks.
                 </Text>
             </View>
         );
     }
 
-    // UI: Completed Tasks list
+    const handlePress = (task: Task) => {
+        setSelectedTask(task);
+        setModalVisible(true);
+    };
+
+    const renderTask = (task: Task) => {
+        return <TaskListItem task={task} />;
+    };
+
     return (
-        <View style={{ width: "100%", flex: 1 }}>
+        <View style={{ width: "100%" }}>
+            {/* Completed Tasks */}
+            <Text style={GlobalStyles.floatingHeaderText}>
+                Completed Tasks
+            </Text>
+
             <ModularListView
-                data={tasks}
+                data={completedTasks}
                 loading={loading}
                 error={error}
-                listHeight="full"
                 emptyText="No completed tasks."
-                keyExtractor={(task) => String(task.task_id)}
+                listHeight={listHeight}
+                renderItem={renderTask}
+                keyExtractor={(item) => String(item.task_id)}
+                onItemPress={(item) => handlePress(item)}
                 refreshing={loading}
-                onRefresh={() => { }}
-                onItemPress={(task) => handlePress(task)}
-                itemContainerStyle={styles.itemContainer}
-                renderItem={(task) => (
-                    <>
-                        <View>
-                            <View style={styles.rowBetween}>
-                                <Text style={{ fontWeight: "bold" }}>{task.title}</Text>
-
-                                {task.recurring_task_id !== null && (
-                                    <Text style={styles.recurring}>Recurring</Text>
-                                )}
-                            </View>
-
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={{ color: Colors.gray }}>Completed by </Text>
-                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>
-                                    {task.last_modified_name}
-                                </Text>
-                            </View>
-
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={{ color: Colors.gray }}>Due: </Text>
-                                <Text style={{ color: "#535353ff", fontWeight: "500" }}>
-                                    {task.due_date}
-                                </Text>
-                            </View>
-
-                            <Text style={styles.timestamp}>
-                                Assigned On {formatDateTime(task.timestamp)}
-                            </Text>
-                        </View>
-                    </>
-                )}
+                onRefresh={fetchCompletedTasks}
+                itemContainerStyle={styles.taskContainer}
             />
 
-
-            <TaskDetailsModal
-                visible={modalVisible}
+            <TaskInfoModal
                 task={selectedTask}
+                visible={modalVisible}
                 onClose={() => setModalVisible(false)}
-                onComplete={handleUndo}
-                actionLabel="Mark As Incomplete"
+                onSubmit={handleUndo}
+                actionLabel="Mark as Incomplete"
             />
-
         </View>
     );
 };
@@ -183,32 +184,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, refreshKey, onRef
 export default CompletedTasks;
 
 const styles = StyleSheet.create({
-    rowBetween: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
+    taskContainer: {
+        backgroundColor: "white",
     },
-    itemContainer: {
-        backgroundColor: Colors.TaskBG,
-        borderRadius: 16,
-        padding: 18,
-        borderColor: Colors.borderColor,
-        borderWidth: 1,
-        marginVertical: 5,
-    },
-    recurring: {
-        backgroundColor: Colors.bgGreen,
-        padding: 6,
-        borderRadius: 4,
-        color: Colors.acceptGreen,
-        fontSize: 12,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-    },
-    timestamp: {
-        fontSize: 12,
-        color: Colors.gray,
-        marginTop: 4,
-    }
 });
-

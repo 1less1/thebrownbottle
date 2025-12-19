@@ -1,0 +1,75 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
+import { Colors } from '@/constants/Colors';
+
+import { Task } from '@/types/iTask';
+import { formatDateTime, formatDate } from '@/utils/dateTimeHelpers';
+
+interface Props {
+    task: Task | null;
+}
+
+// Reusable Shift Cover Modal Details
+const TaskModalContent: React.FC<Props> = ({ task }) => {
+
+    if (!task) return null;
+
+    return (
+
+        <>
+            {/* Modal Title */}
+            <Text style={GlobalStyles.modalTitle}>
+                Task
+            </Text>
+
+            {/* Task Details */}
+
+            <View style={styles.row}>
+                <Text style={GlobalStyles.semiBoldText}>Title: </Text>
+                <Text style={GlobalStyles.text}>
+                    {task.title}
+                </Text>
+            </View>
+
+            <View style={styles.row}>
+                <Text style={GlobalStyles.semiBoldText}>Description: </Text>
+                <Text style={GlobalStyles.text}>
+                    {task.description}
+                </Text>
+            </View>
+
+            <View style={styles.row}>
+                <Text style={GlobalStyles.semiBoldText}>Due: </Text>
+                <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                    {formatDate(task.due_date)}
+                </Text>
+            </View>
+
+            {/* Timestamp */}
+            <View style={{flexDirection: "column", marginTop: 2}}>
+                {(task.last_modified_name || task.last_modified_at) && (
+                    <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
+                        Last modified on {formatDateTime(task.last_modified_at)} by {task.last_modified_name}
+                    </Text>
+                )}
+                <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
+                    Posted on {formatDateTime(task.timestamp)} by {task.author}
+                </Text>
+            </View>
+        </>
+
+    );
+
+};
+
+const styles = StyleSheet.create({
+    row: {
+        flexDirection: 'row',
+        flexWrap: "wrap",
+        marginBottom: 10
+    },
+})
+
+export default TaskModalContent;

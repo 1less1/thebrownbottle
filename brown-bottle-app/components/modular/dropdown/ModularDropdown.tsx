@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         minWidth: "55%",
         maxWidth: "80%",
-        maxHeight: "65%",
+        maxHeight: "80%",
         backgroundColor: Colors.white,
         elevation: 5,
         borderRadius: 10,

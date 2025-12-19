@@ -34,8 +34,6 @@ const isActiveDropdownOptions: DropdownOption<number>[] = [
     { key: "Inactive", value: 0 }
 ];
 
-
-
 const columns = [
     { key: "full_name", label: "Name", width: 120 },
     { key: "email", label: "Email", width: 200 },
@@ -49,7 +47,7 @@ interface StaffSearchProps {
 }
 
 
-const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone }) => {
+const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -83,7 +81,6 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
             console.error("Search failed:", error.message);
         } finally {
             setLoading(false);
-            onRefreshDone?.(); // Notify parent refresh is complete
         }
     };
 
@@ -230,7 +227,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                     />
                 </View>
 
-                {loading && <LoadingCircle size={"small"} />}
+                {loading ? <LoadingCircle size={"small"} /> : null}
 
                 {/* Data Table */}
                 {/* Scroll View = Horizontal */}
@@ -253,11 +250,11 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                 </View>
 
                 {/* Fallback */}
-                {!loading && results.length === 0 && query.length > 0 && (
+                {!loading && results.length === 0 && query.length > 0 ? (
                     <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
                         No results found...
                     </Text>
-                )}
+                ) : null}
 
             </Card>
 

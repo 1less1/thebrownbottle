@@ -3,7 +3,6 @@ import React from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 
 // Get Session Data
@@ -18,7 +17,7 @@ export default function TabLayout() {
     // New Navbar Theme!
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "gray",
+        tabBarActiveTintColor: Colors.darkGray,
         tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,

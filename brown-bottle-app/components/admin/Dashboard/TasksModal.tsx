@@ -264,9 +264,9 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15, }}>
             <Pressable onPress={() => setIsRecurring(!isRecurring)} style={{ marginRight: 5 }}>
               <Ionicons
-                name={isRecurring ? 'checkbox' : 'square-outline'}
-                size={24}
-                color={isRecurring ? Colors.selectedBox : Colors.unselectedBox}
+                name={isRecurring ? "checkbox-outline" : "square-outline"}
+                size={20}
+                color={isRecurring ? Colors.blue : Colors.gray}
               />
             </Pressable>
             <Text style={GlobalStyles.mediumText}>Recurring Task</Text>
@@ -291,9 +291,9 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15, }}>
                   <ModularButton
                     text="Choose Range"
-                    textStyle={{ color: Colors.blue }}
+                    textStyle={{ color: Colors.purple }}
                     style={[
-                      { backgroundColor: Colors.bgBlue, borderColor: Colors.borderBlue, borderWidth: 1, flexShrink: 1, }
+                      { backgroundColor: Colors.bgPurple, borderColor: Colors.borderPurple, borderWidth: 1, flexShrink: 1, }
                     ]}
                     onPress={() => {
                       setTempStartDate(start_date);
@@ -303,10 +303,10 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                   />
 
                   <View style={styles.dateContainer}>
-                    <Text style={[GlobalStyles.text, {color: Colors.blue}]}>
+                    <Text style={[GlobalStyles.text, { color: Colors.purple }]}>
                       {start_date && end_date
                         ? `${formatDateWithYear(start_date)} → ${formatDateWithYear(end_date)}`
-                        : `${formatDateWithYear(start_date)} →`}
+                        : `${formatDateWithYear(start_date)}`}
                     </Text>
                   </View>
 
@@ -329,30 +329,34 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                     />
                     <View style={[styles.dateContainer, { marginTop: 10 }]}>
                       <Text style={GlobalStyles.text}>Selected: </Text>
-                      <Text style={[GlobalStyles.semiBoldText, { color: Colors.blue }]}>
+                      <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
                         {tempStartDate && tempEndDate
                           ? `${formatDateWithYear(tempStartDate)} → ${formatDateWithYear(tempEndDate)}`
                           : tempStartDate
                             ? `${formatDateWithYear(tempStartDate)} →`
-                            : ''}
+                            : null}
                       </Text>
                     </View>
 
-                    <View style={styles.buttonRowContainer}>
+                    <View style={GlobalStyles.buttonRowContainer}>
                       <ModularButton
                         text="Confirm"
-                        style={GlobalStyles.submitButton}
                         textStyle={{ color: 'white' }}
+                        style={[GlobalStyles.submitButton, { flex: 1 }]}
                         onPress={() => {
-                          setStartDate(tempStartDate);
-                          setEndDate(noEndDate ? null : tempEndDate);
-                          setRangePickerVisible(false);
+                          if (tempStartDate == tempEndDate) {
+                            alert("Start Date and End Date must be different!")
+                          } else {
+                            setStartDate(tempStartDate);
+                            setEndDate(noEndDate ? null : tempEndDate);
+                            setRangePickerVisible(false);
+                          }
                         }}
                       />
                       <ModularButton
                         text="Cancel"
-                        style={GlobalStyles.cancelButton}
                         textStyle={{ color: 'gray' }}
+                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
                         onPress={() => {
                           setTempStartDate(start_date);
                           setTempEndDate(end_date);
@@ -397,9 +401,9 @@ const TasksModal: React.FC<TasksModalProps> = ({ visible, onClose, user }) => {
                   style={{ marginRight: 5 }}
                 >
                   <Ionicons
-                    name={noEndDate ? 'checkbox' : 'square-outline'}
-                    size={24}
-                    color={noEndDate ? Colors.selectedBox : Colors.unselectedBox}
+                    name={noEndDate ? "checkbox-outline" : "square-outline"}
+                    size={20}
+                    color={noEndDate ? Colors.blue : Colors.gray}
                   />
                 </Pressable>
                 <Text style={GlobalStyles.mediumText}>No End Date</Text>
@@ -439,12 +443,6 @@ const styles = StyleSheet.create({
   formContainer: {
     gap: 12,
     marginTop: 10,
-  },
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-    marginTop: 15,
   },
   dateContainer: {
     flexShrink: 1,

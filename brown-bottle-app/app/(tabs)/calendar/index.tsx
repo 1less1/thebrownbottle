@@ -14,8 +14,6 @@ import ShiftCalendar from '@/components/calendar/ShiftCalendar/ShiftCalendar';
 import ShiftCover from '@/components/calendar/ShiftCover/ShiftCover';
 import TimeOff from '@/components/calendar/TimeOff/TimeOff';
 
-import LoadingCircle from '@/components/modular/LoadingCircle';
-
 import { useSession } from '@/utils/SessionContext';
 
 const CalendarPage = () => {

@@ -7,7 +7,7 @@ import { Colors } from '@/constants/Colors';
 import StatCard from '@/components/modular/StatCard';
 import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
 
-import { getTasks } from '@/routes/task';
+import { getTask } from '@/routes/task';
 import { getShift } from '@/routes/shift';
 import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
@@ -70,7 +70,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 setTaskCount(0);
             } else {
                 const section_id = todaysShift[0].section_id;
-                const tasks = await getTasks({
+                const tasks = await getTask({
                     section_id,
                     complete: 0,
                 });

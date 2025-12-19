@@ -33,6 +33,20 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
   const MAX_CHARS = 450;
 
+  const dateDisplay = (() => {
+    if (!startDate) return "";
+
+    // If only start selected (no end yet)
+    if (!endDate) return `${formatDateWithYear(startDate)} →`;
+
+    // If start and end are the same day
+    if (startDate === endDate) return formatDateWithYear(startDate);
+
+    // Normal range
+    return `${formatDateWithYear(startDate)} → ${formatDateWithYear(endDate)}`;
+  })();
+
+
   const resetForm = () => {
     setReason('');
     setStartDate('');
@@ -103,13 +117,9 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       {/* Selected Dates Display */}
       <View style={{ flexDirection: "row", gap: 10, marginVertical: 15 }}>
         <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>From: </Text>
+          <Text style={GlobalStyles.text}>Selected: </Text>
           <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {startDate && endDate
-              ? `${formatDateWithYear(startDate)} → ${formatDateWithYear(endDate)}`
-              : startDate
-                ? `${formatDateWithYear(startDate)} →`
-                : ""}
+            {dateDisplay}
           </Text>
         </View>
       </View>
@@ -130,7 +140,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
           }
         }}
         multiline
-        numberOfLines={4}
+        numberOfLines={3}
         style={[GlobalStyles.input, { marginBottom: 5 }]}
       />
       <Text style={{ color: Colors.gray }}>

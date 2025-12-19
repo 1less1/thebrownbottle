@@ -12,6 +12,8 @@ def get_tasks(db, request):
     Fetches task records based on optional URL query parameters.
     If no parameters are provided, returns all tasks (equivalent to SELECT * FROM task)
     Expects parameters in the URL. 
+
+    IMPORTANT: Used for getting records in the "task" table
     """
     conn = None
     cursor = None
@@ -21,10 +23,12 @@ def get_tasks(db, request):
             'task_id': int,
             'author_id': int,
             'section_id': int, 
-            'complete': int,  # 0 or 1
-            'today': bool,
-            'recurring': bool,
-            'due_date': str,
+            'complete': int,  # 1=True, 0=False
+            'today': int, # 1=True, 0=False
+            'past': int, # 1=True, 0=False
+            'future': int, # 1=True, 0=False
+            'recurring': int, # 1=True, 0=False
+            'due_date': str, # YYYY-MM-DD
         }
 
         # Validate and parse parameters
@@ -37,9 +41,11 @@ def get_tasks(db, request):
         author_id = params.get('author_id')
         section_id = params.get('section_id')
         complete = params.get('complete')
-        today = params.get('today', False)
-        recurring = params.get('recurring', False)
-        due_date = params.get('due_date') # 'YYYY-MM-DD'
+        today = params.get('today')
+        past = params.get('past')
+        future = params.get('future')
+        recurring = params.get('recurring')
+        due_date = params.get('due_date')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -87,11 +93,25 @@ def get_tasks(db, request):
             query += " AND t.complete = %s"
             query_params.append(complete)
 
-        if today:
+        # Date filters
+        if past == 1 and today == 1 and future == 1:
+            # everything
+            pass  # no filter, since all dates are included
+        elif past == 1 and today == 1:
             query += " AND t.due_date <= CURDATE()"
+        elif today == 1 and future == 1:
+            query += " AND t.due_date >= CURDATE()"
+        elif past == 1:
+            query += " AND t.due_date < CURDATE()"
+        elif today == 1:
+            query += " AND t.due_date = CURDATE()"
+        elif future == 1:
+            query += " AND t.due_date > CURDATE()"
 
-        if recurring:
+        if recurring == 1:
             query += " AND t.recurring_task_id IS NOT NULL"
+        elif recurring == 0:
+            query += " AND t.recurring_task_id IS NULL"
 
         if due_date:
             # Validate date format -> 'YYYY-MM-DD'
@@ -191,125 +211,7 @@ def insert_task(db, request):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
-    
-
-
-def insert_recurring_task(db, request):
-    """
-    Inserts a new record into the "recurring_task" table.
-    Then triggers a mysql stored procedure to migrate
-    today's recurring tasks to the normal "task" table.
-    """
-    conn = None
-    cursor = None
-    proc_cursor = None
-    try:
-        # Define Required Fields
-        required_fields = [
-            'title', 'description', 'author_id', 'section_id',
-            'start_date', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'
-        ]
-        
-        # Define Expected Field Types
-        field_types = {
-            'title': str,
-            'description': str,
-            'author_id': int,
-            'section_id': int,
-            'start_date': str,
-            'mon': int, 'tue': int, 'wed': int,
-            'thu': int, 'fri': int, 'sat': int, 'sun': int,
-            'end_date': str,  # Optional
-        }
-
-        # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
-
-        if error:
-            return jsonify(error), 400
-
-        title = fields['title']
-        description = fields['description']
-        author_id = fields['author_id']
-        section_id = fields['section_id']
-        start_date = fields['start_date']
-
-        # Weekdays
-        mon = fields['mon']
-        tue = fields['tue']
-        wed = fields['wed']
-        thu = fields['thu']
-        fri = fields['fri']
-        sat = fields['sat']
-        sun = fields['sun']
-        
-        # Check optional end_date field
-        end_date = fields.get('end_date')
-        if not end_date or end_date.lower() == 'none':
-            end_date = None
-
-        conn = db
-        cursor = conn.cursor(dictionary=True)
-
-        # Execute Query
-        cursor.execute("""
-            INSERT INTO recurring_task 
-            (title, description, author_id, section_id, start_date, end_date,
-             mon, tue, wed, thu, fri, sat, sun)
-            VALUES (%s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s);
-        """, (
-            title, description, author_id, section_id, start_date, end_date,
-            mon, tue, wed, thu, fri, sat, sun
-        ))
-            
-
-        inserted_id = cursor.lastrowid
-        
-        conn.commit()
-
-        # Call the Stored Procedure to insert today's recurring tasks into 'task' table
-        proc_cursor = conn.cursor(dictionary=True)
-        proc_cursor.callproc("insert_recurring_tasks")
-        conn.commit()
-
-        return jsonify({"status": "success", "inserted_id": inserted_id}), 200
-
-    except mysql.connector.Error as e:
-        print(f"Database error: {e}")
-        return jsonify({"status": "error", "message": "Database error occurred"}), 500
-
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
-    finally:
-        if cursor:
-            cursor.close()
-        if proc_cursor:
-            proc_cursor.close()
-        if conn:
-            conn.close()
-
-def handle_new_task(db, request):
-    """
-    Handles incoming task POST request:
-    If the request is a recurring task, insert into the 'recurring_task' table
-    If the request is not recurring, insert immediately into the 'task' table
-    """
-
-    if request.is_json:
-        data = request.get_json()
-        start_date = data.get("start_date")
-    else:
-        return jsonify({"status": "error", "message": "Invalid or missing JSON body"}), 400
-    
-
-    if start_date and all(day in data for day in ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']):
-        return insert_recurring_task(db, request)
-    else:
-        return insert_task(db, request)
+            conn.close()   
     
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -396,4 +298,55 @@ def update_task(db, request, task_id):
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
+
+# DELETE Task -----------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+def delete_task(db, task_id):
+    """
+    Deletes a task record by task_id
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = db
+        cursor = conn.cursor(dictionary=True)
+
+        # Check if task exists
+        cursor.execute(
+            "SELECT task_id FROM task WHERE task_id = %s",
+            (task_id,)
+        )
+        result = cursor.fetchone()
+
+        if not result:
+            return jsonify({"status": "error", "message": "Task not found"}), 404
+
+        # Delete the task
+        cursor.execute(
+            "DELETE FROM task WHERE task_id = %s",
+            (task_id,)
+        )
+        conn.commit()
+
+        return jsonify({"status": "success", "message": "Task deleted"}), 200
+
+    except mysql.connector.Error as e:
+        print(f"Database error: {e}")
+        return jsonify({"status": "error", "message": "Database error occurred"}), 500
+
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
 
