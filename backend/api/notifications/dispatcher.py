@@ -11,6 +11,10 @@ from .handlers.shiftCoverHandler import (
     handle_cover_accepted,
     handle_cover_denied,
 )
+from .handlers.timeOffHandler import (
+    handle_time_off_created,
+    handle_time_off_updated
+)
 
 
 def dispatch_notification(db, event: NotificationEvent, payload: dict):
@@ -38,6 +42,13 @@ def dispatch_notification(db, event: NotificationEvent, payload: dict):
 
     if event == NotificationEvent.SHIFT_COVER_DENIED:
         handle_cover_denied(db, payload)
+
+    # Time Off Dispatchers
+    if event == NotificationEvent.TIME_OFF_CREATED:
+        handle_time_off_created(db, payload)
+
+    if event == NotificationEvent.TIME_OFF_APPROVED or event == NotificationEvent.TIME_OFF_DENIED:
+        handle_time_off_updated(db, payload)
 
     # Announcement Dispatchers
     if event == NotificationEvent.ANNOUNCEMENT_CREATED:

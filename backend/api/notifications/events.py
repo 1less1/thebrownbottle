@@ -17,6 +17,11 @@ class NotificationEvent(Enum):
     SHIFT_COVER_ACCEPTED = "shift_cover.accepted"
     SHIFT_COVER_DENIED = "shift_cover.denied"
 
+    # Time Off Events
+    TIME_OFF_CREATED = "time_off.created"
+    TIME_OFF_APPROVED = "time_off.approved"
+    TIME_OFF_DENIED = "time_off.denied"
+
     # Announcement Events
     ANNOUNCEMENT_CREATED = "announcement.created"
 

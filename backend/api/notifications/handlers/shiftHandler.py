@@ -24,7 +24,7 @@ def handle_shift_updated(db, payload):
         db,
         payload["employee_id"],
         "Shift Updated",
-        "One of your shifts was updated.",
+        "You have an updated shift.",
         {
             "shift_id": payload["shift_id"]
         }
