@@ -193,8 +193,7 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                 data={requests}
                 loading={loading}
                 error={error}
-                emptyText="No requests found."
-                maxHeight={HEIGHT * 0.625}
+                emptyText="No requests found."            
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);

@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   scrollContent: {
-    flexGrow: 1,
+    flex: 1,
   },
   childrenContainer: {
     // Removed flexGrow: 1

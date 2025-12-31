@@ -48,6 +48,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   const [localRefresh, setLocalRefresh] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [scheduleData, setScheduleData] = useState<ScheduleEmployee[]>([]);
 
@@ -64,6 +65,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   const fetchSchedule = async (searchTerm: string) => {
     setLoading(true);
+    setError(null);
+
     try {
       const { weekStartStr, weekEndStr } = getWeekStartEnd(currentWeekStart);
 
@@ -95,12 +98,12 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       // Attach to schedule
       const updatedSchedule = attachBlockedDays(schedule, blockedDays);
-      console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
+      //console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
 
       setScheduleData(updatedSchedule);
-    } catch (err) {
-      console.error("Error fetching schedule:", err);
-      alert("Error fetching schedule!")
+    } catch (error: any) {
+      setError("Failed to fetch schedule data!")
+      console.error("Failed to fetch schedule data:", error.message);
     } finally {
       setLoading(false);
     }
@@ -236,6 +239,12 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     );
   };
 
+  const ListEmpty = (
+    <View style={styles.singleRow}>
+      <Text style={GlobalStyles.text}>No results found!</Text>
+    </View>
+  );
+
   return (
 
     <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
@@ -272,6 +281,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       {/* Search Container */}
       <View style={styles.searchContainer}>
+
         <TextInput
           value={query}
           onChangeText={handleSearchChange}
@@ -313,11 +323,11 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           <Ionicons name="download-outline" size={20} color={Colors.black} />
         </ModularButton>
 
-
       </View>
 
       {/* Filter Container */}
       <View style={styles.filterContainer}>
+
         <RoleCheckbox
           selectedRoles={selectedRoles}
           onRoleSelect={(keys, values) => {
@@ -346,9 +356,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           usePlaceholder={false}
           disabled={loading}
         />
-      </View>
 
-      {loading ? <LoadingCircle size={"small"} /> : null}
+      </View>
 
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
@@ -357,26 +366,35 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <View>
             {renderHeader()}
-            <FlatList
-              data={scheduleData}
-              keyExtractor={(item) => item.employee_id.toString()}
-              renderItem={({ item }) => renderEmployeeRow(item)}
-              keyboardShouldPersistTaps="handled"
-              style={{ maxHeight: HEIGHT * 0.7 }}
-              scrollEnabled={true}
-              nestedScrollEnabled={true}
-              showsVerticalScrollIndicator={true}
-            />
+
+            {loading ? (
+              // Loading state
+              <View style={styles.singleRow}>
+                <LoadingCircle size="small" />
+              </View>
+            ) : error ? (
+              // Error state
+              <View style={styles.singleRow}>
+                <Text style={GlobalStyles.errorText}>
+                  {error}
+                </Text>
+              </View>
+            ) : (
+              // Success state
+              <FlatList
+                data={scheduleData}
+                keyExtractor={(item) => item.employee_id.toString()}
+                renderItem={({ item }) => renderEmployeeRow(item)}
+                keyboardShouldPersistTaps="handled"
+                scrollEnabled={true}
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={true}
+                ListEmptyComponent={ListEmpty}
+              />
+            )}
           </View>
         </ScrollView>
       </View>
-
-      {/* Fallback */}
-      {!loading && scheduleData.length === 0 && query.length > 0 ? (
-        <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-          No results found...
-        </Text>
-      ) : null}
 
       {/* Shift Modal - Add, Update, Delete */}
       <ShiftModal
@@ -470,6 +488,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.darkGray,
     textAlign: 'center',
+  },
+  singleRow: {
+    flex: 1,
+    padding: 8,
+    alignSelf: "center",
+    justifyContent: "center",
   },
 
   // Employee Name Cell

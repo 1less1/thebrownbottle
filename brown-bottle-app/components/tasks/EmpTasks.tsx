@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-import ActiveTasks from "./ActiveTasks";
-import CompletedTasks from "./CompletedTasks";
-import LoadingCircle from "../modular/LoadingCircle";
-
+import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
-import { useSession } from "@/utils/SessionContext";
-import { User } from "@/utils/SessionContext";
+
+import LoadingCircle from "@/components/modular/LoadingCircle";
+
+import ActiveTasks from "@/components/tasks/ActiveTasks";
+import CompletedTasks from "@/components/tasks/CompletedTasks";
+
 import { Employee } from "@/types/iEmployee";
+
+import { useSession } from "@/utils/SessionContext";
 
 export default function EmpTasks() {
     const { user } = useSession();
@@ -26,7 +29,7 @@ export default function EmpTasks() {
         }, 1000);
     };
 
-    // Define available tabs and corresponding components
+    // Define tabs and corresponding components
     const tabs = [
         {
             key: "active",
@@ -43,9 +46,12 @@ export default function EmpTasks() {
     const isLoaded = user;
 
     return (
+
         <View style={styles.container}>
-            {/* Tab Selector */}
-            <View style={{ width: "83%" }}>
+
+            <View style={{ width: "85%" }}>
+
+                {/* Tab Bar */}
                 <View style={styles.tabBar}>
                     {tabs.map((tab, index) => (
                         <TouchableOpacity
@@ -68,7 +74,7 @@ export default function EmpTasks() {
                     ))}
                 </View>
 
-                {/* Content Area */}
+                {/* Render Content */}
                 <View>
                     {!isLoaded ? (
                         <LoadingCircle size="large" style={{ marginTop: 40 }} />
@@ -76,8 +82,11 @@ export default function EmpTasks() {
                         tabs[activeTab]?.component
                     )}
                 </View>
+
             </View>
+
         </View>
+
     );
 };
 

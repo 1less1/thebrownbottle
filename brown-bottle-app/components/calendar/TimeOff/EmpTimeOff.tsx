@@ -166,7 +166,6 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         loading={loading}
         error={error}
         emptyText="No requests found."
-        maxHeight={HEIGHT * 0.625}
         onItemPress={(req) => {
           setSelectedRequest(req);
           toggleTORInfo();

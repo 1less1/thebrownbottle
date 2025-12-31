@@ -34,6 +34,15 @@ export interface UpdateAnnouncement {
   role_id: number;
 }
 
+
+
+export interface Acknowledgement {
+  announcement_id: number // Foreign Key
+  employee_id: number;
+  employee_name: number;
+  acknowledged_at: string; // YYYY-MM-DD 00:00 (24 hour time)
+}
+
 // POST Route
 export interface AcknowledgeAnnouncement {
   announcement_id: number;

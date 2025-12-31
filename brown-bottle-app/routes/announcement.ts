@@ -6,6 +6,8 @@ import {
   GetAnnouncement,
   InsertAnnouncement,
   UpdateAnnouncement,
+  Acknowledgement,
+  GetAcknowledgedAnnouncements
 } from "@/types/iAnnouncement";
 
 // GET: Fetches data from the announcement table
@@ -153,18 +155,29 @@ export async function acknowledgeAnnouncement(
 }
 
 // GET Acknolwedged Announcements for a specific employee
-export async function getAcknowledgedAnnouncements(employee_id: number) {
+export async function getAcknowledgedAnnouncements(params?: Partial<GetAcknowledgedAnnouncements>) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
-  const baseURL = API_BASE_URL;
 
-  const response = await fetch(
-    `${baseURL}/announcement/acknowledgement?employee_id=${employee_id}`
-  );
+  const queryString = buildQueryString(params || {});
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch acknowledged announcements");
+  const url = `${API_BASE_URL}/announcement/acknowledgement?${queryString}`;
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`[Announcement API] Failed to GET: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data as Acknowledgement[];
+  } catch (error) {
+    console.error("Failed to fetch announcement acknowledgement data:", error);
+    throw error;
   }
 
-  return (await response.json()) as { announcement_id: number }[];
-  // [{ announcement_id, employee_id, acknowledged_at, employee_name }]
 }

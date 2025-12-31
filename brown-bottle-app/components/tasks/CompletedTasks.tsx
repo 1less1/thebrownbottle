@@ -103,11 +103,11 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
                 last_modified_by: user.employee_id,
             });
             setModalVisible(false);
-            alert("Task completion has been undone!");
+            alert("Task has been markes as incomplete!");
             setLocalRefresh((prev) => prev + 1);
         } catch (error: any) {
-            alert("Failed to undo completion. Try again later.");
-            console.error("Undo completion failed:", error.message);
+            alert("Failed to mark as incomplete. Try again later.");
+            console.error("Failed to mark as incomplete:", error.message);
         } finally {
             setLoading(false);
         }

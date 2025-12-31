@@ -32,19 +32,16 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+
 
     const { confirm } = useConfirm();
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
     };
-
-    const toggleConfirmationModal = () => {
-        setConfirmationModalVisible(!confirmationModalVisible);
-    }
 
     const onOpen = () => {
         toggleModal();
@@ -58,10 +55,6 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         setSelectedIds(new Set());
     };
 
-    const onConfirmationClose = () => {
-        toggleConfirmationModal();
-    }
-
     const buildParams = (
         searchTerm: string,
     ) => {
@@ -72,12 +65,15 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
 
     const fetchEmployees = async (searchTerm: string) => {
+        setError(null);
         setLoading(true);
+
         try {
             const response = await getEmployee(buildParams(searchTerm));
             setResults(response);
         } catch (error: any) {
-            console.error("Search failed:", error.message);
+            setError("Failed to fetch employee data!")
+            console.error("Failed to fetch employee data:", error.message);
         } finally {
             setLoading(false);
         }
@@ -146,7 +142,6 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
             await removeEmployees(employeeIdList);
             alert("Employee(s) successfully removed!")
             onRemove?.();
-            onConfirmationClose();
             onClose();
         } catch (error: any) {
             alert("Unable to remove Employee(s): " + error.message);
@@ -175,7 +170,11 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         );
     };
 
-
+    const ListEmpty = (
+        <View style={styles.singleRow}>
+            <Text style={GlobalStyles.text}>No employees found!</Text>
+        </View>
+    );
 
     return (
 
@@ -215,23 +214,30 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                     </ModularButton>
                 </View>
 
-                {loading ? <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} /> : null}
-
                 {/* Search Results (Scrollable) */}
                 <View style={{ height: HEIGHT * 0.42 }}>
-                    <FlatList
-                        data={results}
-                        keyExtractor={(item) => item.employee_id?.toString() ?? ""}
-                        renderItem={renderItem}
-                        showsVerticalScrollIndicator={true}
-                    />
-
-                    {!loading && results.length === 0 && query.length > 0 ? (
-                        <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-                            No results found...
-                        </Text>
-                    ) : null}
-
+                    {loading ? (
+                        // Loading state
+                        <View style={styles.singleRow}>
+                            <LoadingCircle size="small" />
+                        </View>
+                    ) : error ? (
+                        // Error state
+                        <View style={styles.singleRow}>
+                            <Text style={GlobalStyles.errorText}>
+                                {error}
+                            </Text>
+                        </View>
+                    ) : (
+                        // Success state
+                        <FlatList
+                            data={results}
+                            keyExtractor={(item) => item.employee_id?.toString() ?? ""}
+                            renderItem={renderItem}
+                            showsVerticalScrollIndicator={true}
+                            ListEmptyComponent={ListEmpty}
+                        />
+                    )}
                 </View>
 
                 {/* Buttons */}
@@ -302,6 +308,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderColor: Colors.lightBorderColor,
+    },
+    singleRow: {
+        flex: 1,
+        alignSelf: "center",
+        justifyContent: "center",
+        paddingVertical: 14,
+        paddingHorizontal: 16,
     },
 });
 

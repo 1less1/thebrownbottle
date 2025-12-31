@@ -57,6 +57,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]); // Default to Empty Array
     const [selectedIsAdmin, setSelectedIsAdmin] = useState<number | null>(null); // Default to null ("placeholderText")
@@ -64,6 +65,8 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
 
     const fetchEmployees = async (searchTerm: string,) => {
         setLoading(true);
+        setError(null);
+
         try {
             const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
 
@@ -78,7 +81,8 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
 
             setResults(response);
         } catch (error: any) {
-            console.error("Search failed:", error.message);
+            setError("Failed to fetch employee data!")
+            console.error("Failed to fetch employee data:", error.message);
         } finally {
             setLoading(false);
         }
@@ -171,6 +175,12 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
     ), []);
 
 
+    const ListEmpty = (
+        <View style={styles.singleRow}>
+            <Text style={GlobalStyles.text}>No employees found!</Text>
+        </View>
+    );
+
     return (
 
         <>
@@ -226,9 +236,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
                         disabled={loading}
                     />
                 </View>
-
-                {loading ? <LoadingCircle size={"small"} /> : null}
-
+                
                 {/* Data Table */}
                 {/* Scroll View = Horizontal */}
                 {/* Flat List = Vertical */}
@@ -236,25 +244,35 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
                     <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
                         <View style={styles.tableContainer}>
                             {renderHeader()}
-                            <FlatList
-                                data={results}
-                                keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
-                                renderItem={renderCell}
-                                style={{ maxHeight: HEIGHT * 0.5 }}
-                                scrollEnabled={true}
-                                nestedScrollEnabled={true}
-                                showsVerticalScrollIndicator={true}
-                            />
+
+                            {loading ? (
+                                // Loading state
+                                <View style={styles.singleRow}>
+                                    <LoadingCircle size="small" />
+                                </View>
+                            ) : error ? (
+                                // Error state
+                                <View style={styles.singleRow}>
+                                    <Text style={GlobalStyles.errorText}>
+                                        {error}
+                                    </Text>
+                                </View>
+                            ) : (
+                                // Success state
+                                <FlatList
+                                    data={results}
+                                    keyExtractor={(item) => item.employee_id?.toString() ?? ""}
+                                    renderItem={renderCell}
+                                    scrollEnabled={true}
+                                    nestedScrollEnabled={true}
+                                    showsVerticalScrollIndicator={true}
+                                    ListEmptyComponent={ListEmpty}
+                                />
+                            )}
+
                         </View>
                     </ScrollView>
                 </View>
-
-                {/* Fallback */}
-                {!loading && results.length === 0 && query.length > 0 ? (
-                    <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-                        No results found...
-                    </Text>
-                ) : null}
 
             </Card>
 
@@ -310,6 +328,12 @@ const styles = StyleSheet.create({
         borderColor: Colors.lightBorderColor,
         flexShrink: 1,
     },
+    singleRow: {
+        flex: 1,
+        padding: 8,
+        alignSelf: "center",
+        justifyContent: "center",
+    }
 });
 
 

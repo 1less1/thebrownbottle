@@ -50,6 +50,12 @@ const ModularDropdown = <T extends string | number | null>({
         setVisible(false);
     };
 
+    const ListEmpty = (
+        <View style={styles.singleOptionRow}>
+            <Text style={GlobalStyles.text}>No data found!</Text>
+        </View>
+    );
+
     return (
         <View style={[styles.container, containerStyle]}>
             {/* Optional Label */}
@@ -80,7 +86,6 @@ const ModularDropdown = <T extends string | number | null>({
                 animationType="fade"
                 onRequestClose={() => setVisible(false)}
             >
-
                 {/* Overlay */}
                 <TouchableWithoutFeedback onPress={() => setVisible(false)}>
                     <View style={styles.overlay}>
@@ -89,10 +94,14 @@ const ModularDropdown = <T extends string | number | null>({
                         <TouchableWithoutFeedback>
                             <View style={styles.dropdown}>
                                 {data.length === 0 ? (
-                                    <Text style={[GlobalStyles.errorText, { marginTop: 12, marginHorizontal: 8, marginBottom: 20 }]}>
-                                        Failed to fetch!
-                                    </Text>
+                                    // Error state
+                                    <View style={styles.singleOptionRow}>
+                                        <Text style={GlobalStyles.errorText}>
+                                            Failed to fetch!
+                                        </Text>
+                                    </View>
                                 ) : (
+                                    // Success state
                                     <FlatList
                                         data={dropdownOptions}
                                         keyExtractor={(item, idx) => item.value !== null ? item.value.toString() : `null-${idx}`}
@@ -114,6 +123,7 @@ const ModularDropdown = <T extends string | number | null>({
                                                 </Text>
                                             </TouchableOpacity>
                                         )}
+                                        ListEmptyComponent={ListEmpty}
                                     />
                                 )}
                             </View>
@@ -121,7 +131,6 @@ const ModularDropdown = <T extends string | number | null>({
 
                     </View>
                 </TouchableWithoutFeedback>
-
             </Modal>
 
         </View>
@@ -172,6 +181,13 @@ const styles = StyleSheet.create({
     selectedOption: {
         fontWeight: "bold",
         color: Colors.blue,
+    },
+    singleOptionRow: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        alignSelf: "center",
+        justifyContent: "center",
     },
 });
 

@@ -190,7 +190,6 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                         ? "No requests found."
                         : "No available shifts right now."
                 }
-                maxHeight={HEIGHT * 0.625}
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);

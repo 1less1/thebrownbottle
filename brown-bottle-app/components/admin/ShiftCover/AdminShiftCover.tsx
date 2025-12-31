@@ -194,7 +194,6 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 loading={loading}
                 error={error}
                 emptyText="No requests found."
-                maxHeight={HEIGHT * 0.625}
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={(req) => {
                     setSelectedRequest(req);

@@ -63,8 +63,9 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
   },
   scrollView: {
-    flexGrow: 1,
-    paddingBottom: 10
+    flex: 1,
+    paddingBottom: 10,
+    overflow: 'hidden',
   },
   background: {
     ...StyleSheet.absoluteFillObject,

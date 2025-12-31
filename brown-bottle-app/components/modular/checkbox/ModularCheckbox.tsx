@@ -68,6 +68,12 @@ const ModularCheckbox = <T extends string | number>({
     const handleSelectAll = () => setTempSelected(data);
     const handleReset = () => setTempSelected([]);
 
+    const ListEmpty = (
+        <View style={styles.singleOptionRow}>
+            <Text style={GlobalStyles.text}>No data found!</Text>
+        </View>
+    );
+
     return (
         <View style={[styles.container, containerStyle]}>
             {/* Optional Label */}
@@ -125,86 +131,90 @@ const ModularCheckbox = <T extends string | number>({
                         {/* Checkbox List */}
                         <TouchableWithoutFeedback>
                             <View style={styles.dropdown}>
-                                {data.length === 0 ? (
-                                    <Text style={[GlobalStyles.errorText, { marginTop: 12, marginHorizontal: 8, marginBottom: 20 }]}>
-                                        Failed to fetch {pluralLabel ?? "Items"}!
-                                    </Text>
-                                ) : (
-                                    <>
-                                        <FlatList
-                                            data={data}
-                                            keyExtractor={(item) => item.value?.toString() ?? item.key}
-                                            style={{ flexGrow: 0 }}
-                                            renderItem={({ item }) => {
-                                                const checked = tempSelected.some((o) => o.value === item.value);
-                                                return (
-                                                    <TouchableOpacity
-                                                        style={styles.option}
-                                                        onPress={() => toggleSelection(item)}
-                                                    >
-                                                        <View style={styles.optionRow}>
-                                                            <Ionicons
-                                                                name={checked ? "checkbox-outline" : "square-outline"}
-                                                                size={20}
-                                                                color={checked ? Colors.blue : Colors.gray}
-                                                                style={{ marginRight: 4 }}
-                                                            />
-                                                            {/* Display List Items as "Keys" */}
-                                                            <Text style={[styles.optionText, checked && styles.selectedOption]}>
-                                                                {item.key}
-                                                            </Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                );
-                                            }}
-                                        />
 
-                                        {/* Button Container */}
-                                        <View
-                                            style={[
-                                                GlobalStyles.buttonRowContainer,
-                                                {
-                                                    marginTop: 0,
-                                                    padding: 20,
-                                                    flexDirection: isMobile ? 'column' : 'row', // 👈 responsive switch
-                                                }
-                                            ]}
-                                        >
-                                            <ModularButton
-                                                onPress={handleConfirm}
-                                                style={[
-                                                    GlobalStyles.submitButton,
-                                                    !isMobile && { flex: 1 } // only flex in row mode
-                                                ]}
-                                                textStyle={{ color: "white" }}
-                                                text="Confirm"
-                                            />
-                                            <ModularButton
-                                                onPress={handleSelectAll}
-                                                style={[
-                                                    { backgroundColor: Colors.buttonBlue },
-                                                    !isMobile && { flex: 1 }
-                                                ]}
-                                                textStyle={{ color: "white" }}
-                                                text="Select All"
-                                            />
-                                            <ModularButton
-                                                onPress={handleReset}
-                                                style={!isMobile ? { flex: 1 } : {}}
-                                                text=""
-                                                textStyle={{ marginRight: 4 }}
-                                            >
-                                                <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
-                                            </ModularButton>
-                                        </View>
-                                    </>
+                                {data.length === 0 ? (
+                                    // Error state
+                                    <View style={styles.singleOptionRow}>
+                                        <Text style={GlobalStyles.errorText}>
+                                            Failed to fetch!
+                                        </Text>
+                                    </View>
+                                ) : (
+                                    // Success state
+                                    <FlatList
+                                        data={data}
+                                        keyExtractor={(item) => item.value?.toString() ?? item.key}
+                                        style={{ flexGrow: 0 }}
+                                        renderItem={({ item }) => {
+                                            const checked = tempSelected.some((o) => o.value === item.value);
+                                            return (
+                                                <TouchableOpacity
+                                                    style={styles.option}
+                                                    onPress={() => toggleSelection(item)}
+                                                >
+                                                    <View style={styles.optionRow}>
+                                                        <Ionicons
+                                                            name={checked ? "checkbox-outline" : "square-outline"}
+                                                            size={20}
+                                                            color={checked ? Colors.blue : Colors.gray}
+                                                            style={{ marginRight: 4 }}
+                                                        />
+                                                        {/* Display List Items as "Keys" */}
+                                                        <Text style={[styles.optionText, checked && styles.selectedOption]}>
+                                                            {item.key}
+                                                        </Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            );
+                                        }}
+                                        ListEmptyComponent={ListEmpty}
+                                    />
                                 )}
+
+                                {/* Button Container */}
+                                <View
+                                    style={[
+                                        GlobalStyles.buttonRowContainer,
+                                        {
+                                            marginTop: 0,
+                                            padding: 20,
+                                            flexDirection: isMobile ? 'column' : 'row', // 👈 responsive switch
+                                        }
+                                    ]}
+                                >
+                                    <ModularButton
+                                        onPress={handleConfirm}
+                                        style={[
+                                            GlobalStyles.submitButton,
+                                            !isMobile && { flex: 1 } // only flex in row mode
+                                        ]}
+                                        textStyle={{ color: "white" }}
+                                        text="Confirm"
+                                    />
+                                    <ModularButton
+                                        onPress={handleSelectAll}
+                                        style={[
+                                            { backgroundColor: Colors.buttonBlue },
+                                            !isMobile && { flex: 1 }
+                                        ]}
+                                        textStyle={{ color: "white" }}
+                                        text="Select All"
+                                    />
+                                    <ModularButton
+                                        onPress={handleReset}
+                                        style={!isMobile ? { flex: 1 } : {}}
+                                        text=""
+                                        textStyle={{ marginRight: 4 }}
+                                    >
+                                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
+                                    </ModularButton>
+                                </View>
+
                             </View>
                         </TouchableWithoutFeedback>
 
                     </View>
                 </TouchableWithoutFeedback>
-
             </Modal>
 
         </View>
@@ -258,6 +268,13 @@ const styles = StyleSheet.create({
     selectedOption: {
         fontWeight: "bold",
         color: Colors.blue,
+    },
+    singleOptionRow: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        alignSelf: "center",
+        justifyContent: "center",
     },
 });
 

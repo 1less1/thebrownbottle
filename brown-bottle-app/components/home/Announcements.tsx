@@ -28,9 +28,10 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const HEIGHT = height;
 
   const isMobile = WIDTH < 768;
-  const listHeight = isMobile ? height * 0.5 : height * 0.6;
+  const listHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.6;
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -41,10 +42,15 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-  const fetchAnnouncements = useCallback(async () => {
+  const fetchAnnouncements = useCallback(async (isInitial = false) => {
     setError(null);
-    setLoading(true);
-    await delay(500);
+
+    if (isInitial) {
+      setLoading(true);
+      await delay(500);
+    } else {
+      setRefreshing(true);
+    }
 
     try {
       const params: Partial<GetAnnouncement> = {
@@ -53,28 +59,34 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
       const data = await getAnnouncement(params);
       setAnnouncements(data);
 
+      // Fetch acknowledgements once user is present
+      if (user?.employee_id) {
+        const ack = await getAcknowledgedAnnouncements({ employee_id: user.employee_id });
+        setAcknowledged(ack.map(a => a.announcement_id));
+      }
+
     } catch (error: any) {
       setError('Failed to fetch announcements.');
       console.log('Failed to fetch announcements', error.message);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      } else {
+        setRefreshing(false);
+      }
     }
-  }, [roleFilter]);
+  }, [roleFilter, user?.employee_id]);
 
   // Fetch announcements on initialization and state update
   useEffect(() => {
-    fetchAnnouncements();
-  }, [parentRefresh, fetchAnnouncements]);
+    fetchAnnouncements(true); // Initial Load
 
-  // Fetch acknowledged announcements ONLY once user is present
-  useEffect(() => {
-    const loadAcknowledged = async () => {
-      if (!user) return;
-      const ack = await getAcknowledgedAnnouncements(user.employee_id);
-      setAcknowledged(ack.map(a => a.announcement_id));
-    };
-    loadAcknowledged();
-  }, [user]);
+    const interval = setInterval(() => {
+      fetchAnnouncements(false); // SILENT Polling
+    }, 20000); // Every 20 seconds
+
+    return () => clearInterval(interval);
+  }, [parentRefresh, fetchAnnouncements]);
 
 
   const handleAcknowledge = async (announcementId: number) => {
@@ -123,12 +135,10 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
         </View>
 
-        {/* Announcment Feed */}
+        {/* Announcement Feed */}
         <View style={{ height: listHeight }}>
           {loading ? (
-            <>
-              <AnnouncementSkeleton />
-            </>
+            <AnnouncementSkeleton />
           ) : (
             <ModularListView
               data={announcements}
