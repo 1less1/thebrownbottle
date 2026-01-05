@@ -4,17 +4,17 @@ import { View, Text, StyleSheet } from 'react-native';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-import { formatDateTime, formatDate } from '@/utils/dateTimeHelpers';
+import { formatDateTime } from '@/utils/dateTimeHelpers';
 
 import StatusBadge from '@/components/modular/StatusBadge';
-import { TimeOffRequest, Status } from "@/types/iTimeOff";
+import { ShiftCoverRequest, Status } from "@/types/iShiftCover";
 
 interface Props {
-    request: TimeOffRequest | null;
+    request: ShiftCoverRequest | null;
 }
 
-// Reusable Time Off List Item Details
-const ListItemDetails: React.FC<Props> = ({ request }) => {
+// Reusable Shift Cover List Item Details
+const SCRListItem: React.FC<Props> = ({ request }) => {
 
     if (!request) return null;
 
@@ -27,12 +27,22 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
                 {/* Top Section + Badge */}
                 <View style={styles.topRow}>
                     <View style={styles.topLeftText}>
-                        <Text style={GlobalStyles.semiBoldText}>
-                            {request.start_date === request.end_date
-                                ? formatDate(request.start_date)
-                                : `${formatDate(request.start_date)} → ${formatDate(request.end_date)}`
-                            }
-                        </Text>
+                        {/* "Employee is requesting" line */}
+                        {request.status !== 'Pending' && request.accepted_first_name && request.accepted_last_name ? (
+                            <>
+                                <Text style={GlobalStyles.boldText}>
+                                    {request.accepted_first_name} {request.accepted_last_name} { }
+                                </Text>
+                                <Text style={GlobalStyles.text}>
+                                    ({request.accepted_primary_role_name}) { }
+                                </Text>
+                                <Text style={GlobalStyles.altText}>covering...</Text>
+                            </>
+                        ) : (
+                            <Text style={GlobalStyles.semiBoldAltText}>
+                                Shift Available
+                            </Text>
+                        )}
                     </View>
 
                     <View style={styles.badgeWrapper}>
@@ -42,15 +52,22 @@ const ListItemDetails: React.FC<Props> = ({ request }) => {
 
                 {/* Bottom Section (Free Flowing Text) */}
                 <>
+                    {/* Shift Details */}
                     <View style={styles.row}>
-                        <Text style={GlobalStyles.text}>From: </Text>
-                        <Text
-                            style={[GlobalStyles.boldText, { color: Colors.purple }]}
-                        >
-                            {request.first_name} {request.last_name} { }
+                        <Text style={GlobalStyles.semiBoldText}>
+                            {request.shift_date} {"@"} {request.shift_start}
                         </Text>
-                        <Text>
-                            ({request.primary_role_name})
+                        {/* <Text style={GlobalStyles.altText}>Section: {request.section_name}</Text> */}
+                    </View>
+
+                    {/* Original Shift Assignment */}
+                    <View style={[styles.row, { marginTop: 2 }]}>
+                        <Text style={GlobalStyles.text}>From: </Text>
+                        <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
+                            {request.requested_first_name} {request.requested_last_name} { }
+                        </Text>
+                        <Text style={GlobalStyles.text}>
+                            ({request.requested_primary_role_name})
                         </Text>
                     </View>
 
@@ -99,4 +116,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default ListItemDetails;
+export default SCRListItem;

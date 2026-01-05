@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-    View, Text, TouchableOpacity, StyleSheet, Modal,
-    FlatList, TouchableWithoutFeedback, StyleProp,
-    ViewStyle, TextStyle
+import { 
+    View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, 
+    TouchableWithoutFeedback, StyleProp, ViewStyle, useWindowDimensions 
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -28,7 +27,7 @@ const ModularDropdown = <T extends string | number | null>({
     data,
     selectedValue,
     onSelect,
-    labelText = "",
+    labelText,
     usePlaceholder = true,
     placeholderText = "Select an option...",
     disabled = false,
@@ -57,27 +56,31 @@ const ModularDropdown = <T extends string | number | null>({
     );
 
     return (
-        <View style={[styles.container, containerStyle]}>
-            {/* Optional Label */}
-            {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
+        <>
 
-            {/* Dropdown Button */}
-            <TouchableOpacity
-                style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
-                onPress={() => setVisible(true)}
-                disabled={disabled}
-            >
-                <View style={styles.buttonContent}>
-                    <Text style={[styles.optionText, { color: selectedValue === null ? Colors.gray : Colors.black, marginRight: 5 }]}>
-                        {displayLabel}
-                    </Text>
-                    <Ionicons
-                        name={visible ? "chevron-up" : "chevron-down"}
-                        size={18}
-                        color={Colors.black}
-                    />
-                </View>
-            </TouchableOpacity>
+            {/* Button */}
+            <View style={[styles.container, containerStyle]}>
+                {/* Optional Label */}
+                {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
+
+                {/* Dropdown Button */}
+                <TouchableOpacity
+                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
+                    onPress={() => setVisible(true)}
+                    disabled={disabled}
+                >
+                    <View style={styles.buttonContent}>
+                        <Text style={[styles.optionText, { color: selectedValue === null ? Colors.gray : Colors.black, marginRight: 5 }]}>
+                            {displayLabel}
+                        </Text>
+                        <Ionicons
+                            name={visible ? "chevron-up" : "chevron-down"}
+                            size={18}
+                            color={Colors.black}
+                        />
+                    </View>
+                </TouchableOpacity>
+            </View>
 
             {/* Dropdown Modal */}
             <Modal
@@ -133,7 +136,7 @@ const ModularDropdown = <T extends string | number | null>({
                 </TouchableWithoutFeedback>
             </Modal>
 
-        </View>
+        </>
 
     );
 };

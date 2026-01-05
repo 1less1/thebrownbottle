@@ -12,7 +12,7 @@ interface Props {
 }
 
 // Reusable Shift Cover Modal Details
-const ModalDetails: React.FC<Props> = ({ request }) => {
+const SCRModalContent: React.FC<Props> = ({ request }) => {
 
     if (!request) return null;
 
@@ -94,4 +94,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default ModalDetails;
+export default SCRModalContent;

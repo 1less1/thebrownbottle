@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-    View, Text, TouchableOpacity, StyleSheet, Modal,
-    FlatList, TouchableWithoutFeedback, StyleProp,
-    ViewStyle, TextStyle, useWindowDimensions
+import { 
+    View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, 
+    TouchableWithoutFeedback, StyleProp, ViewStyle, useWindowDimensions 
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -32,7 +31,7 @@ const ModularCheckbox = <T extends string | number>({
     data,
     selectedData,
     onSelect,
-    labelText = "",
+    labelText,
     usePlaceholder = false,
     placeholderText = "Select options...",
     singularLabel = "Option",
@@ -75,49 +74,53 @@ const ModularCheckbox = <T extends string | number>({
     );
 
     return (
-        <View style={[styles.container, containerStyle]}>
-            {/* Optional Label */}
-            {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
+        <>
 
-            {/* Dropdown Button */}
-            <TouchableOpacity
-                style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
-                onPress={() => {
-                    setTempSelected(selectedData);
-                    setVisible(true);
-                }}
-                disabled={disabled}
-            >
-                <View style={styles.buttonContent}>
-                    <Text style={[styles.optionText, { color: selectedData.length > 0 ? Colors.black : Colors.gray }]}>
-                        {
-                            // If there is NO selectedData...
-                            selectedData.length === 0
-                                // If usePlacholder = True...
-                                ? usePlaceholder
-                                    // Use placholderText if provided or default to "All ___ Items"
-                                    ? placeholderText ?? "Select options..."
-                                    : `All ${pluralLabel ?? "Items"}`
-                                // If all options in data are selected...
-                                : selectedData.length === data.length
-                                    // Display "All ___ Items"
-                                    ? `All ${pluralLabel ?? "Items"}`
-                                    // If ONE option is selected, display "Item [1]"
-                                    // If MORE than one option is selected, display "Items [number]"
-                                    : selectedData.length === 1
-                                        ? `${singularLabel ?? "Item"} [${selectedData.length}]`
-                                        : `${pluralLabel ?? "Items"} [${selectedData.length}]`
-                        }
-                    </Text>
-                    <Ionicons
-                        name={visible ? "chevron-up" : "chevron-down"}
-                        size={18}
-                        color={Colors.black}
-                    />
-                </View>
-            </TouchableOpacity>
+            {/* Button */}
+            <View style={[styles.container, containerStyle]}>
+                {/* Optional Label */}
+                {labelText ? <Text style={styles.label}>{labelText}</Text> : null}
 
-            {/* Modal */}
+                {/* Dropdown Button */}
+                <TouchableOpacity
+                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
+                    onPress={() => {
+                        setTempSelected(selectedData);
+                        setVisible(true);
+                    }}
+                    disabled={disabled}
+                >
+                    <View style={styles.buttonContent}>
+                        <Text style={[styles.optionText, { color: selectedData.length > 0 ? Colors.black : Colors.gray }]}>
+                            {
+                                // If there is NO selectedData...
+                                selectedData.length === 0
+                                    // If usePlacholder = True...
+                                    ? usePlaceholder
+                                        // Use placholderText if provided or default to "All ___ Items"
+                                        ? placeholderText ?? "Select options..."
+                                        : `All ${pluralLabel ?? "Items"}`
+                                    // If all options in data are selected...
+                                    : selectedData.length === data.length
+                                        // Display "All ___ Items"
+                                        ? `All ${pluralLabel ?? "Items"}`
+                                        // If ONE option is selected, display "Item [1]"
+                                        // If MORE than one option is selected, display "Items [number]"
+                                        : selectedData.length === 1
+                                            ? `${singularLabel ?? "Item"} [${selectedData.length}]`
+                                            : `${pluralLabel ?? "Items"} [${selectedData.length}]`
+                            }
+                        </Text>
+                        <Ionicons
+                            name={visible ? "chevron-up" : "chevron-down"}
+                            size={18}
+                            color={Colors.black}
+                        />
+                    </View>
+                </TouchableOpacity>
+            </View>
+
+            {/* Checkbox Modal */}
             <Modal
                 transparent
                 visible={visible}
@@ -217,7 +220,7 @@ const ModularCheckbox = <T extends string | number>({
                 </TouchableWithoutFeedback>
             </Modal>
 
-        </View>
+        </>
 
     );
 };

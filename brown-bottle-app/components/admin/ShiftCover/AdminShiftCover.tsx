@@ -16,7 +16,7 @@ import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
+import SCRListItem from "@/components/calendar/ShiftCover/Templates/SCRListItem";
 import SCRModal from "@/components/admin/ShiftCover/SCRModal";
 
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
@@ -200,7 +200,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                     toggleSCRModal();
                 }}
                 renderItem={(req) => (
-                    <ListItemDetails request={req} />
+                    <SCRListItem request={req} />
                 )}
             />
 

@@ -15,7 +15,7 @@ import ModularListView from '@/components/modular/ModularListView';
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import { DropdownOption, DateSortType } from '@/types/iDropdown';
 
-import ListItemDetails from '@/components/calendar/TimeOff/Templates/ListItemDetails';
+import TORListItem from '@/components/calendar/TimeOff/Templates/TORListItem';
 import SubmitTimeOff from '@/components/calendar/TimeOff/SubmitTimeOff';
 import TORInfo from '@/components/calendar/TimeOff/TORInfo';
 
@@ -172,7 +172,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
         }}
         itemContainerStyle={{ backgroundColor: "white" }}
         renderItem={(req) => (
-          <ListItemDetails request={req} />
+          <TORListItem request={req} />
         )}
       />
 

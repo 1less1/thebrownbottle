@@ -6,7 +6,7 @@ import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import ModalDetails from '@/components/calendar/TimeOff/Templates/ModalDetails';
+import TORModalContent from '@/components/calendar/TimeOff/Templates/TORModalContent';
 
 import { updateTimeOffRequest } from '@/routes/time_off_request';
 import { TimeOffRequest, UpdateTimeOffRequest } from '@/types/iTimeOff';
@@ -90,7 +90,7 @@ const TORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted
 
         <ModularModal visible={visible} onClose={onClose}>
 
-            <ModalDetails request={request} />
+            <TORModalContent request={request} />
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>

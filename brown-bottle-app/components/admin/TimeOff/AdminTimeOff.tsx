@@ -16,7 +16,7 @@ import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import ListItemDetails from "@/components/calendar/TimeOff/Templates/ListItemDetails";
+import TORListItem from "@/components/calendar/TimeOff/Templates/TORListItem";
 import TORModal from "@/components/admin/TimeOff/TORModal";
 
 import { getTimeOffRequest } from "@/routes/time_off_request";
@@ -200,7 +200,7 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                     toggleTORModal();
                 }}
                 renderItem={(req) => (
-                    <ListItemDetails request={req} />
+                    <TORListItem request={req} />
                 )}
             />
 

@@ -42,7 +42,7 @@ export interface InsertRecurringTask {
     sat: number;
     sun: number;
     start_date: string; // YYYY-MM-DD
-    end_date?: string; // YYYY-MM-DD (optional)
+    end_date?: string | null; // YYYY-MM-DD (optional)
 }
 
 export interface UpdateRecurringTask {
@@ -58,5 +58,5 @@ export interface UpdateRecurringTask {
     sat: number;
     sun: number;
     start_date: string; // YYYY-MM-DD
-    end_date: string; // YYYY-MM-DD
+    end_date: string | null; // YYYY-MM-DD (optional)
 }

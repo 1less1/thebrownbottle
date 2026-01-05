@@ -8,8 +8,8 @@ export type YesNoSortType = 1 | 0;
 export type DateSortType = "Newest" | "Oldest";
 
 export const yesNoDropdownOptions: DropdownOption<number>[] = [
-  { value: 1, key: "Yes" },
-  { value: 0, key: "No" },
+  { key: "Yes", value: 1 },
+  { key: "No", value: 0 },
 ];
 
 export const ageDropdownOptions: DropdownOption<string>[] = [

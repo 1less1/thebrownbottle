@@ -11,7 +11,6 @@ import { Colors } from '@/constants/Colors';
 import DefaultView from '@/components/DefaultView';
 import AdminDrawer from '@/components/admin/AdminDrawer';
 
-import Dashboard from "@/components/admin/Dashboard/Dashboard";
 import Announcements from "@/components/admin/Announcements/Announcements"
 import Tasks from "@/components/admin/Tasks/Tasks"
 import ShiftCover from '@/components/admin/ShiftCover/ShiftCover';
@@ -49,7 +48,6 @@ const Admin = () => {
 
   // Define available tabs and corresponding components
   const tabs: Tab[] = [
-    { key: 'Dashboard', title: 'Dashboard', component: <Dashboard /> },
     { key: 'Announcements', title: 'Announcements', component: <Announcements /> },
     { key: 'Tasks', title: 'Tasks', component: <Tasks /> },
     { key: 'Shift Cover', title: 'Shift Cover', component: <ShiftCover /> },

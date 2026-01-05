@@ -103,7 +103,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
                 last_modified_by: user.employee_id,
             });
             setModalVisible(false);
-            alert("Task has been markes as incomplete!");
+            alert("Task has been marked as incomplete!");
             setLocalRefresh((prev) => prev + 1);
         } catch (error: any) {
             alert("Failed to mark as incomplete. Try again later.");

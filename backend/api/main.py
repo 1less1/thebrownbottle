@@ -155,7 +155,7 @@ def get_tasks():
 @app.route('/task/insert', methods=['POST'])
 def handle_new_task():
     """
-    POST new tasks to the 'task' or 'recurring_task' table
+    POST new tasks to the 'task' table
     """
     with request_lock:  # Serialize concurrent requests to be processed in order for multiple task inserts from different clients
         return task.insert_task(get_db_connection(), request)

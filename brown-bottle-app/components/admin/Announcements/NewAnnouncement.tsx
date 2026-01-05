@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import {
-    View,
-    Text,
-    TextInput,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-    useWindowDimensions
+    View, Text, TextInput, StyleSheet, ScrollView, 
+    TouchableOpacity, useWindowDimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,9 +9,10 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from '@/components/modular/Card';
-import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
+
+import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import { InsertAnnouncement } from '@/types/iAnnouncement';
 import { insertAnnouncement } from '@/routes/announcement';
@@ -33,7 +29,7 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
     const WIDTH = width;
     const HEIGHT = height;
 
-    const buttonHeight = height * 0.15;
+    const buttonHeight = HEIGHT * 0.15;
 
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRole, setSelectedRole] = useState<number | null>(1);
@@ -85,9 +81,9 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
             toggleModal();
             onSubmit();
 
-        } catch (error) {
-            console.error("Error posting announcement:", error);
-            alert("Error: Failed to post announcement. Please try again.");
+        } catch (error: any) {
+            console.error("Failed to post announcement:", error.message);
+            alert("Failed to post announcement!");
         }
     };
 
@@ -112,6 +108,7 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
 
                 <Text style={GlobalStyles.modalTitle}>New Announcement</Text>
 
+                {/* Form */}
                 <View style={[styles.formContainer, { maxHeight: height * 0.45 }]}>
                     <ScrollView>
 
@@ -136,7 +133,7 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
                             {description.length}/{MAX_CHARS}
                         </Text>
 
-                        <View style={{ marginBottom: 10 }}>
+                        <View style={{ marginBottom: 15 }}>
                             <RoleDropdown
                                 selectedRole={selectedRole}
                                 onRoleSelect={setSelectedRole}

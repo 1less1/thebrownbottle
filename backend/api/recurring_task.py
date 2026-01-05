@@ -215,7 +215,7 @@ def insert_recurring_task(db, request):
         start_date = fields['start_date']
         # Check optional end_date field
         end_date = fields.get('end_date')
-        if not end_date or end_date.lower() == 'none':
+        if not end_date:
             end_date = None
 
         conn = db
@@ -240,7 +240,7 @@ def insert_recurring_task(db, request):
 
         # Call the Stored Procedure to insert today's recurring tasks into 'task' table
         proc_cursor = conn.cursor(dictionary=True)
-        proc_cursor.callproc("insert_recurring_tasks")
+        proc_cursor.callproc("insert_recurring_tasks_procedure")
         conn.commit()
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 200

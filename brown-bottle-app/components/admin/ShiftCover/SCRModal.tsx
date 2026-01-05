@@ -6,7 +6,7 @@ import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import ModalDetails from '@/components/calendar/ShiftCover/Templates/ModalDetails';
+import SCRModalContent from '@/components/calendar/ShiftCover/Templates/SCRModalContent';
 
 import { updateShiftCoverRequest, approveShiftCoverRequest } from '@/routes/shift_cover_request';
 import { ShiftCoverRequest, UpdateShiftCoverRequest } from '@/types/iShiftCover';
@@ -86,7 +86,7 @@ const SCRModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmitted
 
         <ModularModal visible={visible} onClose={onClose}>
 
-            <ModalDetails request={request} />
+            <SCRModalContent request={request} />
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>

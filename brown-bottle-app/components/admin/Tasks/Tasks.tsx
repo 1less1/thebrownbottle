@@ -3,6 +3,8 @@ import { View } from 'react-native';
 
 import DefaultScrollView from "@/components/DefaultScrollView";
 
+import NewTask from "@/components/admin/Tasks/NewTask";
+
 import { useSession } from '@/utils/SessionContext';
 
 const Tasks = () => {
@@ -25,7 +27,7 @@ const Tasks = () => {
         <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
             <View style={{ marginTop: 16, width: '90%' }}>
-                {/* AdminTasks Placeholder */}
+                <NewTask onSubmit={handleRefresh} />
             </View>
 
         </DefaultScrollView>

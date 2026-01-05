@@ -15,7 +15,7 @@ import ModularListView from "@/components/modular/ModularListView";
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 
-import ListItemDetails from "@/components/calendar/ShiftCover/Templates/ListItemDetails";
+import SCRListItem from "@/components/calendar/ShiftCover/Templates/SCRListItem";
 import SubmitShiftCover from "@/components/calendar/ShiftCover/SubmitShiftCover";
 import SCRInfo from "@/components/calendar/ShiftCover/SCRInfo";
 
@@ -196,7 +196,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                     toggleSCRInfoModal();
                 }}
                 renderItem={(req) => (
-                    <ListItemDetails request={req} />
+                    <SCRListItem request={req} />
                 )}
             />
 

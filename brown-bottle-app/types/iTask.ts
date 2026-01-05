@@ -42,18 +42,6 @@ export interface UpdateTask {
   section_id: number;
   due_date: string; // YYYY-MM-DD
   complete: 1 | 0;
-  recurring_task_id: number | null; // Foreign key to "recurring_task" table4
+  recurring_task_id: number | null; // Foreign key to "recurring_task" table
   last_modified_by: number; // Employee ID
 }
-
-// Original Below
-export type UpdateTaskFields = Partial<{
-  title: string;
-  description: string;
-  author_id: number;
-  section_id: number;
-  due_date: string;    // YYYY-MM-DD
-  complete: 0 | 1;
-  recurring_task_id: number;
-  last_modified_by: number; // employee_id
-}>;

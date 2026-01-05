@@ -7,7 +7,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import ModalDetails from '@/components/calendar/TimeOff/Templates/ModalDetails';
+import TORModalContent from '@/components/calendar/TimeOff/Templates/TORModalContent';
 
 
 import { deleteTimeOffRequest } from '@/routes/time_off_request';
@@ -65,7 +65,7 @@ const TORInfo: React.FC<ModalProps> = ({
 
         <ModularModal visible={visible} onClose={onClose}>
 
-            <ModalDetails request={request} />
+            <TORModalContent request={request} />
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>

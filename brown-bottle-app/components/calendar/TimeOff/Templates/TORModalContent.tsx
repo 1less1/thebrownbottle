@@ -12,7 +12,7 @@ interface Props {
 }
 
 // Reusable Time Off Modal Details
-const ModalDetails: React.FC<Props> = ({ request }) => {
+const TORModalContent: React.FC<Props> = ({ request }) => {
 
     if (!request) return null;
 
@@ -70,4 +70,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default ModalDetails;
+export default TORModalContent;

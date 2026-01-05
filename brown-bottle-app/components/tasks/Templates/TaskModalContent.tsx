@@ -41,6 +41,13 @@ const TaskModalContent: React.FC<Props> = ({ task }) => {
             </View>
 
             <View style={styles.row}>
+                <Text style={GlobalStyles.semiBoldText}>Section: </Text>
+                <Text style={GlobalStyles.text}>
+                    {task.section_name}
+                </Text>
+            </View>
+
+            <View style={styles.row}>
                 <Text style={GlobalStyles.semiBoldText}>Due: </Text>
                 <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
                     {formatDate(task.due_date)}
@@ -48,7 +55,7 @@ const TaskModalContent: React.FC<Props> = ({ task }) => {
             </View>
 
             {/* Timestamp */}
-            <View style={{flexDirection: "column", marginTop: 2}}>
+            <View style={{ flexDirection: "column", marginTop: 2 }}>
                 {(task.last_modified_name || task.last_modified_at) && (
                     <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
                         Last modified on {formatDateTime(task.last_modified_at)} by {task.last_modified_name}
