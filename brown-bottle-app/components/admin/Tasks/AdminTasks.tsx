@@ -7,20 +7,25 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from '@/components/modular/Card';
-import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+import SectionDropdown from '@/components/modular/dropdown/SectionDropdown';
 
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import ModularListView from "@/components/modular/ModularListView";
-import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
+import TaskListItem from '@/components/admin/Tasks/Templates/TaskListItem';
 
-import AckModal from '@/components/admin/Announcements/AckModal';
+import EditTask from '@/components/admin/Tasks/EditTask';
 
-import { getAnnouncement, deleteAnnouncement } from '@/routes/announcement';
-import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
+import { getTask, deleteTask } from '@/routes/task';
+import { Task, GetTask } from '@/types/iTask';
 
 import { useConfirm } from '@/hooks/useConfirm';
 import { useSession } from "@/utils/SessionContext";
-import { DropdownOption, DateSortType } from "@/types/iDropdown";
+import { DropdownOption, DateSortType, YesNoSortType } from "@/types/iDropdown";
+
+const activeDropdownOptions: DropdownOption<number>[] = [
+    { key: "Active", value: 0 },
+    { key: "Completed", value: 1 }
+]
 
 const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Newest Date", value: "Newest" },
@@ -32,100 +37,103 @@ interface Props {
     onRefreshDone?: () => void;
 }
 
-const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? HEIGHT * 0.50 : HEIGHT * 0.55;
+    const cardHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.53;
+
+    const { user } = useSession();
+    const { confirm } = useConfirm();
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null)
 
-    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-    const [selectedAnnouncementId, setSelectedAnnounceId] = useState<number | null>(null);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-    const [ackModalVisible, setAckModalVisible] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
 
-    const [roleFilter, setRoleFilter] = useState<number | null>(null);
+    const [activeFilter, setActiveFilter] = useState<1 | 0>(0); // 1=Completed, 0=Active
+    const [sectionFilter, setSectionFilter] = useState<number | null>(null);
     const [timestampFilter, setTimestampFilter] = useState<DateSortType>("Newest");
 
-    const openAckModal = (announcement_id: number) => {
-        setSelectedAnnounceId(announcement_id);
-        setAckModalVisible(true);
+    const openEditModal = (task: Task) => {
+        setSelectedTask(task);
+        setEditModalVisible(true);
     };
 
-    const closeAckModal = () => {
-        setAckModalVisible(false);
-        setSelectedAnnounceId(null);
+    const closeEditModal = () => {
+        setEditModalVisible(false);
+        setSelectedTask(null);
     };
 
-    const { confirm } = useConfirm();
-    const { user } = useSession();
-
-    const fetchAnnouncements = useCallback(async () => {
+    const fetchTasks = useCallback(async () => {
         try {
             setError(null);
             setLoading(true);
 
-            const params: Partial<GetAnnouncement> = {
-                role_id: roleFilter as number,
+            const params: Partial<GetTask> = {
+                complete: activeFilter,
+                section_id: sectionFilter as number,
                 timestamp_sort: timestampFilter,
+                recurring: 0,
             };
-            const data = await getAnnouncement(params);
-            setAnnouncements(data);
+            const data = await getTask(params);
+            setTasks(data);
 
         } catch (error: any) {
-            setError('Failed to fetch announcements.');
-            console.log('Failed to fetch announcements', error.message);
+            setError('Failed to fetch tasks.');
+            console.log('Failed to fetch tasks', error.message);
         } finally {
             setLoading(false);
         }
-    }, [roleFilter, timestampFilter]);
+    }, [activeFilter, sectionFilter, timestampFilter]);
 
-    // Fetch announcements on initialization and state update
+    // Fetch tasks on initialization and state update
     useEffect(() => {
-        fetchAnnouncements();
-    }, [parentRefresh, localRefresh, fetchAnnouncements]);
+        fetchTasks();
+    }, [parentRefresh, localRefresh, fetchTasks]);
 
 
-    const handleDelete = async (announcementId: number) => {
+    const handleDelete = async (taskId: number) => {
         if (!user) return;
 
         // Confirmation Popup
-        const ok = await confirm("Confirm Deletion", "Are you sure you want to delete this announcement?");
+        const ok = await confirm("Confirm Deletion", "Are you sure you want to delete this task?");
         if (!ok) return;
 
         setLoading(true);
 
         try {
-            await deleteAnnouncement(announcementId);
+            await deleteTask(taskId);
             setLocalRefresh((prev) => prev + 1); // Trigger Refresh
         } catch (error: any) {
-            console.log("Error deleting announcement:" + error.message);
+            console.log("Error deleting task:" + error.message);
         } finally {
             setLoading(false);
         }
     }
 
-    const actionButtons = (announcement: Announcement) => {
+    const actionButtons = (task: Task) => {
         return (
             <View style={styles.buttonRow}>
-                {/* Ack Button */}
+                {/* Edit Button */}
                 <TouchableOpacity
-                    style={[styles.ackButton]}
-                    onPress={() => openAckModal(announcement.announcement_id)}
+                    style={[styles.editButton]}
+                    onPress={() => openEditModal(task)}
                     disabled={loading}
                 >
-                    <Ionicons name="eye" size={20} color={Colors.blue} />
+                    <Ionicons name="create-outline" size={20} color={Colors.blue} />
                 </TouchableOpacity>
 
                 {/* Delete Button */}
                 <TouchableOpacity
                     style={[GlobalStyles.deleteButton, styles.deleteButton]}
-                    onPress={() => handleDelete(announcement.announcement_id)}
+                    onPress={() => handleDelete(task.task_id)}
                     disabled={loading}
                 >
                     <Ionicons name="close-circle-outline" size={20} color={Colors.red} />
@@ -134,11 +142,11 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
         );
     };
 
-    const renderAnnouncement = (announcement: Announcement) => {
+    const renderTask = (task: Task) => {
         return (
-            <AnnouncementListItem announcement={announcement}>
-                {actionButtons(announcement)}
-            </AnnouncementListItem>
+            <TaskListItem task={task}>
+                {actionButtons(task)}
+            </TaskListItem>
         );
     };
 
@@ -148,11 +156,20 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-                <RoleDropdown
-                    selectedRole={roleFilter}
-                    onRoleSelect={(value) => setRoleFilter(value as number)}
+                <ModularDropdown
+                    data={activeDropdownOptions}
+                    onSelect={(value) => setActiveFilter(value as YesNoSortType)}
+                    selectedValue={activeFilter}
+                    usePlaceholder={false}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
+                    disabled={loading}
+                />
+
+                <SectionDropdown
+                    selectedSection={sectionFilter}
+                    onSectionSelect={(value) => setSectionFilter(value as number)}
                     usePlaceholder={true}
-                    placeholderText="All Roles"
+                    placeholderText="All Sections"
                     containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading}
                 />
@@ -167,25 +184,28 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
                 />
             </View>
 
-            {/* Announcement Feed */}
+            {/* Task Feed */}
             <ModularListView
-                data={announcements}
+                data={tasks}
                 loading={loading}
                 error={error}
-                emptyText="No announcements available."
-                renderItem={renderAnnouncement}
-                keyExtractor={(item) => item.announcement_id}
+                emptyText="No tasks found."
+                //itemContainerStyle={{ backgroundColor: "white" }}
+                renderItem={renderTask}
+                keyExtractor={(item) => item.task_id}
             />
 
 
-            {/* Acknowledgement Modal */}
-            {selectedAnnouncementId && ackModalVisible && (
-                <AckModal
-                    announcement_id={selectedAnnouncementId}
-                    modalVisible={ackModalVisible}
-                    onClose={closeAckModal}
+            {/* Edit Task Modal */}
+            {selectedTask && (
+                <EditTask
+                    task={selectedTask as Task}
+                    visible={editModalVisible}
+                    onClose={closeEditModal}
+                    onUpdate={() => setLocalRefresh(prev => prev + 1)}
                 />
             )}
+
 
         </Card>
 
@@ -214,7 +234,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderRed,
         borderWidth: 1,
     },
-    ackButton: {
+    editButton: {
         flexShrink: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -225,4 +245,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AdminAnnouncements;
+export default AdminTasks;

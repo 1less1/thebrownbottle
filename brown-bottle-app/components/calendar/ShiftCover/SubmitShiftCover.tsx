@@ -85,7 +85,7 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
             resetForm();
             onClose();
         } catch (error: any) {
-            alert("Failed to submit request: " + error.message);
+            alert("Failed to submit shift cover request: " + error.message);
         } finally {
             setLoading(false);
         }

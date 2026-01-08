@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-    View, Text, TextInput, StyleSheet, ScrollView, 
+    View, Text, TextInput, StyleSheet, ScrollView,
     TouchableOpacity, useWindowDimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,15 +31,19 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
 
     const buttonHeight = HEIGHT * 0.15;
 
+    const { user } = useSession();
+    const { confirm } = useConfirm();
+
+    const [loading, setLoading] = useState(false);
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedRole, setSelectedRole] = useState<number | null>(1);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
 
-    const MAX_CHARS = 500;
+    const TITLE_MAX_CHARS = 150;
+    const DESC_MAX_CHARS = 350;
 
-    const { confirm } = useConfirm();
-    const { user } = useSession();
 
     const toggleModal = () => setModalVisible(prev => !prev);
 
@@ -49,23 +53,26 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
         setSelectedRole(1);
     };
 
+    const handleClose = () => {
+        resetForm();
+        toggleModal();
+    };
+
+    // Form Validation
+    const isValidForm =
+        title.trim().length > 0 &&
+        description.trim().length > 0 &&
+        selectedRole !== null;
+
     const handlePost = async () => {
-        if (!user) return;
+        if (!user || !selectedRole) return;
 
-        if (!title.trim() || !description.trim() || selectedRole === null) {
-            alert("Please fill in both Title and Description!");
-            return;
-        }
-
-        // Confirmation Popup
-        const ok = await confirm(
-            "Confirm Announcement",
-            `Are you sure you want to post this announcement?`
-        );
-
+        // Confirmation
+        const ok = await confirm("Confirm Announcement", "Are you sure you want to post this announcement?");
         if (!ok) return;
 
         try {
+            setLoading(true);
 
             const payload: InsertAnnouncement = {
                 author_id: Number(user.employee_id),
@@ -84,12 +91,9 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
         } catch (error: any) {
             console.error("Failed to post announcement:", error.message);
             alert("Failed to post announcement!");
+        } finally {
+            setLoading(false);
         }
-    };
-
-    const handleClose = () => {
-        resetForm();
-        toggleModal();
     };
 
     return (
@@ -115,22 +119,27 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
                         <TextInput
                             placeholder="Title"
                             value={title}
-                            onChangeText={setTitle}
-                            style={[GlobalStyles.input, { marginBottom: 15 }]}
+                            onChangeText={(text) => {
+                                if (text.length <= TITLE_MAX_CHARS) setTitle(text);
+                            }}
+                            style={[GlobalStyles.input, { marginBottom: 5 }]}
                         />
+                        <Text style={{ color: Colors.gray, marginBottom: 10 }}>
+                            {title.length}/{TITLE_MAX_CHARS}
+                        </Text>
 
                         <TextInput
                             placeholder="Description"
                             value={description}
                             onChangeText={(text) => {
-                                if (text.length <= MAX_CHARS) setDescription(text);
+                                if (text.length <= DESC_MAX_CHARS) setDescription(text);
                             }}
                             multiline
                             numberOfLines={4}
                             style={[GlobalStyles.input, { marginBottom: 5 }]}
                         />
                         <Text style={{ color: Colors.gray, marginBottom: 10 }}>
-                            {description.length}/{MAX_CHARS}
+                            {description.length}/{DESC_MAX_CHARS}
                         </Text>
 
                         <View style={{ marginBottom: 15 }}>
@@ -152,6 +161,7 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
                         textStyle={{ color: 'white' }}
                         style={[GlobalStyles.submitButton, { flex: 1 }]}
                         onPress={handlePost}
+                        enabled={isValidForm && !loading}
                     />
 
                     <ModularButton

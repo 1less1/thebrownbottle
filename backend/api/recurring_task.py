@@ -32,6 +32,7 @@ def get_recurring_tasks(db, request):
             'sun': int,
             'start_date': str,  # YYYY-MM-DD
             'end_date': str,    # YYYY-MM-DD
+            'timestamp_sort': str, # "Newest", "Oldest"
         }
 
         # Validate and parse parameters
@@ -54,6 +55,7 @@ def get_recurring_tasks(db, request):
 
         start_date = params.get('start_date')
         end_date = params.get('end_date')
+        timestamp_sort = params.get('timestamp_sort')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -62,6 +64,7 @@ def get_recurring_tasks(db, request):
         query = """
             SELECT 
                 r.recurring_task_id,
+                r.type,
                 r.title,
                 r.description,
                 r.author_id,
@@ -134,8 +137,22 @@ def get_recurring_tasks(db, request):
             query += " AND r.end_date = %s"
             query_params.append(end_date)
 
-        # Last Query Line
-        query += " ORDER BY r.start_date ASC;"
+        # -----------------------------
+        # Time Sorting Logic
+        # -----------------------------
+        order_clauses = []
+        
+        # TIMESTAMP SORTING
+        if timestamp_sort == "Newest":
+            order_clauses.append("r.timestamp DESC")
+        elif timestamp_sort == "Oldest":
+            order_clauses.append("r.timestamp ASC")
+
+        # Default fallback
+        if not order_clauses:
+            order_clauses.append("r.timestamp DESC")
+
+        query += " ORDER BY " + ", ".join(order_clauses)
 
         # Execute Query
         cursor.execute(query, tuple(query_params))
@@ -294,7 +311,7 @@ def update_recurring_task(db, request, recurring_task_id):
 
             # Dates
             'start_date': str,  # YYYY-MM-DD
-            'end_date': str,    # YYYY-MM-DD or null
+            'end_date': str, # YYYY-MM-DD or NULL
         }
 
         # Validate the fields in JSON body (all optional)

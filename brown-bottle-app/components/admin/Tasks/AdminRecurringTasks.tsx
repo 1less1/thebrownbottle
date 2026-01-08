@@ -7,20 +7,25 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from '@/components/modular/Card';
-import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+import SectionDropdown from '@/components/modular/dropdown/SectionDropdown';
 
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import ModularListView from "@/components/modular/ModularListView";
-import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
+import RecurringTaskistItem from '@/components/admin/Tasks/Templates/RecurringTaskListItem';
 
-import AckModal from '@/components/admin/Announcements/AckModal';
+import EditTask from '@/components/admin/Tasks/EditTask';
 
-import { getAnnouncement, deleteAnnouncement } from '@/routes/announcement';
-import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
+import { getRecurringTask, deleteRecurringTask } from '@/routes/recurring_task';
+import { RecurringTask, GetRecurringTask } from '@/types/iRecurringTask';
 
 import { useConfirm } from '@/hooks/useConfirm';
 import { useSession } from "@/utils/SessionContext";
-import { DropdownOption, DateSortType } from "@/types/iDropdown";
+import { DropdownOption, DateSortType, YesNoSortType } from "@/types/iDropdown";
+
+const activeDropdownOptions: DropdownOption<number>[] = [
+    { key: "Active", value: 0 },
+    { key: "Completed", value: 1 }
+]
 
 const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Newest Date", value: "Newest" },
@@ -32,113 +37,116 @@ interface Props {
     onRefreshDone?: () => void;
 }
 
-const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+const AdminRecurringTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? HEIGHT * 0.50 : HEIGHT * 0.55;
+    const cardHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.53;
+
+    const { user } = useSession();
+    const { confirm } = useConfirm();
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null)
 
-    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-    const [selectedAnnouncementId, setSelectedAnnounceId] = useState<number | null>(null);
+    const [recurringTasks, setRecurringTasks] = useState<RecurringTask[]>([]);
+    const [selectedTask, setSelectedTask] = useState<RecurringTask | null>(null);
 
-    const [ackModalVisible, setAckModalVisible] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
 
-    const [roleFilter, setRoleFilter] = useState<number | null>(null);
+    const [sectionFilter, setSectionFilter] = useState<number | null>(null);
     const [timestampFilter, setTimestampFilter] = useState<DateSortType>("Newest");
 
-    const openAckModal = (announcement_id: number) => {
-        setSelectedAnnounceId(announcement_id);
-        setAckModalVisible(true);
+    const openEditModal = (recurringTask: RecurringTask) => {
+        setSelectedTask(recurringTask);
+        setEditModalVisible(true);
     };
 
-    const closeAckModal = () => {
-        setAckModalVisible(false);
-        setSelectedAnnounceId(null);
+    const closeEditModal = () => {
+        setEditModalVisible(false);
+        setSelectedTask(null);
     };
 
-    const { confirm } = useConfirm();
-    const { user } = useSession();
-
-    const fetchAnnouncements = useCallback(async () => {
+    const fetchRecurringTasks = useCallback(async () => {
         try {
             setError(null);
             setLoading(true);
 
-            const params: Partial<GetAnnouncement> = {
-                role_id: roleFilter as number,
+            const params: Partial<GetRecurringTask> = {
+                section_id: sectionFilter as number,
                 timestamp_sort: timestampFilter,
             };
-            const data = await getAnnouncement(params);
-            setAnnouncements(data);
+            const data = await getRecurringTask(params);
+            setRecurringTasks(data);
 
         } catch (error: any) {
-            setError('Failed to fetch announcements.');
-            console.log('Failed to fetch announcements', error.message);
+            setError('Failed to fetch recurring tasks.');
+            console.log('Failed to fetch recurring tasks', error.message);
         } finally {
             setLoading(false);
         }
-    }, [roleFilter, timestampFilter]);
+    }, [sectionFilter, timestampFilter]);
 
-    // Fetch announcements on initialization and state update
+    // Fetch recurring tasks on initialization and state update
     useEffect(() => {
-        fetchAnnouncements();
-    }, [parentRefresh, localRefresh, fetchAnnouncements]);
+        fetchRecurringTasks();
+    }, [parentRefresh, localRefresh, fetchRecurringTasks]);
 
 
-    const handleDelete = async (announcementId: number) => {
+    const handleDelete = async (recurringTaskId: number) => {
         if (!user) return;
 
         // Confirmation Popup
-        const ok = await confirm("Confirm Deletion", "Are you sure you want to delete this announcement?");
+        const ok = await confirm("Confirm Deletion", "Are you sure you want to delete this recurring task?");
         if (!ok) return;
 
         setLoading(true);
 
         try {
-            await deleteAnnouncement(announcementId);
+            await deleteRecurringTask(recurringTaskId);
             setLocalRefresh((prev) => prev + 1); // Trigger Refresh
         } catch (error: any) {
-            console.log("Error deleting announcement:" + error.message);
+            console.log("Error deleting recurring task:" + error.message);
         } finally {
             setLoading(false);
         }
     }
 
-    const actionButtons = (announcement: Announcement) => {
+    const actionButtons = (recurringTask: RecurringTask) => {
         return (
             <View style={styles.buttonRow}>
-                {/* Ack Button */}
+                {/* Edit Button */}
                 <TouchableOpacity
-                    style={[styles.ackButton]}
-                    onPress={() => openAckModal(announcement.announcement_id)}
+                    style={[styles.editButton]}
+                    onPress={() => openEditModal(recurringTask)}
                     disabled={loading}
                 >
-                    <Ionicons name="eye" size={20} color={Colors.blue} />
+                    <Ionicons name="create-outline" size={20} color={Colors.blue} />
                 </TouchableOpacity>
 
                 {/* Delete Button */}
                 <TouchableOpacity
                     style={[GlobalStyles.deleteButton, styles.deleteButton]}
-                    onPress={() => handleDelete(announcement.announcement_id)}
+                    onPress={() => handleDelete(recurringTask.recurring_task_id)}
                     disabled={loading}
                 >
                     <Ionicons name="close-circle-outline" size={20} color={Colors.red} />
                 </TouchableOpacity>
+
             </View>
         );
     };
 
-    const renderAnnouncement = (announcement: Announcement) => {
+    const renderTask = (recurringTask: RecurringTask) => {
         return (
-            <AnnouncementListItem announcement={announcement}>
-                {actionButtons(announcement)}
-            </AnnouncementListItem>
+            <RecurringTaskistItem
+                recurringTask={recurringTask}
+            >
+                {actionButtons(recurringTask)}
+            </RecurringTaskistItem>
         );
     };
 
@@ -148,13 +156,12 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-                <RoleDropdown
-                    selectedRole={roleFilter}
-                    onRoleSelect={(value) => setRoleFilter(value as number)}
+                <SectionDropdown
+                    selectedSection={sectionFilter}
+                    onSectionSelect={(value) => setSectionFilter(value as number)}
                     usePlaceholder={true}
-                    placeholderText="All Roles"
+                    placeholderText="All Sections"
                     containerStyle={GlobalStyles.dropdownButtonWrapper}
-                    disabled={loading}
                 />
 
                 <ModularDropdown
@@ -163,29 +170,31 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
                     selectedValue={timestampFilter}
                     usePlaceholder={false}
                     containerStyle={GlobalStyles.dropdownButtonWrapper}
-                    disabled={loading}
                 />
             </View>
 
-            {/* Announcement Feed */}
+            {/* Task Feed */}
             <ModularListView
-                data={announcements}
+                data={recurringTasks}
                 loading={loading}
                 error={error}
-                emptyText="No announcements available."
-                renderItem={renderAnnouncement}
-                keyExtractor={(item) => item.announcement_id}
+                emptyText="No recurring tasks found."
+                //itemContainerStyle={{ backgroundColor: "white" }}
+                renderItem={renderTask}
+                keyExtractor={(item) => item.recurring_task_id}
             />
 
 
-            {/* Acknowledgement Modal */}
-            {selectedAnnouncementId && ackModalVisible && (
-                <AckModal
-                    announcement_id={selectedAnnouncementId}
-                    modalVisible={ackModalVisible}
-                    onClose={closeAckModal}
+            {/* Edit Task Modal */}
+            {selectedTask && (
+                <EditTask
+                    task={selectedTask as RecurringTask}
+                    visible={editModalVisible}
+                    onClose={closeEditModal}
+                    onUpdate={() => setLocalRefresh(prev => prev + 1)}
                 />
             )}
+
 
         </Card>
 
@@ -214,7 +223,7 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderRed,
         borderWidth: 1,
     },
-    ackButton: {
+    editButton: {
         flexShrink: 1,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -225,4 +234,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AdminAnnouncements;
+export default AdminRecurringTasks;

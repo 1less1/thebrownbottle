@@ -6,8 +6,8 @@ import { Colors } from "@/constants/Colors";
 
 import ModularListView from "@/components/modular/ModularListView";
 
-import TaskListItem from "@/components/tasks/Templates/TaskListItem";
-import TaskInfoModal from "@/components/tasks/TaskActionModal";
+import TaskListItem from '@/components/admin/Tasks/Templates/TaskListItem';
+import TaskActionModal from "@/components/tasks/TaskActionModal";
 
 import { Shift, GetShift } from "@/types/iShift";
 import { getShift } from "@/routes/shift";
@@ -24,6 +24,8 @@ interface CompletedTasksProps {
 }
 
 const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, onRefreshDone }) => {
+    if (!user) return;
+
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -124,7 +126,7 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
         if (sectionId) {
             fetchCompletedTasks();
         }
-    }, [sectionId, localRefresh]);
+    }, [sectionId, localRefresh, parentRefresh]);
 
 
     if (hasShiftToday === false) {
@@ -165,18 +167,19 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
                 renderItem={renderTask}
                 keyExtractor={(item) => String(item.task_id)}
                 onItemPress={(item) => handlePress(item)}
-                refreshing={loading}
-                onRefresh={fetchCompletedTasks}
                 itemContainerStyle={styles.taskContainer}
             />
 
-            <TaskInfoModal
-                task={selectedTask}
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSubmit={handleUndo}
-                actionLabel="Mark as Incomplete"
-            />
+            {selectedTask &&
+                <TaskActionModal
+                    task={selectedTask}
+                    mode={"completed"}
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onSubmit={handleUndo}
+                    loading={loading}
+                />
+            }
         </View>
     );
 };

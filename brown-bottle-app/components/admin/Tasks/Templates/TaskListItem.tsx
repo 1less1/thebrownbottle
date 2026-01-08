@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
+import Badge from '@/components/modular/Badge';
+
+import { Task } from '@/types/iTask';
 import { formatDateTime, formatDate } from '@/utils/dateTimeHelpers';
 
-import Badge from '@/components/modular/Badge';
-import { Task } from '@/types/iTask'
-
 interface Props {
-    task: Task | null;
+    task: Task;
+    children?: React.ReactNode
 }
 
-// Reusable Shift Cover List Item Details
-const TaskListItem: React.FC<Props> = ({ task }) => {
-
-    if (!task) return null;
+// Reusable Task List Item
+const TaskListItem: React.FC<Props> = ({ task, children }) => {
 
     return (
 
@@ -28,14 +27,21 @@ const TaskListItem: React.FC<Props> = ({ task }) => {
                 <View style={styles.topRow}>
                     <View style={styles.topLeftText}>
                         {/* Task Title */}
-                        <Text style={GlobalStyles.headerText}>{task.title}</Text>
+                        <Text
+                            style={GlobalStyles.headerText}
+                            numberOfLines={1}           // Limit to one line
+                            ellipsizeMode="tail"        // Show ellipses at the end
+                        >
+                            {task.title}</Text>
                     </View>
 
+                    {/* No need for badge anymore 
                     {task.recurring_task_id !== null && (
                         <View style={styles.badgeWrapper}>
                             <Badge text={"Recurring"} />
                         </View>
                     )}
+                    */}
 
                 </View>
 
@@ -43,16 +49,23 @@ const TaskListItem: React.FC<Props> = ({ task }) => {
                 <>
                     {/* Task Details */}
                     <View style={styles.row}>
-                        <Text style={GlobalStyles.text}>Due: </Text>
-                        <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>{formatDate(task.due_date)}</Text>
+                        <Text style={GlobalStyles.text}>
+                            Due:{" "}
+                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                                {formatDate(task.due_date).replace(/ /g, '\u00A0')}
+                            </Text>
+                        </Text>
                     </View>
 
                     {/* Timestamp */}
                     <View style={[styles.row, { marginTop: 2 }]}>
                         <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
-                            Posted on {formatDateTime(task.timestamp)} by {task.author}
+                            Posted {formatDateTime(task.timestamp)} by {task.author}
                         </Text>
                     </View>
+
+                    {/* Optional List Item Content - Mainly used for buttons! */}
+                    {children}
                 </>
 
             </View>
@@ -69,6 +82,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "flex-start",
     },
+
+    // Content
     topRow: {
         flexDirection: "row",
         justifyContent: "space-between",

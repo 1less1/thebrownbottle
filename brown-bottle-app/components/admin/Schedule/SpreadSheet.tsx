@@ -279,7 +279,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       </View>
 
-      {/* Search Container */}
+      {/* Search/Filter Container */}
       <View style={styles.searchContainer}>
 
         <TextInput
@@ -311,17 +311,19 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           <Ionicons name="calendar-number-outline" size={20} color={Colors.black} />
         </ModularButton>
 
-
-        <ModularButton
-          onPress={() => exportToCSV(scheduleData, weekDays)}
-          onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
-          style={{ backgroundColor: Colors.bgGreen }}
-          text=""
-          textStyle={{ marginRight: 4 }}
-          enabled={!loading}
-        >
-          <Ionicons name="download-outline" size={20} color={Colors.black} />
-        </ModularButton>
+        {/* Export to CSV only shown on web! */}
+        {Platform.OS === 'web' && (
+          <ModularButton
+            onPress={() => exportToCSV(scheduleData, weekDays)}
+            onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
+            style={{ backgroundColor: Colors.bgGreen }}
+            text=""
+            textStyle={{ marginRight: 4 }}
+            enabled={!loading}
+          >
+            <Ionicons name="download-outline" size={20} color={Colors.black} />
+          </ModularButton>
+        )}
 
       </View>
 
@@ -331,20 +333,32 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         <RoleCheckbox
           selectedRoles={selectedRoles}
           onRoleSelect={(keys, values) => {
-            setSelectedRoles(values.map((value, index) => ({
+            const tempRoles = values.map((value, index) => ({
               key: keys[index],
               value: value,
-            })));
+            }));
+            // Check if lengths match and every ID is the same
+            const isSame = tempRoles.length === selectedRoles.length &&
+              tempRoles.every((val, index) => val.value === selectedRoles[index]?.value);
+            // Exit if nothing actually changed
+            if (isSame) return;
+            setSelectedRoles(tempRoles);
           }}
           containerStyle={styles.dropdownButton}
         />
         <SectionCheckbox
           selectedSections={selectedSections}
           onSectionSelect={(keys, values) => {
-            setSelectedSections(values.map((value, index) => ({
+            const tempSections = values.map((value, index) => ({
               key: keys[index],
               value: value,
-            })));
+            }));
+            // Check if lengths match and every ID is the same
+            const isSame = tempSections.length === selectedSections.length &&
+              tempSections.every((val, index) => val.value === selectedSections[index]?.value);
+            // Exit if nothing actually changed
+            if (isSame) return;
+            setSelectedSections(tempSections);
           }}
           containerStyle={styles.dropdownButton}
         />

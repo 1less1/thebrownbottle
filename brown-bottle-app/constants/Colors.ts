@@ -39,6 +39,7 @@ export const Colors = {
 
   green: '#28a745',
   acceptGreen: '#28a745',
+  borderGreen: '#28a745',
   bgGreen: '#d4edda',
 
   yellow: '#ff9800',

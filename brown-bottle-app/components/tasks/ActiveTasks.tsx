@@ -6,8 +6,8 @@ import { Colors } from "@/constants/Colors";
 
 import ModularListView from "@/components/modular/ModularListView";
 
-import TaskListItem from "@/components/tasks/Templates/TaskListItem";
-import TaskDetailsModal from "./TaskActionModal";
+import TaskListItem from '@/components/admin/Tasks/Templates/TaskListItem';
+import TaskActionModal from "@/components/tasks/TaskActionModal";
 
 import { Shift, GetShift } from "@/types/iShift";
 import { getShift } from "@/routes/shift";
@@ -24,6 +24,8 @@ interface ActiveTasksProps {
 }
 
 const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefreshDone }) => {
+    if (!user) return;
+
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -42,14 +44,11 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
 
     // List View Scaling
     const isMobile = WIDTH < 768;
-    const listHeight = isMobile ? height * 0.35 : height * 0.45;
-
-    // Default heights
-    const baseActiveHeight = isMobile ? height * 0.35 : height * 0.45;
-    const expandedActiveHeight = isMobile ? height * 0.6 : height * 0.6; // 60% of screen height
+    const listHeight = isMobile ? height * 0.25 : height * 0.28;
 
     // Decide height based on overdueTasks
-    const activeListHeight = overdueTasks.length > 0 ? baseActiveHeight : expandedActiveHeight;
+    const expandedActiveHeight = isMobile ? height * 0.6 : height * 0.6; // 60% of screen height
+    const activeListHeight = overdueTasks.length > 0 ? listHeight : expandedActiveHeight;
 
 
     // Check if user has a shift today...
@@ -163,7 +162,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
             fetchActiveTasks();
             fetchOverdueTasks();
         }
-    }, [sectionId, localRefresh]);
+    }, [sectionId, localRefresh, parentRefresh]);
 
 
     if (hasShiftToday === false) {
@@ -207,8 +206,6 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
                 renderItem={renderTask}
                 keyExtractor={(item) => String(item.task_id)}
                 onItemPress={(item) => handlePress(item)}
-                refreshing={loading}
-                onRefresh={fetchActiveTasks}
                 itemContainerStyle={styles.taskContainer}
             />
 
@@ -230,21 +227,22 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
                         keyExtractor={(item) => String(item.task_id)}
                         onItemPress={(item) => handlePress(item)}
                         refreshing={loading}
-                        onRefresh={fetchOverdueTasks}
+                        //onRefresh={fetchOverdueTasks}
                         itemContainerStyle={styles.taskContainer}
                     />
                 </View>
             )}
 
-
-            <TaskDetailsModal
-                task={selectedTask}
-                visible={modalVisible}
-                onClose={() => setModalVisible(false)}
-                onSubmit={handleComplete}
-                actionLabel="Mark as Complete"
-            />
-
+            {selectedTask &&
+                <TaskActionModal
+                    task={selectedTask}
+                    mode={"active"}
+                    visible={modalVisible}
+                    onClose={() => setModalVisible(false)}
+                    onSubmit={handleComplete}
+                    loading={loading}
+                />
+            }
         </View>
 
     );

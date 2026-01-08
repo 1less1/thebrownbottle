@@ -18,6 +18,8 @@ import TimeOff from '@/components/admin/TimeOff/TimeOff';
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
 
+import LoadingCircle from '@/components/modular/LoadingCircle';
+
 import { Tab } from '@/components/admin/AdminDrawer';
 
 import { useSession } from '@/utils/SessionContext';
@@ -33,6 +35,7 @@ const Admin = () => {
   );
 
   const { user } = useSession();
+  const [loading, setLoading] = useState<boolean>(true); // Start as true
 
   const [activeTab, setActiveTab] = useState(0);
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
@@ -59,6 +62,7 @@ const Admin = () => {
   // Load Saved Tab If it Exists
   useEffect(() => {
     const loadSavedTab = async () => {
+      setLoading(true);
       try {
         const savedTabIndex = await AsyncStorage.getItem(TAB_STORAGE_KEY);
         const tabIndex = Number(savedTabIndex);
@@ -67,6 +71,8 @@ const Admin = () => {
         }
       } catch (error) {
         console.warn('Failed to load saved tab index:', error);
+      } finally {
+        setLoading(false);
       }
     };
     loadSavedTab();
@@ -92,9 +98,16 @@ const Admin = () => {
         </View>
 
         {/* Tab Content */}
-        <View style={styles.tabContent}>
-          {tabs[activeTab]?.component}
-        </View>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <LoadingCircle size="large" />
+          </View>
+        ) : (
+          <View style={styles.tabContent}>
+            {tabs[activeTab]?.component}
+          </View>
+        )}
+
       </View>
 
       <AdminDrawer
@@ -121,6 +134,11 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -14,12 +14,10 @@ import { formatDateTime } from '@/utils/dateTimeHelpers';
 
 interface Props {
     announcement: Announcement;
-    handleDelete: (announcement_id: number) => void;
-    handleViewAcks: () => void;
-    loading: boolean;
+    children?: React.ReactNode
 }
 
-const AnnouncementListItem: React.FC<Props> = ({ announcement, handleDelete, handleViewAcks, loading }) => {
+const AnnouncementListItem: React.FC<Props> = ({ announcement, children }) => {
 
     return (
 
@@ -34,6 +32,7 @@ const AnnouncementListItem: React.FC<Props> = ({ announcement, handleDelete, han
                         <Text style={GlobalStyles.headerText}>{announcement.title}</Text>
                     </View>
 
+                    {/* Role Badge */}
                     <View style={styles.badgeWrapper}>
                         <Badge text={announcement.role_name} />
                     </View>
@@ -47,32 +46,15 @@ const AnnouncementListItem: React.FC<Props> = ({ announcement, handleDelete, han
                     {/* Author */}
                     <Text style={GlobalStyles.semiBoldSmallAltText}>- {announcement.author}</Text>
 
+                    {/* Timestamp */}
                     <View style={{ marginTop: 2 }}>
                         <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
                             Posted on {formatDateTime(announcement.timestamp)}
                         </Text>
                     </View>
 
-                    <View style={styles.buttonRow}>
-                        {/* Ack Button */}
-                        <TouchableOpacity
-                            style={[styles.ackButton]}
-                            onPress={handleViewAcks}
-                            disabled={loading}
-                        >
-                            <Ionicons name="eye" size={20} color={Colors.blue} />
-                        </TouchableOpacity>
-
-                        {/* Delete Button */}
-                        <TouchableOpacity
-                            style={[GlobalStyles.deleteButton, styles.deleteButton]}
-                            onPress={() => handleDelete(announcement.announcement_id)}
-                            disabled={loading}
-                        >
-                            <Ionicons name="close-circle-outline" size={20} color={Colors.red} />
-                        </TouchableOpacity>
-
-                    </View>
+                    {/* Optional List Item Content - Mainly used for buttons! */}
+                    {children}
                 </>
 
             </View>
@@ -88,6 +70,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "flex-start",
     },
+    
+    // Content
     topRow: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -109,28 +93,6 @@ const styles = StyleSheet.create({
         color: Colors.buttonBlue,
         fontWeight: '600',
         fontSize: 13,
-    },
-
-    // Buttons
-    buttonRow: {
-        flexDirection: "row",
-        justifyContent: "flex-end",   // pushes both buttons to the right
-        alignItems: "center",
-        gap: 10,
-    },
-    deleteButton: {
-        flexShrink: 1,
-        borderColor: Colors.borderRed,
-        borderWidth: 1,
-    },
-    ackButton: {
-        flexShrink: 1,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 5,
-        backgroundColor: Colors.bgBlue,
-        borderColor: Colors.borderBlue,
-        borderWidth: 1,
     },
 });
 

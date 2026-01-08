@@ -9,7 +9,7 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularListView from "@/components/modular/ModularListView";
-import AnnouncementListItem from '@/components/home/Templates/AnnouncementListItem';
+import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
 import AnnouncementSkeleton from '@/components/ui/skeleton/home/AnnouncementSkeleton';
 
 import { getAnnouncement, getAcknowledgedAnnouncements, acknowledgeAnnouncement } from '@/routes/announcement';
@@ -30,15 +30,15 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const isMobile = WIDTH < 768;
   const listHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.6;
 
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useSession();
+
+  const [loading, setLoading] = useState(true); // Used for deliberate user fetches
+  const [refreshing, setRefreshing] = useState(false); // Used for background fetches
   const [error, setError] = useState<string | null>(null);
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [acknowledged, setAcknowledged] = useState<number[]>([]);
   const [roleFilter, setRoleFilter] = useState<number | null>(null);
-
-  const { user } = useSession();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
@@ -101,12 +101,31 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     }
   };
 
+  const actionButton = (announcement: Announcement, isAcknowledged: boolean) => {
+    return (
+      <View style={styles.buttonRow}>
+        {isAcknowledged ? (
+          <Text style={[GlobalStyles.semiBoldText, styles.acknowledged]}>Acknowledged</Text>
+        ) : (
+          <TouchableOpacity
+            onPress={() => handleAcknowledge(announcement.announcement_id)}
+            style={styles.ackButton}
+          >
+            <Text style={[GlobalStyles.semiBoldText, { color: "white" }]}>Acknowledge</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
+
   const renderAnnouncement = (announcement: Announcement) => {
     //  use local `acknowledged` state so UI updates immediately
     const isAcknowledged = acknowledged.includes(announcement.announcement_id);
 
     return (
-      <AnnouncementListItem announcement={announcement} isAcknowledged={isAcknowledged} handleAcknowledge={handleAcknowledge} />
+      <AnnouncementListItem announcement={announcement}>
+        {actionButton(announcement, isAcknowledged)}
+      </AnnouncementListItem>
     );
   };
 
@@ -119,7 +138,7 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="notifications" size={22} color="black" style={styles.icon} />
+            <Ionicons name="notifications" size={20} color="black" style={styles.icon} />
             <Text style={GlobalStyles.floatingHeaderText}>Announcements</Text>
           </View>
 
@@ -147,8 +166,7 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
               emptyText="No announcements available."
               listHeight={375}
               renderItem={renderAnnouncement}
-              keyExtractor={(item) => item.announcement_id.toString()}
-              onRefresh={fetchAnnouncements}
+              keyExtractor={(item) => item.announcement_id}
               refreshing={loading}
             />
           )}
@@ -162,6 +180,7 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 };
 
 const styles = StyleSheet.create({
+  // Content
   container: {
     width: '100%',
     alignItems: 'center',
@@ -179,7 +198,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  ackBtn: {
+
+  // Buttons
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",   // pushes both buttons to the right
+    alignItems: "center",
+    marginTop: 5,
+    gap: 10,
+  },
+  ackButton: {
     marginTop: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
@@ -194,11 +222,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: Colors.ackknowledgedBG,
     borderRadius: 6,
-    fontWeight: "500"
-  },
-  ackBtnText: {
-    color: Colors.white,
-    fontWeight: "bold",
   },
   icon: {
     marginRight: 3,

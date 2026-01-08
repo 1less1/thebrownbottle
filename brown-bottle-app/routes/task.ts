@@ -5,7 +5,8 @@ import {
   Task,
   GetTask,
   InsertTask,
-  UpdateTask
+  UpdateTask,
+  ConvertTask
 } from "@/types/iTask";
 
 
@@ -131,4 +132,65 @@ export async function deleteTask(task_id: number) {
     throw error;
   }
 
+}
+
+// POST: Converts Normal Task -> Recurring or Recurring -> Normal
+export async function convertTask(fields: ConvertTask) {
+  const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  const url = `${API_BASE_URL}/task/convert`;
+
+  // Base required fields for both directions
+  const baseRequired: (keyof ConvertTask)[] = [
+    "direction",
+    "title",
+    "description",
+    "author_id",
+    "section_id",
+  ];
+
+  try {
+    // 1. Validate Base Fields
+    for (const key of baseRequired) {
+      if (fields[key] === undefined || fields[key] === null) {
+        throw new Error(`[Convert Task API] Missing base required field: ${key}`);
+      }
+    }
+
+    // 2. Validate Direction-Specific Requirements
+    if (fields.direction === "to_recurring") {
+      if (!fields.task_id) {
+        throw new Error("[Convert Task API] task_id is required for conversion to recurring.");
+      }
+      if (!fields.start_date) {
+        throw new Error("[Convert Task API] start_date is required for recurring tasks.");
+      }
+    }
+
+    if (fields.direction === "to_normal") {
+      if (!fields.recurring_task_id) {
+        throw new Error("[Convert Task API] recurring_task_id is required for conversion to normal.");
+      }
+      if (!fields.due_date) {
+        throw new Error("[Convert Task API] due_date is required for normal tasks.");
+      }
+    }
+
+    // 3. Execute Request
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`[Task API] Conversion Failed: ${errorData.message || response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to convert task:", error);
+    throw error;
+  }
 }

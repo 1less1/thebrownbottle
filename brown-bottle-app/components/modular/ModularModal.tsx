@@ -10,41 +10,41 @@ interface ModularModalProps {
 }
 
 const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children, scroll = true }) => {
-
   return (
-
-    <Modal
-      visible={visible}
-      animationType="none"
-      transparent
-      onRequestClose={onClose}
-    >
-
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      
+      {/* 1. Main centering container */}
       <View style={styles.overlay}>
+        
+        {/* 2. Dismiss background */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.background} />
         </TouchableWithoutFeedback>
 
-        <KeyboardAvoidingView
+        {/* 3. The Modal Card */}
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          // keyboardVerticalOffset helps fine-tune the gap between keyboard and input
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
           style={styles.modalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           {scroll ? (
-            <ScrollView contentContainerStyle={styles.scrollView}>
+            <ScrollView 
+              style={{ flexShrink: 1 }}
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+            >
               {children}
             </ScrollView>
           ) : (
-            <View style={styles.scrollView}>
+            <View style={styles.scrollContent}>
               {children}
             </View>
           )}
         </KeyboardAvoidingView>
       </View>
-
     </Modal>
-
   );
-
 };
 
 const styles = StyleSheet.create({
@@ -57,15 +57,14 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: '85%',
     backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
+    borderRadius: 15,
+    maxHeight: '80%',
     elevation: 5,
-    maxHeight: '90%',
-  },
-  scrollView: {
-    flex: 1,
-    paddingBottom: 10,
     overflow: 'hidden',
+  },
+  scrollContent: {
+    padding: 20,
+    flexGrow: 0, // Modal content defines height
   },
   background: {
     ...StyleSheet.absoluteFillObject,

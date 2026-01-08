@@ -31,7 +31,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const MAX_CHARS = 450;
+  const MAX_CHARS = 400;
 
   const dateDisplay = (() => {
     if (!startDate) return "";
@@ -83,7 +83,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       resetForm();
       onClose();
     } catch (error: any) {
-      alert("Failed to submit request: " + error.message);
+      alert("Failed to submit time off request: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -114,12 +114,31 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
         />
       </View>
 
-      {/* Selected Dates Display */}
+      {/* Selected Range Display */}
       <View style={{ flexDirection: "row", gap: 10, marginVertical: 15 }}>
         <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>Selected: </Text>
-          <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-            {dateDisplay}
+          <Text style={GlobalStyles.text}>
+            Selected:{" "}
+            <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
+              {/* No Start Date Selected */}
+              {!startDate && ""}
+
+              {/* Start and End are different (Range) */}
+              {startDate && startDate !== endDate && (
+                <>
+                  {formatDateWithYear(startDate).replace(/ /g, '\u00A0')}
+                  {" → "}
+                  {endDate
+                    ? formatDateWithYear(endDate).replace(/ /g, '\u00A0')
+                    : "..."}
+                </>
+              )}
+
+              {/* Start and End are the same (Single Day) */}
+              {startDate && startDate === endDate && (
+                formatDateWithYear(startDate).replace(/ /g, '\u00A0')
+              )}
+            </Text>
           </Text>
         </View>
       </View>

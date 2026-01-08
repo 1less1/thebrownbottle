@@ -71,7 +71,7 @@ const TORInfo: React.FC<ModalProps> = ({
             <View style={GlobalStyles.buttonRowContainer}>
                 {request.status === "Pending" && (
                     <ModularButton
-                        text={loading ? "Removing..." : "Remove"}
+                        text={"Remove"}
                         style={[GlobalStyles.deleteButton, { flex: 1 }]}
                         onPress={handleDelete}
                         enabled={!loading}

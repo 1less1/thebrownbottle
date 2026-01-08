@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { 
-    ScrollView, 
-    FlatList, 
-    View, 
-    Text, 
-    StyleSheet, 
-    TouchableOpacity, 
-    ViewStyle 
+import {
+    ScrollView,
+    FlatList,
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    ViewStyle
 } from 'react-native';
 import { Colors } from '@/constants/Colors';
 
@@ -53,26 +53,31 @@ export default function ModularListView<T>({
     // Derived values for pagination
     const isPaginating = data.length > ITEMS_PER_PAGE;
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-    
+
     // Slice data to show only current page items
-    const paginatedData = isPaginating 
+    const paginatedData = isPaginating
         ? data.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE)
         : data;
 
     // Empty List Text
-    const ListEmpty = (
-        <View style={styles.singleRow}>
-            <Text style={GlobalStyles.text}>{emptyText}</Text>
-        </View>
-    );
+    const ListEmpty = () => {
+        // If we are currently fetching, don't show the empty text
+        if (loading) return null;
 
+        return (
+            <View style={styles.singleRow}>
+                <Text style={GlobalStyles.text}>{emptyText}</Text>
+            </View>
+        );
+    };
+    
     // Pagination
     const ListFooter = () => {
         if (!isPaginating) return null;
 
         return (
             <View style={styles.paginationRow}>
-                <TouchableOpacity 
+                <TouchableOpacity
                     disabled={currentPage === 0}
                     onPress={() => setCurrentPage(prev => prev - 1)}
                     style={styles.navButton}
@@ -81,12 +86,12 @@ export default function ModularListView<T>({
                         Previous
                     </Text>
                 </TouchableOpacity>
-                
+
                 <Text style={[GlobalStyles.text, { fontSize: 12 }]}>
                     Page {currentPage + 1} of {totalPages}
                 </Text>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                     disabled={currentPage >= totalPages - 1}
                     onPress={() => setCurrentPage(prev => prev + 1)}
                     style={styles.navButton}
@@ -188,8 +193,6 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         paddingHorizontal: 10,
         marginTop: 5,
-        //borderTopWidth: 1,
-        //borderTopColor: Colors.borderColor,
     },
     navButton: {
         padding: 8,

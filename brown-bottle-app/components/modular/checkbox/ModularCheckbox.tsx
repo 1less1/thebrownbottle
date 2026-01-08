@@ -194,15 +194,20 @@ const ModularCheckbox = <T extends string | number>({
                                         textStyle={{ color: "white" }}
                                         text="Confirm"
                                     />
+                                    
+                                    {/* Not Needed for now but functional!
                                     <ModularButton
                                         onPress={handleSelectAll}
                                         style={[
                                             { backgroundColor: Colors.buttonBlue },
                                             !isMobile && { flex: 1 }
                                         ]}
-                                        textStyle={{ color: "white" }}
-                                        text="Select All"
-                                    />
+                                        text=""
+                                        textStyle={{ marginRight: 4 }}
+                                    >
+                                        <Ionicons name="checkbox-outline" size={20} color={Colors.white} />
+                                    </ModularButton>
+                                    
                                     <ModularButton
                                         onPress={handleReset}
                                         style={!isMobile ? { flex: 1 } : {}}
@@ -211,6 +216,7 @@ const ModularCheckbox = <T extends string | number>({
                                     >
                                         <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
                                     </ModularButton>
+                                    */}
                                 </View>
 
                             </View>

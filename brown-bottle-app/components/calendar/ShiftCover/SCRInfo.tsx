@@ -104,14 +104,14 @@ const SCRInfo: React.FC<ModalProps> = ({
                 {!isLocked && (
                     isOwner ? (
                         <ModularButton
-                            text={loading ? "Removing..." : "Remove"}
+                            text={"Remove"}
                             style={[GlobalStyles.deleteButton, { flex: 1 }]}
                             onPress={handleDelete}
                             enabled={!loading}
                         />
                     ) : (
                         <ModularButton
-                            text={loading ? "Requesting..." : "Request Shift"}
+                            text={"Request Shift"}
                             textStyle={{ color: "white" }}
                             style={[GlobalStyles.submitButton, { flex: 1 }]}
                             onPress={handleSubmit}

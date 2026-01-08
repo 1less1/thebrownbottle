@@ -31,7 +31,7 @@ const Announcements = () => {
                 <NewAnnouncement onSubmit={handleRefresh} />
             </View>
 
-            <View style={{ marginVertical: 10, width: '90%' }}>
+            <View style={{ marginVertical: 16, width: '90%' }}>
                 <AdminAnnouncements parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
 

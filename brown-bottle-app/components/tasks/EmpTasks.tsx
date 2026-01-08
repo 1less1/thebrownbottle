@@ -12,6 +12,13 @@ import CompletedTasks from "@/components/tasks/CompletedTasks";
 import { Employee } from "@/types/iEmployee";
 
 import { useSession } from "@/utils/SessionContext";
+import DefaultScrollView from "../DefaultScrollView";
+
+interface Tab {
+    key: string;
+    title: string;
+    component: React.ReactNode;
+}
 
 export default function EmpTasks() {
     const { user } = useSession();
@@ -30,7 +37,7 @@ export default function EmpTasks() {
     };
 
     // Define tabs and corresponding components
-    const tabs = [
+    const tabs: Tab[] = [
         {
             key: "active",
             title: "To Do",
@@ -47,7 +54,7 @@ export default function EmpTasks() {
 
     return (
 
-        <View style={styles.container}>
+        <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh} scrollEnabled={false}>
 
             <View style={{ width: "85%" }}>
 
@@ -76,25 +83,17 @@ export default function EmpTasks() {
 
                 {/* Render Content */}
                 <View>
-                    {!isLoaded ? (
-                        <LoadingCircle size="large" style={{ marginTop: 40 }} />
-                    ) : (
-                        tabs[activeTab]?.component
-                    )}
+                    {tabs[activeTab]?.component}
                 </View>
 
             </View>
 
-        </View>
+        </DefaultScrollView>
 
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center"
-    },
     tabBar: {
         flexDirection: "row",
         alignSelf: "center",

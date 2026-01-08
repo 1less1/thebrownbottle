@@ -8,13 +8,12 @@ import { Task } from '@/types/iTask';
 import { formatDateTime, formatDate } from '@/utils/dateTimeHelpers';
 
 interface Props {
-    task: Task | null;
+    task: Task;
+    children?: React.ReactNode
 }
 
-// Reusable Shift Cover Modal Details
-const TaskModalContent: React.FC<Props> = ({ task }) => {
-
-    if (!task) return null;
+// Reusable Employee Task Modal Content
+const TaskModalContent: React.FC<Props> = ({ task, children }) => {
 
     return (
 
@@ -54,17 +53,20 @@ const TaskModalContent: React.FC<Props> = ({ task }) => {
                 </Text>
             </View>
 
-            {/* Timestamp */}
+            {/* Last Modified + Timestamp */}
             <View style={{ flexDirection: "column", marginTop: 2 }}>
-                {(task.last_modified_name || task.last_modified_at) && (
+                {(task.last_modified_name && task.last_modified_at) && (
                     <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
-                        Last modified on {formatDateTime(task.last_modified_at)} by {task.last_modified_name}
+                        Modified {formatDateTime(task.last_modified_at)} by {task.last_modified_name}
                     </Text>
                 )}
                 <Text style={[GlobalStyles.smallAltText, { color: Colors.gray }]}>
-                    Posted on {formatDateTime(task.timestamp)} by {task.author}
+                    Posted {formatDateTime(task.timestamp)} by {task.author}
                 </Text>
             </View>
+
+            {/* Optional Modal Content - Mainly used for buttons! */}
+            {children}
         </>
 
     );

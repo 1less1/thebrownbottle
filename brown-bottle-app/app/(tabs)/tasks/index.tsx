@@ -28,7 +28,8 @@ export default function TaskPage() {
         <View style={GlobalStyles.pageHeaderContainer}>
           <Text style={GlobalStyles.pageHeader}>Tasks</Text>
         </View>
-
+      
+      {/* Employee Tasks View */}
         <ScrollView style={{ flex: 1 }}>
           <EmpTasks/>
         </ScrollView>

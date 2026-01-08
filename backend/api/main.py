@@ -178,6 +178,15 @@ def delete_task(task_id):
     with request_lock:
         return task.delete_task(get_db_connection(), task_id)
 
+@app.route('/task/convert', methods=['POST'])
+def convert_task():
+    """
+    POST route to handle converting Normal Task -> Recurring or Recurring -> Normal.
+    Uses a transaction to ensure database integrity.
+    """
+    with request_lock:
+        return task.convert_task(get_db_connection(), request)
+
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
