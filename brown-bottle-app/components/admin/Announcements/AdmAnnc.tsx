@@ -8,7 +8,7 @@ import AdminAnnouncements from "@/components/admin/Announcements/AdmAnncFeed";
 
 import { useSession } from '@/utils/SessionContext';
 
-const Announcements = () => {
+const AdmAnnc = () => {
     const { user } = useSession();
 
     const [refreshing, setRefreshing] = useState(false);
@@ -41,4 +41,4 @@ const Announcements = () => {
 
 };
 
-export default Announcements;
+export default AdmAnnc;

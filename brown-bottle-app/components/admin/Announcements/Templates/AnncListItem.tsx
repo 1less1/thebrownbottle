@@ -17,7 +17,7 @@ interface Props {
     children?: React.ReactNode
 }
 
-const AnnouncementListItem: React.FC<Props> = ({ announcement, children }) => {
+const AnncListItem: React.FC<Props> = ({ announcement, children }) => {
 
     return (
 
@@ -96,4 +96,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AnnouncementListItem;
+export default AnncListItem;
