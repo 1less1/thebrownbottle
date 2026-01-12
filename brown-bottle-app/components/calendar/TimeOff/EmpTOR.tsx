@@ -3,16 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
-import { useSession } from '@/utils/SessionContext';
 
-import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
-import Card from '@/components/modular/Card';
+import EmpTORFeed from '@/components/calendar/TimeOff/EmpTORFeed';
 
-import EmpTimeOff from '@/components/calendar/TimeOff/EmpTimeOff';
-
-const TimeOff = () => {
-    const { user } = useSession();
+const EmpTOR = () => {
 
     const [refreshing, setRefreshing] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -31,7 +26,7 @@ const TimeOff = () => {
         <DefaultScrollView scrollEnabled={false} refreshing={refreshing} onRefresh={handleRefresh}>
 
             <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
-                <EmpTimeOff parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                <EmpTORFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
 
         </DefaultScrollView>
@@ -39,4 +34,4 @@ const TimeOff = () => {
     );
 };
 
-export default TimeOff;
+export default EmpTOR;

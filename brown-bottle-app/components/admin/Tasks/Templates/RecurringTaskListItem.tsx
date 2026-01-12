@@ -43,7 +43,7 @@ const RecurringTaskistItem: React.FC<Props> = ({ recurringTask, children }) => {
 
                 {/* Bottom Section (Free Flowing Text) */}
                 <>
-                    {/* Task Details */}
+                    {/* Task Start Date */}
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             Start Date:{" "}
@@ -53,6 +53,7 @@ const RecurringTaskistItem: React.FC<Props> = ({ recurringTask, children }) => {
                         </Text>
                     </View>
 
+                    {/* Task End Date */}
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             End Date:{" "}

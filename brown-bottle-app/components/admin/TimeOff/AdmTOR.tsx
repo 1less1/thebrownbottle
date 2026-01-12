@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View } from 'react-native';
-import { useSession } from '@/utils/SessionContext';
-import DefaultScrollView from '@/components/DefaultScrollView';
-import AdminTimeOff from "@/components/admin/TimeOff/AdminTimeOff";
 
-const TimeOff = () => {
-  const { user } = useSession();
+import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
+import DefaultScrollView from '@/components/DefaultScrollView';
+import AdmTORFeed from "@/components/admin/TimeOff/AdmTORFeed";
+
+const AdmTOR = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -23,8 +25,8 @@ const TimeOff = () => {
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <View style={{ marginTop: 16, width: '90%' }}>
-        <AdminTimeOff parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+      <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
+        <AdmTORFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
     </DefaultScrollView>
@@ -33,4 +35,4 @@ const TimeOff = () => {
 
 };
 
-export default TimeOff;
+export default AdmTOR;

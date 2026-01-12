@@ -47,7 +47,7 @@ const TaskListItem: React.FC<Props> = ({ task, children }) => {
 
                 {/* Bottom Section (Free Flowing Text) */}
                 <>
-                    {/* Task Details */}
+                    {/* Task Due Date */}
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             Due:{" "}

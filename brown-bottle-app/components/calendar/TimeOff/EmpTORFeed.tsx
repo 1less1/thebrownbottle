@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -15,16 +15,16 @@ import ModularListView from '@/components/modular/ModularListView';
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import { DropdownOption, DateSortType } from '@/types/iDropdown';
 
-import TORListItem from '@/components/calendar/TimeOff/Templates/TORListItem';
-import SubmitTimeOff from '@/components/calendar/TimeOff/SubmitTimeOff';
-import TORInfo from '@/components/calendar/TimeOff/TORInfo';
+import TORListItem from '@/components/admin/TimeOff/Templates/TORListItem';
+import EmpSubmitTOR from '@/components/calendar/TimeOff/EmpSubmitTOR';
+import EmpTORModal from '@/components/calendar/TimeOff/EmpTORModal';
 
 import { getTimeOffRequest } from '@/routes/time_off_request';
 import { TimeOffRequest, Status, GetTimeOffRequest } from '@/types/iTimeOff';
 
 import { useSession } from '@/utils/SessionContext';
 
-interface EmpTimeOffProps {
+interface Props {
   parentRefresh?: number;
   onRefreshDone?: () => void;
 }
@@ -40,13 +40,13 @@ const dateDropdownOptions: DropdownOption<string>[] = [
   { key: "Oldest Date", value: "Oldest" }
 ];
 
-const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone }) => {
+const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const { width, height } = useWindowDimensions();
   const WIDTH = width;
   const HEIGHT = height;
 
   const isMobile = WIDTH < 768;
-  const cardHeight = isMobile ? height * 0.65 : height * 0.7;
+  const cardHeight = isMobile ? HEIGHT * 0.65 : HEIGHT * 0.7;
 
   const { user } = useSession();
 
@@ -55,26 +55,24 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
   const [error, setError] = useState<string | null>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
-  const [submitTimeOffVisible, setSubmitTimeOffVisible] = useState(false);
-  const [timeOffDetailsVisible, setTORInfoVisible] = useState(false);
+  const [submitTORVisible, setSubmitTORVisible] = useState(false);
+  const [torModalVisible, setTORModalVisible] = useState(false);
 
-  const toggleSubmitTimeOff = () => setSubmitTimeOffVisible((prev) => !prev);
-  const toggleTORInfo = () => setTORInfoVisible((prev) => !prev);
+  const toggleSubmitTOR = () => setSubmitTORVisible((prev) => !prev);
+  const toggleTORModal = () => setTORModalVisible((prev) => !prev);
 
   const [statusFilter, setStatusFilter] = useState<Status | null>(null);
   const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
 
   const [localRefresh, setLocalRefresh] = useState(0);
 
-  // Fetch Time Off Requests
-  const fetchTOR = async () => {
-
-    if (!user?.employee_id) return;
+  // Fetch time off requests
+  const fetchTOR = useCallback(async () => {
+    if (!user) return;
 
     try {
-
+      setError(null);
       setLoading(true);
-      setError(null)
 
       const statuses: Status[] = [];
 
@@ -92,23 +90,33 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
 
       setRequests(data);
 
-    } catch (error) {
-      setError('Failed to fetch time off requests.');
-      console.log(error);
+    } catch (error: any) {
+      setError('Failed to fetch time off requests!');
+      console.log('Failed to fetch time off requests:', error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, dateFilter, statusFilter]);
 
   // Fetch Time Off Requests Data on Initialization and State Update
   useEffect(() => {
     fetchTOR();
-  }, [user, parentRefresh, localRefresh, statusFilter, dateFilter]);
+  }, [parentRefresh, localRefresh, fetchTOR]);
+
+  // UI Rendering
+  const handlePress = (request: TimeOffRequest) => {
+    setSelectedRequest(request);
+    toggleTORModal();
+  };
+
+  const renderTOR = (request: TimeOffRequest) => {
+    return <TORListItem request={request} />
+  };
 
   if (!user) {
     return (
-      <Card style={GlobalStyles.loadingContainer}>
-        <LoadingCircle />
+      <Card style={{ height: cardHeight }}>
+        <LoadingCircle size="small" />
       </Card>
     );
   }
@@ -120,7 +128,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
       {/* Header Row */}
       <View style={styles.headerContainer}>
 
-        {/* Dropdown Filters */}
+        {/* Filter Container*/}
         <View style={styles.filterContainer}>
           {/* Status Filter */}
           <ModularDropdown
@@ -129,7 +137,7 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
             onSelect={(value) => setStatusFilter(value as Status)}
             usePlaceholder={true}
             placeholderText="Any Status"
-            containerStyle={styles.dropdownButton}
+            containerStyle={GlobalStyles.dropdownButtonWrapper}
           />
 
           {/* Date Filter */}
@@ -138,58 +146,56 @@ const EmpTimeOff: React.FC<EmpTimeOffProps> = ({ parentRefresh, onRefreshDone })
             onSelect={(value) => setDateFilter(value as DateSortType)}
             selectedValue={dateFilter}
             usePlaceholder={false}
-            containerStyle={styles.dropdownButton}
+            containerStyle={GlobalStyles.dropdownButtonWrapper}
           />
         </View>
 
-
+        {/* Action Container */}
         <View style={styles.actionContainer}>
+          {/* Add Button */}
           <ModularButton
             text="Add"
-            onPress={toggleSubmitTimeOff}
+            onPress={toggleSubmitTOR}
             style={styles.addButton}
             textStyle={{ color: Colors.purple }}
           />
         </View>
-
       </View>
 
-      <SubmitTimeOff
-        visible={submitTimeOffVisible}
-        onClose={toggleSubmitTimeOff}
-        onSubmitted={() => setLocalRefresh(prev => prev + 1)}
+      {/* Submit TOR Modal */}
+      <EmpSubmitTOR
+        visible={submitTORVisible}
+        onClose={toggleSubmitTOR}
+        onSubmit={() => setLocalRefresh(prev => prev + 1)}
       />
 
 
+      {/* Time Off Request Feed */}
       <ModularListView
         data={requests}
         loading={loading}
         error={error}
         emptyText="No requests found."
-        onItemPress={(req) => {
-          setSelectedRequest(req);
-          toggleTORInfo();
-        }}
         itemContainerStyle={{ backgroundColor: "white" }}
-        renderItem={(req) => (
-          <TORListItem request={req} />
-        )}
+        onItemPress={handlePress}
+        renderItem={renderTOR}
       />
 
+      {/* Time Off Request Modal */}
+      {selectedRequest && (
+        <EmpTORModal
+          visible={torModalVisible}
+          request={selectedRequest}
+          onClose={toggleTORModal}
+          onSubmit={() => setLocalRefresh(prev => prev + 1)}
+        />
+      )}
 
-      <TORInfo
-        visible={timeOffDetailsVisible}
-        request={selectedRequest}
-        onClose={toggleTORInfo}
-        onSubmitted={() => setLocalRefresh(prev => prev + 1)}
-      />
 
     </Card>
 
   );
 };
-
-export default EmpTimeOff;
 
 const styles = StyleSheet.create({
   headerContainer: {
@@ -225,3 +231,5 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderPurple,
   },
 });
+
+export default EmpTORFeed;

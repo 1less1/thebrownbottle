@@ -193,7 +193,7 @@ const EditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
                 titleText={"Edit Task"}
             />
 
-            <View style={styles.buttonRow}>
+            <View style={GlobalStyles.buttonRowContainer}>
                 <ModularButton
                     text="Save"
                     textStyle={{ color: 'white' }}
@@ -213,11 +213,6 @@ const EditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
 };
 
 const styles = StyleSheet.create({
-    buttonRow: {
-        flexDirection: "row",
-        gap: 10,
-        marginTop: 10,
-    },
 });
 
 export default EditTask;

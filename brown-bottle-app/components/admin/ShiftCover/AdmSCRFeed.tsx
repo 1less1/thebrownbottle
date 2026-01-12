@@ -21,7 +21,6 @@ import AdmSCRModal from "@/components/admin/ShiftCover/AdmSCRModal";
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { GetShiftCoverRequest, ShiftCoverRequest, Status } from "@/types/iShiftCover";
 
-
 import { useSession } from "@/utils/SessionContext";
 
 interface Props {
@@ -124,7 +123,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         toggleSCRModal();
     };
 
-    const renderTask = (request: ShiftCoverRequest) => {
+    const renderSCR = (request: ShiftCoverRequest) => {
         return <SCRListItem request={request} />
     };
 
@@ -148,7 +147,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     selectedRole={roleFilter}
                     usePlaceholder={true}
                     placeholderText="All Roles"
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading}
                 />
 
@@ -159,7 +158,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     onSelect={(value) => setStatusFilter(value as Status)}
                     usePlaceholder={true}
                     placeholderText="Any Status"
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading || activeTab == "Active"}
                 />
 
@@ -169,7 +168,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     onSelect={(value) => setDateFilter(value as DateSortType)}
                     selectedValue={dateFilter}
                     usePlaceholder={false}
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading}
                 />
             </View>
@@ -203,7 +202,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 emptyText="No requests found."
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={handlePress}
-                renderItem={renderTask}
+                renderItem={renderSCR}
             />
 
             {/* Shift Cover Request Modal */}

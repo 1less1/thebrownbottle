@@ -14,14 +14,14 @@ import { formatDateWithYear } from '@/utils/dateTimeHelpers';
 import { InsertTimeOffRequest } from '@/types/iTimeOff';
 import { useConfirm } from '@/hooks/useConfirm';
 
-
-interface ModalProps {
+interface Props {
   visible: boolean;
   onClose: () => void;
-  onSubmitted?: () => void;
+  onSubmit?: () => void;
 }
 
-const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
+const SubmitTimeOff: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
+
   const { user } = useSession();
   const { confirm } = useConfirm();
 
@@ -33,39 +33,31 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
   const MAX_CHARS = 400;
 
-  const dateDisplay = (() => {
-    if (!startDate) return "";
-
-    // If only start selected (no end yet)
-    if (!endDate) return `${formatDateWithYear(startDate)} →`;
-
-    // If start and end are the same day
-    if (startDate === endDate) return formatDateWithYear(startDate);
-
-    // Normal range
-    return `${formatDateWithYear(startDate)} → ${formatDateWithYear(endDate)}`;
-  })();
-
-
   const resetForm = () => {
     setReason('');
     setStartDate('');
     setEndDate('');
   };
 
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  // Form Validation
+  const isValidForm =
+    reason.trim().length > 0 &&
+    startDate.trim().length > 0 &&
+    endDate.trim().length > 0;
+
   const handleSubmit = async () => {
+    if (!user || loading || !startDate || !endDate) return;
 
-    if (!user) {
-      alert('User not found. Please log in again.');
-      return;
-    }
-
-    if (!reason.trim() || !startDate || !endDate) {
-      alert('Please fill in all fields!');
-      return;
-    }
-
-    if (loading) return;
+    const ok = await confirm(
+      'Confirm Submission',
+      `Submit Time Off Request?`
+    );
+    if (!ok) return;
 
     try {
       setLoading(true);
@@ -79,19 +71,15 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 
       await insertTimeOffRequest(payload);
       alert('Time off request submitted successfully!');
-      onSubmitted?.();
+      onSubmit?.();
       resetForm();
       onClose();
     } catch (error: any) {
-      alert("Failed to submit time off request: " + error.message);
+      alert("Failed to submit time off request!");
+      console.log("Failed to submit time off request:", error.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleClose = () => {
-    resetForm();
-    onClose();
   };
 
   return (
@@ -115,40 +103,30 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
       </View>
 
       {/* Selected Range Display */}
-      <View style={{ flexDirection: "row", gap: 10, marginVertical: 15 }}>
-        <View style={styles.dateContainer}>
-          <Text style={GlobalStyles.text}>
-            Selected:{" "}
-            <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
-              {/* No Start Date Selected */}
-              {!startDate && ""}
+      <View style={styles.dateContainer}>
+        <Text style={[GlobalStyles.semiBoldText, { color: Colors.purple }]}>
+          {/* No Start Date Selected */}
+          {!startDate && "No Date Selected"}
 
-              {/* Start and End are different (Range) */}
-              {startDate && startDate !== endDate && (
-                <>
-                  {formatDateWithYear(startDate).replace(/ /g, '\u00A0')}
-                  {" → "}
-                  {endDate
-                    ? formatDateWithYear(endDate).replace(/ /g, '\u00A0')
-                    : "..."}
-                </>
-              )}
+          {/* Start and End are different (Range) */}
+          {startDate && startDate !== endDate && (
+            <>
+              {formatDateWithYear(startDate).replace(/ /g, '\u00A0')}
+              {" → "}
+              {endDate
+                ? formatDateWithYear(endDate).replace(/ /g, '\u00A0')
+                : "..."}
+            </>
+          )}
 
-              {/* Start and End are the same (Single Day) */}
-              {startDate && startDate === endDate && (
-                formatDateWithYear(startDate).replace(/ /g, '\u00A0')
-              )}
-            </Text>
-          </Text>
-        </View>
+          {/* Start and End are the same (Single Day) */}
+          {startDate && startDate === endDate && (
+            formatDateWithYear(startDate).replace(/ /g, '\u00A0')
+          )}
+        </Text>
       </View>
 
-
-      {/* Reason Field
-      <Text style={[GlobalStyles.boldMediumText, { marginBottom: 10 }]}>
-        Reason for Time Off
-      </Text>
-      */}
+      {/* Reason */}
       <TextInput
         placeholder="Enter A Reason"
         placeholderTextColor={Colors.gray}
@@ -174,6 +152,7 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
           textStyle={{ color: 'white' }}
           style={[GlobalStyles.submitButton, { flex: 1 }]}
           onPress={handleSubmit}
+          enabled={!loading && isValidForm}
         />
         <ModularButton
           text="Cancel"
@@ -191,27 +170,6 @@ const SubmitTimeOff: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) 
 export default SubmitTimeOff;
 
 const styles = StyleSheet.create({
-  buttonRowContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-  dateContainer: {
-    flexShrink: 1,
-    flexGrow: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    minWidth: 200,
-    flexBasis: '48%',
-    borderRadius: 5,
-    backgroundColor: 'white',
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    textAlignVertical: 'center',
-  },
   calendarContainer: {
     flex: 1,
     borderWidth: 1,
@@ -222,9 +180,17 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     paddingLeft: 10,
   },
-  calendarButton: {
-    flexShrink: 1,
-    minWidth: 200,
+  dateContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderRadius: 5,
+    backgroundColor: Colors.bgPurple,
+    borderColor: Colors.borderPurple,
+    borderWidth: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
     paddingHorizontal: 15,
+    marginVertical: 15
   },
 });

@@ -51,7 +51,7 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
             await updateShiftCoverRequest(request.cover_request_id, fields)
             alert("Request is now awaiting manager approval.");
             onSubmit?.();
-            onClose?.();
+            onClose();
         } catch (error: any) {
             alert("Failed to submit shift cover request!");
             console.log("Failed to submit shift cover request:", error.message);
@@ -75,7 +75,7 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
             await deleteShiftCoverRequest(request.cover_request_id);
             alert("Shift cover request successfully deleted!");
             onSubmit?.();
-            onClose?.();
+            onClose();
         } catch (error: any) {
             alert("Failed to delete shift cover request!");
             console.log("Failed to delete shift cover request:", error.message);
@@ -96,7 +96,6 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
-
                 {/* Only show Delete/Request Button if NOT "Locked" */}
                 {!isLocked && (
                     isOwner ? (
@@ -125,7 +124,6 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                     style={[GlobalStyles.cancelButton, { flex: 1 }]}
                     onPress={onClose}
                 />
-
             </View>
 
         </ModularModal >

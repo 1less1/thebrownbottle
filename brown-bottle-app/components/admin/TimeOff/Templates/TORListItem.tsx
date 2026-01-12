@@ -10,13 +10,11 @@ import StatusBadge from '@/components/modular/StatusBadge';
 import { TimeOffRequest, Status } from "@/types/iTimeOff";
 
 interface Props {
-    request: TimeOffRequest | null;
+    request: TimeOffRequest;
 }
 
 // Reusable Time Off List Item Details
 const TORListItem: React.FC<Props> = ({ request }) => {
-
-    if (!request) return null;
 
     return (
 
@@ -42,14 +40,13 @@ const TORListItem: React.FC<Props> = ({ request }) => {
 
                 {/* Bottom Section (Free Flowing Text) */}
                 <>
+                    {/* Author */}
                     <View style={styles.row}>
-                        <Text style={GlobalStyles.text}>From: </Text>
-                        <Text
-                            style={[GlobalStyles.boldText, { color: Colors.purple }]}
-                        >
-                            {request.first_name} {request.last_name} { }
-                        </Text>
-                        <Text>
+                        <Text style={GlobalStyles.text}>
+                            From:{" "}
+                            <Text style={[GlobalStyles.boldText, { color: Colors.purple }]}>
+                                {request.first_name} {request.last_name} { }
+                            </Text>
                             ({request.primary_role_name})
                         </Text>
                     </View>

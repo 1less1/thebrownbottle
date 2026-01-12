@@ -81,7 +81,6 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
             setError(null);
             setLoading(true);
 
-
             const statuses: Status[] = [];
 
             if (requestType === 'Available') {
@@ -124,7 +123,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         toggleSCRModal();
     };
 
-    const renderTask = (request: ShiftCoverRequest) => {
+    const renderSCR = (request: ShiftCoverRequest) => {
         return <SCRListItem request={request} />
     };
 
@@ -153,7 +152,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
             <EmpSubmitSCR
                 visible={submitSCRVisible}
                 onClose={toggleSubmitSCR}
-                onSubmitted={fetchSCR}
+                onSubmit={fetchSCR}
             />
 
 
@@ -165,7 +164,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     onSelect={(value) => setRequestType(value as string)}
                     selectedValue={requestType}
                     usePlaceholder={false}
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading}
                 />
 
@@ -176,7 +175,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     onSelect={(value) => setStatusFilter(value as Status)}
                     usePlaceholder={true}
                     placeholderText="Any Status"
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading || requestType != "My Requests"}
                 />
 
@@ -186,7 +185,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     onSelect={(value) => setDateFilter(value as DateSortType)}
                     selectedValue={dateFilter}
                     usePlaceholder={false}
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
                     disabled={loading}
                 />
             </View>
@@ -204,7 +203,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 }
                 itemContainerStyle={{ backgroundColor: "white" }}
                 onItemPress={handlePress}
-                renderItem={renderTask}
+                renderItem={renderSCR}
             />
 
             {/* SCR Modal */}

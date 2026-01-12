@@ -16,13 +16,13 @@ import { useConfirm } from '@/hooks/useConfirm';
 import { insertShiftCoverRequest, hasPendingRequest } from '@/routes/shift_cover_request';
 import { InsertShiftCoverRequest } from '@/types/iShiftCover';
 
-interface ModalProps {
+interface Props {
     visible: boolean;
     onClose: () => void;
-    onSubmitted?: () => void;
+    onSubmit?: () => void;
 }
 
-const EmpSubmitSCR: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
+const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
 
     const { user } = useSession();
     const { confirm } = useConfirm();
@@ -78,7 +78,7 @@ const EmpSubmitSCR: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) =
 
             await insertShiftCoverRequest(payload);
             alert("Shift cover request submitted successfully!");
-            onSubmitted?.();
+            onSubmit?.();
             resetForm();
             onClose();
         } catch (error: any) {
@@ -117,12 +117,16 @@ const EmpSubmitSCR: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) =
                 )}
             </View>
 
-            <Text style={styles.selectedDate}>
-                {!selectedShift
-                    ? "No shift selected"
-                    : formatDateWithYear(selectedDate)
-                }
-            </Text>
+            {/* Selected Date Display */}
+            <View style={styles.dateContainer}>
+                <Text style={[GlobalStyles.semiBoldText, { color: Colors.blue }]}>
+                    {!selectedShift
+                        ? "No shift selected"
+                        : formatDateWithYear(selectedDate)
+                    }
+                </Text>
+            </View>
+
 
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
@@ -157,21 +161,20 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         paddingLeft: 10,
     },
-    selectedDate: {
-        width: "100%",
-        marginTop: 10,
-        marginBottom: 15,
-        borderRadius: 8,
-        fontWeight: 600,
-        fontSize: 18,
+    dateContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        borderRadius: 5,
         backgroundColor: Colors.bgBlue,
-        borderWidth: 1,
         borderColor: Colors.borderBlue,
-        color: Colors.blue,
-        padding: 8,
-        textAlign: 'center',
+        borderWidth: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-    }
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        marginVertical: 15
+    },
 });
 
 export default EmpSubmitSCR;

@@ -94,7 +94,7 @@ const AdmSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
 
-                {/* Only show Accept/Deny if NOT completed */}
+                {/* Only show Accept/Deny if NOT "Completed" */}
                 {!isCompleted && (
                     <>
                         {/* Accept Button */}
@@ -112,7 +112,6 @@ const AdmSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                             disabled={loading}>
                             <Ionicons name={"close-outline"} size={20} color={Colors.red} />
                         </TouchableOpacity>
-
                     </>
                 )}
 
@@ -124,7 +123,6 @@ const AdmSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                     onPress={onClose}
                 />
             </View>
-
 
         </ModularModal >
 

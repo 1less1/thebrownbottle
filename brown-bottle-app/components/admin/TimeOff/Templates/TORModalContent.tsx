@@ -35,17 +35,20 @@ const TORModalContent: React.FC<Props> = ({ request }) => {
                 </Text>
             </View>
 
-
+            {/* Reason */}
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Reason: </Text>
                 <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Reason: </Text>
                     {request.reason}
                 </Text>
             </View>
 
+            {/* Author */}
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>From: </Text>
-                <Text style={[GlobalStyles.boldMediumText, { color: Colors.purple }]}>
+                <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.purple }]}>
+                    {/* Black text overrides purple text here...*/}
+                    <Text style={GlobalStyles.semiBoldMediumText}>From: </Text>
+                    {/* Purple Text */}
                     {request.first_name} {request.last_name}
                 </Text>
             </View>

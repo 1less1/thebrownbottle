@@ -22,7 +22,7 @@ const Calendar: React.FC<CalendarProps> = ({ parentRefresh, onRefreshDone }) => 
   if (!user) {
     return (
       <Card style={GlobalStyles.loadingContainer}>
-        <LoadingCircle size={"large"} />
+        <LoadingCircle size={"small"} />
       </Card>
     );
   }

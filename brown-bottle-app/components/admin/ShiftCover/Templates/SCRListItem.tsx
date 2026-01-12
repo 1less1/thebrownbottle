@@ -50,7 +50,7 @@ const SCRListItem: React.FC<Props> = ({ request }) => {
 
                 {/* Bottom Section (Free Flowing Text) */}
                 <>
-                    {/* Shift Details */}
+                    {/* Shift Date + Time */}
                     <View style={styles.row}>
                         <Text style={GlobalStyles.semiBoldText}>
                             {request.shift_date} {"@"} {request.shift_start}

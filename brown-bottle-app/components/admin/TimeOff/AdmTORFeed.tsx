@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -9,23 +9,21 @@ import { Colors } from "@/constants/Colors";
 import Card from "@/components/modular/Card";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
-import ModularButton from "@/components/modular/ModularButton";
 import ModularListView from "@/components/modular/ModularListView";
 
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import TORListItem from "@/components/calendar/TimeOff/Templates/TORListItem";
-import TORModal from "@/components/admin/TimeOff/TORModal";
+import TORListItem from "@/components/admin/TimeOff/Templates/TORListItem";
+import AdmTORModal from "@/components/admin/TimeOff/AdmTORModal";
 
 import { getTimeOffRequest } from "@/routes/time_off_request";
 import { GetTimeOffRequest, TimeOffRequest, Status } from "@/types/iTimeOff";
 
-
 import { useSession } from "@/utils/SessionContext";
 
-interface AdminTimeOffProps {
+interface Props {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
@@ -40,13 +38,13 @@ const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDone }) => {
+const AdmTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? height * 0.68 : height * 0.7;
+    const cardHeight = isMobile ? HEIGHT * 0.68 : HEIGHT * 0.7;
 
     const { user } = useSession();
 
@@ -55,8 +53,8 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
     const [error, setError] = useState<string | null>(null);
 
     const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
-    const [shiftCoverModalVisible, setTORModalVisible] = useState(false);
 
+    const [torModalVisible, setTORModalVisible] = useState(false);
     const toggleTORModal = () => setTORModalVisible((prev) => !prev);
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -67,15 +65,13 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
 
     const [localRefresh, setLocalRefresh] = useState(0);
 
-    // Fetch Time Off Requests
-    const fetchTOR = async () => {
-
-        if (!user?.employee_id) return;
-
-        setLoading(true);
-        setError(null);
+    // Fetch time off requests
+    const fetchTOR = useCallback(async () => {
+        if (!user) return;
 
         try {
+            setError(null);
+            setLoading(true);
 
             const statuses: Status[] = [];
 
@@ -108,24 +104,33 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
 
             setRequests(data);
 
-        } catch (error) {
-            setError('Failed to fetch time off requests.');
-            console.log(error);
+        } catch (error: any) {
+            setError('Failed to fetch time off requests!');
+            console.log('Failed to fetch time off requests:', error.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, activeTab, roleFilter, dateFilter, statusFilter]);
 
-    // Fetch Time Off Requests on Initialization and State Update
+    // Fetch time off requests on initialization and state update
     useEffect(() => {
         fetchTOR();
-    }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
+    }, [parentRefresh, localRefresh, fetchTOR]);
 
+    // UI Rendering
+    const handlePress = (request: TimeOffRequest) => {
+        setSelectedRequest(request);
+        toggleTORModal();
+    };
+
+    const renderTOR = (request: TimeOffRequest) => {
+        return <TORListItem request={request} />
+    };
 
     if (!user) {
         return (
-            <Card style={GlobalStyles.loadingContainer}>
-                <LoadingCircle />
+            <Card style={{ height: cardHeight }}>
+                <LoadingCircle size="small" />
             </Card>
         );
     }
@@ -136,14 +141,14 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-
                 {/* Role Filter */}
                 <RoleDropdown
                     onRoleSelect={(value) => setRoleFilter(value as number)}
                     selectedRole={roleFilter}
                     usePlaceholder={true}
                     placeholderText="All Roles"
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
+                    disabled={loading}
                 />
 
                 {/* Status Filter */}
@@ -153,8 +158,8 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                     onSelect={(value) => setStatusFilter(value as Status)}
                     usePlaceholder={true}
                     placeholderText="Any Status"
-                    containerStyle={styles.dropdownButton}
-                    disabled={activeTab == "Active"}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
+                    disabled={loading || activeTab == "Active"}
                 />
 
                 {/* Date Filter */}
@@ -163,7 +168,8 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                     onSelect={(value) => setDateFilter(value as DateSortType)}
                     selectedValue={dateFilter}
                     usePlaceholder={false}
-                    containerStyle={styles.dropdownButton}
+                    containerStyle={GlobalStyles.dropdownButtonWrapper}
+                    disabled={loading}
                 />
             </View>
 
@@ -193,31 +199,26 @@ const AdminTimeOff: React.FC<AdminTimeOffProps> = ({ parentRefresh, onRefreshDon
                 data={requests}
                 loading={loading}
                 error={error}
-                emptyText="No requests found."            
+                emptyText="No requests found."
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={(req) => {
-                    setSelectedRequest(req);
-                    toggleTORModal();
-                }}
-                renderItem={(req) => (
-                    <TORListItem request={req} />
-                )}
+                onItemPress={handlePress}
+                renderItem={renderTOR}
             />
 
-
-            <TORModal
-                visible={shiftCoverModalVisible}
-                request={selectedRequest}
-                onClose={toggleTORModal}
-                onSubmitted={() => setLocalRefresh(prev => prev + 1)}
-            />
+            {/* Time Off Request Modal */}
+            {selectedRequest && (
+                <AdmTORModal
+                    visible={torModalVisible}
+                    request={selectedRequest}
+                    onClose={toggleTORModal}
+                    onSubmit={() => setLocalRefresh(prev => prev + 1)}
+                />
+            )}
 
         </Card>
 
     );
 };
-
-export default AdminTimeOff;
 
 const styles = StyleSheet.create({
     // Filters
@@ -258,4 +259,6 @@ const styles = StyleSheet.create({
         color: Colors.black,
     },
 });
+
+export default AdmTORFeed;
 

@@ -9,40 +9,34 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import TORModalContent from '@/components/calendar/TimeOff/Templates/TORModalContent';
-
-
-import { deleteTimeOffRequest } from '@/routes/time_off_request';
+import TORModalContent from '@/components/admin/TimeOff/Templates/TORModalContent';
 
 import { TimeOffRequest } from '@/types/iTimeOff';
+import { deleteTimeOffRequest } from '@/routes/time_off_request';
 
 import { useConfirm } from '@/hooks/useConfirm';
 import { useSession } from '@/utils/SessionContext';
 
 
-interface ModalProps {
+interface Props {
     visible: boolean;
     onClose: () => void;
-    request: TimeOffRequest | null;
-    onSubmitted?: () => void;
+    request: TimeOffRequest;
+    onSubmit?: () => void;
 }
 
-const TORInfo: React.FC<ModalProps> = ({
-    visible,
-    onClose,
-    request,
-    onSubmitted
-}) => {
+const EmpTORModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) => {
 
     const { user } = useSession();
     const { confirm } = useConfirm();
+
     const [loading, setLoading] = useState(false);
 
     const handleDelete = async () => {
         if (!request || loading) return;
 
         const ok = await confirm(
-            "Confirm Deletion",
+            "Confirm Delete",
             "Are you sure you want to delete this request? This action cannot be undone."
         );
 
@@ -50,18 +44,18 @@ const TORInfo: React.FC<ModalProps> = ({
 
         try {
             setLoading(true);
+
             await deleteTimeOffRequest(request.request_id);
             alert("Time off request successfully deleted!");
-            onSubmitted?.();
-            onClose?.();
+            onSubmit?.();
+            onClose();
         } catch (error: any) {
-            alert("Failed to delete request: " + error.message);
+            alert("Failed to delete time off request!");
+            console.log("Failed to delete time off request:", error.message);
         } finally {
             setLoading(false);
         }
     };
-
-    if (!request) return null;
 
     return (
 
@@ -80,6 +74,8 @@ const TORInfo: React.FC<ModalProps> = ({
                         <Ionicons name={"close-outline"} size={20} color={Colors.red} />
                     </TouchableOpacity>
                 )}
+
+                {/* Always show Close Button */}
                 <ModularButton
                     text="Close"
                     textStyle={{ color: "gray" }}
@@ -93,8 +89,6 @@ const TORInfo: React.FC<ModalProps> = ({
     );
 };
 
-export default TORInfo;
-
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
@@ -107,3 +101,5 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
 })
+
+export default EmpTORModal;

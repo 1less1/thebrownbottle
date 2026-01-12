@@ -11,7 +11,7 @@ import DefaultView from '@/components/DefaultView';
 
 import ShiftCalendar from '@/components/calendar/ShiftCalendar/ShiftCalendar';
 import EmpSCR from '@/components/calendar/ShiftCover/EmpSCR';
-import TimeOff from '@/components/calendar/TimeOff/TimeOff';
+import EmpTOR from '@/components/calendar/TimeOff/EmpTOR';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 
@@ -33,7 +33,7 @@ const CalendarPage = () => {
   );
 
   const { user } = useSession();
-  
+
   const [loading, setLoading] = useState<boolean>(true); // Start as true
 
   const [activeTab, setActiveTab] = useState(0);
@@ -49,7 +49,7 @@ const CalendarPage = () => {
   const tabs: Tab[] = [
     { key: 'shifts', title: 'Shifts', component: <ShiftCalendar /> },
     { key: 'shift cover', title: 'Shift Cover', component: <EmpSCR /> },
-    { key: 'time off', title: 'Time Off', component: <TimeOff /> },
+    { key: 'time off', title: 'Time Off', component: <EmpTOR /> },
   ];
 
   // Load Saved Tab If it Exists, otherwise load tab index 0

@@ -25,29 +25,40 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime,
     <ModularModal visible={visible} onClose={onClose}>
 
       {/* Date Header */}
-      <Text style={GlobalStyles.modalTitle}>{date}</Text>
+      <Text style={GlobalStyles.modalTitle}>Shift</Text>
 
       <>
+        {date && (
+          <View style={styles.row}>
+            <Text style={GlobalStyles.mediumText}>
+              <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
+              {date}
+            </Text>
+          </View>
+        )}
+
         {startTime && (
           <View style={styles.row}>
-            <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
             <Text style={GlobalStyles.mediumText}>
+              <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
               {startTime}
             </Text>
           </View>
         )}
+
         {section && (
           <View style={styles.row}>
-            <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
             <Text style={GlobalStyles.mediumText}>
+              <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
               {section}
             </Text>
           </View>
         )}
+
         {role && (
           <View style={styles.row}>
-            <Text style={GlobalStyles.semiBoldMediumText}>Role: </Text>
             <Text style={GlobalStyles.mediumText}>
+              <Text style={GlobalStyles.semiBoldMediumText}>Role: </Text>
               {role}
             </Text>
           </View>
@@ -73,6 +84,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime,
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    flexWrap: "wrap",
     marginBottom: 10
   },
 });
