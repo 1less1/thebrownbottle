@@ -7,7 +7,7 @@ import { Colors } from "@/constants/Colors";
 import ModularListView from "@/components/modular/ModularListView";
 
 import TaskListItem from '@/components/admin/Tasks/Templates/TaskListItem';
-import TaskActionModal from "@/components/tasks/TaskActionModal";
+import EmpTaskModal from "@/components/tasks/EmpTaskModal";
 
 import { Shift, GetShift } from "@/types/iShift";
 import { getShift } from "@/routes/shift";
@@ -17,13 +17,13 @@ import { getTask, updateTask } from "@/routes/task";
 
 import { User } from "@/utils/SessionContext";
 
-interface ActiveTasksProps {
+interface Props {
     user: User
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
 
-const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefreshDone }) => {
+const EmpActiveTasks: React.FC<Props> = ({ user, parentRefresh, onRefreshDone }) => {
     if (!user) return;
 
     const { width, height } = useWindowDimensions();
@@ -232,7 +232,7 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
             )}
 
             {selectedTask &&
-                <TaskActionModal
+                <EmpTaskModal
                     task={selectedTask}
                     mode={"active"}
                     visible={modalVisible}
@@ -246,11 +246,11 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
     );
 };
 
-export default ActiveTasks;
-
 const styles = StyleSheet.create({
     taskContainer: {
         backgroundColor: "white",
     }
 });
+
+export default EmpActiveTasks;
 

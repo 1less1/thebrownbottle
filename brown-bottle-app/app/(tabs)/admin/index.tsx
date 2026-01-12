@@ -9,10 +9,10 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import AdminDrawer from '@/components/admin/AdminDrawer';
+import AdmDrawer from '@/components/admin/AdmDrawer';
 
 import AdmAnnc from "@/components/admin/Announcements/AdmAnnc"
-import Tasks from "@/components/admin/Tasks/Tasks"
+import AdmTasks from "@/components/admin/Tasks/AdmTasks"
 import AdmSCR from '@/components/admin/ShiftCover/AdmSCR';
 import AdmTOR from '@/components/admin/TimeOff/AdmTOR';
 import Schedule from "@/components/admin/Schedule/Schedule";
@@ -20,7 +20,7 @@ import Staff from "@/components/admin/Staff/Staff";
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 
-import { Tab } from '@/components/admin/AdminDrawer';
+import { Tab } from '@/components/admin/AdmDrawer';
 
 import { useSession } from '@/utils/SessionContext';
 
@@ -53,7 +53,7 @@ const Admin = () => {
   // Define available tabs and corresponding components
   const tabs: Tab[] = [
     { key: 'Announcements', title: 'Announcements', component: <AdmAnnc /> },
-    { key: 'Tasks', title: 'Tasks', component: <Tasks /> },
+    { key: 'Tasks', title: 'Tasks', component: <AdmTasks /> },
     { key: 'Shift Cover', title: 'Shift Cover', component: <AdmSCR /> },
     { key: 'Time Off', title: 'Time Off', component: <AdmTOR /> },
     { key: 'Schedule', title: 'Schedule', component: <Schedule /> },
@@ -111,7 +111,7 @@ const Admin = () => {
 
       </View>
 
-      <AdminDrawer
+      <AdmDrawer
         visible={drawerVisible}
         onClose={() => setDrawerVisible(false)}
         activeTab={activeTab}

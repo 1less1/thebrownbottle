@@ -29,7 +29,7 @@ interface Props {
     onClose: () => void;
     onUpdate: () => void;
 }
-const EditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
+const AdmEditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
     if (!task) return null;
 
     const { user } = useSession();
@@ -215,4 +215,4 @@ const EditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
 const styles = StyleSheet.create({
 });
 
-export default EditTask;
+export default AdmEditTask;

@@ -13,12 +13,12 @@ import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import SectionDropdown from '@/components/modular/dropdown/SectionDropdown';
 
 import ModularListView from "@/components/modular/ModularListView";
-import TaskListItem from '@/components/admin/Tasks/Templates/TaskListItem';
+import RecurTaskListItem from '@/components/admin/Tasks/Templates/RecurTaskListItem';
 
-import EditTask from '@/components/admin/Tasks/EditTask';
+import AdmEditTask from '@/components/admin/Tasks/AdmEditTask';
 
-import { getTask, deleteTask } from '@/routes/task';
-import { Task, GetTask } from '@/types/iTask';
+import { getRecurringTask, deleteRecurringTask } from '@/routes/recurring_task';
+import { RecurringTask, GetRecurringTask } from '@/types/iRecurringTask';
 
 import { useConfirm } from '@/hooks/useConfirm';
 import { useSession } from "@/utils/SessionContext";
@@ -39,7 +39,7 @@ interface Props {
     onRefreshDone?: () => void;
 }
 
-const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+const AdmRecurTaskFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -54,17 +54,16 @@ const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null)
 
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [recurringTasks, setRecurringTasks] = useState<RecurringTask[]>([]);
+    const [selectedTask, setSelectedTask] = useState<RecurringTask | null>(null);
 
     const [editModalVisible, setEditModalVisible] = useState(false);
 
-    const [activeFilter, setActiveFilter] = useState<1 | 0>(0); // 1=Completed, 0=Active
     const [sectionFilter, setSectionFilter] = useState<number | null>(null);
     const [timestampFilter, setTimestampFilter] = useState<DateSortType>("Newest");
 
-    const openEditModal = (task: Task) => {
-        setSelectedTask(task);
+    const openEditModal = (recurringTask: RecurringTask) => {
+        setSelectedTask(recurringTask);
         setEditModalVisible(true);
     };
 
@@ -73,62 +72,61 @@ const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         setSelectedTask(null);
     };
 
-    const fetchTasks = useCallback(async () => {
+    const fetchRecurringTasks = useCallback(async () => {
         try {
             setError(null);
             setLoading(true);
 
-            const params: Partial<GetTask> = {
-                complete: activeFilter,
+            const params: Partial<GetRecurringTask> = {
                 section_id: sectionFilter as number,
                 timestamp_sort: timestampFilter,
-                recurring: 0,
             };
-            const data = await getTask(params);
-            setTasks(data);
+            const data = await getRecurringTask(params);
+            setRecurringTasks(data);
 
         } catch (error: any) {
-            setError('Failed to fetch tasks.');
-            console.log('Failed to fetch tasks', error.message);
+            setError('Failed to fetch recurring tasks.');
+            console.log('Failed to fetch recurring tasks', error.message);
         } finally {
             setLoading(false);
         }
-    }, [activeFilter, sectionFilter, timestampFilter]);
+    }, [sectionFilter, timestampFilter]);
 
-    // Fetch tasks on initialization and state update
+    // Fetch recurring tasks on initialization and state update
     useEffect(() => {
-        fetchTasks();
-    }, [parentRefresh, localRefresh, fetchTasks]);
+        fetchRecurringTasks();
+    }, [parentRefresh, localRefresh, fetchRecurringTasks]);
 
 
-    const handleDelete = async (taskId: number) => {
+    const handleDelete = async (recurringTaskId: number) => {
         if (!user) return;
 
         // Confirmation Popup
-        const ok = await confirm("Confirm Deletion", 
-            "Are you sure you want to delete this task?"
+        const ok = await confirm(
+            "Confirm Deletion", 
+            "Are you sure you want to delete this recurring task?"
         );
         if (!ok) return;
 
         setLoading(true);
 
         try {
-            await deleteTask(taskId);
+            await deleteRecurringTask(recurringTaskId);
             setLocalRefresh((prev) => prev + 1); // Trigger Refresh
         } catch (error: any) {
-            console.log("Error deleting task:" + error.message);
+            console.log("Error deleting recurring task:" + error.message);
         } finally {
             setLoading(false);
         }
     }
 
-    const actionButtons = (task: Task) => {
+    const actionButtons = (recurringTask: RecurringTask) => {
         return (
             <View style={styles.buttonRow}>
                 {/* Edit Button */}
                 <TouchableOpacity
                     style={[styles.editButton]}
-                    onPress={() => openEditModal(task)}
+                    onPress={() => openEditModal(recurringTask)}
                     disabled={loading}
                 >
                     <Ionicons name="create-outline" size={20} color={Colors.blue} />
@@ -137,20 +135,23 @@ const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 {/* Delete Button */}
                 <TouchableOpacity
                     style={[GlobalStyles.deleteButton, styles.deleteButton]}
-                    onPress={() => handleDelete(task.task_id)}
+                    onPress={() => handleDelete(recurringTask.recurring_task_id)}
                     disabled={loading}
                 >
                     <Ionicons name="close-circle-outline" size={20} color={Colors.red} />
                 </TouchableOpacity>
+
             </View>
         );
     };
 
-    const renderTask = (task: Task) => {
+    const renderTask = (recurringTask: RecurringTask) => {
         return (
-            <TaskListItem task={task}>
-                {actionButtons(task)}
-            </TaskListItem>
+            <RecurTaskListItem
+                recurringTask={recurringTask}
+            >
+                {actionButtons(recurringTask)}
+            </RecurTaskListItem>
         );
     };
 
@@ -168,22 +169,12 @@ const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-                <ModularDropdown
-                    data={activeDropdownOptions}
-                    onSelect={(value) => setActiveFilter(value as YesNoSortType)}
-                    selectedValue={activeFilter}
-                    usePlaceholder={false}
-                    containerStyle={GlobalStyles.dropdownButtonWrapper}
-                    disabled={loading}
-                />
-
                 <SectionDropdown
                     selectedSection={sectionFilter}
                     onSectionSelect={(value) => setSectionFilter(value as number)}
                     usePlaceholder={true}
                     placeholderText="All Sections"
                     containerStyle={GlobalStyles.dropdownButtonWrapper}
-                    disabled={loading}
                 />
 
                 <ModularDropdown
@@ -192,26 +183,25 @@ const AdminTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                     selectedValue={timestampFilter}
                     usePlaceholder={false}
                     containerStyle={GlobalStyles.dropdownButtonWrapper}
-                    disabled={loading}
                 />
             </View>
 
             {/* Task Feed */}
             <ModularListView
-                data={tasks}
+                data={recurringTasks}
                 loading={loading}
                 error={error}
-                emptyText="No tasks found."
+                emptyText="No recurring tasks found."
                 //itemContainerStyle={{ backgroundColor: "white" }}
                 renderItem={renderTask}
-                keyExtractor={(item) => item.task_id}
+                keyExtractor={(item) => item.recurring_task_id}
             />
 
 
             {/* Edit Task Modal */}
             {selectedTask && (
-                <EditTask
-                    task={selectedTask as Task}
+                <AdmEditTask
+                    task={selectedTask as RecurringTask}
                     visible={editModalVisible}
                     onClose={closeEditModal}
                     onUpdate={() => setLocalRefresh(prev => prev + 1)}
@@ -257,4 +247,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AdminTasks;
+export default AdmRecurTaskFeed;

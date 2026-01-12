@@ -13,7 +13,7 @@ import TaskModalContent from "@/components/tasks/Templates/TaskModalContent";
 
 import { Task } from "@/types/iTask";
 
-interface ModalProps {
+interface Props {
   task: Task;
   mode: "active" | "completed";
   visible: boolean;
@@ -22,7 +22,7 @@ interface ModalProps {
   loading: boolean;
 }
 
-const TaskActionModal: React.FC<ModalProps> = ({ task, mode, visible, onClose, onSubmit, loading }) => {
+const EmpTaskModal: React.FC<Props> = ({ task, mode, visible, onClose, onSubmit, loading }) => {
 
   const modeConfig = {
     active: {
@@ -69,8 +69,6 @@ const TaskActionModal: React.FC<ModalProps> = ({ task, mode, visible, onClose, o
   );
 };
 
-export default TaskActionModal;
-
 const styles = StyleSheet.create({
   // Buttons
   buttonRow: {
@@ -93,4 +91,6 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
 });
+
+export default EmpTaskModal;
 

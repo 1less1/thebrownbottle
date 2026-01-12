@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import {
-    View, Text, TextInput, StyleSheet, ScrollView,
-    Pressable, TouchableOpacity, useWindowDimensions
-} from 'react-native';
+import { View, Text,  StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -29,7 +26,7 @@ interface Props {
     onSubmit: () => void;
 }
 
-const NewTask: React.FC<Props> = ({ onSubmit }) => {
+const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -204,4 +201,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NewTask;
+export default AdmNewTask;

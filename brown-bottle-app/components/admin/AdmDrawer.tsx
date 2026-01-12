@@ -7,7 +7,6 @@ import {
     Animated,
     TouchableWithoutFeedback,
     useWindowDimensions,
-    SafeAreaView,
 } from 'react-native';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -19,7 +18,7 @@ export interface Tab {
     component: React.ReactNode;
 }
 
-interface AdminDrawerProps {
+interface Props {
     visible: boolean;
     onClose: () => void;
     activeTab: number;
@@ -27,7 +26,7 @@ interface AdminDrawerProps {
     tabs: Tab[];
 }
 
-const AdminDrawer = ({ visible, onClose, activeTab, onTabChange, tabs = [] }: AdminDrawerProps) => {
+const AdmDrawer = ({ visible, onClose, activeTab, onTabChange, tabs = [] }: Props) => {
     const { width, height } = useWindowDimensions();
     const SCREEN_WIDTH = width;
     const SCREEN_HEIGHT = height;
@@ -142,4 +141,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AdminDrawer;
+export default AdmDrawer;

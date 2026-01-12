@@ -6,13 +6,13 @@ import { Colors } from "@/constants/Colors";
 
 import DefaultScrollView from "@/components/DefaultScrollView";
 
-import NewTask from "@/components/admin/Tasks/NewTask";
-import AdminTasks from "@/components/admin/Tasks/AdminTasks";
-import AdminRecurringTasks from "@/components/admin/Tasks/AdminRecurringTasks";
+import AdmNewTask from "@/components/admin/Tasks/AdmNewTask";
+import AdmTaskFeed from "@/components/admin/Tasks/AdmTaskFeed";
+import AdmRecurTaskFeed from "@/components/admin/Tasks/AdmRecurTaskFeed";
 
 import { useSession } from '@/utils/SessionContext';
 
-const Tasks = () => {
+const AdmTasks = () => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -37,7 +37,7 @@ const Tasks = () => {
         <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
             <View style={{ marginTop: 16, width: '90%' }}>
-                <NewTask onSubmit={handleRefresh} />
+                <AdmNewTask onSubmit={handleRefresh} />
             </View>
 
             {/* Feeds side by side on desktop - Wrap vertically on mobile */}
@@ -51,12 +51,12 @@ const Tasks = () => {
 
                 <View style={{ width: isMobile ? '100%' : '49%' }}>
                     <Text style={GlobalStyles.floatingHeaderText}>Tasks</Text>
-                    <AdminTasks parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                    <AdmTaskFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
                 </View>
 
                 <View style={{ marginTop: isMobile ? 16 : 0, width: isMobile ? '100%' : '49%' }}>
                     <Text style={GlobalStyles.floatingHeaderText}>Recurring Tasks</Text>
-                    <AdminRecurringTasks parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                    <AdmRecurTaskFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
                 </View>
 
             </View>
@@ -67,4 +67,4 @@ const Tasks = () => {
 
 };
 
-export default Tasks;
+export default AdmTasks;

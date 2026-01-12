@@ -6,8 +6,8 @@ import { Colors } from "@/constants/Colors";
 
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
-import ActiveTasks from "@/components/tasks/ActiveTasks";
-import CompletedTasks from "@/components/tasks/CompletedTasks";
+import EmpActiveTasks from "@/components/tasks/EmpActiveTasks";
+import EmpCompTasks from "@/components/tasks/EmpCompTasks";
 
 import { Employee } from "@/types/iEmployee";
 
@@ -41,12 +41,12 @@ export default function EmpTasks() {
         {
             key: "active",
             title: "To Do",
-            component: <ActiveTasks user={user as Employee} onRefreshDone={() => setRefreshing(false)} parentRefresh={refreshTrigger} />
+            component: <EmpActiveTasks user={user as Employee} onRefreshDone={() => setRefreshing(false)} parentRefresh={refreshTrigger} />
         },
         {
             key: "completed",
             title: "Completed",
-            component: <CompletedTasks user={user as Employee} onRefreshDone={() => setRefreshing(false)} parentRefresh={refreshTrigger} />
+            component: <EmpCompTasks user={user as Employee} onRefreshDone={() => setRefreshing(false)} parentRefresh={refreshTrigger} />
         }
     ];
 
