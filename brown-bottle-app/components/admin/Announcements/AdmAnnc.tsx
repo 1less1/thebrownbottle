@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import DefaultScrollView from "@/components/DefaultScrollView";
 
-import NewAnnouncement from "@/components/admin/Announcements/NewAnnouncement";
-import AdminAnnouncements from "@/components/admin/Announcements/AdminAnnouncements";
+import NewAnnouncement from "@/components/admin/Announcements/AdmNewAnnc";
+import AdminAnnouncements from "@/components/admin/Announcements/AdmAnncFeed";
 
 import { useSession } from '@/utils/SessionContext';
 

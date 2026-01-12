@@ -24,7 +24,7 @@ interface Props {
     onSubmit: () => void;
 }
 
-const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
+const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -205,4 +205,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default NewAnnouncement;
+export default AdmNewAnnc;

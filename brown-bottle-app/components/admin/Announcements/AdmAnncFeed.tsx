@@ -13,9 +13,9 @@ import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularListView from "@/components/modular/ModularListView";
-import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
+import AnncListItem from '@/components/admin/Announcements/Templates/AnncListItem';
 
-import AckModal from '@/components/admin/Announcements/AckModal';
+import AdmAckModal from '@/components/admin/Announcements/AdmAckModal';
 
 import { getAnnouncement, deleteAnnouncement } from '@/routes/announcement';
 import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
@@ -34,7 +34,7 @@ interface Props {
     onRefreshDone?: () => void;
 }
 
-const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+const AdmAnncFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
@@ -138,9 +138,9 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
 
     const renderAnnouncement = (announcement: Announcement) => {
         return (
-            <AnnouncementListItem announcement={announcement}>
+            <AnncListItem announcement={announcement}>
                 {actionButtons(announcement)}
-            </AnnouncementListItem>
+            </AnncListItem>
         );
     };
 
@@ -190,7 +190,7 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
 
             {/* Acknowledgement Modal */}
             {selectedAnnouncementId && ackModalVisible && (
-                <AckModal
+                <AdmAckModal
                     announcement_id={selectedAnnouncementId}
                     modalVisible={ackModalVisible}
                     onClose={closeAckModal}
@@ -235,4 +235,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AdminAnnouncements;
+export default AdmAnncFeed;

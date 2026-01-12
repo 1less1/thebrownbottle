@@ -19,7 +19,7 @@ interface Props {
     onClose: () => void;
 }
 
-const AckModal: React.FC<Props> = ({ announcement_id, modalVisible, onClose }) => {
+const AdmAckModal: React.FC<Props> = ({ announcement_id, modalVisible, onClose }) => {
     // Early Escape
     if (!announcement_id) return null;
 
@@ -109,7 +109,8 @@ const AckModal: React.FC<Props> = ({ announcement_id, modalVisible, onClose }) =
                 )}
 
             </View>
-
+            
+            {/* Close Button */}
             <View style={GlobalStyles.buttonRowContainer}>
                 <ModularButton
                     text="Close"
@@ -143,4 +144,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AckModal;
+export default AdmAckModal;

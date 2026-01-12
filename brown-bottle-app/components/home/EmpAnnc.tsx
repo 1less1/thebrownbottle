@@ -9,8 +9,8 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 
 import ModularListView from "@/components/modular/ModularListView";
-import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
-import AnnouncementSkeleton from '@/components/ui/skeleton/home/AnnouncementSkeleton';
+import AnncListItem from '@/components/admin/Announcements/Templates/AnncListItem';
+import AnncSkeleton from '@/components/ui/skeleton/home/AnncSkeleton';
 
 import { getAnnouncement, getAcknowledgedAnnouncements, acknowledgeAnnouncement } from '@/routes/announcement';
 import { Announcement, GetAnnouncement } from '@/types/iAnnouncement';
@@ -22,7 +22,7 @@ interface Props {
   onRefreshDone?: () => void;
 }
 
-const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+const EmpAnnc: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const { width, height } = useWindowDimensions();
   const WIDTH = width;
   const HEIGHT = height;
@@ -123,9 +123,9 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const isAcknowledged = acknowledged.includes(announcement.announcement_id);
 
     return (
-      <AnnouncementListItem announcement={announcement}>
+      <AnncListItem announcement={announcement}>
         {actionButton(announcement, isAcknowledged)}
-      </AnnouncementListItem>
+      </AnncListItem>
     );
   };
 
@@ -157,7 +157,7 @@ const Announcements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         {/* Announcement Feed */}
         <View style={{ height: listHeight }}>
           {loading ? (
-            <AnnouncementSkeleton />
+            <AnncSkeleton />
           ) : (
             <ModularListView
               data={announcements}
@@ -228,4 +228,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Announcements;
+export default EmpAnnc;
