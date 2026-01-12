@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -15,16 +15,16 @@ import ModularListView from "@/components/modular/ModularListView";
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 
-import SCRListItem from "@/components/calendar/ShiftCover/Templates/SCRListItem";
-import SubmitShiftCover from "@/components/calendar/ShiftCover/SubmitShiftCover";
-import SCRInfo from "@/components/calendar/ShiftCover/SCRInfo";
+import SCRListItem from "@/components/admin/ShiftCover/Templates/SCRListItem";
+import EmpSubmitSCR from "@/components/calendar/ShiftCover/EmpSubmitSCR";
+import EmpSCRModal from "@/components/calendar/ShiftCover/EmpSCRModal";
 
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { ShiftCoverRequest, Status, GetShiftCoverRequest } from "@/types/iShiftCover";
 
 import { useSession } from "@/utils/SessionContext";
 
-interface EmpShiftCoverProps {
+interface Props {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
@@ -46,13 +46,13 @@ const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshDone }) => {
+const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? height * 0.65 : height * 0.7;
+    const cardHeight = isMobile ? HEIGHT * 0.65 : HEIGHT * 0.7;
 
     const { user } = useSession();
 
@@ -61,11 +61,11 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
     const [error, setError] = useState<string | null>(null);
 
     const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [shiftCoverModalVisible, setSubmitShiftCoverVisible] = useState(false);
-    const [shiftDetailsModalVisible, setSCRInfoModalVisible] = useState(false);
+    const [submitSCRVisible, setSubmitSCRVisible] = useState(false);
+    const [scrModalVisible, setSCRModalVisible] = useState(false);
 
-    const toggleSubmitShiftCover = () => setSubmitShiftCoverVisible((prev) => !prev);
-    const toggleSCRInfoModal = () => setSCRInfoModalVisible((prev) => !prev);
+    const toggleSubmitSCR = () => setSubmitSCRVisible((prev) => !prev);
+    const toggleSCRModal = () => setSCRModalVisible((prev) => !prev);
 
     const [requestType, setRequestType] = useState<string>("Available");
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -73,15 +73,14 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
     const [localRefresh, setLocalRefresh] = useState(0);
 
-    // Fetch Shift Cover Requests
-    const fetchSCR = async () => {
-
-        if (!user?.employee_id) return;
-
-        setLoading(true);
-        setError(null);
+    // Fetch shift cover requests
+    const fetchSCR = useCallback(async () => {
+        if (!user) return;
 
         try {
+            setError(null);
+            setLoading(true);
+
 
             const statuses: Status[] = [];
 
@@ -106,24 +105,33 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
 
             setRequests(data);
 
-        } catch (error) {
-            setError('Failed to fetch shift cover requests.');
-            console.log(error);
+        } catch (error: any) {
+            setError('Failed to fetch shift cover requests!');
+            console.log('Failed to fetch shift cover requests:', error.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, requestType, dateFilter, statusFilter]);
 
-    // Fetch Shift Cover Requests on Initialization and State Update
+    // Fetch shift cover requests on initialiaztion and state update
     useEffect(() => {
         fetchSCR();
-    }, [user, parentRefresh, localRefresh, requestType, dateFilter, statusFilter]);
+    }, [parentRefresh, localRefresh, fetchSCR]);
 
+    // UI Rendering
+    const handlePress = (request: ShiftCoverRequest) => {
+        setSelectedRequest(request);
+        toggleSCRModal();
+    };
+
+    const renderTask = (request: ShiftCoverRequest) => {
+        return <SCRListItem request={request} />
+    };
 
     if (!user) {
         return (
-            <Card style={GlobalStyles.loadingContainer}>
-                <LoadingCircle />
+            <Card style={{ height: cardHeight }}>
+                <LoadingCircle size="small" />
             </Card>
         );
     }
@@ -135,14 +143,16 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
             {/* New Request Button */}
             <ModularButton
                 text="New Request"
-                onPress={toggleSubmitShiftCover}
+                onPress={toggleSubmitSCR}
                 style={styles.newRequestButton}
                 textStyle={{ color: Colors.blue }}
+                enabled={!loading}
             />
 
-            <SubmitShiftCover
-                visible={shiftCoverModalVisible}
-                onClose={toggleSubmitShiftCover}
+            {/* Submit SCR Modal */}
+            <EmpSubmitSCR
+                visible={submitSCRVisible}
+                onClose={toggleSubmitSCR}
                 onSubmitted={fetchSCR}
             />
 
@@ -156,6 +166,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                     selectedValue={requestType}
                     usePlaceholder={false}
                     containerStyle={styles.dropdownButton}
+                    disabled={loading}
                 />
 
                 {/* Status Filter */}
@@ -166,7 +177,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                     usePlaceholder={true}
                     placeholderText="Any Status"
                     containerStyle={styles.dropdownButton}
-                    disabled={requestType != "My Requests"}
+                    disabled={loading || requestType != "My Requests"}
                 />
 
                 {/* Date Filter */}
@@ -176,6 +187,7 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                     selectedValue={dateFilter}
                     usePlaceholder={false}
                     containerStyle={styles.dropdownButton}
+                    disabled={loading}
                 />
             </View>
 
@@ -191,36 +203,32 @@ const EmpShiftCover: React.FC<EmpShiftCoverProps> = ({ parentRefresh, onRefreshD
                         : "No available shifts right now."
                 }
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={(req) => {
-                    setSelectedRequest(req);
-                    toggleSCRInfoModal();
-                }}
-                renderItem={(req) => (
-                    <SCRListItem request={req} />
-                )}
+                onItemPress={handlePress}
+                renderItem={renderTask}
             />
 
+            {/* SCR Modal */}
+            {selectedRequest && (
+                <EmpSCRModal
+                    visible={scrModalVisible}
+                    request={selectedRequest}
+                    onClose={toggleSCRModal}
+                    onSubmit={() => setLocalRefresh(prev => prev + 1)}
+                />
+            )}
 
-            <SCRInfo
-                visible={shiftDetailsModalVisible}
-                request={selectedRequest}
-                onClose={toggleSCRInfoModal}
-                onSubmitted={() => setLocalRefresh(prev => prev + 1)}
-            />
 
         </Card>
 
     );
 };
 
-export default EmpShiftCover;
-
 const styles = StyleSheet.create({
     filterContainer: {
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
-        gap: 10, 
+        gap: 10,
         marginVertical: 10,
     },
     dropdownButton: {
@@ -235,3 +243,4 @@ const styles = StyleSheet.create({
     },
 });
 
+export default EmpSCRFeed;

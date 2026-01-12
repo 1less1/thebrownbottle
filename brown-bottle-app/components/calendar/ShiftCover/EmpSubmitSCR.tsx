@@ -22,7 +22,8 @@ interface ModalProps {
     onSubmitted?: () => void;
 }
 
-const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
+const EmpSubmitSCR: React.FC<ModalProps> = ({ visible, onClose, onSubmitted }) => {
+
     const { user } = useSession();
     const { confirm } = useConfirm();
 
@@ -37,19 +38,18 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
         setSelectedShift(null);
     };
 
+    const handleClose = () => {
+        resetForm();
+        onClose();
+    };
+
+    // Form Validation
+    const isValidForm =
+        selectedDate.trim().length > 0 &&
+        selectedShift != null;
+
     const handleSubmit = async () => {
-
-        if (!user) {
-            alert('User not found. Please log in again.');
-            return;
-        }
-
-        if (!selectedShift) {
-            alert('No shift found for this date.');
-            return;
-        }
-
-        if (loading) return;
+        if (!user || loading || !selectedShift) return;
 
         // I NEED to add a SQL TRIGGER for this!!!
         const alreadyExists = await hasPendingRequest(
@@ -66,10 +66,7 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
             'Confirm Submission',
             `Submit Shift Cover Request?`
         );
-
         if (!ok) return;
-
-        setLoading(true);
 
         try {
             setLoading(true);
@@ -85,15 +82,11 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
             resetForm();
             onClose();
         } catch (error: any) {
-            alert("Failed to submit shift cover request: " + error.message);
+            alert("Failed to submit shift cover request!");
+            console.log("Failed to submit shift cover request:", error.message);
         } finally {
             setLoading(false);
         }
-    };
-
-    const handleClose = () => {
-        resetForm();
-        onClose();
     };
 
     return (
@@ -138,7 +131,7 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
                     textStyle={{ color: 'white' }}
                     style={[GlobalStyles.submitButton, { flex: 1 }]}
                     onPress={handleSubmit}
-                    enabled={!loading && !loadingShifts && selectedShift !== null}
+                    enabled={!loading && !loadingShifts && isValidForm}
                 />
                 <ModularButton
                     text="Cancel"
@@ -152,8 +145,6 @@ const SubmitShiftCover: React.FC<ModalProps> = ({ visible, onClose, onSubmitted 
 
     );
 };
-
-export default SubmitShiftCover;
 
 const styles = StyleSheet.create({
     calendarContainer: {
@@ -181,5 +172,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         alignItems: 'center',
     }
-
 });
+
+export default EmpSubmitSCR;

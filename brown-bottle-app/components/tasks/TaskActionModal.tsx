@@ -44,26 +44,25 @@ const TaskActionModal: React.FC<ModalProps> = ({ task, mode, visible, onClose, o
     <ModularModal visible={visible} onClose={onClose}>
 
       {/* Modal Content */}
-      <TaskModalContent task={task}>
+      <TaskModalContent task={task} />
 
-        {/* Buttons */}
-        <View style={GlobalStyles.buttonRowContainer}>
-          <TouchableOpacity
-            style={config.style}
-            onPress={() => onSubmit(task)} // Pass the task back to the parent
-            disabled={loading}
-          >
-            <Ionicons name={config.icon} size={20} color={config.color} />
-          </TouchableOpacity>
+      {/* Buttons */}
+      <View style={GlobalStyles.buttonRowContainer}>
+        <TouchableOpacity
+          style={config.style}
+          onPress={() => onSubmit(task)} // Pass the task back to the parent
+          disabled={loading}
+        >
+          <Ionicons name={config.icon} size={20} color={config.color} />
+        </TouchableOpacity>
 
-          <ModularButton
-            text="Cancel"
-            textStyle={{ color: 'gray' }}
-            style={[GlobalStyles.cancelButton, { flex: 1 }]}
-            onPress={onClose}
-          />
-        </View>
-      </TaskModalContent>
+        <ModularButton
+          text="Cancel"
+          textStyle={{ color: 'gray' }}
+          style={[GlobalStyles.cancelButton, { flex: 1 }]}
+          onPress={onClose}
+        />
+      </View>
 
     </ModularModal>
 

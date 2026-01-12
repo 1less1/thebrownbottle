@@ -41,7 +41,7 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
 
-    const TITLE_MAX_CHARS = 150;
+    const TITLE_MAX_CHARS = 100;
     const DESC_MAX_CHARS = 350;
 
 
@@ -65,10 +65,12 @@ const NewAnnouncement: React.FC<Props> = ({ onSubmit }) => {
         selectedRole !== null;
 
     const handlePost = async () => {
-        if (!user || !selectedRole) return;
+        if (!user || loading || !selectedRole) return;
 
         // Confirmation
-        const ok = await confirm("Confirm Announcement", "Are you sure you want to post this announcement?");
+        const ok = await confirm("Confirm Announcement", 
+            "Are you sure you want to post this announcement?"
+        );
         if (!ok) return;
 
         try {

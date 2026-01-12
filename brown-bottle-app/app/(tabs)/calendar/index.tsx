@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -8,10 +8,9 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
 
 import ShiftCalendar from '@/components/calendar/ShiftCalendar/ShiftCalendar';
-import ShiftCover from '@/components/calendar/ShiftCover/ShiftCover';
+import EmpSCR from '@/components/calendar/ShiftCover/EmpSCR';
 import TimeOff from '@/components/calendar/TimeOff/TimeOff';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
@@ -34,6 +33,7 @@ const CalendarPage = () => {
   );
 
   const { user } = useSession();
+  
   const [loading, setLoading] = useState<boolean>(true); // Start as true
 
   const [activeTab, setActiveTab] = useState(0);
@@ -48,7 +48,7 @@ const CalendarPage = () => {
   // Define available tabs and corresponding components
   const tabs: Tab[] = [
     { key: 'shifts', title: 'Shifts', component: <ShiftCalendar /> },
-    { key: 'shift cover', title: 'Shift Cover', component: <ShiftCover /> },
+    { key: 'shift cover', title: 'Shift Cover', component: <EmpSCR /> },
     { key: 'time off', title: 'Time Off', component: <TimeOff /> },
   ];
 

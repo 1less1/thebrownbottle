@@ -7,9 +7,11 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from '@/components/modular/Card';
-import SectionDropdown from '@/components/modular/dropdown/SectionDropdown';
+import LoadingCircle from '@/components/modular/LoadingCircle';
 
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
+import SectionDropdown from '@/components/modular/dropdown/SectionDropdown';
+
 import ModularListView from "@/components/modular/ModularListView";
 import RecurringTaskistItem from '@/components/admin/Tasks/Templates/RecurringTaskListItem';
 
@@ -100,7 +102,9 @@ const AdminRecurringTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) 
         if (!user) return;
 
         // Confirmation Popup
-        const ok = await confirm("Confirm Deletion", "Are you sure you want to delete this recurring task?");
+        const ok = await confirm("Confirm Deletion", 
+            "Are you sure you want to delete this recurring task?"
+        );
         if (!ok) return;
 
         setLoading(true);
@@ -149,6 +153,14 @@ const AdminRecurringTasks: React.FC<Props> = ({ parentRefresh, onRefreshDone }) 
             </RecurringTaskistItem>
         );
     };
+
+    if (!user) {
+        return (
+            <Card style={{ height: cardHeight }}>
+                <LoadingCircle size="small" />
+            </Card>
+        );
+    }
 
     return (
 

@@ -17,7 +17,7 @@ export default function TabLayout() {
     // New Navbar Theme!
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.darkGray,
+        tabBarActiveTintColor: Colors.darkTan,
         tabBarInactiveTintColor: 'black',
         headerShown: false,
         tabBarButton: HapticTab,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Pressable, useWindowDimensions, Platform } from "react-native";
 
 import { Ionicons } from '@expo/vector-icons';
@@ -9,15 +9,14 @@ import { Colors } from "@/constants/Colors";
 import Card from "@/components/modular/Card";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
-import ModularButton from "@/components/modular/ModularButton";
 import ModularListView from "@/components/modular/ModularListView";
 
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import { DropdownOption, DateSortType } from "@/types/iDropdown";
 import RoleDropdown from "@/components/modular/dropdown/RoleDropdown";
 
-import SCRListItem from "@/components/calendar/ShiftCover/Templates/SCRListItem";
-import SCRModal from "@/components/admin/ShiftCover/SCRModal";
+import SCRListItem from "@/components/admin/ShiftCover/Templates/SCRListItem";
+import AdmSCRModal from "@/components/admin/ShiftCover/AdmSCRModal";
 
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { GetShiftCoverRequest, ShiftCoverRequest, Status } from "@/types/iShiftCover";
@@ -25,7 +24,7 @@ import { GetShiftCoverRequest, ShiftCoverRequest, Status } from "@/types/iShiftC
 
 import { useSession } from "@/utils/SessionContext";
 
-interface AdminShiftCoverProps {
+interface Props {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
@@ -40,13 +39,13 @@ const dateDropdownOptions: DropdownOption<string>[] = [
     { key: "Oldest Date", value: "Oldest" }
 ];
 
-const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefreshDone }) => {
+const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? height * 0.68 : height * 0.7;
+    const cardHeight = isMobile ? HEIGHT * 0.68 : HEIGHT * 0.7;
 
     const { user } = useSession();
 
@@ -54,9 +53,11 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [shiftCoverModalVisible, setSCRModalVisible] = useState(false);
+    const [localRefresh, setLocalRefresh] = useState(0);
 
+    const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
+
+    const [scrModalVisible, setSCRModalVisible] = useState(false);
     const toggleSCRModal = () => setSCRModalVisible((prev) => !prev);
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -65,17 +66,13 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
     const [activeTab, setActiveTab] = useState<"Active" | "Completed">("Active");
 
-    const [localRefresh, setLocalRefresh] = useState(0);
-
-    // Fetch Shift Cover Requests
-    const fetchSCR = async () => {
-
-        if (!user?.employee_id) return;
-
-        setLoading(true);
-        setError(null);
+    // Fetch shift cover requests
+    const fetchSCR = useCallback(async () => {
+        if (!user) return;
 
         try {
+            setError(null);
+            setLoading(true);
 
             const statuses: Status[] = [];
 
@@ -108,24 +105,33 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
             setRequests(data);
 
-        } catch (error) {
-            setError('Failed to fetch shift cover requests.');
-            console.log(error);
+        } catch (error: any) {
+            setError('Failed to fetch shift cover requests!');
+            console.log('Failed to fetch shift cover requests:', error.message);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, activeTab, roleFilter, dateFilter, statusFilter]);
 
-    // Fetch Shift Cover Requests on Initialization and State Update
+    // Fetch shift cover requests on initialiaztion and state update
     useEffect(() => {
         fetchSCR();
-    }, [user, parentRefresh, localRefresh, activeTab, roleFilter, dateFilter, statusFilter]);
+    }, [parentRefresh, localRefresh, fetchSCR]);
 
+    // UI Rendering
+    const handlePress = (request: ShiftCoverRequest) => {
+        setSelectedRequest(request);
+        toggleSCRModal();
+    };
+
+    const renderTask = (request: ShiftCoverRequest) => {
+        return <SCRListItem request={request} />
+    };
 
     if (!user) {
         return (
-            <Card style={GlobalStyles.loadingContainer}>
-                <LoadingCircle />
+            <Card style={{ height: cardHeight }}>
+                <LoadingCircle size="small" />
             </Card>
         );
     }
@@ -136,7 +142,6 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
 
             {/* Filter Container*/}
             <View style={styles.filterContainer}>
-
                 {/* Role Filter */}
                 <RoleDropdown
                     onRoleSelect={(value) => setRoleFilter(value as number)}
@@ -144,6 +149,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                     usePlaceholder={true}
                     placeholderText="All Roles"
                     containerStyle={styles.dropdownButton}
+                    disabled={loading}
                 />
 
                 {/* Status Filter */}
@@ -154,7 +160,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                     usePlaceholder={true}
                     placeholderText="Any Status"
                     containerStyle={styles.dropdownButton}
-                    disabled={activeTab == "Active"}
+                    disabled={loading || activeTab == "Active"}
                 />
 
                 {/* Date Filter */}
@@ -164,6 +170,7 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                     selectedValue={dateFilter}
                     usePlaceholder={false}
                     containerStyle={styles.dropdownButton}
+                    disabled={loading}
                 />
             </View>
 
@@ -195,29 +202,24 @@ const AdminShiftCover: React.FC<AdminShiftCoverProps> = ({ parentRefresh, onRefr
                 error={error}
                 emptyText="No requests found."
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={(req) => {
-                    setSelectedRequest(req);
-                    toggleSCRModal();
-                }}
-                renderItem={(req) => (
-                    <SCRListItem request={req} />
-                )}
+                onItemPress={handlePress}
+                renderItem={renderTask}
             />
 
-
-            <SCRModal
-                visible={shiftCoverModalVisible}
-                request={selectedRequest}
-                onClose={toggleSCRModal}
-                onSubmitted={() => setLocalRefresh(prev => prev + 1)}
-            />
+            {/* Shift Cover Request Modal */}
+            {selectedRequest && (
+                <AdmSCRModal
+                    visible={scrModalVisible}
+                    request={selectedRequest}
+                    onClose={toggleSCRModal}
+                    onSubmit={() => setLocalRefresh(prev => prev + 1)}
+                />
+            )}
 
         </Card>
 
     );
 };
-
-export default AdminShiftCover;
 
 const styles = StyleSheet.create({
     // Filters
@@ -259,3 +261,4 @@ const styles = StyleSheet.create({
     },
 });
 
+export default AdmSCRFeed;

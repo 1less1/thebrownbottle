@@ -10,13 +10,11 @@ import StatusBadge from '@/components/modular/StatusBadge';
 import { ShiftCoverRequest, Status } from "@/types/iShiftCover";
 
 interface Props {
-    request: ShiftCoverRequest | null;
+    request: ShiftCoverRequest;
 }
 
 // Reusable Shift Cover List Item Details
 const SCRListItem: React.FC<Props> = ({ request }) => {
-
-    if (!request) return null;
 
     return (
 
@@ -57,16 +55,15 @@ const SCRListItem: React.FC<Props> = ({ request }) => {
                         <Text style={GlobalStyles.semiBoldText}>
                             {request.shift_date} {"@"} {request.shift_start}
                         </Text>
-                        {/* <Text style={GlobalStyles.altText}>Section: {request.section_name}</Text> */}
                     </View>
 
                     {/* Original Shift Assignment */}
                     <View style={[styles.row, { marginTop: 2 }]}>
-                        <Text style={GlobalStyles.text}>From: </Text>
-                        <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
-                            {request.requested_first_name} {request.requested_last_name} { }
-                        </Text>
                         <Text style={GlobalStyles.text}>
+                            From:{" "}
+                            <Text style={[GlobalStyles.boldText, { color: Colors.blue }]}>
+                                {request.requested_first_name} {request.requested_last_name} { }
+                            </Text>
                             ({request.requested_primary_role_name})
                         </Text>
                     </View>
@@ -114,6 +111,5 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
     },
 });
-
 
 export default SCRListItem;

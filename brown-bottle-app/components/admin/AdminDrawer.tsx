@@ -57,7 +57,7 @@ const AdminDrawer = ({ visible, onClose, activeTab, onTabChange, tabs = [] }: Ad
                 useNativeDriver: true,
             })
         ]).start();
-    }, [visible]);
+    }, [visible, width]);
 
     return (
         <>

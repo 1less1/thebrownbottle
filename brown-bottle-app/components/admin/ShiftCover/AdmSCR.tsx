@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View } from 'react-native';
-import { useSession } from '@/utils/SessionContext';
-import DefaultScrollView from '@/components/DefaultScrollView';
-import AdminShiftCover from "@/components/admin/ShiftCover/AdminShiftCover";
 
-const ShiftCover = () => {
-  const { user } = useSession();
+import { Colors } from '@/constants/Colors';
+import { GlobalStyles } from '@/constants/GlobalStyles';
+
+import DefaultScrollView from '@/components/DefaultScrollView';
+import AdmSCRFeed from "@/components/admin/ShiftCover/AdmSCRFeed";
+
+const AdmSCR = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -23,8 +25,8 @@ const ShiftCover = () => {
 
     <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-      <View style={{ marginTop: 16, width: '90%' }}>
-        <AdminShiftCover parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+      <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
+        <AdmSCRFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
       </View>
 
     </DefaultScrollView>
@@ -33,4 +35,4 @@ const ShiftCover = () => {
 
 };
 
-export default ShiftCover;
+export default AdmSCR;

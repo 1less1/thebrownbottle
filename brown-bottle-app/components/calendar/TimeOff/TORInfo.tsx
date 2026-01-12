@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Pressable } from 'react-native';
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -70,12 +72,13 @@ const TORInfo: React.FC<ModalProps> = ({
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
                 {request.status === "Pending" && (
-                    <ModularButton
-                        text={"Remove"}
-                        style={[GlobalStyles.deleteButton, { flex: 1 }]}
+                    // Delete Button
+                    <TouchableOpacity
+                        style={[GlobalStyles.borderButton, styles.deleteButton]}
                         onPress={handleDelete}
-                        enabled={!loading}
-                    />
+                        disabled={loading}>
+                        <Ionicons name={"close-outline"} size={20} color={Colors.red} />
+                    </TouchableOpacity>
                 )}
                 <ModularButton
                     text="Close"
@@ -96,5 +99,11 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         marginBottom: 10
+    },
+    deleteButton: {
+        flex: 1,
+        backgroundColor: Colors.bgRed,
+        borderColor: Colors.borderRed,
+        alignItems: "center"
     },
 })

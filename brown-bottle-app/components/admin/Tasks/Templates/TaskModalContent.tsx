@@ -10,7 +10,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import Card from '@/components/modular/Card';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 

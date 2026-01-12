@@ -46,10 +46,10 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
 
     // Check if user has a shift today...
     const fetchTodayShift = useCallback(async () => {
-        setError(null);
-        setLoading(true);
-
         try {
+            setError(null);
+            setLoading(true);
+
             const params: Partial<GetShift> = {
                 employee_id: user.employee_id,
                 is_today: 1,
@@ -65,8 +65,8 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
             }
 
         } catch (error: any) {
-            setError("Failed to fetch user shift.");
-            console.log("Failed to fetch user shift", error.message);
+            setError("Failed to fetch user shift!");
+            console.log("Failed to fetch user shift:", error.message);
         } finally {
             setLoading(false);
         }
@@ -74,11 +74,11 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
 
     // Fetch Completed Tasks (tasks with complete=1)
     const fetchCompletedTasks = useCallback(async () => {
-        setError(null);
-        setLoading(true);
-
         try {
             if (!sectionId) return;
+
+            setError(null);
+            setLoading(true);
 
             const params: Partial<GetTask> = {
                 section_id: sectionId,
@@ -88,8 +88,8 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
             setCompletedTasks(data);
 
         } catch (error: any) {
-            setError("Failed to fetch completed tasks.");
-            console.log("Failed to fetch completed tasks", error.message);
+            setError("Failed to fetch completed tasks!");
+            console.log("Failed to fetch completed tasks:", error.message);
         } finally {
             setLoading(false);
         }
@@ -97,9 +97,9 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
 
     // Undo completion of a task
     const handleUndo = async (task: Task) => {
-        setLoading(true);
-
         try {
+            setLoading(true);
+
             await updateTask(task.task_id, {
                 complete: 0,
                 last_modified_by: user.employee_id,
@@ -108,8 +108,8 @@ const CompletedTasks: React.FC<CompletedTasksProps> = ({ user, parentRefresh, on
             alert("Task has been marked as incomplete!");
             setLocalRefresh((prev) => prev + 1);
         } catch (error: any) {
-            alert("Failed to mark as incomplete. Try again later.");
-            console.error("Failed to mark as incomplete:", error.message);
+            alert("Failed to mark as incomplete! Try again later.");
+            console.error("Failed to mark task as incomplete:", error.message);
         } finally {
             setLoading(false);
         }

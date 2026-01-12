@@ -9,11 +9,10 @@ import { formatDateTime, formatDate } from '@/utils/dateTimeHelpers';
 
 interface Props {
     task: Task;
-    children?: React.ReactNode
 }
 
 // Reusable Employee Task Modal Content
-const TaskModalContent: React.FC<Props> = ({ task, children }) => {
+const TaskModalContent: React.FC<Props> = ({ task }) => {
 
     return (
 
@@ -64,9 +63,6 @@ const TaskModalContent: React.FC<Props> = ({ task, children }) => {
                     Posted {formatDateTime(task.timestamp)} by {task.author}
                 </Text>
             </View>
-
-            {/* Optional Modal Content - Mainly used for buttons! */}
-            {children}
         </>
 
     );

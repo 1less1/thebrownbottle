@@ -72,8 +72,8 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
             }
 
         } catch (error: any) {
-            setError('Failed to fetch user shift.');
-            console.log('Failed to fetch user shift', error.message);
+            setError('Failed to fetch user shift!');
+            console.log('Failed to fetch user shift:', error.message);
         } finally {
             setLoading(false);
         }
@@ -81,12 +81,11 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
 
     // Fetch Active Tasks (Incomplete tasks for due_date >= Today's Date)
     const fetchActiveTasks = useCallback(async () => {
-        setError(null);
-        setLoading(true);
-
         try {
-
             if (!sectionId) return;
+
+            setError(null);
+            setLoading(true);
 
             const params: Partial<GetTask> = {
                 section_id: sectionId,
@@ -98,8 +97,8 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
             setActiveTasks(data);
 
         } catch (error: any) {
-            setError('Failed to fetch active tasks.');
-            console.log('Failed to fetch active tasks', error.message);
+            setError('Failed to fetch active tasks!');
+            console.log('Failed to fetch active tasks:', error.message);
         } finally {
             setLoading(false);
         }
@@ -107,12 +106,11 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
 
     // Fetch Overdue Tasks (Incomplete tasks for due date < Today's Date)
     const fetchOverdueTasks = useCallback(async () => {
-        setError(null);
-        setLoading(true);
-
         try {
-
             if (!sectionId) return;
+
+            setError(null);
+            setLoading(true);
 
             const params: Partial<GetTask> = {
                 section_id: sectionId,
@@ -132,9 +130,9 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
 
     // Complete a Task
     const handleComplete = async (task: Task) => {
-        setLoading(true);
-
         try {
+            setLoading(true);
+
             await updateTask(task.task_id, {
                 complete: 1,
                 last_modified_by: user.employee_id,
@@ -143,8 +141,8 @@ const ActiveTasks: React.FC<ActiveTasksProps> = ({ user, parentRefresh, onRefres
             alert("Task has been completed!")
             setLocalRefresh((prev) => prev + 1);
         } catch (error: any) {
-            alert("Task completion failed! Try again later.")
-            console.error("Task completion failed:", error.message)
+            alert("Failed to complete task! Try again later.")
+            console.error("Failed to mark task as complete:", error.message)
         } finally {
             setLoading(false);
         }

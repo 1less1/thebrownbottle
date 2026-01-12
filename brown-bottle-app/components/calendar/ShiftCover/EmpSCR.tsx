@@ -4,16 +4,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
-import DefaultView from '@/components/DefaultView'
 import DefaultScrollView from '@/components/DefaultScrollView';
-import Card from '@/components/modular/Card';
+import EmpSCRFeed from '@/components/calendar/ShiftCover/EmpSCRFeed';
 
-import EmpShiftCover from '@/components/calendar/ShiftCover/EmpShiftCover';
-
-import { useSession } from '@/utils/SessionContext';
-
-const ShiftCover = () => {
-    const { user } = useSession();
+const EmpSCR = () => {
 
     const [refreshing, setRefreshing] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -32,7 +26,7 @@ const ShiftCover = () => {
         <DefaultScrollView scrollEnabled={false} refreshing={refreshing} onRefresh={handleRefresh}>
 
             <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
-                <EmpShiftCover parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                <EmpSCRFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
             </View>
 
         </DefaultScrollView>
@@ -40,4 +34,4 @@ const ShiftCover = () => {
     );
 };
 
-export default ShiftCover;
+export default EmpSCR;

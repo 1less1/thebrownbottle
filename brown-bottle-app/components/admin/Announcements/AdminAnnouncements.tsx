@@ -7,9 +7,11 @@ import { Colors } from '@/constants/Colors';
 import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import Card from '@/components/modular/Card';
-import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+import LoadingCircle from '@/components/modular/LoadingCircle';
 
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
+import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
+
 import ModularListView from "@/components/modular/ModularListView";
 import AnnouncementListItem from '@/components/admin/Announcements/Templates/AnnouncementListItem';
 
@@ -40,6 +42,9 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
     const isMobile = WIDTH < 768;
     const cardHeight = isMobile ? HEIGHT * 0.50 : HEIGHT * 0.55;
 
+    const { user } = useSession();
+    const { confirm } = useConfirm();
+
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null)
@@ -61,9 +66,6 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
         setAckModalVisible(false);
         setSelectedAnnounceId(null);
     };
-
-    const { confirm } = useConfirm();
-    const { user } = useSession();
 
     const fetchAnnouncements = useCallback(async () => {
         try {
@@ -141,6 +143,14 @@ const AdminAnnouncements: React.FC<Props> = ({ parentRefresh, onRefreshDone }) =
             </AnnouncementListItem>
         );
     };
+
+    if (!user) {
+        return (
+            <Card style={{ height: cardHeight }}>
+                <LoadingCircle size="small" />
+            </Card>
+        );
+    }
 
     return (
 

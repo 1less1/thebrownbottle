@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+
+import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
-import SCRModalContent from '@/components/calendar/ShiftCover/Templates/SCRModalContent';
+import SCRModalContent from '@/components/admin/ShiftCover/Templates/SCRModalContent';
 
 import { ShiftCoverRequest, Status } from '@/types/iShiftCover';
 import { updateShiftCoverRequest, deleteShiftCoverRequest } from '@/routes/shift_cover_request';
@@ -14,34 +16,28 @@ import { updateShiftCoverRequest, deleteShiftCoverRequest } from '@/routes/shift
 import { useConfirm } from '@/hooks/useConfirm';
 import { useSession } from '@/utils/SessionContext';
 
-interface ModalProps {
+interface Props {
     visible: boolean;
     onClose: () => void;
-    request: ShiftCoverRequest | null;
-    onSubmitted?: () => void;
+    request: ShiftCoverRequest;
+    onSubmit?: () => void;
 }
 
-const SCRInfo: React.FC<ModalProps> = ({
-    visible,
-    onClose,
-    request,
-    onSubmitted
-}) => {
+const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) => {
 
     const { user } = useSession();
     const { confirm } = useConfirm();
+
     const [loading, setLoading] = useState(false);
 
 
     const handleSubmit = async () => {
         if (!request || loading) return;
 
-
         const ok = await confirm(
             "Confirm Request",
             "Are you sure you want to request this shift?"
         );
-
         if (!ok) return;
 
         try {
@@ -54,10 +50,11 @@ const SCRInfo: React.FC<ModalProps> = ({
 
             await updateShiftCoverRequest(request.cover_request_id, fields)
             alert("Request is now awaiting manager approval.");
-            onSubmitted?.();
+            onSubmit?.();
             onClose?.();
         } catch (error: any) {
-            alert("Failed to submit request: " + error.message);
+            alert("Failed to submit shift cover request!");
+            console.log("Failed to submit shift cover request:", error.message);
         } finally {
             setLoading(false);
         }
@@ -67,26 +64,25 @@ const SCRInfo: React.FC<ModalProps> = ({
         if (!request || loading) return;
 
         const ok = await confirm(
-            "Confirm Deletion",
+            "Confirm Delete",
             "Are you sure you want to delete this request? This action cannot be undone."
         );
-
         if (!ok) return;
 
         try {
             setLoading(true);
+
             await deleteShiftCoverRequest(request.cover_request_id);
             alert("Shift cover request successfully deleted!");
-            onSubmitted?.();
+            onSubmit?.();
             onClose?.();
         } catch (error: any) {
-            alert("Failed to delete request: " + error.message);
+            alert("Failed to delete shift cover request!");
+            console.log("Failed to delete shift cover request:", error.message);
         } finally {
             setLoading(false);
         }
     };
-
-    if (!request) return null;
 
     const isOwner = Number(request?.requested_employee_id) === Number(user?.employee_id);
     const isLocked = ["Accepted", "Denied", "Awaiting Approval"].includes(request.status);
@@ -101,25 +97,28 @@ const SCRInfo: React.FC<ModalProps> = ({
             {/* Buttons */}
             <View style={GlobalStyles.buttonRowContainer}>
 
+                {/* Only show Delete/Request Button if NOT "Locked" */}
                 {!isLocked && (
                     isOwner ? (
-                        <ModularButton
-                            text={"Remove"}
-                            style={[GlobalStyles.deleteButton, { flex: 1 }]}
+                        // Delete Button
+                        <TouchableOpacity
+                            style={[GlobalStyles.borderButton, styles.deleteButton]}
                             onPress={handleDelete}
-                            enabled={!loading}
-                        />
+                            disabled={loading}>
+                            <Ionicons name={"close-outline"} size={20} color={Colors.red} />
+                        </TouchableOpacity>
                     ) : (
-                        <ModularButton
-                            text={"Request Shift"}
-                            textStyle={{ color: "white" }}
-                            style={[GlobalStyles.submitButton, { flex: 1 }]}
+                        // Request Shift Button
+                        <TouchableOpacity
+                            style={[GlobalStyles.borderButton, styles.requestShiftButton]}
                             onPress={handleSubmit}
-                            enabled={!loading && isPending}
-                        />
+                            disabled={loading && !isPending}>
+                            <Ionicons name={"swap-horizontal-outline"} size={20} color={Colors.blue} />
+                        </TouchableOpacity>
                     )
                 )}
-
+                
+                {/* Always show Close Button */}
                 <ModularButton
                     text={isLocked ? "Close" : "Cancel"}
                     textStyle={{ color: "gray" }}
@@ -128,17 +127,29 @@ const SCRInfo: React.FC<ModalProps> = ({
                 />
 
             </View>
-            
-        </ModularModal>
+
+        </ModularModal >
 
     );
 };
-
-export default SCRInfo;
 
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         marginBottom: 10
     },
+    deleteButton: {
+        flex: 1,
+        backgroundColor: Colors.bgRed,
+        borderColor: Colors.borderRed,
+        alignItems: "center"
+    },
+    requestShiftButton: {
+        flex: 1,
+        backgroundColor: Colors.bgBlue,
+        borderColor: Colors.borderBlue,
+        alignItems: "center"
+    },
 })
+
+export default EmpSCRModal;

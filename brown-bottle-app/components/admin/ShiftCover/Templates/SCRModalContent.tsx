@@ -8,13 +8,11 @@ import { ShiftCoverRequest } from '@/types/iShiftCover';
 import { formatDateTime } from '@/utils/dateTimeHelpers';
 
 interface Props {
-    request: ShiftCoverRequest | null;
+    request: ShiftCoverRequest;
 }
 
 // Reusable Shift Cover Modal Details
 const SCRModalContent: React.FC<Props> = ({ request }) => {
-
-    if (!request) return null;
 
     const isPending = request.status === "Pending";
 
@@ -54,22 +52,24 @@ const SCRModalContent: React.FC<Props> = ({ request }) => {
 
             {/* Shift Details */}
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
+                {/* Parent holds the standard text style */}
                 <Text style={GlobalStyles.mediumText}>
+                    {/* Child holds the bold style */}
+                    <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
                     {request.shift_date}
                 </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
                 <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
                     {request.shift_start}
                 </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
                 <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
                     {request.section_name}
                 </Text>
             </View>

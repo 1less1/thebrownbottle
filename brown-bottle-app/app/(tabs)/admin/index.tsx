@@ -13,7 +13,7 @@ import AdminDrawer from '@/components/admin/AdminDrawer';
 
 import Announcements from "@/components/admin/Announcements/Announcements"
 import Tasks from "@/components/admin/Tasks/Tasks"
-import ShiftCover from '@/components/admin/ShiftCover/ShiftCover';
+import AdmSCR from '@/components/admin/ShiftCover/AdmSCR';
 import TimeOff from '@/components/admin/TimeOff/TimeOff';
 import Schedule from "@/components/admin/Schedule/Schedule";
 import Staff from "@/components/admin/Staff/Staff";
@@ -35,6 +35,7 @@ const Admin = () => {
   );
 
   const { user } = useSession();
+  
   const [loading, setLoading] = useState<boolean>(true); // Start as true
 
   const [activeTab, setActiveTab] = useState(0);
@@ -53,7 +54,7 @@ const Admin = () => {
   const tabs: Tab[] = [
     { key: 'Announcements', title: 'Announcements', component: <Announcements /> },
     { key: 'Tasks', title: 'Tasks', component: <Tasks /> },
-    { key: 'Shift Cover', title: 'Shift Cover', component: <ShiftCover /> },
+    { key: 'Shift Cover', title: 'Shift Cover', component: <AdmSCR /> },
     { key: 'Time Off', title: 'Time Off', component: <TimeOff /> },
     { key: 'Schedule', title: 'Schedule', component: <Schedule /> },
     { key: 'Staff', title: 'Staff', component: <Staff /> },
