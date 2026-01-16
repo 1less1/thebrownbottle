@@ -16,17 +16,17 @@ export interface Shift {
 }
 
 export interface GetShift {
-  shift_id?: number;
-  employee_id?: number;
-  primary_role?: number;
-  secondary_role?: number;
-  tertiary_role?: number;
-  section_id?: number;
-  date?: string; // Exact date filtering
-  start_date?: string; // Date Range 
-  end_date?: string; // Date Range
-  is_today?: 1 | 0; // Shift's only Today?
-  next_shift?: 1 | 0;
+  shift_id: number;
+  employee_id: number;
+  primary_role: number;
+  secondary_role: number;
+  tertiary_role: number;
+  section_id: number;
+  date: string; // Exact date filtering
+  start_date: string; // Date Range 
+  end_date: string; // Date Range
+  is_today: 1 | 0; // Shift's only Today?
+  next_shift: 1 | 0; // Get next shift
 }
 
 export interface InsertShift {

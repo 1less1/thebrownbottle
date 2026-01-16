@@ -44,18 +44,19 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
     const TITLE_MAX_CHARS = 100;
     const DESC_MAX_CHARS = 350;
 
-
-    const toggleModal = () => setModalVisible(prev => !prev);
-
     const resetForm = () => {
         setTitle('');
         setDescription('');
         setSelectedRole(1);
     };
 
-    const handleClose = () => {
+    const openModal = () => {
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
         resetForm();
-        toggleModal();
+        setModalVisible(false);
     };
 
     // Form Validation
@@ -86,10 +87,8 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
             await insertAnnouncement(payload);
 
             alert("Announcement posted successfully!");
-            resetForm();
-            toggleModal();
+            closeModal();
             onSubmit();
-
         } catch (error: any) {
             console.error("Failed to post announcement:", error.message);
             alert("Failed to post announcement!");
@@ -103,14 +102,14 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
         <>
             {/* New Announcement Button */}
             <Card style={[styles.buttonContainer, { height: buttonHeight }]}>
-                <TouchableOpacity onPress={toggleModal} style={styles.button}>
+                <TouchableOpacity onPress={openModal} style={styles.button}>
                     <Ionicons name="notifications" size={30} color="black" style={styles.icon} />
                     <Text style={GlobalStyles.boldText}>New Announcement</Text>
                 </TouchableOpacity>
             </Card>
 
             {/* New Announcement Modal */}
-            <ModularModal visible={modalVisible} onClose={handleClose} scroll={false}>
+            <ModularModal visible={modalVisible} onClose={closeModal} scroll={false}>
 
                 <Text style={GlobalStyles.modalTitle}>New Announcement</Text>
 
@@ -161,7 +160,7 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
                     <ModularButton
                         text="Post"
                         textStyle={{ color: 'white' }}
-                        style={[GlobalStyles.submitButton, { flex: 1 }]}
+                        style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                         onPress={handlePost}
                         enabled={isValidForm && !loading}
                     />
@@ -169,8 +168,8 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                        onPress={handleClose}
+                        style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
+                        onPress={closeModal}
                     />
                 </View>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useWindowDimensions, View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -11,9 +11,11 @@ import ModularButton from '@/components/modular/ModularButton';
 import RoleDropdown from '@/components/modular/dropdown/RoleDropdown';
 import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 
+import LoadingCircle from '@/components/modular/LoadingCircle';
+
 import { yesNoDropdownOptions } from '@/types/iDropdown';
 
-import { Employee } from "@/types/iEmployee";
+import { Employee, UpdateEmployee } from "@/types/iEmployee";
 import { updateEmployee } from '@/routes/employee';
 import { buildPatchData } from '@/utils/apiHelpers';
 import { isValidEmail, isValidPhone, formatPhone, formatWage } from '@/utils/formHelpers';
@@ -24,7 +26,7 @@ import { useConfirm } from '@/hooks/useConfirm';
 interface EditEmpProps {
   visible: boolean;
   onClose: () => void;
-  empData: Employee | null;
+  empData: Employee;
   onUpdate?: () => void;
 }
 
@@ -32,13 +34,20 @@ const adminDropdownOptions = yesNoDropdownOptions;
 
 const isActiveDropdownOptions = yesNoDropdownOptions;
 
+// List of keys that can be included in a PATCH request
+const patchableKeys: (keyof UpdateEmployee)[] = [
+  "first_name", "last_name", "email", "phone_number", "wage",
+  "admin", "primary_role", "secondary_role", "tertiary_role", "is_active"
+];
+
 const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }) => {
   const { width, height } = useWindowDimensions();
   const WIDTH = width;
   const HEIGHT = height;
 
+  const { confirm } = useConfirm();
+
   const [loading, setLoading] = useState(false);
-  const [edit, setEdit] = useState(false);
 
   const [originalEmpData, setOriginalEmpData] = useState<Employee | null>(null);
 
@@ -54,27 +63,47 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
   const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
   const [isActive, setIsActive] = useState<number>(1); // Default is_active=1 (True)
 
-  const { confirm } = useConfirm();
-
-  // Map local variables to an Employee object
-  const buildFormData = (): Employee => ({
+  // Build Form Data
+  const formData = useMemo(() => ({
     employee_id: employeeId,
-    first_name: firstName,
-    last_name: lastName,
-    email: email,
-    phone_number: phoneNumber,
-    wage: wage,
+    first_name: firstName.trim(),
+    last_name: lastName.trim(),
+    email: email.trim(),
+    phone_number: phoneNumber.trim(),
+    wage: wage.trim(),
     admin: admin,
     primary_role: primaryRole,
     secondary_role: secondaryRole,
     tertiary_role: tertiaryRole,
     is_active: isActive,
-  });
+  }), [firstName, lastName, email, phoneNumber, wage, admin, primaryRole, secondaryRole, tertiaryRole, isActive, employeeId]);
 
-  // Set form data on empData input change
+  // Form Validation
+  const isValidForm = useMemo(() => (
+    formData.first_name!.length > 0 &&
+    formData.last_name!.length > 0 &&
+    isValidEmail(formData.email!) &&
+    isValidPhone(formData.phone_number!) &&
+    formData.wage!.length > 0 &&
+    formData.primary_role != null &&
+    (isActive === 0 || isActive === 1)
+  ), [formData]); // Only recalculates when formData changes
+
+  // Construct data that has been changed
+  const patchData = useMemo(() => {
+    if (!originalEmpData) return {};
+
+    return buildPatchData(originalEmpData, formData, patchableKeys);
+  }, [originalEmpData, formData]);
+
+  const isDirty = Object.keys(patchData).length > 0;
+  const canUpdate = isDirty && isValidForm && !loading;
+
+  // Create a fresh form on modal visibility and empData change
   useEffect(() => {
-    if (empData) {
+    if (visible && empData) {
       setOriginalEmpData(empData);
+
       setEmployeeId(empData.employee_id);
       setFirstName(empData.first_name);
       setLastName(empData.last_name);
@@ -87,89 +116,36 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
       setTertiaryRole(empData.tertiary_role);
       setIsActive(empData.is_active);
     }
-  }, [empData]);
+  }, [visible, empData]);
 
-  // Reset form on visbility change
-  useEffect(() => {
-    if (!visible) {
-      setEdit(false);
-      setOriginalEmpData(null);
-    }
-  }, [visible]);
-
-  const handleEdit = () => setEdit(!edit);
-
-  // List of keys that can be included in a PATCH request
-  const patchableKeys: (keyof Employee)[] = [
-    "first_name", "last_name", "email", "phone_number", "wage",
-    "admin", "primary_role", "secondary_role", "tertiary_role", "is_active"
-  ];
 
   // Update Employee Logic
   const handleUpdate = async () => {
-    if (!originalEmpData) return;
-
-    const formData = buildFormData();
-
-    // Builds patchData by comparing originalEmpData and formData
-    // Returns a record of fields that have been changed
-    const patchData = buildPatchData(originalEmpData, formData, patchableKeys);
-    console.log("Patch Data:", patchData);
-
-    if (Object.keys(patchData).length === 0) {
-      alert("No changes detected!");
-      return;
-    }
+    if (!canUpdate) return;
 
     // Confirmation Popup
     const ok = await confirm(
       "Confirm Update",
       `Are you sure you want to update employee details?`
     );
-
     if (!ok) return;
 
-    setLoading(true);
-
     try {
+      setLoading(true);
 
-      // Validate Required Fields
-      if (!firstName.trim() || !lastName.trim() || !email.trim() || !phoneNumber.trim() || !wage.trim()) {
-        alert("Please fill out all required fields!");
-        setLoading(false);
-        return;
-      }
+      // Construct Final Patch Data
+      const finalPatchData = { ...patchData };
 
-      if (primaryRole == null) {
-        alert("Please assign a primary role!");
-        setLoading(false);
-        return;
-      }
-
-      // Validate Phone Number
-      if (!isValidPhone(phoneNumber)) {
-        alert("Please enter a valid phone number in the format XXX-XXX-XXXX.");
-        setLoading(false);
-        return;
-      }
-
-      // Validate Email
-      if (!isValidEmail(email)) {
-        alert("Please enter a valid email address.");
-        setLoading(false);
-        return;
-      }
-
-      await updateEmployee(originalEmpData.employee_id, patchData);
+      await updateEmployee(employeeId, finalPatchData as UpdateEmployee);
       alert("Employee successfully updated!");
       onUpdate?.();
       onClose();
     } catch (error: any) {
-      alert("Unable to update Employee: " + error.message);
+      alert("Failed to update employee: " + error.message);
+      console.log("Failed to update employee: " + error.message);
     } finally {
       setLoading(false);
     }
-
   };
 
 
@@ -180,21 +156,20 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
       {/* Header */}
       <Text style={GlobalStyles.modalTitle}>Employee Details</Text>
 
-
       {/* Employee Form */}
-      {originalEmpData ? (
+      {!originalEmpData ? (
+        <LoadingCircle size="small" />
+      ) : (
         <>
           <View style={[styles.formContainer, { height: HEIGHT * 0.42 }]}>
 
             <ScrollView>
-
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>First Name</Text>
               <TextInput
                 style={GlobalStyles.input}
                 value={firstName}
                 onChangeText={setFirstName}
-                editable={edit}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Last Name</Text>
@@ -202,7 +177,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 style={GlobalStyles.input}
                 value={lastName}
                 onChangeText={setLastName}
-                editable={edit}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Email</Text>
@@ -214,7 +188,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 placeholderTextColor={Colors.gray}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                editable={edit}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Phone</Text>
@@ -225,7 +198,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 placeholder="XXX-XXX-XXXX"
                 placeholderTextColor={Colors.gray}
                 keyboardType="phone-pad"
-                editable={edit}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Wage</Text>
@@ -236,7 +208,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 placeholder="00.00"
                 placeholderTextColor={Colors.gray}
                 keyboardType="decimal-pad"
-                editable={edit}
               />
 
               <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
@@ -244,7 +215,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 data={adminDropdownOptions}
                 selectedValue={admin}
                 onSelect={(value) => setAdmin(value as number)}
-                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
@@ -253,7 +223,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 selectedRole={primaryRole}
                 onRoleSelect={setPrimaryRole}
                 placeholderText="None"
-                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
@@ -262,7 +231,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 selectedRole={secondaryRole}
                 onRoleSelect={setSecondaryRole}
                 placeholderText="None"
-                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
@@ -271,7 +239,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 selectedRole={tertiaryRole}
                 onRoleSelect={setTertiaryRole}
                 placeholderText="None"
-                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
@@ -281,7 +248,6 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
                 selectedValue={isActive}
                 onSelect={(value) => setIsActive(value as number)}
                 usePlaceholder={false}
-                disabled={!edit}
                 containerStyle={styles.dropdownButton}
               />
 
@@ -289,34 +255,26 @@ const EditEmp: React.FC<EditEmpProps> = ({ visible, onClose, empData, onUpdate }
 
           </View>
 
-
+          {/* Buttons */}
           <View style={GlobalStyles.buttonRowContainer}>
-            {edit ? (
-              <ModularButton
-                text="Update"
-                textStyle={{ color: 'white' }}
-                style={[GlobalStyles.submitButton, { flex: 1 }]}
-                onPress={handleUpdate}
-                enabled={!loading}
-              />
-            ) : (
-              <ModularButton
-                text="Edit"
-                style={{ flex: 1 }}
-                onPress={handleEdit}
-              />
-            )}
+            {/* Update Button */}
+            <ModularButton
+              text="Update"
+              textStyle={{ color: 'white' }}
+              style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
+              onPress={handleUpdate}
+              enabled={canUpdate}
+            />
+
+            {/* Cancel Button */}
             <ModularButton
               text="Cancel"
               textStyle={{ color: 'gray' }}
-              style={[GlobalStyles.cancelButton, { flex: 1 }]}
+              style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
               onPress={onClose}
             />
           </View>
         </>
-
-      ) : (
-        <Text style={GlobalStyles.loadingText}>Loading employee data...</Text>
       )}
 
     </ModularModal>

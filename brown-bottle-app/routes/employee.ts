@@ -2,10 +2,11 @@ import Constants from "expo-constants";
 
 import { buildQueryString } from "@/utils/apiHelpers";
 
-import { Employee } from "@/types/iEmployee";
+import { Employee, GetEmployee, InsertEmployee, UpdateEmployee } from "@/types/iEmployee";
 
 // GET: Fetches data from the employee table
-export async function getEmployee(params?: Partial<Employee>) {
+export async function getEmployee(params?: Partial<GetEmployee>) {
+
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
@@ -13,7 +14,7 @@ export async function getEmployee(params?: Partial<Employee>) {
   const queryString = buildQueryString(params || {});
 
   const url = `${API_BASE_URL}/employee?${queryString}`;
-  
+
   try {
     const response = await fetch(url, {
       method: "GET",
@@ -28,7 +29,8 @@ export async function getEmployee(params?: Partial<Employee>) {
 
     const data = await response.json();
 
-    return data; // JSON Response
+    return data as Employee[]; // JSON Response
+
   } catch (error) {
     console.error("Failed to fetch employee data:", error);
     throw error;
@@ -36,13 +38,14 @@ export async function getEmployee(params?: Partial<Employee>) {
 }
 
 // POST: Inserts an employee record within the employee table
-export async function insertEmployee(fields: Partial<Employee>) {
+export async function insertEmployee(fields: InsertEmployee) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
 
   const url = `${API_BASE_URL}/employee/insert`;
 
   // Required db fields for POST
-  const requiredFields: (keyof Employee)[] = [
+  const requiredFields: (keyof InsertEmployee)[] = [
     "first_name",
     "last_name",
     "email",
@@ -50,13 +53,11 @@ export async function insertEmployee(fields: Partial<Employee>) {
     "wage",
     "admin",
     "primary_role",
-    "secondary_role",
-    "tertiary_role",
   ];
 
   try {
     for (const key of requiredFields) {
-      if (fields[key] === undefined || fields[key] === "") {
+      if (fields[key] === undefined || fields[key] === null || fields[key] === "") {
         throw new Error(`Missing required field: ${key}`);
       }
     }
@@ -73,9 +74,8 @@ export async function insertEmployee(fields: Partial<Employee>) {
       throw new Error(`[Employee API] Failed to POST: ${response.status}`);
     }
 
-    const data = await response.json();
+    return await response.json();
 
-    return data;
   } catch (error) {
     console.error("Failed to insert employee data:", error);
     throw error;
@@ -83,8 +83,13 @@ export async function insertEmployee(fields: Partial<Employee>) {
 }
 
 // PATCH: Updates an employee record within the employee table
-export async function updateEmployee(id: number, fields: Partial<Employee>) {
+export async function updateEmployee(id: number, fields: UpdateEmployee) {
+
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
+
+  if (!id) {
+    throw new Error("Updating an employee requires an id!");
+  }
 
   const url = `${API_BASE_URL}/employee/update/${id}`;
 
@@ -98,12 +103,11 @@ export async function updateEmployee(id: number, fields: Partial<Employee>) {
     });
 
     if (!response.ok) {
-      throw new Error(`[Employee API] Failed to PATCH: ${response.status}`);
+      throw new Error(`[Employee API] Failed to PATCH: ${id} - ${response.status}`);
     }
 
-    const data = await response.json();
+    return await response.json();
 
-    return data;
   } catch (error) {
     console.error("Failed to update employee data:", error);
     throw error;
@@ -137,8 +141,9 @@ export async function removeEmployees(employeeIds: number[]) {
     );
 
     return results; // Response Array
+
   } catch (error) {
-    console.error("Failed to update one or more employees:", error);
+    console.error("Failed to remove one or more employees:", error);
     throw error;
   }
 }

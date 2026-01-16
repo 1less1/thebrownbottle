@@ -14,7 +14,6 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
 import { CheckboxOption } from "@/types/iCheckbox";
-import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { convertToSQLDate, formatDateToCellHeader } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
@@ -26,7 +25,6 @@ import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
 
 import RoleCheckbox from "@/components/modular/checkbox/RoleCheckbox";
 import SectionCheckbox from "@/components/modular/checkbox/SectionCheckbox";
-import { Status } from "@/types/iTimeOff";
 import { DropdownOption } from '@/types/iDropdown';
 
 interface SpreadSheetProps {
@@ -56,18 +54,25 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]);
   const [isToday, setIsToday] = useState<number>(0);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [shiftModalVisible, setModalVisible] = useState(false);
+  const closeShiftModal = () => {
+    setModalVisible(false);
+    setSelectedShift(null);
+    setSelectedEmployee(null);
+  };
+
   const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getSunday(new Date()));
 
+  // Fetch Schedule Logic
   const fetchSchedule = async (searchTerm: string) => {
-    setLoading(true);
-    setError(null);
-
     try {
+      setError(null);
+      setLoading(true);
+
       const { weekStartStr, weekEndStr } = getWeekStartEnd(currentWeekStart);
 
       const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
@@ -85,13 +90,12 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         params.end_date = weekEndStr;
       }
 
-      const schedule: ScheduleEmployee[] = await getSchedule(params);
+      const schedule = await getSchedule(params);
 
       // Fetch accepted time off requests
       const timeOff = await getTimeOffRequest({
         status: ["Accepted"],
       });
-
 
       // Build blocked days
       const blockedDays = buildBlockedDaysMap(timeOff);
@@ -102,8 +106,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       setScheduleData(updatedSchedule);
     } catch (error: any) {
-      setError("Failed to fetch schedule data!")
-      console.error("Failed to fetch schedule data:", error.message);
+      setError("Failed to fetch schedule data: " + error.message);
+      console.error("Failed to fetch schedule data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -134,7 +138,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       setSelectedRoles([]);
       setSelectedSections([]);
       setIsToday(0);
-      setLocalRefresh((prev) => prev + 1);
+      setLocalRefresh((prev) => prev + 1); // triggers refresh
     }
   };
 
@@ -142,7 +146,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     const sundayThisWeek = getSunday(new Date());
     if (currentWeekStart.getTime() !== sundayThisWeek.getTime()) {
       debouncedSearch.cancel();
-      setLocalRefresh((prev) => prev + 1);
+      setLocalRefresh((prev) => prev + 1); // triggers refresh
       setCurrentWeekStart(sundayThisWeek);
     }
   };
@@ -150,18 +154,18 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   // Fetch Schedule Data on Initialization and State Update
   useEffect(() => {
     triggerRefresh(query)
-  }, [selectedSections, selectedRoles, isToday, currentWeekStart, parentRefresh, localRefresh]);
+  }, [parentRefresh, localRefresh, selectedSections, selectedRoles, isToday, currentWeekStart]);
 
   // Layout Calculations
   const weekDays = getWeekDayList(currentWeekStart, 7);
   const isMobile = WIDTH < 768;
   const NAME_COL_WIDTH = isMobile ? 170 : Math.max(170, WIDTH * 0.12);
   const DAY_COL_WIDTH = isMobile ? 135 : Math.max(135, (WIDTH * 0.75) / weekDays.length);
-  const ROW_HEIGHT = 50;
-  const HEADER_HEIGHT = 44;
+  const ROW_HEIGHT = isMobile ? 65 : 52;
+  const HEADER_HEIGHT = 45;
   const cardHeight = isMobile ? height * 0.7 : height * 0.8;
 
-
+  // UI Rendering
   const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
     const clickedDate = new Date(currentWeekStart);
     clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
@@ -411,14 +415,16 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       </View>
 
       {/* Shift Modal - Add, Update, Delete */}
-      <ShiftModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        shiftData={selectedShift}
-        employeeData={selectedEmployee}
-        date={selectedDate}
-        onUpdate={() => setLocalRefresh((prev) => prev + 1)}
-      />
+      {selectedEmployee && (
+        <ShiftModal
+          visible={shiftModalVisible}
+          onClose={closeShiftModal}
+          shiftData={selectedShift}
+          employeeData={selectedEmployee}
+          date={selectedDate}
+          onUpdate={() => setLocalRefresh((prev) => prev + 1)}
+        />
+      )}
 
     </Card>
 
@@ -505,9 +511,11 @@ const styles = StyleSheet.create({
   },
   singleRow: {
     flex: 1,
-    padding: 8,
-    alignSelf: "center",
+    width: '100%',
     justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    padding: 8,
   },
 
   // Employee Name Cell

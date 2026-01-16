@@ -279,7 +279,7 @@ const TaskModalContent: React.FC<Props> = ({ formState, setFormState, titleText 
                                             <ModularButton
                                                 text="Confirm"
                                                 textStyle={{ color: 'white' }}
-                                                style={[GlobalStyles.submitButton, { flex: 1 }]}
+                                                style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                                                 onPress={() => {
                                                     if (formState.noEndDate) {
                                                         update({
@@ -307,7 +307,7 @@ const TaskModalContent: React.FC<Props> = ({ formState, setFormState, titleText 
                                             <ModularButton
                                                 text="Cancel"
                                                 textStyle={{ color: 'gray' }}
-                                                style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                                                style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                                                 onPress={toggleRangePicker}
                                             />
                                         </View>

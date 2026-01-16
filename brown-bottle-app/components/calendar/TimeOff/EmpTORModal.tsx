@@ -67,19 +67,20 @@ const EmpTORModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
             <View style={GlobalStyles.buttonRowContainer}>
                 {request.status === "Pending" && (
                     // Delete Button
-                    <TouchableOpacity
+                    <ModularButton
+                        text="Delete"
+                        textStyle={{ color: Colors.red }}
                         style={[GlobalStyles.borderButton, styles.deleteButton]}
                         onPress={handleDelete}
-                        disabled={loading}>
-                        <Ionicons name={"close-outline"} size={20} color={Colors.red} />
-                    </TouchableOpacity>
+                        enabled={!loading}
+                    />
                 )}
 
                 {/* Always show Close Button */}
                 <ModularButton
                     text="Close"
                     textStyle={{ color: "gray" }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={onClose}
                 />
             </View>
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     deleteButton: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: Colors.bgRed,
         borderColor: Colors.borderRed,
         alignItems: "center"

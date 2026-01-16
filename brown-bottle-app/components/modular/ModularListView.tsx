@@ -70,7 +70,7 @@ export default function ModularListView<T>({
             </View>
         );
     };
-    
+
     // Pagination
     const ListFooter = () => {
         if (!isPaginating) return null;
@@ -181,8 +181,9 @@ const styles = StyleSheet.create({
     },
     singleRow: {
         flex: 1,
-        alignSelf: "center",
+        width: '100%',
         justifyContent: "center",
+        alignItems: "center",
         padding: 12,
         margin: 5,
     },

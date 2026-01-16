@@ -26,14 +26,14 @@ const EmpTaskModal: React.FC<Props> = ({ task, mode, visible, onClose, onSubmit,
 
   const modeConfig = {
     active: {
+      text: "Mark Complete",
+      textColor: Colors.green,
       style: [GlobalStyles.borderButton, styles.completeButton],
-      icon: "checkmark-outline" as const,
-      color: Colors.green,
     },
     completed: {
+      text: "Mark Incomplete",
+      textColor: Colors.red,
       style: [GlobalStyles.borderButton, styles.incompleteButton],
-      icon: "close-outline" as const,
-      color: Colors.red,
     },
   };
 
@@ -48,18 +48,20 @@ const EmpTaskModal: React.FC<Props> = ({ task, mode, visible, onClose, onSubmit,
 
       {/* Buttons */}
       <View style={GlobalStyles.buttonRowContainer}>
-        <TouchableOpacity
+        {/* Action Button */}
+        <ModularButton
+          text={config.text}
+          textStyle={{ color: config.textColor }}
           style={config.style}
           onPress={() => onSubmit(task)} // Pass the task back to the parent
-          disabled={loading}
-        >
-          <Ionicons name={config.icon} size={20} color={config.color} />
-        </TouchableOpacity>
-
+          enabled={!loading}
+        />
+        
+        {/* Cancel Button */}
         <ModularButton
           text="Cancel"
           textStyle={{ color: 'gray' }}
-          style={[GlobalStyles.cancelButton, { flex: 1 }]}
+          style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
           onPress={onClose}
         />
       </View>
@@ -79,13 +81,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   incompleteButton: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.bgRed,
     borderColor: Colors.borderRed,
     alignItems: "center"
   },
   completeButton: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: Colors.bgGreen,
     borderColor: Colors.borderGreen,
     alignItems: "center"

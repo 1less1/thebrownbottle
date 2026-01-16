@@ -150,14 +150,14 @@ const SubmitTimeOff: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
         <ModularButton
           text="Submit"
           textStyle={{ color: 'white' }}
-          style={[GlobalStyles.submitButton, { flex: 1 }]}
+          style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
           onPress={handleSubmit}
           enabled={!loading && isValidForm}
         />
         <ModularButton
           text="Cancel"
           textStyle={{ color: 'gray' }}
-          style={[GlobalStyles.cancelButton, { flex: 1 }]}
+          style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
           onPress={handleClose}
         />
       </View>

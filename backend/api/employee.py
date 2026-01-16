@@ -25,13 +25,13 @@ def get_employees(db, request):
             'phone_number': str,
             'wage': float,
             'admin': int,
-            # Used for filtering all 3 role designations below
-            'role_id': List[int],
             'primary_role': int,
             'secondary_role': int,
             'tertiary_role': int,
-            'full_name': str,
             'is_active': int,
+            'full_name': str,
+            # Used for filtering all 3 role designations below
+            'role_id': List[int],
         }
 
         # Validate and parse parameters
@@ -47,12 +47,13 @@ def get_employees(db, request):
         phone_number = params.get('phone_number')
         wage = params.get('wage')
         admin = params.get('admin')
-        role_ids = params.get('role_id')
         primary_role = params.get('primary_role')
         secondary_role = params.get('secondary_role')
         tertiary_role = params.get('tertiary_role')
-        full_name = params.get('full_name')
         is_active = params.get('is_active')
+        
+        full_name = params.get('full_name')
+        role_ids = params.get('role_id')
 
         conn = db
         cursor = conn.cursor(dictionary=True)

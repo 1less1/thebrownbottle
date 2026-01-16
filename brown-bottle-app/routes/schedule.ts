@@ -28,7 +28,8 @@ export async function getSchedule(params?: Partial<ScheduleAPI>) {
 
     const data = await response.json();
 
-    return data; // JSON Response
+    return data as ScheduleEmployee[]; // JSON Response
+    
   } catch (error) {
     console.error("Failed to fetch shift data:", error);
     throw error;

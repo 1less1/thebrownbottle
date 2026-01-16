@@ -28,7 +28,6 @@ const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
     const { confirm } = useConfirm();
 
     const [loading, setLoading] = useState(false);
-    const [loadingShifts, setLoadingShifts] = useState(true);
 
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
@@ -96,7 +95,6 @@ const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
             {/* Modal Title */}
             <Text style={GlobalStyles.modalTitle}>New Shift Cover Request</Text>
 
-
             {/* Calendar */}
             <View style={styles.calendarContainer}>
                 <CalendarWidget
@@ -104,17 +102,11 @@ const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
                     showShifts={true}
                     requireShiftSelection={true}
                     initialDate={selectedDate}
-                    onLoadingChange={setLoadingShifts}
                     onSelectDate={({ date, shift }) => {
                         setSelectedDate(date);
                         setSelectedShift(shift);
                     }}
                 />
-                {(loadingShifts) && (
-                    <View>
-                        <LoadingCircle size="large" />
-                    </View>
-                )}
             </View>
 
             {/* Selected Date Display */}
@@ -133,14 +125,14 @@ const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
                 <ModularButton
                     text={"Submit"}
                     textStyle={{ color: 'white' }}
-                    style={[GlobalStyles.submitButton, { flex: 1 }]}
+                    style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                     onPress={handleSubmit}
-                    enabled={!loading && !loadingShifts && isValidForm}
+                    enabled={!loading && isValidForm}
                 />
                 <ModularButton
                     text="Cancel"
                     textStyle={{ color: 'gray' }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={handleClose}
                 />
             </View>

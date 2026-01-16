@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { Calendar, LocaleConfig } from "react-native-calendars";
+
+import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
+
+import LoadingCircle from "@/components/modular/LoadingCircle";
 import CalendarModal from "@/components/calendar/CalendarModal";
+
 import { useSession } from "@/utils/SessionContext";
-import { Dimensions } from "react-native";
-import { getShift } from "@/routes/shift";
 
 import { Shift } from "@/types/iShift";
+import { getShift } from "@/routes/shift";
 
-interface CalendarWidgetProps {
+interface Props {
   mode?: "calendar" | "picker";
   pickerType?: PickerType;
   requireShiftSelection?: boolean;
@@ -17,7 +21,8 @@ interface CalendarWidgetProps {
   onSelectDate?: (payload: { date: string; shift: Shift | null }) => void;
   onSelectRange?: (payload: { startDate: string; endDate: string }) => void;
   initialDate?: string;
-  onLoadingChange?: (loading: boolean) => void;
+  parentRefresh?: number;
+  onRefreshDone?: () => void;
 }
 
 LocaleConfig.locales["en"] = {
@@ -51,13 +56,13 @@ LocaleConfig.defaultLocale = "en";
 type PickerType = "single" | "range";
 
 const getToday = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
   ).padStart(2, "0")}`;
 };
 
-const CalendarWidget: React.FC<CalendarWidgetProps> = ({
+const CalendarWidget: React.FC<Props> = ({
   mode = "calendar",
   pickerType = "single",
   requireShiftSelection = false,
@@ -65,9 +70,27 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   onSelectDate,
   onSelectRange,
   initialDate,
-  onLoadingChange,
+  parentRefresh,
+  onRefreshDone,
 }) => {
   const { user } = useSession();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = (shift: Shift) => {
+    setSelectedShift(shift);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    // We keep the shift data for a moment so the 
+    // closing animation doesn't look empty/broken
+    setTimeout(() => setSelectedShift(null), 300);
+  };
 
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
@@ -82,20 +105,33 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
   const scale = Math.min(screenWidth / 380, 1.1);
 
 
-  // Fetch Shifts
-  useEffect(() => {
-    if (!showShifts || !user?.employee_id) return;
+  // Fetch Shifts - Modified to handle internal loading
+  // Wrap fetch in useCallback for consistency
+  const fetchShifts = useCallback(async () => {
+    if (!showShifts || !user?.employee_id) {
+      setShifts([]);
+      return;
+    }
 
-    onLoadingChange?.(true);
-    (async () => {
-      try {
-        const data = await getShift({ employee_id: user.employee_id });
-        setShifts(data || []);
-      } finally {
-        onLoadingChange?.(false);
-      }
-    })();
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await getShift({ employee_id: user.employee_id });
+      setShifts(data || []);
+    } catch (error: any) {
+      setError("Calendar Wisget failed to fetch shifts!");
+      console.error("CalendarWidget failed to fetch shifts:", error.message);
+    } finally {
+      setLoading(false);
+      onRefreshDone?.();
+    }
   }, [showShifts, user?.employee_id]);
+
+  // Fetch shifts on mount or when parentRefresh changes
+  useEffect(() => {
+    fetchShifts();
+  }, [fetchShifts, parentRefresh]);
 
 
   // Mark dates on calendar
@@ -185,28 +221,34 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
 
   // Select single day
   const handleDayPress = ({ dateString }: { dateString: string }) => {
-    const isShiftDay = shifts.some((s) => s.date === dateString);
+    // 1. Find the shift once
+    const foundShift = shifts.find((s) => s.date === dateString) || null;
 
-    if (mode === "picker" && requireShiftSelection && !isShiftDay) return;
+    // 2. Early exit for picker mode if shift is required but missing
+    if (mode === "picker" && requireShiftSelection && !foundShift) return;
 
+    // 3. Always update the visual selection
     setSelectedDate(dateString);
 
-    if (mode === "picker" && pickerType === "range") {
-      handleRangePress(dateString);
-      return;
-    }
-
+    // 4. Handle Picker Logic
     if (mode === "picker") {
-      const shift = shifts.find((s) => s.date === dateString) || null;
-      onSelectDate?.({ date: dateString, shift });
-      return;
+      if (pickerType === "range") {
+        handleRangePress(dateString);
+      } else {
+        onSelectDate?.({ date: dateString, shift: foundShift });
+      }
+      return; // Exit early since we are in picker mode
     }
 
-    setSelectedShift(shifts.find((s) => s.date === dateString) || null);
+    // 5. Handle Calendar Logic
+    if (mode === "calendar" && foundShift) {
+      setSelectedShift(foundShift);
+      setModalVisible(true);
+    }
   };
 
 
-  // Calendar Theme:
+  // Calendar Theme
   const calendarTheme = useMemo(() => {
     const isRange = pickerType === "range";
 
@@ -239,32 +281,52 @@ const CalendarWidget: React.FC<CalendarWidgetProps> = ({
 
 
   return (
-    <View style={styles.container}>
-      <Calendar
-        current={selectedDate}
-        markingType={pickerType === "range" ? "period" : undefined}
-        markedDates={markedDates}
-        onDayPress={handleDayPress}
-        minDate={mode === "picker" ? today : undefined}
-        theme={calendarTheme}
-      />
 
-      {mode === "calendar" && selectedShift && (
-        <CalendarModal
-          visible
-          date={selectedShift.date}
-          startTime={selectedShift.start_time}
-          role={selectedShift.primary_role_name}
-          section={selectedShift.section_name}
-          onClose={() => setSelectedShift(null)}
+    <View style={styles.container}>
+      {error ? (
+        <View style={styles.loadingContainer}>
+          <Text style={GlobalStyles.errorText}>{error}</Text>
+        </View>
+      ) : loading ? (
+        <View style={styles.loadingContainer}>
+          <LoadingCircle size="small" />
+        </View>
+      ) : (
+        <Calendar
+          current={selectedDate}
+          markingType={pickerType === "range" ? "period" : undefined}
+          markedDates={markedDates}
+          onDayPress={handleDayPress}
+          minDate={mode === "picker" ? today : undefined}
+          theme={calendarTheme}
         />
       )}
+
+      {/* Modal triggered only when CalendarWidget is in "calendar" mode! */}
+      {selectedShift && (
+        <CalendarModal
+          visible={modalVisible}
+          shift={selectedShift}
+          onClose={closeModal}
+        />
+      )}
+
     </View>
+
   );
 };
 
 const styles = StyleSheet.create({
-  container: { width: "100%" },
+  container: {
+    width: "100%",
+    minHeight: 300, // Approximate height of a standard calendar
+  },
+  loadingContainer: {
+    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    height: 300,
+  }
 });
 
 export default CalendarWidget;

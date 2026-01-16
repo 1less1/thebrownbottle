@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text,  StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import dayjs from 'dayjs';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -39,7 +39,6 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
     const [loading, setLoading] = useState(false);
 
     const [modalVisible, setModalVisible] = useState(false);
-    const toggleModal = () => setModalVisible(!modalVisible);
 
     const initialFormState: TaskFormState = {
         title: '',
@@ -69,9 +68,14 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
         (!formState.isRecurring || formState.noEndDate || dayjs(formState.endDate).isAfter(dayjs(formState.startDate)));
 
 
-    const handleClose = () => {
+    const openModal = () => {
         resetForm();
-        toggleModal();
+        setModalVisible(true);
+    }
+
+    const closeModal = () => {
+        resetForm();
+        setModalVisible(false);
     };
 
     const getRecurrenceDays = () => {
@@ -126,8 +130,7 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
                 alert("Recurring Task assigned successfully!");
             }
 
-            resetForm();
-            toggleModal();
+            closeModal();
             onSubmit();
         } catch (error: any) {
             console.error("Failed to assign task:", error.message);
@@ -142,14 +145,14 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
         <>
             {/* New Task Button */}
             <Card style={[styles.buttonContainer, { height: buttonHeight }]}>
-                <TouchableOpacity onPress={toggleModal} style={styles.button}>
+                <TouchableOpacity onPress={openModal} style={styles.button}>
                     <Ionicons name="create" size={30} color="black" style={styles.icon} />
                     <Text style={GlobalStyles.boldText}>New Task</Text>
                 </TouchableOpacity>
             </Card>
 
             {/* New Task Modal */}
-            <ModularModal visible={modalVisible} onClose={handleClose} scroll={false}>
+            <ModularModal visible={modalVisible} onClose={closeModal} scroll={false}>
 
                 <TaskModalContent
                     formState={formState}
@@ -162,7 +165,7 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
                     <ModularButton
                         text="Assign"
                         textStyle={{ color: 'white' }}
-                        style={[GlobalStyles.submitButton, { flex: 1 }]}
+                        style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                         onPress={handleAssign}
                         enabled={isValidForm && !loading}
                     />
@@ -170,8 +173,8 @@ const AdmNewTask: React.FC<Props> = ({ onSubmit }) => {
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                        onPress={handleClose}
+                        style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
+                        onPress={closeModal}
                     />
                 </View>
 

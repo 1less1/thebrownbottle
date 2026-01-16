@@ -98,20 +98,22 @@ const AdmSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                 {!isCompleted && (
                     <>
                         {/* Accept Button */}
-                        <TouchableOpacity
+                        <ModularButton
+                            text="Accept"
+                            textStyle={{ color: Colors.green }}
                             style={[GlobalStyles.borderButton, styles.acceptButton]}
                             onPress={handleAccept}
-                            disabled={loading}>
-                            <Ionicons name={"checkmark-outline"} size={20} color={Colors.green} />
-                        </TouchableOpacity>
+                            enabled={!loading}
+                        />
 
                         {/* Deny Button */}
-                        <TouchableOpacity
+                        <ModularButton
+                            text="Deny"
+                            textStyle={{ color: Colors.red }}
                             style={[GlobalStyles.borderButton, styles.denyButton]}
                             onPress={handleDeny}
-                            disabled={loading}>
-                            <Ionicons name={"close-outline"} size={20} color={Colors.red} />
-                        </TouchableOpacity>
+                            enabled={!loading}
+                        />
                     </>
                 )}
 
@@ -119,7 +121,7 @@ const AdmSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                 <ModularButton
                     text="Close"
                     textStyle={{ color: "gray" }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={onClose}
                 />
             </View>
@@ -135,13 +137,13 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     denyButton: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: Colors.bgRed,
         borderColor: Colors.borderRed,
         alignItems: "center"
     },
     acceptButton: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: Colors.bgGreen,
         borderColor: Colors.borderGreen,
         alignItems: "center"

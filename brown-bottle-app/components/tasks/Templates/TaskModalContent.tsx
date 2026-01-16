@@ -23,31 +23,31 @@ const TaskModalContent: React.FC<Props> = ({ task }) => {
             </Text>
 
             {/* Task Details */}
-
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldText}>Title: </Text>
-                <Text style={GlobalStyles.text}>
+                <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Title: </Text>
                     {task.title}
                 </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldText}>Description: </Text>
-                <Text style={GlobalStyles.text}>
+                <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Description: </Text>
                     {task.description}
                 </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldText}>Section: </Text>
-                <Text style={GlobalStyles.text}>
+                <Text style={GlobalStyles.mediumText}>
+                    <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
                     {task.section_name}
                 </Text>
             </View>
 
             <View style={styles.row}>
-                <Text style={GlobalStyles.semiBoldText}>Due: </Text>
-                <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.orange }]}>
+                    {/* Black text overrides orange text here...*/}
+                    <Text style={GlobalStyles.semiBoldMediumText}>Due: </Text>
                     {formatDate(task.due_date)}
                 </Text>
             </View>

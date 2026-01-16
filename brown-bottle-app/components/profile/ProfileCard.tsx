@@ -21,46 +21,44 @@ const ProfileCard: React.FC<Props> = ({ profile }) => {
     ].filter(Boolean);
 
     return (
-        <View style={styles.wrapper}>
-            <View style={styles.profileContainer}>
+        <View style={styles.profileContainer}>
 
-                {/* Logout */}
-                <View style={{ position: "absolute", right: 15, top: 15 }}>
-                    <HandleLogout />
-                </View>
+            {/* Logout */}
+            <View style={{ position: "absolute", right: 15, top: 15 }}>
+                <HandleLogout />
+            </View>
 
-                {/* Avatar / Name / Email */}
-                <View style={styles.row}>
-                    <ProfileAvatar size={105} fullName={profile.full_name} />
+            {/* Avatar / Name / Email */}
+            <View style={styles.row}>
+                <ProfileAvatar size={105} fullName={profile.full_name} />
 
-                    <View style={styles.infoWrapper}>
-                        <Text style={styles.nameText}>{profile.full_name}</Text>
-                        <Text style={styles.emailText}>{profile.email}</Text>
+                <View style={styles.infoWrapper}>
+                    <Text style={styles.nameText}>{profile.full_name}</Text>
+                    <Text style={styles.emailText}>{profile.email}</Text>
 
-                        {/* Tags */}
-                        <View style={styles.tagRow}>
+                    {/* Tags */}
+                    <View style={styles.tagRow}>
 
-                            {profile.admin === 1 && (
-                                <AnimatedTouchableWrapper>
-                                    <View style={GlobalStyles.tag}>
-                                        <Text style={styles.tagText}>Admin</Text>
-                                    </View>
-                                </AnimatedTouchableWrapper>
-                            )}
+                        {profile.admin === 1 && (
+                            <AnimatedTouchableWrapper>
+                                <View style={GlobalStyles.tag}>
+                                    <Text style={styles.tagText}>Admin</Text>
+                                </View>
+                            </AnimatedTouchableWrapper>
+                        )}
 
-                            {roles.map((role, index) => (
-                                <AnimatedTouchableWrapper key={index}>
-                                    <View style={GlobalStyles.tag}>
-                                        <Text style={styles.tagText}>{role}</Text>
-                                    </View>
-                                </AnimatedTouchableWrapper>
-                            ))}
+                        {roles.map((role, index) => (
+                            <AnimatedTouchableWrapper key={index}>
+                                <View style={GlobalStyles.tag}>
+                                    <Text style={styles.tagText}>{role}</Text>
+                                </View>
+                            </AnimatedTouchableWrapper>
+                        ))}
 
-                        </View>
                     </View>
                 </View>
-
             </View>
+
         </View>
     );
 };
@@ -68,10 +66,6 @@ const ProfileCard: React.FC<Props> = ({ profile }) => {
 export default ProfileCard;
 
 const styles = StyleSheet.create({
-    wrapper: {
-        width: "100%",
-        marginBottom: 15
-    },
     profileContainer: {
         width: "100%",
         minHeight: 260,
@@ -100,7 +94,7 @@ const styles = StyleSheet.create({
         color: "black",
         opacity: 0.9,
         marginTop: 2,
-        fontSize: 15
+        fontSize: 12
     },
     tagRow: {
         flexDirection: "row",

@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    minWidth: 50, // Dom Edit
   },
   iconButton: {
     paddingHorizontal: 15,   // ✅ less padding for icon-only buttons
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
 });
 

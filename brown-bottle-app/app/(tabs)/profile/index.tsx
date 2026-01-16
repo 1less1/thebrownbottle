@@ -60,7 +60,7 @@ export default function Profile() {
 
         <DefaultScrollView>
 
-          <View style={{ width: '90%' }}>
+          <View style={{ flex: 1, width: '90%' }}>
 
             {/* Profile Card */}
             <View style={{ marginTop: 20 }}>
@@ -70,12 +70,11 @@ export default function Profile() {
                 <ProfileCard profile={profile} />
               )}
             </View>
-
-
+          
+            {/* Content Row */}
             <View style={[styles.contentRow, { width: '100%' }]}>
-
               {/* Account Info */}
-              <Card style={styles.accountInfo}>
+              <Card style={styles.accountInfoContainer}>
                 {loading || !profile ? (
                   <AccountInfoSkeleton />
                 ) :
@@ -84,19 +83,19 @@ export default function Profile() {
               </Card>
 
               {/* Profile Stats */}
-              <View style={styles.stats}>
+              <View style={styles.statContainer}>
                 {loading || !profile ? (
                   <StatSkeletons />
                 ) :
                   <ProfileStats profile={profile} />
                 }
               </View>
-
             </View>
+
           </View>
 
         </DefaultScrollView>
-        
+
       </View>
 
     </DefaultView>
@@ -105,38 +104,26 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  progressCard: {
-    backgroundColor: Colors.white,
-    padding: 20,
-    borderRadius: 8,
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    textAlign: "left",
-    fontSize: 18,
-    color: "black",
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
   contentRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    alignItems: "center",
     width: '100%',
-    gap: 10
+    columnGap: 10, // Space between them when in a row
+    rowGap: 0,    // No space between them when wrapped/stacked
   },
-  accountInfo: {
+  accountInfoContainer: {
     flexBasis: '55%',
     minWidth: 250,
     flexGrow: 1,
+    borderRadius: 14,
     marginVertical: 20,
-    borderRadius: 14
   },
-  stats: {
+  statContainer: {
     flexBasis: '30%',
     minWidth: 250,
     flexGrow: 1,
-    marginVertical: 20,
   }
 });
 

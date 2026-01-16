@@ -55,11 +55,26 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   const [error, setError] = useState<string | null>(null);
 
   const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
-  const [submitTORVisible, setSubmitTORVisible] = useState(false);
-  const [torModalVisible, setTORModalVisible] = useState(false);
 
-  const toggleSubmitTOR = () => setSubmitTORVisible((prev) => !prev);
-  const toggleTORModal = () => setTORModalVisible((prev) => !prev);
+  const [submitTORVisible, setSubmitTORVisible] = useState(false);
+  const openSubmitTOR = () => {
+    setSubmitTORVisible(true);
+  };
+  const closeSubmitTOR = () => {
+    setSelectedRequest(null);
+    setSubmitTORVisible(false);
+  };
+
+
+  const [torModalVisible, setTORModalVisible] = useState(false);
+  const openTORModal = (request: TimeOffRequest) => {
+    setSelectedRequest(request);
+    setTORModalVisible(true);
+  };
+  const closeTORModal = () => {
+    setTORModalVisible(false);
+    setSelectedRequest(null);
+  };
 
   const [statusFilter, setStatusFilter] = useState<Status | null>(null);
   const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -104,11 +119,6 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
   }, [parentRefresh, localRefresh, fetchTOR]);
 
   // UI Rendering
-  const handlePress = (request: TimeOffRequest) => {
-    setSelectedRequest(request);
-    toggleTORModal();
-  };
-
   const renderTOR = (request: TimeOffRequest) => {
     return <TORListItem request={request} />
   };
@@ -155,7 +165,7 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
           {/* Add Button */}
           <ModularButton
             text="Add"
-            onPress={toggleSubmitTOR}
+            onPress={openSubmitTOR}
             style={styles.addButton}
             textStyle={{ color: Colors.purple }}
           />
@@ -165,7 +175,7 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
       {/* Submit TOR Modal */}
       <EmpSubmitTOR
         visible={submitTORVisible}
-        onClose={toggleSubmitTOR}
+        onClose={closeSubmitTOR}
         onSubmit={() => setLocalRefresh(prev => prev + 1)}
       />
 
@@ -177,7 +187,7 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         error={error}
         emptyText="No requests found."
         itemContainerStyle={{ backgroundColor: "white" }}
-        onItemPress={handlePress}
+        onItemPress={openTORModal}
         renderItem={renderTOR}
       />
 
@@ -186,7 +196,7 @@ const EmpTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         <EmpTORModal
           visible={torModalVisible}
           request={selectedRequest}
-          onClose={toggleTORModal}
+          onClose={closeTORModal}
           onSubmit={() => setLocalRefresh(prev => prev + 1)}
         />
       )}

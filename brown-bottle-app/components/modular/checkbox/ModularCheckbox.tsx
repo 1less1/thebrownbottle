@@ -83,7 +83,7 @@ const ModularCheckbox = <T extends string | number>({
 
                 {/* Dropdown Button */}
                 <TouchableOpacity
-                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
+                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.6 }]}
                     onPress={() => {
                         setTempSelected(selectedData);
                         setVisible(true);
@@ -175,21 +175,12 @@ const ModularCheckbox = <T extends string | number>({
                                 )}
 
                                 {/* Button Container */}
-                                <View
-                                    style={[
-                                        GlobalStyles.buttonRowContainer,
-                                        {
-                                            marginTop: 0,
-                                            padding: 20,
-                                            flexDirection: isMobile ? 'column' : 'row', // 👈 responsive switch
-                                        }
-                                    ]}
-                                >
+                                <View style={[GlobalStyles.buttonRowContainer, { margin: 20, marginTop: 10 }]}>
                                     <ModularButton
                                         onPress={handleConfirm}
                                         style={[
                                             GlobalStyles.submitButton,
-                                            !isMobile && { flex: 1 } // only flex in row mode
+                                            { flexGrow: 1 } // only flex in row mode
                                         ]}
                                         textStyle={{ color: "white" }}
                                         text="Confirm"

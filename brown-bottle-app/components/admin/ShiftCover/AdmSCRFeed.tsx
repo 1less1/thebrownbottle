@@ -57,7 +57,14 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
 
     const [scrModalVisible, setSCRModalVisible] = useState(false);
-    const toggleSCRModal = () => setSCRModalVisible((prev) => !prev);
+    const openSCRModal = (request: ShiftCoverRequest) => {
+        setSelectedRequest(request);
+        setSCRModalVisible(true);
+    };
+    const closeSCRModal = () => {
+        setSCRModalVisible(false);
+        setSelectedRequest(null);
+    };
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
@@ -118,11 +125,6 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     }, [parentRefresh, localRefresh, fetchSCR]);
 
     // UI Rendering
-    const handlePress = (request: ShiftCoverRequest) => {
-        setSelectedRequest(request);
-        toggleSCRModal();
-    };
-
     const renderSCR = (request: ShiftCoverRequest) => {
         return <SCRListItem request={request} />
     };
@@ -201,7 +203,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 error={error}
                 emptyText="No requests found."
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={handlePress}
+                onItemPress={openSCRModal}
                 renderItem={renderSCR}
             />
 
@@ -210,7 +212,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 <AdmSCRModal
                     visible={scrModalVisible}
                     request={selectedRequest}
-                    onClose={toggleSCRModal}
+                    onClose={closeSCRModal}
                     onSubmit={() => setLocalRefresh(prev => prev + 1)}
                 />
             )}

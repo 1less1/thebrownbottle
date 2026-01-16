@@ -66,7 +66,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     borderRadius: 8,
-    marginTop: 15,
   },
   mainText: {
     fontWeight: "600",
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
     color: Colors.darkGray,
   },
   text: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "500",
     color: "black",
     backgroundColor: "#f1f1f1",

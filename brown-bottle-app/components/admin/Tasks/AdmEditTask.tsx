@@ -197,14 +197,14 @@ const AdmEditTask: React.FC<Props> = ({ task, visible, onClose, onUpdate }) => {
                 <ModularButton
                     text="Save"
                     textStyle={{ color: 'white' }}
-                    style={[GlobalStyles.submitButton, { flex: 1 }]}
+                    style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                     onPress={handleUpdate}
                     enabled={isValidForm && !loading}
                 />
                 <ModularButton
                     text="Cancel"
                     textStyle={{ color: 'gray' }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={onClose}
                 />
             </View>

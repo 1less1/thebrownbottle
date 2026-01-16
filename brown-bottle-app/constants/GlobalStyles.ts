@@ -219,7 +219,7 @@ export const GlobalStyles = StyleSheet.create({
     },
     buttonRowContainer: {
         flexDirection: 'row',
-        //justifyContent: 'flex-end',
+        flexWrap: 'wrap', // Dom Edit
         gap: 10,
         marginTop: 20,
     },

@@ -65,7 +65,7 @@ const ModularDropdown = <T extends string | number | null>({
 
                 {/* Dropdown Button */}
                 <TouchableOpacity
-                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.5 }]}
+                    style={[GlobalStyles.dropdownButton, buttonStyle, disabled && { opacity: 0.6 }]}
                     onPress={() => setVisible(true)}
                     disabled={disabled}
                 >

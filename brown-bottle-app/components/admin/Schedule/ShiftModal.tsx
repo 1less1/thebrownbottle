@@ -1,6 +1,7 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
+
 import { Ionicons } from '@expo/vector-icons';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
@@ -12,9 +13,11 @@ import ModularButton from '@/components/modular/ModularButton';
 import TimeDropdown from '@/components/modular/dropdown/TimeDropdown';
 import SectionDropdown from "@/components/modular/dropdown/SectionDropdown";
 
+import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import { insertShift, updateShift, deleteShift } from '@/routes/shift';
-import { ScheduleEmployee, ScheduleShift, Shift } from '@/types/iShift';
+import { ScheduleEmployee, ScheduleShift, Shift, InsertShift, UpdateShift } from '@/types/iShift';
+import { buildPatchData } from "@/utils/apiHelpers";
 import { convertToSQL24HRTime, isValidTime } from '@/utils/dateTimeHelpers';
 
 import { useConfirm } from '@/hooks/useConfirm';
@@ -22,55 +25,63 @@ import { useConfirm } from '@/hooks/useConfirm';
 
 interface ShiftModalProps {
   visible: boolean;
-  onClose: () => void;
   shiftData: ScheduleShift | null;
-  employeeData: ScheduleEmployee | null;
+  employeeData: ScheduleEmployee;
   date: string;
+  onClose: () => void;
   onUpdate?: () => void;
 }
 
+const patchableKeys: (keyof UpdateShift)[] = ["start_time", "section_id"];
 
-const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, employeeData, date, onUpdate }) => {
-
-  const [loading, setLoading] = useState(false);
-
-  const [employeeId, setEmployeeId] = useState<number | null>(null);
-  const [shiftId, setShiftId] = useState<number | null>(null);
-  const [startTime, setStartTime] = useState<string>("");
-  const [sectionId, setSectionId] = useState<number | null>(null);
-
-  const [edit, setEdit] = useState(false);
-  const handleEdit = () => setEdit(!edit);
+const ShiftModal: React.FC<ShiftModalProps> = ({ visible, shiftData, employeeData, date, onClose, onUpdate }) => {
 
   const { confirm } = useConfirm();
 
+  const [loading, setLoading] = useState(false);
+
+  const [startTime, setStartTime] = useState<string>("");
+  const [sectionId, setSectionId] = useState<number | null>(null);
+
+  // Build Form Data
+  const formData = useMemo(() => ({
+    start_time: startTime,
+    section_id: sectionId,
+  }), [startTime, sectionId]);
+
+  // Form Validation
+  const isValidForm = useMemo(() => (
+    startTime.trim().length > 0 && isValidTime(startTime)
+    && sectionId !== null
+  ), [formData]);  // Only recalculates when formData changes
+
+  // Construct Patch Data (only for existing shifts)
+  const patchData = useMemo(() => {
+    if (!shiftData) return {};
+
+    // Cast shiftData from ScheduleShift to Shift for comparison
+    return buildPatchData(
+      shiftData as unknown as Shift,
+      formData as unknown as Shift,
+      patchableKeys as any
+    );
+  }, [shiftData, formData]);
+
+  const isDirty = Object.keys(patchData).length > 0;
+  const canSave = shiftData ? (isDirty && isValidForm && !loading) : (isValidForm && !loading);
+
+  // Create a fresh form or load data on modal visibility
   useEffect(() => {
     if (visible) {
-      setEmployeeId(employeeData?.employee_id ?? null);
-      setShiftId(shiftData?.shift_id ?? null);
       setStartTime(shiftData?.start_time ?? "");
       setSectionId(shiftData?.section_id ?? null);
-
-      // Correct edit mode initialization
-      setEdit(shiftData ? false : true);
     }
-  }, [visible, shiftData, employeeData]);
+  }, [visible, shiftData]);
 
 
-
-  const buildFormData = (): Partial<Shift> => ({
-    employee_id: employeeData?.employee_id,
-    section_id: sectionId ?? shiftData?.section_id,
-    date: date,   // YYYY-MM-DD
-    start_time: convertToSQL24HRTime(startTime), // HH:MM AM/PM
-  });
-
-
+  // Delete Shift Logic
   const handleDelete = async () => {
-
-    if (!shiftData) {
-      return;
-    }
+    if (!shiftData) return;
 
     // Confirmation Popup
     const ok = await confirm(
@@ -79,9 +90,9 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
     );
     if (!ok) return;
 
-    setLoading(true);
-
     try {
+      setLoading(true);
+
       await deleteShift(shiftData.shift_id);
       alert("Shift successfully deleted!");
       onUpdate?.();
@@ -94,61 +105,51 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
 
   };
 
-  const handleSave = async () => {
-    setLoading(true);
 
-    const formData = buildFormData();
+  // Add/Update Shift Logic
+  const handleSave = async () => {
+    if (!canSave) return;
+
+    // Confirmation Popup
+    const title = shiftData ? 'Confirm Update' : 'Confirm Shift';
+    const message = `Are you sure you want to ${shiftData ? 'update' : 'add'} this shift?`;
+    const ok = await confirm(title, message);
+    if (!ok) return;
 
     try {
-
-      // Validate Required Fields
-      if (!startTime.trim()) {
-        alert("Please assign a start time.");
-        setLoading(false);
-        return;
-      }
-
-      if (!isValidTime(startTime)) {
-        alert("Please enter a valid start time (HH:MM AM/PM).");
-        setLoading(false);
-        return;
-      }
-
-      if (sectionId == null) {
-        alert("Please assign a section.")
-        setLoading(false)
-        return;
-      }
+      setLoading(true);
 
       if (shiftData) {
+        // Construct Final Patch Data
+        const finalPatchData = { ...patchData };
 
-        // Update Confirmation Popup
-        const ok = await confirm(
-          'Confirm Update',
-          'Are you sure you want to update this shift?'
-        );
-        if (!ok) {
-          setLoading(false);
-          return;
+        // Format start_time if it was changed
+        if (finalPatchData.start_time) {
+          finalPatchData.start_time = convertToSQL24HRTime(finalPatchData.start_time);
         }
 
-        if (shiftId !== null) {
-          await updateShift(shiftId, formData as Shift);
-          alert("Shift successfully updated!");
-        }
+        await updateShift(shiftData.shift_id, finalPatchData as UpdateShift);
+        alert("Shift successfully updated!");
       } else {
-        await insertShift(formData as Shift);
+        // Construct Insert Payload
+        const insertPayload = {
+          employee_id: employeeData.employee_id,
+          date: date,
+          section_id: sectionId!, // canSave and isValidForm ensures sectionId is not null here!
+          start_time: convertToSQL24HRTime(startTime),
+        };
+
+        await insertShift(insertPayload as InsertShift);
         alert("Shift successfully added!");
       }
       onUpdate?.();
       onClose();
     } catch (error: any) {
-      console.log("Unable to save shift: " + error.message);
-      alert("Unable to save shift! A shift for this employee may already exist or shift details may not have been updated. Try again later!")
+      alert("Failed to save shift: " + error.message);
+      console.log("Failed to save shift: " + error.message);
     } finally {
       setLoading(false);
     }
-
   };
 
 
@@ -159,23 +160,21 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
       {/* Header */}
       <View>
         <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
-
-        <Text style={GlobalStyles.semiBoldMediumText}>{employeeData?.full_name ?? ""}</Text>
+        <Text style={GlobalStyles.semiBoldMediumText}>{employeeData.full_name}</Text>
         <Text style={GlobalStyles.mediumAltText}>{(date)}</Text>
       </View>
 
-      {loading ? (
-        <Text style={GlobalStyles.loadingText}>Loading shift data...</Text>
+      {!employeeData ? (
+        <LoadingCircle size="small" />
       ) : (
         <View style={styles.formContainer}>
-
 
           {/* Input fields */}
           <Text style={GlobalStyles.inputLabelText}>Start Time</Text>
           <TimeDropdown
             time={startTime}
             onTimeChange={(value) => setStartTime(value)}
-            disabled={!edit}
+            disabled={loading}
           />
 
           <Text style={GlobalStyles.inputLabelText}>Section</Text>
@@ -183,63 +182,37 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, onClose, shiftData, em
             selectedSection={sectionId}
             onSectionSelect={(value) => setSectionId(value as number)}
             labelText=""
-            containerStyle={{ marginBottom: 10, backgroundColor: Colors.inputBG }}
-            disabled={!edit}
+            containerStyle={GlobalStyles.dropdownButtonWrapper}
+            disabled={loading}
           />
 
           {/* Buttons */}
           <View style={GlobalStyles.buttonRowContainer}>
-            {/* CASE 1: shiftData is null → Add mode */}
-            {!shiftData && (
-              <>
-                <ModularButton
-                  textStyle={{ color: 'white' }}
-                  style={[GlobalStyles.submitButton, { flex: 1 }]}
-                  text="Add"
-                  onPress={handleSave}
-                />
+            <ModularButton
+              textStyle={{ color: 'white' }}
+              style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
+              text={shiftData ? "Update" : "Add"}
+              onPress={handleSave}
+              enabled={canSave}
+            />
 
-                <ModularButton
-                  text="Cancel"
-                  textStyle={{ color: 'gray' }}
-                  style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                  onPress={onClose}
-                />
-              </>
-            )}
-
-            {/* CASE 2: shiftData exists → Edit mode */}
             {shiftData && (
-              <>
-                {edit ? (
-                  <ModularButton
-                    textStyle={{ color: 'white' }}
-                    style={[GlobalStyles.submitButton, { flex: 1 }]}
-                    text="Update"
-                    onPress={handleSave}
-                  />
-                ) : (
-                  <ModularButton
-                    text="Edit"
-                    style={{ flex: 1 }}
-                    onPress={() => setEdit(true)}
-                  />
-                )}
-
-                <ModularButton
-                  text="Remove"
-                  onPress={handleDelete}
-                  style={[GlobalStyles.deleteButton, { flex: 1.25 }]}
-                />
-
-                <ModularButton
-                  text="Cancel"
-                  textStyle={{ color: 'gray' }}
-                  style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                  onPress={onClose}
-                />
-              </>
+              // Delete Button
+              <ModularButton
+                text="Remove"
+                textStyle={{ color: Colors.red }}
+                style={[GlobalStyles.borderButton, styles.deleteButton]}
+                onPress={handleDelete}
+                enabled={!loading}
+              />
             )}
+
+            <ModularButton
+              text="Cancel"
+              textStyle={{ color: 'gray' }}
+              style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
+              onPress={onClose}
+            />
           </View>
 
         </View>
@@ -262,6 +235,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
+  },
+  deleteButton: {
+    flexGrow: 1,
+    backgroundColor: Colors.bgRed,
+    borderColor: Colors.borderRed,
+    alignItems: "center"
   },
 });
 

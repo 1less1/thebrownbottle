@@ -115,7 +115,7 @@ const AdmAckModal: React.FC<Props> = ({ announcement_id, modalVisible, onClose }
                 <ModularButton
                     text="Close"
                     textStyle={{ color: 'gray' }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={onClose}
                 />
             </View>
@@ -137,8 +137,10 @@ const styles = StyleSheet.create({
     },
     singleRow: {
         flex: 1,
-        alignSelf: "center",
+        width: '100%',
         justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "center",
         paddingVertical: 14,
         paddingHorizontal: 16,
     },

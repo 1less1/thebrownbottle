@@ -61,11 +61,24 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [error, setError] = useState<string | null>(null);
 
     const [selectedRequest, setSelectedRequest] = useState<ShiftCoverRequest | null>(null);
-    const [submitSCRVisible, setSubmitSCRVisible] = useState(false);
-    const [scrModalVisible, setSCRModalVisible] = useState(false);
 
-    const toggleSubmitSCR = () => setSubmitSCRVisible((prev) => !prev);
-    const toggleSCRModal = () => setSCRModalVisible((prev) => !prev);
+    const [submitSCRVisible, setSubmitSCRVisible] = useState(false);
+    const openSubmitSCR = () => {
+        setSubmitSCRVisible(true);
+    };
+    const closeSubmitSCR = () => {
+        setSubmitSCRVisible(false);
+    };
+
+    const [scrModalVisible, setSCRModalVisible] = useState(false);
+    const openSCRModal = (request: ShiftCoverRequest) => {
+        setSelectedRequest(request);
+        setSCRModalVisible(true);
+    };
+    const closeSCRModal = () => {
+        setSCRModalVisible(false);
+        setSelectedRequest(null);
+    };
 
     const [requestType, setRequestType] = useState<string>("Available");
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
@@ -118,11 +131,6 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     }, [parentRefresh, localRefresh, fetchSCR]);
 
     // UI Rendering
-    const handlePress = (request: ShiftCoverRequest) => {
-        setSelectedRequest(request);
-        toggleSCRModal();
-    };
-
     const renderSCR = (request: ShiftCoverRequest) => {
         return <SCRListItem request={request} />
     };
@@ -142,7 +150,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
             {/* New Request Button */}
             <ModularButton
                 text="New Request"
-                onPress={toggleSubmitSCR}
+                onPress={openSubmitSCR}
                 style={styles.newRequestButton}
                 textStyle={{ color: Colors.blue }}
                 enabled={!loading}
@@ -151,7 +159,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
             {/* Submit SCR Modal */}
             <EmpSubmitSCR
                 visible={submitSCRVisible}
-                onClose={toggleSubmitSCR}
+                onClose={closeSubmitSCR}
                 onSubmit={fetchSCR}
             />
 
@@ -202,7 +210,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                         : "No available shifts right now."
                 }
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={handlePress}
+                onItemPress={openSCRModal}
                 renderItem={renderSCR}
             />
 
@@ -211,7 +219,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 <EmpSCRModal
                     visible={scrModalVisible}
                     request={selectedRequest}
-                    onClose={toggleSCRModal}
+                    onClose={closeSCRModal}
                     onSubmit={() => setLocalRefresh(prev => prev + 1)}
                 />
             )}

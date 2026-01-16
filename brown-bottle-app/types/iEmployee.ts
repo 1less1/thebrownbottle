@@ -6,16 +6,54 @@ export interface Employee {
   phone_number: string;
   wage: string; // DECIMAL MySQL types are formatted as strings in JSON
   admin: number;
-  role_id?: number[];
-  primary_role: number | null;
-  secondary_role: number | null;
-  tertiary_role: number | null;
+  primary_role: number;
+  secondary_role: number;
+  tertiary_role: number;
   is_active: number;
-  timestamp?: string;
+  timestamp: string; // When the employee was created
 
-  // Only Used for JSON Responses:
-  full_name?: string;
-  primary_role_name?: string;
-  secondary_role_name?: string;
-  tertiary_role_name?: string;
+  full_name: string;
+  primary_role_name: string;
+  secondary_role_name: string;
+  tertiary_role_name: string;
+}
+
+export interface GetEmployee {
+  employee_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  wage: string;
+  admin: number;
+  primary_role: number;
+  secondary_role: number;
+  tertiary_role: number;
+  is_active: number;
+  
+  full_name: string;
+  role_id: number | number[];
+}
+
+export interface InsertEmployee {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  wage: string;
+  admin: number;
+  primary_role: number;
+}
+
+export interface UpdateEmployee {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  wage: string;
+  admin: number;
+  primary_role: number;
+  secondary_role: number;
+  tertiary_role: number;
+  is_active: number;
 }

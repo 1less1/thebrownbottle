@@ -55,7 +55,14 @@ const AdmTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [selectedRequest, setSelectedRequest] = useState<TimeOffRequest | null>(null);
 
     const [torModalVisible, setTORModalVisible] = useState(false);
-    const toggleTORModal = () => setTORModalVisible((prev) => !prev);
+    const openTORModal = (request: TimeOffRequest) => {
+        setSelectedRequest(request);
+        setTORModalVisible(true);
+    };
+    const closeTORModal = () => {
+        setTORModalVisible(false);
+        setSelectedRequest(null);
+    };
 
     const [dateFilter, setDateFilter] = useState<DateSortType>("Newest");
     const [statusFilter, setStatusFilter] = useState<Status | null>(null);
@@ -118,11 +125,6 @@ const AdmTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     }, [parentRefresh, localRefresh, fetchTOR]);
 
     // UI Rendering
-    const handlePress = (request: TimeOffRequest) => {
-        setSelectedRequest(request);
-        toggleTORModal();
-    };
-
     const renderTOR = (request: TimeOffRequest) => {
         return <TORListItem request={request} />
     };
@@ -201,7 +203,7 @@ const AdmTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 error={error}
                 emptyText="No requests found."
                 itemContainerStyle={{ backgroundColor: "white" }}
-                onItemPress={handlePress}
+                onItemPress={openTORModal}
                 renderItem={renderTOR}
             />
 
@@ -210,7 +212,7 @@ const AdmTORFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 <AdmTORModal
                     visible={torModalVisible}
                     request={selectedRequest}
-                    onClose={toggleTORModal}
+                    onClose={closeTORModal}
                     onSubmit={() => setLocalRefresh(prev => prev + 1)}
                 />
             )}

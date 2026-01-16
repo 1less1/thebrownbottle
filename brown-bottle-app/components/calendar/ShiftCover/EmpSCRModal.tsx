@@ -30,7 +30,6 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
 
     const [loading, setLoading] = useState(false);
 
-
     const handleSubmit = async () => {
         if (!request || loading) return;
 
@@ -100,28 +99,30 @@ const EmpSCRModal: React.FC<Props> = ({ visible, request, onClose, onSubmit }) =
                 {!isLocked && (
                     isOwner ? (
                         // Delete Button
-                        <TouchableOpacity
+                        <ModularButton
+                            text="Delete"
+                            textStyle={{ color: Colors.red }}
                             style={[GlobalStyles.borderButton, styles.deleteButton]}
                             onPress={handleDelete}
-                            disabled={loading}>
-                            <Ionicons name={"close-outline"} size={20} color={Colors.red} />
-                        </TouchableOpacity>
+                            enabled={!loading}
+                        />
                     ) : (
                         // Request Shift Button
-                        <TouchableOpacity
+                        <ModularButton
+                            text="Request"
+                            textStyle={{ color: Colors.blue }}
                             style={[GlobalStyles.borderButton, styles.requestShiftButton]}
                             onPress={handleSubmit}
-                            disabled={loading && !isPending}>
-                            <Ionicons name={"swap-horizontal-outline"} size={20} color={Colors.blue} />
-                        </TouchableOpacity>
+                            enabled={!loading}
+                        />
                     )
                 )}
-                
+
                 {/* Always show Close Button */}
                 <ModularButton
                     text={isLocked ? "Close" : "Cancel"}
                     textStyle={{ color: "gray" }}
-                    style={[GlobalStyles.cancelButton, { flex: 1 }]}
+                    style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
                     onPress={onClose}
                 />
             </View>
@@ -137,13 +138,13 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     deleteButton: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: Colors.bgRed,
         borderColor: Colors.borderRed,
         alignItems: "center"
     },
     requestShiftButton: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: Colors.bgBlue,
         borderColor: Colors.borderBlue,
         alignItems: "center"
