@@ -13,7 +13,6 @@ interface DefaultScrollViewProps {
   onRefresh?: () => void; // Optional: if not provided, no refresh control is shown
   topSafeAreaColor?: string;
   bottomSafeAreaColor?: string;
-  scrollViewColor?: string;
   scrollEnabled?: boolean;
 }
 
@@ -53,13 +52,12 @@ const DefaultScrollView: React.FC<DefaultScrollViewProps> = ({ children, style, 
 const styles = StyleSheet.create({
   scrollView: {
     backgroundColor: 'transparent',
-    width: '100%',
+    flex: 1,
   },
   scrollContent: {
     flexGrow: 1,
   },
   childrenContainer: {
-    // Removed flexGrow: 1
     justifyContent: 'flex-start',
     alignItems: 'center',
     width: '100%',

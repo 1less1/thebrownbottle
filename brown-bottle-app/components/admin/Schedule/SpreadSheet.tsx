@@ -14,7 +14,6 @@ import LoadingCircle from "@/components/modular/LoadingCircle";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
 import { CheckboxOption } from "@/types/iCheckbox";
-import { yesNoDropdownOptions } from '@/types/iDropdown';
 
 import { convertToSQLDate, formatDateToCellHeader } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
@@ -26,7 +25,6 @@ import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
 
 import RoleCheckbox from "@/components/modular/checkbox/RoleCheckbox";
 import SectionCheckbox from "@/components/modular/checkbox/SectionCheckbox";
-import { Status } from "@/types/iTimeOff";
 import { DropdownOption } from '@/types/iDropdown';
 
 interface SpreadSheetProps {
@@ -48,6 +46,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   const [localRefresh, setLocalRefresh] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [scheduleData, setScheduleData] = useState<ScheduleEmployee[]>([]);
 
@@ -55,16 +54,25 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]);
   const [isToday, setIsToday] = useState<number>(0);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [shiftModalVisible, setModalVisible] = useState(false);
+  const closeShiftModal = () => {
+    setModalVisible(false);
+    setSelectedShift(null);
+    setSelectedEmployee(null);
+  };
+
   const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>("");
 
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getSunday(new Date()));
 
+  // Fetch Schedule Logic
   const fetchSchedule = async (searchTerm: string) => {
-    setLoading(true);
     try {
+      setError(null);
+      setLoading(true);
+
       const { weekStartStr, weekEndStr } = getWeekStartEnd(currentWeekStart);
 
       const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
@@ -82,25 +90,24 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         params.end_date = weekEndStr;
       }
 
-      const schedule: ScheduleEmployee[] = await getSchedule(params);
+      const schedule = await getSchedule(params);
 
       // Fetch accepted time off requests
       const timeOff = await getTimeOffRequest({
         status: ["Accepted"],
       });
 
-
       // Build blocked days
       const blockedDays = buildBlockedDaysMap(timeOff);
 
       // Attach to schedule
       const updatedSchedule = attachBlockedDays(schedule, blockedDays);
-      console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
+      //console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
 
       setScheduleData(updatedSchedule);
-    } catch (err) {
-      console.error("Error fetching schedule:", err);
-      alert("Error fetching schedule!")
+    } catch (error: any) {
+      setError("Failed to fetch schedule data: " + error.message);
+      console.error("Failed to fetch schedule data: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -131,7 +138,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       setSelectedRoles([]);
       setSelectedSections([]);
       setIsToday(0);
-      setLocalRefresh((prev) => prev + 1);
+      setLocalRefresh((prev) => prev + 1); // triggers refresh
     }
   };
 
@@ -139,7 +146,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     const sundayThisWeek = getSunday(new Date());
     if (currentWeekStart.getTime() !== sundayThisWeek.getTime()) {
       debouncedSearch.cancel();
-      setLocalRefresh((prev) => prev + 1);
+      setLocalRefresh((prev) => prev + 1); // triggers refresh
       setCurrentWeekStart(sundayThisWeek);
     }
   };
@@ -147,18 +154,18 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   // Fetch Schedule Data on Initialization and State Update
   useEffect(() => {
     triggerRefresh(query)
-  }, [selectedSections, selectedRoles, isToday, currentWeekStart, parentRefresh, localRefresh]);
+  }, [parentRefresh, localRefresh, selectedSections, selectedRoles, isToday, currentWeekStart]);
 
   // Layout Calculations
   const weekDays = getWeekDayList(currentWeekStart, 7);
   const isMobile = WIDTH < 768;
   const NAME_COL_WIDTH = isMobile ? 170 : Math.max(170, WIDTH * 0.12);
   const DAY_COL_WIDTH = isMobile ? 135 : Math.max(135, (WIDTH * 0.75) / weekDays.length);
-  const ROW_HEIGHT = 50;
-  const HEADER_HEIGHT = 44;
+  const ROW_HEIGHT = isMobile ? 65 : 52;
+  const HEADER_HEIGHT = 45;
   const cardHeight = isMobile ? height * 0.7 : height * 0.8;
 
-
+  // UI Rendering
   const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
     const clickedDate = new Date(currentWeekStart);
     clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
@@ -236,6 +243,12 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     );
   };
 
+  const ListEmpty = (
+    <View style={styles.singleRow}>
+      <Text style={GlobalStyles.text}>No results found!</Text>
+    </View>
+  );
+
   return (
 
     <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
@@ -270,8 +283,9 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       </View>
 
-      {/* Search Container */}
+      {/* Search/Filter Container */}
       <View style={styles.searchContainer}>
+
         <TextInput
           value={query}
           onChangeText={handleSearchChange}
@@ -301,40 +315,54 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           <Ionicons name="calendar-number-outline" size={20} color={Colors.black} />
         </ModularButton>
 
-
-        <ModularButton
-          onPress={() => exportToCSV(scheduleData, weekDays)}
-          onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
-          style={{ backgroundColor: Colors.bgGreen }}
-          text=""
-          textStyle={{ marginRight: 4 }}
-          enabled={!loading}
-        >
-          <Ionicons name="download-outline" size={20} color={Colors.black} />
-        </ModularButton>
-
+        {/* Export to CSV only shown on web! */}
+        {Platform.OS === 'web' && (
+          <ModularButton
+            onPress={() => exportToCSV(scheduleData, weekDays)}
+            onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
+            style={{ backgroundColor: Colors.bgGreen }}
+            text=""
+            textStyle={{ marginRight: 4 }}
+            enabled={!loading}
+          >
+            <Ionicons name="download-outline" size={20} color={Colors.black} />
+          </ModularButton>
+        )}
 
       </View>
 
       {/* Filter Container */}
       <View style={styles.filterContainer}>
+
         <RoleCheckbox
           selectedRoles={selectedRoles}
           onRoleSelect={(keys, values) => {
-            setSelectedRoles(values.map((value, index) => ({
+            const tempRoles = values.map((value, index) => ({
               key: keys[index],
               value: value,
-            })));
+            }));
+            // Check if lengths match and every ID is the same
+            const isSame = tempRoles.length === selectedRoles.length &&
+              tempRoles.every((val, index) => val.value === selectedRoles[index]?.value);
+            // Exit if nothing actually changed
+            if (isSame) return;
+            setSelectedRoles(tempRoles);
           }}
           containerStyle={styles.dropdownButton}
         />
         <SectionCheckbox
           selectedSections={selectedSections}
           onSectionSelect={(keys, values) => {
-            setSelectedSections(values.map((value, index) => ({
+            const tempSections = values.map((value, index) => ({
               key: keys[index],
               value: value,
-            })));
+            }));
+            // Check if lengths match and every ID is the same
+            const isSame = tempSections.length === selectedSections.length &&
+              tempSections.every((val, index) => val.value === selectedSections[index]?.value);
+            // Exit if nothing actually changed
+            if (isSame) return;
+            setSelectedSections(tempSections);
           }}
           containerStyle={styles.dropdownButton}
         />
@@ -346,9 +374,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
           usePlaceholder={false}
           disabled={loading}
         />
-      </View>
 
-      {loading && <LoadingCircle size={"small"} />}
+      </View>
 
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
@@ -357,36 +384,47 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
           <View>
             {renderHeader()}
-            <FlatList
-              data={scheduleData}
-              keyExtractor={(item) => item.employee_id.toString()}
-              renderItem={({ item }) => renderEmployeeRow(item)}
-              keyboardShouldPersistTaps="handled"
-              style={{ maxHeight: HEIGHT * 0.7 }}
-              scrollEnabled={true}
-              nestedScrollEnabled={true}
-              showsVerticalScrollIndicator={true}
-            />
+
+            {loading ? (
+              // Loading state
+              <View style={styles.singleRow}>
+                <LoadingCircle size="small" />
+              </View>
+            ) : error ? (
+              // Error state
+              <View style={styles.singleRow}>
+                <Text style={GlobalStyles.errorText}>
+                  {error}
+                </Text>
+              </View>
+            ) : (
+              // Success state
+              <FlatList
+                data={scheduleData}
+                keyExtractor={(item) => item.employee_id.toString()}
+                renderItem={({ item }) => renderEmployeeRow(item)}
+                keyboardShouldPersistTaps="handled"
+                scrollEnabled={true}
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={true}
+                ListEmptyComponent={ListEmpty}
+              />
+            )}
           </View>
         </ScrollView>
       </View>
 
-      {/* Fallback */}
-      {!loading && scheduleData.length === 0 && query.length > 0 && (
-        <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-          No results found...
-        </Text>
-      )}
-
       {/* Shift Modal - Add, Update, Delete */}
-      <ShiftModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        shiftData={selectedShift}
-        employeeData={selectedEmployee}
-        date={selectedDate}
-        onUpdate={() => setLocalRefresh((prev) => prev + 1)}
-      />
+      {selectedEmployee && (
+        <ShiftModal
+          visible={shiftModalVisible}
+          onClose={closeShiftModal}
+          shiftData={selectedShift}
+          employeeData={selectedEmployee}
+          date={selectedDate}
+          onUpdate={() => setLocalRefresh((prev) => prev + 1)}
+        />
+      )}
 
     </Card>
 
@@ -470,6 +508,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.darkGray,
     textAlign: 'center',
+  },
+  singleRow: {
+    flex: 1,
+    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    padding: 8,
   },
 
   // Employee Name Cell

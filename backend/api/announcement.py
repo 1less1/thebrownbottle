@@ -25,8 +25,8 @@ def get_announcements(db, request):
             'author_id': int,
             'role_id': int,
             'title': str,
-            'recent_only': int,  # 1=True, 0=False
-            'timestamp_sort': str  # "Newest", "Oldest"
+            'recent_only': int, # 1=True, 0=False
+            'timestamp_sort': str, # "Newest", "Oldest"
         }
 
         # Validate and parse parameters

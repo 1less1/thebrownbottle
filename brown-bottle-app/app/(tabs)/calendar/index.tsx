@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -8,15 +8,20 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import DefaultView from '@/components/DefaultView';
-import DefaultScrollView from '@/components/DefaultScrollView';
 
 import ShiftCalendar from '@/components/calendar/ShiftCalendar/ShiftCalendar';
-import ShiftCover from '@/components/calendar/ShiftCover/ShiftCover';
-import TimeOff from '@/components/calendar/TimeOff/TimeOff';
+import EmpSCR from '@/components/calendar/ShiftCover/EmpSCR';
+import EmpTOR from '@/components/calendar/TimeOff/EmpTOR';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 
-import { useSession } from '@/utils/SessionContext';
+import { useSession } from '@/utils/SessionContext'
+
+interface Tab {
+    key: string;
+    title: string;
+    component: React.ReactNode;
+}
 
 const CalendarPage = () => {
   // Dynamic Status Bar
@@ -29,6 +34,8 @@ const CalendarPage = () => {
 
   const { user } = useSession();
 
+  const [loading, setLoading] = useState<boolean>(true); // Start as true
+
   const [activeTab, setActiveTab] = useState(0);
   const TAB_STORAGE_KEY = 'calendarActiveTab';
 
@@ -39,25 +46,17 @@ const CalendarPage = () => {
   };
 
   // Define available tabs and corresponding components
-  const tabs = [
-    {
-      key: 'shifts', title: 'Shifts', component: <ShiftCalendar />
-
-    },
-
-    {
-      key: 'shift cover', title: 'Shift Cover', component: <ShiftCover />
-    },
-
-    {
-      key: 'time off', title: 'Time Off', component: <TimeOff />
-    },
+  const tabs: Tab[] = [
+    { key: 'shifts', title: 'Shifts', component: <ShiftCalendar /> },
+    { key: 'shift cover', title: 'Shift Cover', component: <EmpSCR /> },
+    { key: 'time off', title: 'Time Off', component: <EmpTOR /> },
   ];
 
   // Load Saved Tab If it Exists, otherwise load tab index 0
   useEffect(() => {
     const loadSavedTab = async () => {
       try {
+        setLoading(true);
         const savedTabIndex = await AsyncStorage.getItem(TAB_STORAGE_KEY);
         const tabIndex = Number(savedTabIndex);
         if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < tabs.length) {
@@ -67,6 +66,8 @@ const CalendarPage = () => {
         }
       } catch (error) {
         console.warn('Failed to load saved tab index:', error);
+      } finally {
+        setLoading(false);
       }
     };
     loadSavedTab();
@@ -101,10 +102,16 @@ const CalendarPage = () => {
 
         </View>
 
-        {/* Render content based on selected tab */}
-        <View style={styles.tabContent}>
-          {tabs[activeTab]?.component} {/* Render the component of the active tab */}
-        </View>
+        {/* Tab Content */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <LoadingCircle size="large" />
+          </View>
+        ) : (
+          <View style={styles.tabContent}>
+            {tabs[activeTab]?.component}
+          </View>
+        )}
 
       </View>
 
@@ -143,6 +150,11 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

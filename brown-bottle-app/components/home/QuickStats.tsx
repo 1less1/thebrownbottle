@@ -7,7 +7,7 @@ import { Colors } from '@/constants/Colors';
 import StatCard from '@/components/modular/StatCard';
 import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
 
-import { getTasks } from '@/routes/task';
+import { getTask } from '@/routes/task';
 import { getShift } from '@/routes/shift';
 import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
@@ -20,6 +20,12 @@ interface Props {
 }
 
 const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
+    const { width, height } = useWindowDimensions();
+    const WIDTH = width;
+    const HEIGHT = height;
+
+    const isMobile = WIDTH < 768;
+
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -28,10 +34,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [shiftCoverCount, setShiftCoverCount] = useState(0);
     const [pendingTimeOffCount, setPendingTimeOffCount] = useState(0);
 
-    const { width } = useWindowDimensions();
     const { user } = useSession();
-
-    const isMobile = width < 768;
 
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
@@ -70,8 +73,8 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 setTaskCount(0);
             } else {
                 const section_id = todaysShift[0].section_id;
-                const tasks = await getTasks({
-                    section_id,
+                const tasks = await getTask({
+                    section_id: section_id,
                     complete: 0,
                 });
                 setTaskCount(tasks.length);
@@ -99,7 +102,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         }
     }, [user?.employee_id]);
 
-    // Fetch data on initalization and state update
+    // Fetch quick stats on initalization and state update
     useEffect(() => {
         fetchData(true); // Initial Load
 

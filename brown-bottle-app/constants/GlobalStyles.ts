@@ -207,6 +207,11 @@ export const GlobalStyles = StyleSheet.create({
         backgroundColor: Colors.white,
         borderRadius: 6,
     },
+    dropdownButtonWrapper: {
+        flexGrow: 1,
+        flexShrink: 1,
+        minWidth: 200,
+    },
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -214,7 +219,7 @@ export const GlobalStyles = StyleSheet.create({
     },
     buttonRowContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        flexWrap: 'wrap', // Dom Edit
         gap: 10,
         marginTop: 20,
     },
@@ -242,7 +247,7 @@ export const GlobalStyles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 5,
     },
-    modernButton: {
+    borderButton: {
         backgroundColor: "white",
         paddingVertical: 10,
         paddingHorizontal: 20,

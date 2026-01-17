@@ -7,51 +7,52 @@ import { Colors } from '@/constants/Colors';
 import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 
-interface CalendarModalProps {
+import { Shift } from '@/types/iShift';
+
+interface Props {
   visible: boolean,
-  date: string | null;
-  startTime: string | undefined;
-  role: string | undefined;
-  section: string | undefined;
+  shift: Shift,
   onClose: () => void;
 }
 
-
-
-const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime, role, section, onClose }) => {
+const CalendarModal: React.FC<Props> = ({ visible, shift, onClose }) => {
 
   return (
 
     <ModularModal visible={visible} onClose={onClose}>
 
       {/* Date Header */}
-      <Text style={GlobalStyles.modalTitle}>{date}</Text>
+      <Text style={GlobalStyles.modalTitle}>Shift</Text>
 
+      {/* Shift Details */}
       <>
-        {startTime && (
-          <View style={styles.row}>
+        <View style={styles.row}>
+          <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.blue }]}>
+            <Text style={GlobalStyles.semiBoldMediumText}>Date: </Text>
+            {shift.date}
+          </Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={GlobalStyles.mediumText}>
             <Text style={GlobalStyles.semiBoldMediumText}>Start Time: </Text>
-            <Text style={GlobalStyles.mediumText}>
-              {startTime}
-            </Text>
-          </View>
-        )}
-        {section && (
-          <View style={styles.row}>
+            {shift.start_time}
+          </Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={GlobalStyles.mediumText}>
             <Text style={GlobalStyles.semiBoldMediumText}>Section: </Text>
-            <Text style={GlobalStyles.mediumText}>
-              {section}
-            </Text>
-          </View>
-        )}
-        {role && (
-          <View style={styles.row}>
+            {shift.section_name}
+          </Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={GlobalStyles.mediumText}>
             <Text style={GlobalStyles.semiBoldMediumText}>Role: </Text>
-            <Text style={GlobalStyles.mediumText}>
-              {role}
-            </Text>
-          </View>
-        )}
+            {shift.primary_role_name}
+          </Text>
+        </View>
       </>
 
       {/* Close Button */}
@@ -59,7 +60,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime,
         <ModularButton
           text="Close"
           textStyle={{ color: "gray" }}
-          style={[GlobalStyles.cancelButton, { flex: 1 }]}
+          style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
           onPress={onClose}
         />
       </View>
@@ -73,6 +74,7 @@ const CalendarModal: React.FC<CalendarModalProps> = ({ visible, date, startTime,
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    flexWrap: "wrap",
     marginBottom: 10
   },
 });

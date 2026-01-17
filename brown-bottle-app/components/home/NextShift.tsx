@@ -25,10 +25,10 @@ const NextShift: React.FC<Props> = ({
   onRefreshDone
 }) => {
 
+  const { user } = useSession();
+
   const [loading, setLoading] = useState(true);
   const [nextShift, setNextShift] = useState<Shift | null>(null);
-
-  const { user } = useSession();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 

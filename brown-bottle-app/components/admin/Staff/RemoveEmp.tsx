@@ -27,73 +27,65 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
     const WIDTH = width;
     const HEIGHT = height;
 
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState<Employee[]>([]);
+    const { confirm } = useConfirm();
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<Employee[]>([]);
+
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
-
-    const { confirm } = useConfirm();
-
-    const toggleModal = () => {
-        setModalVisible(!modalVisible);
-    };
-
-    const toggleConfirmationModal = () => {
-        setConfirmationModalVisible(!confirmationModalVisible);
-    }
-
-    const onOpen = () => {
-        toggleModal();
+    const openModal = () => {
+        setModalVisible(true);
         triggerRefresh(query);
     }
-
-    const onClose = () => {
-        toggleModal();
+    const closeModal = () => {
+        setModalVisible(false);
         setQuery("");
         setResults([]);
         setSelectedIds(new Set());
     };
 
-    const onConfirmationClose = () => {
-        toggleConfirmationModal();
-    }
-
-    const buildParams = (
-        searchTerm: string,
-    ) => {
-        const wildcardTerm = `%${searchTerm.trim()}%`;
-        const params: Record<string, any> = { full_name: wildcardTerm, is_active: 1 };
-        return params;
-    };
-
-
+    // Fetch Employee Logic
     const fetchEmployees = async (searchTerm: string) => {
-        setLoading(true);
         try {
-            const response = await getEmployee(buildParams(searchTerm));
+            setError(null);
+            setLoading(true);
+
+            const params: Record<string, any> = {
+                full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
+                is_active: 1,
+            };
+
+            const response = await getEmployee(params);
             setResults(response);
         } catch (error: any) {
-            console.error("Search failed:", error.message);
+            setError("Failed to fetch employee data: " + error.message);
+            console.error("Failed to fetch employee data: " + error.message);
         } finally {
             setLoading(false);
-            onRemove?.(); // Notify parent refresh is complete
         }
     };
 
+    const debouncedSearch = useCallback(
+        debounce((searchTerm: string) => {
+            fetchEmployees(searchTerm);
+        }, 500), []
+    );
 
-    const debouncedSearch = useCallback(debounce(fetchEmployees, 500), []);
-
-    const handleSearchChange = (text: string) => {
-        setQuery(text);
-        debouncedSearch(text);
+    const handleSearchChange = (searchTerm: string) => {
+        setQuery(searchTerm);
+        debouncedSearch(searchTerm);
     };
 
     const triggerRefresh = (searchTerm: string) => {
-        fetchEmployees(searchTerm);
+        setQuery(searchTerm);
+        debouncedSearch.cancel();
+        debouncedSearch(searchTerm);
     };
 
     const handleReset = () => {
@@ -107,14 +99,10 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         }
     };
 
-
     // Fetch Employees on Initialization and State Update
     useEffect(() => {
         triggerRefresh(query);
     }, [localRefresh]);
-
-
-    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
     const toggleSelection = (id: number) => {
         setSelectedIds((prev) => {
@@ -124,40 +112,34 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         });
     };
 
+    // Remove Employee Logic
     const handleRemove = async () => {
-
-        if (selectedIds.size == 0) {
-            alert("You must select at least one employee to remove!")
-            return;
-        }
+        if (loading || selectedIds.size === 0) return;
 
         // Confirmation Popup
         const ok = await confirm(
             "Confirm Deletion",
             `Are you sure you want to delete ${selectedIds.size} selected employee(s)?`
         );
-
         if (!ok) return;
 
-        const employeeIdList = Array.from(selectedIds);
-
-        setLoading(true);
-
         try {
+            setLoading(true);
+
+            const employeeIdList = Array.from(selectedIds);
             await removeEmployees(employeeIdList);
             alert("Employee(s) successfully removed!")
             onRemove?.();
-            onConfirmationClose();
-            onClose();
+            closeModal();
         } catch (error: any) {
-            alert("Unable to remove Employee(s): " + error.message);
+            alert("Unable to remove employee(s): " + error.message);
+            console.log("Unable to remove employee(s): " + error.message);
         } finally {
             setLoading(false);
         }
-
     };
 
-
+    // Select Employee Logic inside...
     const renderItem = ({ item }: { item: Employee }) => {
         const isSelected = selectedIds.has(item.employee_id);
         return (
@@ -176,7 +158,11 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         );
     };
 
-
+    const ListEmpty = (
+        <View style={styles.singleRow}>
+            <Text style={GlobalStyles.text}>No employees found!</Text>
+        </View>
+    );
 
     return (
 
@@ -184,14 +170,14 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
 
 
             {/* Clickable Tile */}
-            <TouchableOpacity onPress={onOpen} style={styles.removeButton}>
+            <TouchableOpacity onPress={openModal} style={styles.removeButton}>
                 <Ionicons name="person-remove" size={30} color="black" style={styles.icon} />
                 <Text style={[GlobalStyles.boldText, styles.iconText]}>Remove Employee</Text>
             </TouchableOpacity>
 
 
             {/* Remove Emp Modal */}
-            <ModularModal visible={modalVisible} onClose={onClose} scroll={false}>
+            <ModularModal visible={modalVisible} onClose={closeModal} scroll={false}>
 
                 {/* Header */}
                 <Text style={GlobalStyles.modalTitle}>Remove Employee</Text>
@@ -216,39 +202,46 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
                     </ModularButton>
                 </View>
 
-                {loading && <LoadingCircle size="small" style={{ marginTop: 10, alignSelf: 'center' }} />}
-
                 {/* Search Results (Scrollable) */}
                 <View style={{ height: HEIGHT * 0.42 }}>
-                    <FlatList
-                        data={results}
-                        keyExtractor={(item) => item.employee_id?.toString() ?? ""}
-                        renderItem={renderItem}
-                        showsVerticalScrollIndicator={true}
-                    />
-
-                    {!loading && results.length === 0 && query.length > 0 && (
-                        <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-                            No results found...
-                        </Text>
+                    {loading ? (
+                        // Loading state
+                        <View style={styles.singleRow}>
+                            <LoadingCircle size="small" />
+                        </View>
+                    ) : error ? (
+                        // Error state
+                        <View style={styles.singleRow}>
+                            <Text style={GlobalStyles.errorText}>
+                                {error}
+                            </Text>
+                        </View>
+                    ) : (
+                        // Success state
+                        <FlatList
+                            data={results}
+                            keyExtractor={(item) => item.employee_id?.toString() ?? ""}
+                            renderItem={renderItem}
+                            showsVerticalScrollIndicator={true}
+                            ListEmptyComponent={ListEmpty}
+                        />
                     )}
-
                 </View>
 
                 {/* Buttons */}
                 <View style={GlobalStyles.buttonRowContainer}>
                     <ModularButton
-                        text="Delete"
-                        textStyle={{ color: 'white' }}
-                        style={[GlobalStyles.submitButton, { flex: 1 }]}
+                        text="Remove"
+                        textStyle={{ color: Colors.red }}
+                        style={[GlobalStyles.borderButton, styles.deleteButton]}
                         onPress={handleRemove}
-                        enabled={!loading}
+                        enabled={!loading && selectedIds.size > 0}
                     />
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                        onPress={onClose}
+                        style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
+                        onPress={closeModal}
                     />
                 </View>
 
@@ -303,6 +296,21 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderColor: Colors.lightBorderColor,
+    },
+    singleRow: {
+        flex: 1,
+        width: '100%',
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "center",
+        paddingVertical: 14,
+        paddingHorizontal: 16,
+    },
+    deleteButton: {
+        flexGrow: 1,
+        backgroundColor: Colors.bgRed,
+        borderColor: Colors.borderRed,
+        alignItems: "center"
     },
 });
 

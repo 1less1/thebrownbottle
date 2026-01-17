@@ -7,34 +7,16 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import DefaultView from '@/components/DefaultView';
 import { ScrollView } from 'react-native';
-import LoadingCircle from '@/components/modular/LoadingCircle';
-import Tasks from '@/components/tasks/Tasks';
-
-
-// Get Session Data
-import { useSession } from '@/utils/SessionContext';
-import { Section } from '@/types/iSection';
-import { getSection } from '@/routes/section';
+import EmpTasks from '@/components/tasks/EmpTasks';
 
 export default function TaskPage() {
+  // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
       StatusBar.setBackgroundColor(Colors.white);
       StatusBar.setBarStyle('dark-content');
     }, [])
   );
-
-  const { user } = useSession();
-
-  const [sections, setSections] = useState<Section[]>([]);
-
-  useEffect(() => {
-    async function loadSections() {
-      const data = await getSection();
-      setSections(data);
-    }
-    loadSections();
-  }, []);
 
   return (
 
@@ -46,9 +28,10 @@ export default function TaskPage() {
         <View style={GlobalStyles.pageHeaderContainer}>
           <Text style={GlobalStyles.pageHeader}>Tasks</Text>
         </View>
-
+      
+      {/* Employee Tasks View */}
         <ScrollView style={{ flex: 1 }}>
-          <Tasks user={user} sections={sections} />
+          <EmpTasks/>
         </ScrollView>
 
       </View>
@@ -60,46 +43,5 @@ export default function TaskPage() {
 
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "black",
-    marginLeft: 20,
-    marginTop: 40,
-    marginBottom: 20,
 
-  },
-  tabBar: {
-    alignSelf: 'center',
-    flexDirection: "row",
-    borderRadius: 10,
-    width: "90%",
-    marginTop: 20,
-    marginBottom: 15,
-    borderColor: 'lightgrey',
-    borderWidth: 1,
-  },
-  tabButton: {
-    flex: 1,
-    padding: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    margin: 4,
-  },
-  activeTabButton: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    borderColor: Colors.darkTan,
-    borderWidth: 1,
-  },
-  tabText: {
-    fontSize: 16,
-    color: "black",
-  },
-  tabContent: {
-    flex: 1,
-    width: '85%',
-    alignItems: 'center',
-    alignSelf: 'center',
-  },
 });

@@ -42,7 +42,7 @@ const StatCard: React.FC<StatCardProps> = ({
     onPress,
 }) => {
 
-    if (loading) return <LoadingCircle />;
+    if (loading) return <LoadingCircle size="small" />;
 
     return (
         <AnimatedTouchableWrapper

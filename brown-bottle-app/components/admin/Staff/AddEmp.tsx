@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useWindowDimensions, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -13,7 +13,7 @@ import ModularDropdown from '@/components/modular/dropdown/ModularDropdown';
 
 import { yesNoDropdownOptions } from '@/types/iDropdown';
 
-import { Employee } from "@/types/iEmployee";
+import { Employee, InsertEmployee } from "@/types/iEmployee";
 import { insertEmployee } from '@/routes/employee';
 import { isValidEmail, isValidPhone, formatPhone, formatWage } from '@/utils/formHelpers';
 
@@ -29,7 +29,10 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
     const HEIGHT = height;
 
     const [loading, setLoading] = useState(false);
+
     const [modalVisible, setModalVisible] = useState(false);
+    const openModal = () => setModalVisible(true);
+    const closeModal = () => setModalVisible(false);
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -41,87 +44,64 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
     const [secondaryRole, setSecondaryRole] = useState<number | null>(null);
     const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
 
-    const buildFormData = (): Partial<Employee> => ({
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        phone_number: phoneNumber,
-        wage: wage,
+    // Build Form Data
+    const formData = useMemo(() => ({
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim(),
+        phone_number: phoneNumber.trim(),
+        wage: wage.trim(),
         admin: admin,
         primary_role: primaryRole,
         secondary_role: secondaryRole,
         tertiary_role: tertiaryRole,
-    });
+    }), [firstName, lastName, email, phoneNumber, wage, admin, primaryRole, secondaryRole, tertiaryRole]);
 
-    const toggleModal = () => {
-        setModalVisible(!modalVisible)
-    }
+    // Form Validation
+    const isValidForm = useMemo(() => (
+        formData.first_name!.length > 0 &&
+        formData.last_name!.length > 0 &&
+        isValidEmail(formData.email!) &&
+        isValidPhone(formData.phone_number!) &&
+        formData.wage!.length > 0 &&
+        formData.primary_role != null
+    ), [formData]); // Only recalculates when formData changes
 
-    const resetForm = () => {
-        setLoading(false);
-
-        // Reset Employee Form
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setPhoneNumber("");
-        setWage("");
-        setAdmin(0);
-        setPrimaryRole(null);
-        setSecondaryRole(null);
-        setTertiaryRole(null);
-    }
-
-    const onClose = () => {
-        resetForm();
-        toggleModal();
-    };
+    // Create a fresh form on modal visibility change
+    useEffect(() => {
+        if (modalVisible) {
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setPhoneNumber("");
+            setWage("");
+            setAdmin(0);
+            setPrimaryRole(null);
+            setSecondaryRole(null);
+            setTertiaryRole(null);
+        }
+    }, [modalVisible]);
 
     // Insert Employee Logic
     const handleInsert = async () => {
-        const formData = buildFormData();
-
-        setLoading(true);
+        if (loading || !isValidForm) return;
 
         try {
+            setLoading(true);
 
-            // Validate Required Fields
-            if (!firstName.trim() || !lastName.trim() || !email.trim() || !phoneNumber.trim() || !wage.trim()) {
-                alert("Please fill out all required fields!");
-                setLoading(false);
-                return;
-            }
+            // Construct Insert Payload
+            const insertPayload = { ...formData };
 
-            if (primaryRole == null) {
-                alert("Please assign a primary role.");
-                setLoading(false);
-                return;
-            }
-
-            // Validate Phone Number
-            if (!isValidPhone(phoneNumber)) {
-                alert("Please enter a valid phone number in the format XXX-XXX-XXXX.");
-                setLoading(false);
-                return;
-            }
-
-            // Validate Email
-            if (!isValidEmail(email)) {
-                alert("Please enter a valid email address.");
-                setLoading(false);
-                return;
-            }
-
-            await insertEmployee(formData);
+            await insertEmployee(formData as InsertEmployee);
             alert("Employee successfully added!");
             onInsert?.();
-            onClose();
+            closeModal();
         } catch (error: any) {
-            alert("Unable to add Employee: " + error.message);
+            alert("Failed to add employee: " + error.message);
+            console.log("Failed to add employee: " + error.message);
         } finally {
             setLoading(false);
         }
-
     };
 
 
@@ -130,13 +110,13 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
         <View style={styles.container}>
 
             {/* Clickable Tile */}
-            <TouchableOpacity onPress={toggleModal} style={styles.addButton}>
+            <TouchableOpacity onPress={openModal} style={styles.addButton}>
                 <Ionicons name="person-add" size={30} color="black" style={styles.icon} />
                 <Text style={[GlobalStyles.boldText, styles.iconText]}>Add Employee</Text>
             </TouchableOpacity>
 
             {/* Add Emp Modal */}
-            <ModularModal visible={modalVisible} onClose={toggleModal} scroll={false}>
+            <ModularModal visible={modalVisible} onClose={closeModal} scroll={false}>
 
                 {/* Header */}
                 <Text style={GlobalStyles.modalTitle}>Add Employee</Text>
@@ -229,29 +209,23 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
                 {/* Buttons */}
                 <View style={GlobalStyles.buttonRowContainer}>
+                    {/* Add Button */}
                     <ModularButton
                         text="Add"
                         textStyle={{ color: 'white' }}
-                        style={[GlobalStyles.submitButton, { flex: 1 }]}
+                        style={[GlobalStyles.submitButton, { flexGrow: 1 }]}
                         onPress={handleInsert}
-                        enabled={!loading}
+                        enabled={isValidForm && !loading}
                     />
-                    <ModularButton
-                        text="Reset "
-                        style={{ flex: 1 }}
-                        onPress={resetForm}
-                        enabled={!loading}
-                    />
+
+                    {/* Cancel Button */}
                     <ModularButton
                         text="Cancel"
                         textStyle={{ color: 'gray' }}
-                        style={[GlobalStyles.cancelButton, { flex: 1 }]}
-                        onPress={onClose}
+                        style={[GlobalStyles.cancelButton, { flexGrow: 1 }]}
+                        onPress={closeModal}
                     />
                 </View>
-
-
-
 
             </ModularModal>
 

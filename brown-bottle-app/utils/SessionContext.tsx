@@ -8,7 +8,7 @@ import { Employee } from '@/types/iEmployee';
 
 import { registerForPushNotificationsAsync } from './notification';
 
-export type User = Employee;
+export type User = Partial<Employee>;
 
 type SessionContextType = {
   user: User | null;

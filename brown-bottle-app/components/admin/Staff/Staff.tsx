@@ -22,11 +22,13 @@ const Staff = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleRefresh = () => {
-    if (refreshing) return;
     setRefreshing(true);
     setRefreshTrigger(prev => prev + 1);
-  };
 
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
 
   return (
 
@@ -37,13 +39,13 @@ const Staff = () => {
       </View>
 
       <View style={[styles.moduleContainer, { marginVertical: 16, width: '90%' }]}>
-        
+
         <Card style={styles.moduleCard}>
-          <AddEmp onInsert={handleRefresh}/>
+          <AddEmp onInsert={handleRefresh} />
         </Card>
 
         <Card style={styles.moduleCard}>
-          <RemoveEmp onRemove={handleRefresh}/>
+          <RemoveEmp onRemove={handleRefresh} />
         </Card>
 
       </View>

@@ -22,7 +22,7 @@ import { CheckboxOption } from "@/types/iCheckbox";
 import { DropdownOption } from '@/types/iDropdown';
 import { yesNoDropdownOptions } from '@/types/iDropdown';
 
-import { Employee } from "@/types/iEmployee";
+import { Employee, GetEmployee } from "@/types/iEmployee";
 import { getEmployee } from "@/routes/employee";
 
 
@@ -33,8 +33,6 @@ const isActiveDropdownOptions: DropdownOption<number>[] = [
     { key: "Active", value: 1 },
     { key: "Inactive", value: 0 }
 ];
-
-
 
 const columns = [
     { key: "full_name", label: "Name", width: 120 },
@@ -49,44 +47,61 @@ interface StaffSearchProps {
 }
 
 
-const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone }) => {
+const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
     const { width, height } = useWindowDimensions();
     const WIDTH = width;
     const HEIGHT = height;
 
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState<Employee[]>([]);
+    const isMobile = WIDTH < 768;
+    const cardHeight = isMobile ? HEIGHT * 0.52 : HEIGHT * 0.58;
 
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState<Employee[]>([]);
 
     const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]); // Default to Empty Array
     const [selectedIsAdmin, setSelectedIsAdmin] = useState<number | null>(null); // Default to null ("placeholderText")
     const [selectedIsActive, setSelectedIsActive] = useState<number>(1); // Default is_active=1 ("Yes")
 
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+
+    const [editEmpVisible, setEditEmpVisible] = useState(false);
+    const openEditEmp = (employee: Employee) => {
+        setSelectedEmployee(employee);
+        setEditEmpVisible(true);
+    };
+    const closeEditEmp = () => {
+        setEditEmpVisible(false);
+        setSelectedEmployee(null);
+    }
+
+    // Fetch Employee Logic
     const fetchEmployees = async (searchTerm: string,) => {
-        setLoading(true);
         try {
+            setError(null);
+            setLoading(true);
+
             const roleIds = selectedRoles.map(s => s.value); // Create array of roleIds --> [1, 2, 3]
 
-            const params: Record<string, any> = {
+            const params = {
                 full_name: searchTerm.trim() ? `%${searchTerm.trim()}%` : undefined,
                 is_active: selectedIsActive,
                 role_id: roleIds.length > 0 ? roleIds : undefined,
                 admin: selectedIsAdmin,
             };
 
-            const response = await getEmployee(params);
-
+            const response = await getEmployee(params as GetEmployee);
             setResults(response);
         } catch (error: any) {
-            console.error("Search failed:", error.message);
+            setError("Failed to fetch employee data: " + error.message);
+            console.error("Failed to fetch employee data: " + error.message);
         } finally {
             setLoading(false);
-            onRefreshDone?.(); // Notify parent refresh is complete
         }
     };
-
 
     const debouncedSearch = useCallback(
         debounce((searchTerm: string) => {
@@ -94,7 +109,6 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
         }, 500),
         [selectedIsActive, selectedRoles, selectedIsAdmin]
     );
-
 
     const handleSearchChange = (searchTerm: string) => {
         setQuery(searchTerm);
@@ -118,22 +132,12 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
         }
     };
 
-
     // Fetch Employees on Initialization and State Update
     useEffect(() => {
         triggerRefresh(query);
-    }, [selectedRoles, selectedIsAdmin, selectedIsActive, parentRefresh, localRefresh]);
+    }, [parentRefresh, localRefresh, selectedRoles, selectedIsAdmin, selectedIsActive]);
 
-
-    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-    const [editEmpVisible, setEditEmpVisible] = useState(false);
-
-    const closeEditEmp = () => {
-        setEditEmpVisible(!editEmpVisible);
-        setSelectedEmployee(null);
-    }
-
-
+    
     const renderHeader = useCallback(() => (
         <View style={styles.row}>
             {columns.map((col) => (
@@ -144,6 +148,8 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
         </View>
     ), []);
 
+
+    // Select Employee Logic inside...
     const renderCell = useCallback(({ item }: { item: Employee }) => (
         <View style={styles.row}>
             {columns.map((col) => {
@@ -154,10 +160,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
                 return (
                     <View key={col.key} style={[styles.cell, { flex: 1, width: col.width }]}>
                         {isNameColumn ? (
-                            <TouchableOpacity onPress={() => {
-                                setSelectedEmployee(item);
-                                setEditEmpVisible(true);
-                            }}>
+                            <TouchableOpacity onPress={() => openEditEmp(item)}>
                                 <Text numberOfLines={1} ellipsizeMode="tail" style={GlobalStyles.linkText}>
                                     {cellContent}
                                 </Text>
@@ -174,105 +177,117 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh, onRefreshDone 
     ), []);
 
 
+    const ListEmpty = (
+        <View style={styles.singleRow}>
+            <Text style={GlobalStyles.text}>No employees found!</Text>
+        </View>
+    );
+
     return (
 
-        <>
+        <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
 
-            <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: HEIGHT * 0.52 }}>
+            {/* Search Bar + Reset Button */}
+            <View style={styles.searchContainer}>
+                <TextInput
+                    value={query}
+                    onChangeText={handleSearchChange}
+                    placeholder="Search Staff by Name"
+                    placeholderTextColor={Colors.gray}
+                    style={GlobalStyles.searchInput}
+                />
+                <ModularButton
+                    onPress={handleReset}
+                    onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
+                    text=""
+                    enabled={!loading}
+                    textStyle={{ marginRight: 4 }}
+                >
+                    <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
+                </ModularButton>
+            </View>
 
-                {/* Search Bar + Reset Button */}
-                <View style={styles.searchContainer}>
-                    <TextInput
-                        value={query}
-                        onChangeText={handleSearchChange}
-                        placeholder="Search Staff by Name"
-                        placeholderTextColor={Colors.gray}
-                        style={GlobalStyles.searchInput}
-                    />
-                    <ModularButton
-                        onPress={handleReset}
-                        onLongPress={() => Alert.alert("Hint", "Reset Search and All Filters")}
-                        text=""
-                        enabled={!loading}
-                        textStyle={{ marginRight: 4 }}
-                    >
-                        <Ionicons name="reload-outline" size={20} color={Colors.black} style={{ transform: [{ scaleX: -1 }] }} />
-                    </ModularButton>
-                </View>
+            {/* Dropdowns */}
+            <View style={styles.filterContainer}>
+                <RoleCheckbox
+                    selectedRoles={selectedRoles}
+                    onRoleSelect={(keys, values) => {
+                        setSelectedRoles(values.map((value, index) => ({
+                            key: keys[index],
+                            value: value,
+                        })));
+                    }}
+                    containerStyle={styles.dropdownButton}
+                />
+                <ModularDropdown
+                    data={adminDropdownOptions}
+                    selectedValue={selectedIsAdmin}
+                    onSelect={(value) => setSelectedIsAdmin(value as number)}
+                    containerStyle={styles.dropdownButton}
+                    placeholderText={"Select admin..."}
+                    disabled={loading}
+                />
+                <ModularDropdown
+                    data={isActiveDropdownOptions}
+                    selectedValue={selectedIsActive}
+                    onSelect={(value) => setSelectedIsActive(value as number)}
+                    containerStyle={styles.dropdownButton}
+                    usePlaceholder={false}
+                    disabled={loading}
+                />
+            </View>
 
-                {/* Dropdowns */}
-                <View style={styles.filterContainer}>
-                    <RoleCheckbox
-                        selectedRoles={selectedRoles}
-                        onRoleSelect={(keys, values) => {
-                            setSelectedRoles(values.map((value, index) => ({
-                                key: keys[index],
-                                value: value,
-                            })));
-                        }}
-                        containerStyle={styles.dropdownButton}
-                    />
-                    <ModularDropdown
-                        data={adminDropdownOptions}
-                        selectedValue={selectedIsAdmin}
-                        onSelect={(value) => setSelectedIsAdmin(value as number)}
-                        containerStyle={styles.dropdownButton}
-                        placeholderText={"Select admin..."}
-                        disabled={loading}
-                    />
-                    <ModularDropdown
-                        data={isActiveDropdownOptions}
-                        selectedValue={selectedIsActive}
-                        onSelect={(value) => setSelectedIsActive(value as number)}
-                        containerStyle={styles.dropdownButton}
-                        usePlaceholder={false}
-                        disabled={loading}
-                    />
-                </View>
+            {/* Data Table */}
+            {/* Scroll View = Horizontal */}
+            {/* Flat List = Vertical */}
+            <View style={{ flex: 1 }}>
+                <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
+                    <View style={styles.tableContainer}>
+                        {renderHeader()}
 
-                {loading && <LoadingCircle size={"small"} />}
-
-                {/* Data Table */}
-                {/* Scroll View = Horizontal */}
-                {/* Flat List = Vertical */}
-                <View style={{ flex: 1 }}>
-                    <ScrollView horizontal contentContainerStyle={{ flexGrow: 1 }}>
-                        <View style={styles.tableContainer}>
-                            {renderHeader()}
+                        {loading ? (
+                            // Loading state
+                            <View style={styles.singleRow}>
+                                <LoadingCircle size="small" />
+                            </View>
+                        ) : error ? (
+                            // Error state
+                            <View style={styles.singleRow}>
+                                <Text style={GlobalStyles.errorText}>
+                                    {error}
+                                </Text>
+                            </View>
+                        ) : (
+                            // Success state
                             <FlatList
                                 data={results}
-                                keyExtractor={(item, index) => item.employee_id?.toString() ?? `fallback-${index}`}
+                                keyExtractor={(item) => item.employee_id?.toString() ?? ""}
                                 renderItem={renderCell}
-                                style={{ maxHeight: HEIGHT * 0.5 }}
                                 scrollEnabled={true}
                                 nestedScrollEnabled={true}
                                 showsVerticalScrollIndicator={true}
+                                ListEmptyComponent={ListEmpty}
                             />
-                        </View>
-                    </ScrollView>
-                </View>
+                        )}
 
-                {/* Fallback */}
-                {!loading && results.length === 0 && query.length > 0 && (
-                    <Text style={[GlobalStyles.text, { marginBottom: 10, textAlign: "center" }]}>
-                        No results found...
-                    </Text>
-                )}
-
-            </Card>
+                    </View>
+                </ScrollView>
+            </View>
 
             {/* Edit Employee Modal - Update */}
-            <EditEmp
-                visible={editEmpVisible}
-                onClose={closeEditEmp}
-                empData={selectedEmployee as Employee}
-                onUpdate={() => setLocalRefresh((prev) => prev + 1)}
-            />
+            {selectedEmployee && (
+                <EditEmp
+                    visible={editEmpVisible}
+                    onClose={closeEditEmp}
+                    empData={selectedEmployee as Employee}
+                    onUpdate={() => setLocalRefresh((prev) => prev + 1)}
+                />
+            )}
 
-
-        </>
+        </Card>
 
     );
+
 };
 
 
@@ -308,10 +323,20 @@ const styles = StyleSheet.create({
         borderColor: Colors.lightBorderColor,
     },
     cell: {
-        padding: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 8,
         borderWidth: 1,
         borderColor: Colors.lightBorderColor,
         flexShrink: 1,
+    },
+    singleRow: {
+        flex: 1,
+        width: '100%',
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "center",
+        paddingVertical: 10,
+        paddingHorizontal: 8,
     },
 });
 

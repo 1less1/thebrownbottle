@@ -80,6 +80,7 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`recurring_task` (
   `recurring_task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(20) NOT NULL DEFAULT 'recurring',
   `title` VARCHAR(500) NOT NULL,
   `description` TEXT NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
@@ -116,6 +117,7 @@ DEFAULT CHARACTER SET = utf8mb3;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   `task_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(20) NOT NULL DEFAULT 'normal',
   `title` VARCHAR(500) NOT NULL,
   `description` TEXT NOT NULL,
   `author_id` INT UNSIGNED NOT NULL,
@@ -143,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`task` (
   CONSTRAINT `fk_task_recurring_task`
     FOREIGN KEY (`recurring_task_id`)
     REFERENCES `thebrownbottle`.`recurring_task` (`recurring_task_id`)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
     ON UPDATE CASCADE,
   CONSTRAINT `fk_task_last_modified_by`
     FOREIGN KEY (`last_modified_by`)

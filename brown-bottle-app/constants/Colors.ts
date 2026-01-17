@@ -24,6 +24,7 @@ export const Colors = {
   lightTan: '#FAF3ED',
   mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
+  tabTan: '#DFD1C0',
   yellowTan: '#FFDEAB',
   greyBrown: '#5c533f',
   lightBrown: '#7C580D',
@@ -39,6 +40,7 @@ export const Colors = {
 
   green: '#28a745',
   acceptGreen: '#28a745',
+  borderGreen: '#28a745',
   bgGreen: '#d4edda',
 
   yellow: '#ff9800',

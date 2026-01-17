@@ -7,13 +7,10 @@ import { GlobalStyles } from '@/constants/GlobalStyles';
 
 import DefaultView from '@/components/DefaultView';
 import DefaultScrollView from '@/components/DefaultScrollView';
-import CircularImage from '@/components/CircularImage';
-import Announcements from '@/components/home/Announcements';
+import EmpAnnc from '@/components/home/EmpAnnc';
 import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/QuickStats';
 import ProfileAvatar from '@/components/ProfileAvatar';
-import QuickStatsSkeleton from '@/components/ui/skeleton/home/QuickStatsSkeleton';
-
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
@@ -95,7 +92,7 @@ export default function HomeScreen() {
             <View style={styles.contentRow}>
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>
-                <Announcements parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
+                <EmpAnnc parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
               </View>
               {/* Next Shift column */}
               <View style={styles.nextShiftColumn}>
