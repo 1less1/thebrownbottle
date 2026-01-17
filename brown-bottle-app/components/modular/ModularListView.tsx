@@ -77,6 +77,7 @@ export default function ModularListView<T>({
 
         return (
             <View style={styles.paginationRow}>
+                {/* Left Column */}
                 <TouchableOpacity
                     disabled={currentPage === 0}
                     onPress={() => setCurrentPage(prev => prev - 1)}
@@ -87,14 +88,18 @@ export default function ModularListView<T>({
                     </Text>
                 </TouchableOpacity>
 
-                <Text style={[GlobalStyles.text, { fontSize: 12 }]}>
-                    Page {currentPage + 1} of {totalPages}
-                </Text>
+                {/* Middle Column */}
+                <View style={styles.pageTextWrapper}>
+                    <Text style={[GlobalStyles.text, { fontSize: 12, textAlign: 'center' }]}>
+                        Page {currentPage + 1} of {totalPages}
+                    </Text>
+                </View>
 
+                {/* Right Column */}
                 <TouchableOpacity
                     disabled={currentPage >= totalPages - 1}
                     onPress={() => setCurrentPage(prev => prev + 1)}
-                    style={styles.navButton}
+                    style={styles.nextButton}
                 >
                     <Text style={[styles.pageButtonText, currentPage >= totalPages - 1 && styles.disabledText]}>
                         Next
@@ -167,7 +172,6 @@ export default function ModularListView<T>({
 const styles = StyleSheet.create({
     listContainer: {
         flex: 1,
-        maxWidth: "100%",
     },
     listItem: {
         width: '97%',
@@ -187,16 +191,27 @@ const styles = StyleSheet.create({
         padding: 12,
         margin: 5,
     },
+
+    // Pagination
     paginationRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 10,
         marginTop: 5,
+        width: '100%', // Ensure it spans the full width
     },
     navButton: {
-        padding: 8,
+        flex: 1, // Forces button container to take 1/3 of the space
+        alignItems: 'flex-start', // Align "Previous" to the left
+    },
+    nextButton: {
+        flex: 1,
+        alignItems: 'flex-end', // Align "Next" to the right
+    },
+    pageTextWrapper: {
+        flex: 1, // Forces text container to take 1/3 of the space
+        alignItems: 'center', // Centers the text exactly in the middle 1/3
     },
     pageButtonText: {
         fontSize: 14,
@@ -205,5 +220,5 @@ const styles = StyleSheet.create({
     },
     disabledText: {
         opacity: 0.3,
-    }
+    },
 });

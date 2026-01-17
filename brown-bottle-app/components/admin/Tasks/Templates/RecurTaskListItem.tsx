@@ -36,6 +36,7 @@ const RecurringTaskistItem: React.FC<Props> = ({ recurringTask, children }) => {
                         </Text>
                     </View>
 
+                    {/* Recurring Badge */}
                     <View style={styles.badgeWrapper}>
                         <Badge text={"Recurring"} />
                     </View>
@@ -47,7 +48,7 @@ const RecurringTaskistItem: React.FC<Props> = ({ recurringTask, children }) => {
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             Start Date:{" "}
-                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.pendingYellow }]}>
                                 {formatDate(recurringTask.start_date)}
                             </Text>
                         </Text>
@@ -57,7 +58,7 @@ const RecurringTaskistItem: React.FC<Props> = ({ recurringTask, children }) => {
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             End Date:{" "}
-                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.pendingYellow }]}>
                                 {recurringTask.end_date ? formatDate(recurringTask.end_date) : "No End Date"}
                             </Text>
                         </Text>

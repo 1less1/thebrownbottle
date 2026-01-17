@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -82,12 +84,12 @@ def get_announcements(db, request):
         if (recent_only is not None) and (recent_only == 1):
             # Filter announcements inserted within the last 14 days
             query += " AND a.timestamp >= NOW() - INTERVAL 14 DAY"
-        
+
         # -----------------------------
         # Time Sorting Logic
         # -----------------------------
         order_clauses = []
-        
+
         # TIMESTAMP SORTING
         if timestamp_sort == "Newest":
             order_clauses.append("a.timestamp DESC")
@@ -176,6 +178,17 @@ def insert_announcement(db, request):
         inserted_id = cursor.lastrowid
 
         conn.commit()
+
+        # Emit notification event
+        dispatch_notification(
+            db,
+            NotificationEvent.ANNOUNCEMENT_CREATED,
+            {
+                "announcement_id": inserted_id,
+                "role_id": role_id,
+                "title": title
+            }
+        )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
@@ -315,7 +328,6 @@ def delete_announcement(db, announcement_id):
 # -------------------------------------------------------------------------------------------------------
 
 
-
 # Announcement Acknowledgement --------------------------------------------------------------------------
 
 # POST Acknowledge Announcement -------------------------------------------------------------------------
@@ -400,7 +412,7 @@ def get_acknowledged_announcements(db, request):
         param_types = {
             'announcement_id': int,
             'employee_id': int,
-            'recent_only': int, # 1=True, 0=False
+            'recent_only': int,  # 1=True, 0=False
         }
 
         # Validate and parse parameters
@@ -441,13 +453,13 @@ def get_acknowledged_announcements(db, request):
         if employee_id is not None:
             query += " AND aa.employee_id = %s"
             query_params.append(employee_id)
-        
+
         if (recent_only is not None) and (recent_only == 1):
             # Filter announcements inserted within the last 14 days
             query += " AND a.timestamp >= NOW() - INTERVAL 14 DAY"
 
         # Last Query Line
-        query += " ORDER BY a.timestamp DESC;" # Shows newest acknowledgements first
+        query += " ORDER BY a.timestamp DESC;"  # Shows newest acknowledgements first
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

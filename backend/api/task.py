@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -6,6 +8,7 @@ from datetime import datetime
 
 # GET Requests ------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def get_tasks(db, request):
     """
@@ -79,7 +82,7 @@ def get_tasks(db, request):
 
         query_params = []
 
-        # Build Dynamic Query 
+        # Build Dynamic Query
         if task_id is not None:
             query += " AND t.task_id = %s"
             query_params.append(task_id)
@@ -92,7 +95,7 @@ def get_tasks(db, request):
             query += " AND t.section_id = %s"
             query_params.append(section_id)
 
-        if complete is not None and complete in (0,1):
+        if complete is not None and complete in (0, 1):
             query += " AND t.complete = %s"
             query_params.append(complete)
 
@@ -158,7 +161,7 @@ def get_tasks(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -180,7 +183,8 @@ def insert_task(db, request):
     cursor = None
     try:
         # Define Required Fields
-        required_fields = ['title', 'description', 'author_id', 'section_id', 'due_date']
+        required_fields = ['title', 'description',
+                           'author_id', 'section_id', 'due_date']
 
         # Define Expected Field Types
         field_types = {
@@ -192,7 +196,8 @@ def insert_task(db, request):
         }
 
         # Validate the fields in JSON body
-        fields, error = request_helper.verify_body(request, field_types, required_fields)
+        fields, error = request_helper.verify_body(
+            request, field_types, required_fields)
 
         if error:
             return jsonify(error), 400
@@ -216,6 +221,15 @@ def insert_task(db, request):
 
         conn.commit()
 
+        # Emit Notification Event
+        dispatch_notification(
+            db,
+            NotificationEvent.TASK_CREATED,
+            {
+                "task_id": inserted_id
+            }
+        )
+
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 
     except mysql.connector.Error as e:
@@ -225,7 +239,7 @@ def insert_task(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -254,9 +268,9 @@ def update_task(db, request, task_id):
             'author_id': int,
             'section_id': int,
             'due_date': str,  # YYYY-MM-DD
-            'complete': int, # 1 or 0
-            'recurring_task_id': int, # Foreign Key
-            'last_modified_by': int, # Employee ID
+            'complete': int,  # 1 or 0
+            'recurring_task_id': int,  # Foreign Key
+            'last_modified_by': int,  # Employee ID
         }
 
         # Validate the fields in JSON body (only optional fields here)
@@ -281,7 +295,8 @@ def update_task(db, request, task_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(task_id)  # WHERE parameter at the end -> WHERE task_id = %s
+        # WHERE parameter at the end -> WHERE task_id = %s
+        values.append(task_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)

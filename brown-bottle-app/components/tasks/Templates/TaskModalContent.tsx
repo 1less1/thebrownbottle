@@ -45,8 +45,8 @@ const TaskModalContent: React.FC<Props> = ({ task }) => {
             </View>
 
             <View style={styles.row}>
-                <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.orange }]}>
-                    {/* Black text overrides orange text here...*/}
+                <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.pendingYellow }]}>
+                    {/* Black text overrides pendingYellow text here...*/}
                     <Text style={GlobalStyles.semiBoldMediumText}>Due: </Text>
                     {formatDate(task.due_date)}
                 </Text>

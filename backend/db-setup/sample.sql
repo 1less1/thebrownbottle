@@ -1,7 +1,17 @@
+
 -- Sample Data to be inserted into the MySQL Database when Docker containers are created
 
+-- Ensure we are in the correct database
+USE `thebrownbottle`;
 
--- Sample section data ---------------------------------------------------------------------------------------------------------------------------
+START TRANSACTION;
+
+-- Optional: temporarily relax FK checks if you’re iterating
+-- SET FOREIGN_KEY_CHECKS = 0;
+
+-- ======================
+-- Section Data
+-- ======================
 INSERT INTO `thebrownbottle`.`section` (`section_name`)
 VALUES
 ('Prep'),
@@ -13,8 +23,9 @@ VALUES
 ('Lounge'),
 ('Upstairs');
 
-
--- Sample role data ---------------------------------------------------------------------------------------------------------------------------
+-- ======================
+-- Role Data
+-- ======================
 INSERT INTO `thebrownbottle`.`role` (`role_name`)
 VALUES
 ('Manager'),
@@ -24,8 +35,9 @@ VALUES
 ('Kitchen'),
 ('Dish');
 
-
--- Sample employee data --------------------------------------------------------------------------------------------------------------------------
+-- ======================
+-- Employee Data
+-- ======================
 INSERT INTO `thebrownbottle`.`employee` 
 (`first_name`, `last_name`, `email`, `phone_number`, `wage`, `admin`, `primary_role`, `secondary_role`, `tertiary_role`)
 VALUES 
@@ -43,9 +55,10 @@ VALUES
 ('Zoe', 'Ramirez', 'zoe.ramirez@example.com', '555-012-3456', 15.75, 0, 5, NULL, NULL),
 ('Ethan', 'Bishop', 'ethan.bishop@example.com', '555-123-9876', 18.00, 1, 1, 2, NULL);
 
-
--- Sample recurring_task data ------------------------------------------------------------------------------------------------------------------------------
-INSERT INTO recurring_task
+-- ======================
+-- Recurring Task Data
+-- ======================
+INSERT INTO `thebrownbottle`.recurring_task
 (title, description, author_id, section_id, mon, tue, wed, thu, fri, sat, sun, start_date, end_date)
 VALUES
 (
@@ -58,7 +71,7 @@ VALUES
   NULL
 );
 
-INSERT INTO recurring_task
+INSERT INTO `thebrownbottle`.recurring_task
 (title, description, author_id, section_id, mon, tue, wed, thu, fri, sat, sun, start_date, end_date)
 VALUES
 (
@@ -72,108 +85,141 @@ VALUES
   NULL
 );
 
-
--- Sample task data (mapped into 7–13 DEC 2025) ---------------------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`task` 
+-- ======================
+-- Task Data (all due 2026-01-18 .. 2026-01-24)
+-- ======================
+INSERT INTO `thebrownbottle`.`task`
 (`title`, `description`, `author_id`, `section_id`, `due_date`)
 VALUES
-('Inventory Count', 'Count all wine bottles in storage.', 1, 1, '2025-12-07'),
-('Clean Patio', 'Deep clean the outdoor patio seating area.', 2, 5, '2025-12-08'),
-('Restock Bar', 'Refill bar shelves with necessary liquors and mixers.', 1, 4, '2025-12-09'),
-('Table Setup', 'Set up tables for the Friday evening event.', 2, 2, '2025-12-12'),
-('Check Lighting', 'Inspect all lights and replace any burnt-out bulbs.', 1, 3, '2025-12-10');
+('Line Deep Clean', 'Deep clean the sauté and grill stations before dinner service.', 6, 3, '2026-01-18'),
+('Host Stand Audit', 'Verify menus, buzzers, and floor chart are up to date.', 1, 2, '2026-01-19'),
+('Bar Inventory Check', 'Count all spirits below the par level and note reorders.', 2, 5, '2026-01-20'),
+('Patio Heater Maintenance', 'Test patio heaters and replace empty propane tanks.', 2, 6, '2026-01-20'),
+('Menu Tasting Prep', 'Prep tasting portions for new menu items for staff review.', 1, 1, '2026-01-21'),
+('POS Button Update', 'Confirm new appetizer buttons are live on terminals.', 13, 2, '2026-01-21'),
+('Glassware Polish', 'Polish wine and cocktail glasses before service.', 1, 5, '2026-01-22'),
+('Friday Event Table Setup', 'Set up extra two-tops and reset silverware rolls.', 2, 2, '2026-01-23'),
+('Saturday Brunch Prep', 'Batch hollandaise and cut fruit for brunch.', 6, 1, '2026-01-24'),
+('Walk-in Fridge Temp Log', 'Record 3x daily temperature readings and initial.', 6, 3, '2026-01-24');
 
-
--- Sample announcement data ----------------------------------------------------------------------------------------------------------------------
+-- ======================
+-- Announcement Data (role-aligned)
+-- ======================
 INSERT INTO `thebrownbottle`.`announcement` (`author_id`, `title`, `description`, `role_id`)
 VALUES
-(1, 'New Uniform Policy', 'Please review the updated uniform guidelines posted in the staff room.', 1),
-(2, 'Shift Coverage', 'We need additional coverage for the Saturday evening shift. Please reach out if available.', 1),
-(1, 'Inventory Audit', 'A full inventory audit is scheduled for Monday. Be prepared to assist.', 1),
-(2, 'Holiday Schedule', 'The holiday work schedule has been released. Check the bulletin board for your shifts.', 1),
-(1, 'Customer Feedback', 'Recent feedback has been positive! Keep up the excellent service.', 1),
-(2, 'Training Session', 'Mandatory service training will take place this Friday at 3 PM.', 1),
-(1, 'Menu Updates', 'Several new items have been added to the menu. Review them before your next shift.', 1),
-(2, 'Safety Reminder', 'Remember to use proper lifting techniques when handling heavy items.', 1),
-(1, 'Parking Changes', 'Staff parking spots have been reassigned. Check your new location.', 1),
-(2, 'Team Meeting', 'There will be a brief team meeting before Friday’s dinner shift. Please arrive 15 minutes early.', 1),
+(1, 'Managers: Quarterly P&L Review', 'Managers, please review last quarter''s P&L before Sunday''s check-in.', 1),
+(2, 'Hosts: Updated Greeting Script', 'Use the revised greeting and guest waitlist language effective immediately.', 2),
+(1, 'Servers: Appetizer Upsell Focus', 'This week''s focus: upsell the new roasted beet salad and crab cakes.', 3),
+(2, 'Bartenders: Feature Cocktail of the Week', 'Feature: Blood Orange Old Fashioned. Specs posted behind the bar.', 4),
+(1, 'Kitchen: Allergy Protocol Refresher', 'Re-read the allergy card and confirm all special-order procedures.', 5),
+(2, 'Dish: Rack Labeling & Soak Times', 'Update rack labels and adhere to posted soak times for flatware.', 6);
 
-(1, 'Manager Briefing', 'Managers, please attend the monthly briefing on upcoming restaurant changes.', 2),
-(2, 'Host Responsibilities', 'Reminder: All hosts should be familiar with the updated guest seating chart.', 3),
-(1, 'Bartender Training', 'Bartenders, please review the new cocktail recipes added to the menu.', 5),
-(2, 'Server Scheduling', 'Servers, be aware that your schedule for next week has been updated. Check the board.', 4),
-(1, 'Dishwashing Protocols', 'Dish staff, please adhere to the new cleaning and sanitizing guidelines effective today.', 6);
-
-
--- Sample shift data (all dates mapped into 7–13 DEC 2025) ---------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`shift` 
-(`employee_id`, `start_time`, `date`, `section_id`)
+-- ======================
+-- Shift Data (2026-01-18 .. 2026-01-24)
+-- IDs will be 1..36 in this order in a fresh DB
+-- ======================
+INSERT INTO `thebrownbottle`.`shift` (`employee_id`, `start_time`, `date`, `section_id`)
 VALUES
-(1, '10:00:00', '2025-12-14', 1), -- Sunday
-(1, '12:00:00', '2025-12-17', 1), -- Wednesday
+-- Sun 2026-01-18 (IDs 1..5)
+(1,  '10:00:00', '2026-01-18', 2),
+(4,  '11:00:00', '2026-01-18', 7),
+(11, '12:00:00', '2026-01-18', 5),
+(5,  '09:00:00', '2026-01-18', 3),
+(9,  '09:00:00', '2026-01-18', 4),
 
-(2, '09:00:00', '2025-12-14', 1), -- Sunday
-(2, '09:00:00', '2025-12-15', 2), -- Monday
-(2, '11:00:00', '2025-12-17', 2), -- Wednesday
-(2, '11:00:00', '2025-12-20', 1), -- Saturday
+-- Mon 2026-01-19 (IDs 6..10)
+(2,  '09:00:00', '2026-01-19', 2),
+(3,  '10:00:00', '2026-01-19', 2),
+(8,  '11:00:00', '2026-01-19', 8),
+(12, '08:00:00', '2026-01-19', 1),
+(6,  '13:00:00', '2026-01-19', 3),
 
-(3, '16:00:00', '2025-12-16', 2), -- Tuesday
-(3, '10:00:00', '2025-12-19', 2), -- Friday
-(3, '17:00:00', '2025-12-20', 2), -- Saturday
+-- Tue 2026-01-20 (IDs 11..16)
+(13, '09:00:00', '2026-01-20', 2),
+(7,  '10:00:00', '2026-01-20', 2),
+(4,  '16:00:00', '2026-01-20', 6),
+(11, '14:00:00', '2026-01-20', 5),
+(5,  '08:00:00', '2026-01-20', 4),
+(9,  '08:00:00', '2026-01-20', 4),
 
-(4, '17:00:00', '2025-12-14', 3), -- Sunday
-(4, '11:00:00', '2025-12-16', 3), -- Tuesday
-(4, '16:00:00', '2025-12-20', 3), -- Saturday
+-- Wed 2026-01-21 (IDs 17..20)
+(1,  '10:00:00', '2026-01-21', 2),
+(10, '10:00:00', '2026-01-21', 2),
+(8,  '16:00:00', '2026-01-21', 7),
+(12, '08:00:00', '2026-01-21', 1),
 
-(5, '08:00:00', '2025-12-15', 5), -- Monday
-(5, '14:00:00', '2025-12-17', 5), -- Wednesday
+-- Thu 2026-01-22 (IDs 21..25)
+(2,  '09:00:00', '2026-01-22', 2),
+(3,  '10:00:00', '2026-01-22', 2),
+(11, '14:00:00', '2026-01-22', 5),
+(6,  '12:00:00', '2026-01-22', 3),
+(9,  '08:00:00', '2026-01-22', 4),
 
-(6, '09:00:00', '2025-12-16', 5), -- Tuesday
-(6, '13:00:00', '2025-12-19', 5), -- Friday
-(6, '07:00:00', '2025-12-20', 5), -- Saturday
+-- Fri 2026-01-23 (IDs 26..29)
+(13, '09:00:00', '2026-01-23', 2),
+(7,  '10:00:00', '2026-01-23', 2),
+(4,  '17:00:00', '2026-01-23', 8),
+(5,  '08:00:00', '2026-01-23', 3),
 
-(7, '10:00:00', '2025-12-14', 2), -- Sunday
-(7, '17:00:00', '2025-12-16', 2), -- Tuesday
+-- Sat 2026-01-24 (IDs 30..36)
+(1,  '12:00:00', '2026-01-24', 2),
+(10, '16:00:00', '2026-01-24', 2),
+(11, '16:00:00', '2026-01-24', 5),
+(12, '09:00:00', '2026-01-24', 1),
+(6,  '14:00:00', '2026-01-24', 3),
+(9,  '09:00:00', '2026-01-24', 4),
+(8,  '17:00:00', '2026-01-24', 7);
 
-(8, '12:00:00', '2025-12-15', 3), -- Monday
-(8, '16:00:00', '2025-12-17', 3), -- Wednesday
-(8, '10:00:00', '2025-12-19', 3), -- Friday
-
-(9, '08:00:00', '2025-12-16', 6), -- Tuesday
-(9, '14:00:00', '2025-12-19', 6), -- Friday
-
-(10, '09:00:00', '2025-12-16', 2), -- Tuesday
-(10, '15:00:00', '2025-12-20', 2), -- Saturday
-
-(11, '17:00:00', '2025-12-14', 4), -- Sunday
-(11, '11:00:00', '2025-12-16', 4), -- Tuesday
-(11, '13:00:00', '2025-12-19', 4), -- Friday
-
-(12, '08:00:00', '2025-12-15', 5), -- Monday
-(12, '14:00:00', '2025-12-17', 5), -- Wednesday
-
-(13, '09:00:00', '2025-12-16', 1), -- Tuesday
-(13, '12:00:00', '2025-12-19', 1); -- Friday
-
-
--- Shift cover requests remain unchanged (linked by shift_id) ---------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`shift_cover_request` 
-(`shift_id`, `accepted_employee_id`, `requested_employee_id`, `status`) 
+-- ======================
+-- Shift Cover Requests (IDs mapped to the shift insert order above)
+-- ======================
+INSERT INTO `thebrownbottle`.`shift_cover_request`
+(`shift_id`, `accepted_employee_id`, `requested_employee_id`, `status`)
 VALUES
-(1, 3, 1, 'Accepted'),
-(4, NULL, 2, 'Pending'),
-(7, 5, 3, 'Accepted'),
-(10, NULL, 4, 'Pending'),
-(13, 9, 5, 'Denied');
+-- Mon 2026-01-19 10:00 Front (ID 7): Jenna (3) -> Nina (10)
+(7, 10, 3, 'Accepted'),
 
+-- Thu 2026-01-22 14:00 Bar (ID 23): Caleb (11) -> Avery (8)
+(23, 8, 11, 'Awaiting Approval'),
 
--- Time off requests (mapped into same week/next weeks) -----------------------------------------------------------------------------------------------------
-INSERT INTO `thebrownbottle`.`time_off_request` 
-(`employee_id`, `start_date`, `end_date`, `reason`, `status`) 
+-- Fri 2026-01-23 08:00 New Back (ID 29): Sophia (5) -> Devin (6)
+(29, 6, 5, 'Pending'),
+
+-- Thu 2026-01-22 09:00 Front (ID 21): Marcus (2) -> Ethan (13)
+(21, 13, 2, 'Accepted'),
+
+-- Fri 2026-01-23 17:00 Upstairs (ID 28): Tyler (4) -> Avery (8)
+(28, 8, 4, 'Pending'),
+
+-- Sat 2026-01-24 16:00 Bar (ID 32): Caleb (11) -> Tyler (4) (denied)
+(32, 4, 11, 'Denied'),
+
+-- Tue 2026-01-20 08:00 Old Back (ID 16): Liam (9) -> Devin (6)
+(16, 6, 9, 'Accepted'),
+
+-- Wed 2026-01-21 10:00 Front (ID 17): Emily (1) -> Marcus (2)
+(17, 2, 1, 'Awaiting Approval'),
+
+-- Sat 2026-01-24 16:00 Front (ID 31): Nina (10) -> Jenna (3) (denied)
+(31, 3, 10, 'Denied'),
+
+-- Sat 2026-01-24 09:00 Prep (ID 33): Zoe (12) -> Sophia (5)
+(33, 5, 12, 'Awaiting Approval');
+
+-- ======================
+-- Time Off Requests (start 2026-01-25 and later)
+-- ======================
+INSERT INTO `thebrownbottle`.`time_off_request`
+(`employee_id`, `start_date`, `end_date`, `reason`, `status`)
 VALUES
-(1, '2025-12-24', '2025-12-27', 'Family vacation', 'Accepted'),
-(2, '2025-12-30', '2025-12-30', 'Doctor appointment', 'Pending'),
-(3, '2026-01-03', '2026-01-05', 'Traveling for wedding', 'Accepted'), -- Changed to 2026 to fit a future month
-(4, '2025-12-10', '2025-12-11', 'Personal reasons', 'Denied'),
-(5, '2026-01-07', '2026-01-09', 'Attending conference', 'Pending'); -- Changed to 2026 to fit a future month
+(3,  '2026-01-26', '2026-01-26', 'DMV appointment', 'Accepted'),
+(4,  '2026-01-25', '2026-01-27', 'Weekend trip', 'Pending'),
+(12, '2026-02-02', '2026-02-05', 'Family visit', 'Accepted'),
+(9,  '2026-02-10', '2026-02-10', 'School meeting', 'Pending'),
+(1,  '2026-03-01', '2026-03-03', 'Industry conference', 'Accepted'),
+(11, '2026-01-28', '2026-01-28', 'Dentist appointment', 'Denied'),
+(7,  '2026-02-15', '2026-02-16', 'Out of town', 'Pending'),
+(10, '2026-02-01', '2026-02-01', 'Personal day', 'Accepted');
 
+-- SET FOREIGN_KEY_CHECKS = 1;
+COMMIT;

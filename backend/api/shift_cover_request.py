@@ -1,4 +1,6 @@
 from flask import jsonify
+from notifications.dispatcher import dispatch_notification
+from notifications.events import NotificationEvent
 import mysql.connector
 import os
 import request_helper
@@ -23,13 +25,14 @@ def get_scr(db, request):
             'shift_id': int,
             'accepted_employee_id': int,
             'requested_employee_id': int,
-            'employee_id': int,  # Filter all requests either requested by or accepted by the provided employee_id parameter
+            # Filter all requests either requested by or accepted by the provided employee_id parameter
+            'employee_id': int,
             'requested_primary_role': int,
             'requested_secondary_role': int,
             'requested_tertiary_role': int,
             'status': List[str],
-            'date_sort': str, # "Newest" or "Oldest" - Sorts by date in relation to the current day
-            'timestamp_sort' : str # "Newest" or "Oldest" - Sorts by timestamp
+            'date_sort': str,  # "Newest" or "Oldest" - Sorts by date in relation to the current day
+            'timestamp_sort': str  # "Newest" or "Oldest" - Sorts by timestamp
         }
 
         # Validate and parse parameters
@@ -43,12 +46,12 @@ def get_scr(db, request):
         accepted_employee_id = params.get('accepted_employee_id')
         requested_employee_id = params.get('requested_employee_id')
         employee_id = params.get('employee_id')
-        requested_primary_role = params.get('requested_primary_role') 
+        requested_primary_role = params.get('requested_primary_role')
         requested_secondary_role = params.get('requested_secondary_role')
         requested_tertiary_role = params.get('requested_tertiary_role')
-        statuses = params.get('status', []) # List of statuses
-        date_sort = params.get ("date_sort")
-        timestamp_sort = params.get ("timestamp_sort")
+        statuses = params.get('status', [])  # List of statuses
+        date_sort = params.get("date_sort")
+        timestamp_sort = params.get("timestamp_sort")
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -123,7 +126,6 @@ def get_scr(db, request):
                 query += " AND scr.requested_employee_id = %s"
                 query_params.append(requested_employee_id)
 
-
         # Handle multiple Role Clauses
         role_clauses = []
         role_values = []
@@ -154,7 +156,7 @@ def get_scr(db, request):
             order_clauses.append("s.date DESC")
         elif date_sort == "Oldest":
             order_clauses.append("s.date ASC")
-        
+
         # TIMESTAMP SORTING SECOND
         if timestamp_sort == "Newest":
             order_clauses.append("scr.timestamp DESC")
@@ -247,7 +249,7 @@ def insert_scr(db, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return jsonify({"status": "error", "message": "An unexpected error occurred"}), 500
-    
+
     finally:
         if cursor:
             cursor.close()
@@ -287,10 +289,32 @@ def update_scr(db, request, cover_request_id):
         # Build dynamic SET clause
         set_clause = ", ".join([f"{col} = %s" for col in fields.keys()])
         values = list(fields.values())
-        values.append(cover_request_id) # WHERE parameter at the end -> WHERE cover_request_id = %s
+        # WHERE parameter at the end -> WHERE cover_request_id = %s
+        values.append(cover_request_id)
 
         conn = db
         cursor = conn.cursor(dictionary=True)
+
+        # Fetch current state BEFORE update (needed for notifications)
+        cursor.execute("""
+            SELECT
+                status,
+                requested_employee_id,
+                accepted_employee_id,
+                shift_id
+            FROM shift_cover_request
+            WHERE cover_request_id = %s
+        """, (cover_request_id,))
+
+        current = cursor.fetchone()
+
+        if not current:
+            cursor.close()  # Clean up before return
+            return jsonify({"status": "error", "message": "Shift cover request not found"}), 404
+
+        old_status = current["status"]
+        requested_employee_id = current["requested_employee_id"]
+        shift_id = current["shift_id"]
 
         query = f"""
             UPDATE shift_cover_request
@@ -301,8 +325,43 @@ def update_scr(db, request, cover_request_id):
         conn.commit()
         rowcount = cursor.rowcount
 
+        # CRITICAL FIX: Close cursor immediately.
+        # This frees the connection so 'notify_employee' can open a new cursor without crashing.
+        cursor.close()
+        cursor = None
+
         if rowcount == 0:
             return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+
+        # Dispatch notifications ONLY if status changed
+        new_status = fields.get("status")
+
+        if new_status and new_status != old_status:
+            try:
+                if new_status == "Awaiting Approval":
+                    dispatch_notification(
+                        db,
+                        NotificationEvent.SHIFT_COVER_AWAITING_APPROVAL,
+                        {
+                            "cover_request_id": cover_request_id,
+                            "shift_id": shift_id
+                        }
+                    )
+
+                elif new_status == "Denied":
+                    dispatch_notification(
+                        db,
+                        NotificationEvent.SHIFT_COVER_DENIED,
+                        {
+                            "cover_request_id": cover_request_id,
+                            "shift_id": shift_id,
+                            "requesting_employee_id": requested_employee_id,
+                            "accepted_employee_id": current["accepted_employee_id"]
+                        }
+                    )
+            except Exception as e:
+                # Log the error, but do not fail the request since the DB update succeeded
+                print(f"Notification Error in update_scr: {e}")
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 
@@ -325,6 +384,7 @@ def update_scr(db, request, cover_request_id):
 
 # DELETE Shift Cover Request ----------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
+
 
 def delete_scr(db, cover_request_id):
     """
@@ -382,54 +442,105 @@ def approve_scr(db, cover_request_id):
 
     try:
 
-        # Get shift cover request from API URL
+        # Get shift cover request details
         cursor.execute("""
-            SELECT shift_id, accepted_employee_id
-            FROM shift_cover_request
-            WHERE cover_request_id = %s
+            SELECT 
+                scr.shift_id, 
+                scr.requested_employee_id, 
+                scr.accepted_employee_id 
+            FROM shift_cover_request scr
+            WHERE scr.cover_request_id = %s
         """, (cover_request_id,))
 
         row = cursor.fetchone()
 
         if not row:
+            cursor.close()  # Close before return
             return jsonify({"error": "Shift cover request not found"}), 404
 
         shift_id = row["shift_id"]
         accepted_employee_id = row["accepted_employee_id"]
+        requested_employee_id = row["requested_employee_id"]
 
-        # Update the shift cover request status to "Accepted"
+        # Update status to Accepted
         cursor.execute("""
             UPDATE shift_cover_request
-            SET status = 'Accepted'
+            SET status = 'Accepted' 
             WHERE cover_request_id = %s
         """, (cover_request_id,))
 
-        # Update the target shift with the NEW accepted_employee_id
+        #  Assign the shift to the new employee
+        # NOTE: If accepted_employee_id is None (Open Shift), this sets shift.employee_id to NULL.
         cursor.execute("""
             UPDATE shift
             SET employee_id = %s
             WHERE shift_id = %s
         """, (accepted_employee_id, shift_id))
 
-
+        # Deny other pending requests for the same shift
         cursor.execute("""
-            UPDATE shift_cover_request
+            UPDATE shift_cover_request 
             SET status = 'Denied'
-            WHERE shift_id = %s
-            AND cover_request_id != %s
+            WHERE shift_id = %s 
+            AND cover_request_id != %s 
             AND status = 'Pending'
         """, (shift_id, cover_request_id))
 
+        # Fetch denied requests for notification
+        cursor.execute("""
+            SELECT requested_employee_id, accepted_employee_id, cover_request_id
+            FROM shift_cover_request 
+            WHERE shift_id = %s 
+            AND cover_request_id != %s 
+            AND status = 'Denied'
+        """, (shift_id, cover_request_id))
+
+        denied_requests = cursor.fetchall()
+
         conn.commit()
 
-        return jsonify({"status": "success", "message": "Shift request approved"}), 200
+        cursor.close()
 
     except Exception as e:
         conn.rollback()
+        if cursor:
+            cursor.close()
+        print(f"Database Error in approve_scr: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-    finally:
-        cursor.close()
+    # ---  NOTIFICATIONS (Isolated) ---
+    # We do this outside the main Try/Except so a notification failure
+    # doesn't make the API return a 500 error for a successful DB update.
+    try:
+        # Notify Approval
+        dispatch_notification(
+            db,
+            NotificationEvent.SHIFT_COVER_ACCEPTED,
+            {
+                "cover_request_id": cover_request_id,
+                "shift_id": shift_id,
+                "requesting_employee_id": requested_employee_id,
+                "accepted_employee_id": accepted_employee_id
+            }
+        )
 
+        # Notify Auto-Denials
+        for denied in denied_requests:
+            dispatch_notification(
+                db,
+                NotificationEvent.SHIFT_COVER_DENIED,
+                {
+                    "cover_request_id": denied["cover_request_id"],
+                    "shift_id": shift_id,
+                    "requesting_employee_id": denied["requested_employee_id"],
+                    "accepted_employee_id": denied["accepted_employee_id"]
+                }
+            )
+
+    except Exception as e:
+        # Log notification error, but don't fail the request
+        print(f"Notification Error: {e}")
+
+    return jsonify({"status": "success", "message": "Shift request approved"}), 200
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------

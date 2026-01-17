@@ -51,7 +51,7 @@ const TaskListItem: React.FC<Props> = ({ task, children }) => {
                     <View style={styles.row}>
                         <Text style={GlobalStyles.text}>
                             Due:{" "}
-                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.orange }]}>
+                            <Text style={[GlobalStyles.semiBoldText, { color: Colors.pendingYellow }]}>
                                 {formatDate(task.due_date).replace(/ /g, '\u00A0')}
                             </Text>
                         </Text>

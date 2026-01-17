@@ -29,10 +29,10 @@ const SCRListItem: React.FC<Props> = ({ request }) => {
                         {request.status !== 'Pending' && request.accepted_first_name && request.accepted_last_name ? (
                             <>
                                 <Text style={GlobalStyles.boldText}>
-                                    {request.accepted_first_name} {request.accepted_last_name} { }
+                                    {request.accepted_first_name} {request.accepted_last_name} {}
                                 </Text>
                                 <Text style={GlobalStyles.text}>
-                                    ({request.accepted_primary_role_name}) { }
+                                    ({request.accepted_primary_role_name}) {}
                                 </Text>
                                 <Text style={GlobalStyles.altText}>covering...</Text>
                             </>

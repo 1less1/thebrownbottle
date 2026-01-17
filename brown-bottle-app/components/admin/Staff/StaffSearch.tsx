@@ -52,6 +52,9 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
     const WIDTH = width;
     const HEIGHT = height;
 
+    const isMobile = WIDTH < 768;
+    const cardHeight = isMobile ? HEIGHT * 0.52 : HEIGHT * 0.58;
+
     const [localRefresh, setLocalRefresh] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -182,7 +185,7 @@ const StaffSearch: React.FC<StaffSearchProps> = ({ parentRefresh }) => {
 
     return (
 
-        <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: HEIGHT * 0.52 }}>
+        <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
 
             {/* Search Bar + Reset Button */}
             <View style={styles.searchContainer}>

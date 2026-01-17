@@ -28,14 +28,14 @@ const SCRModalContent: React.FC<Props> = ({ request }) => {
             {!isPending ? (
                 <View style={styles.row}>
                     <Text style={GlobalStyles.semiBoldMediumText}>
-                        {request.accepted_first_name} {request.accepted_last_name} { }
+                        {request.accepted_first_name} {request.accepted_last_name} {' '}
                     </Text>
-                    <Text style={GlobalStyles.mediumText}>({request.accepted_primary_role_name}) { }</Text>
+                    <Text style={GlobalStyles.mediumText}>({request.accepted_primary_role_name}) {' '}</Text>
                     <Text style={GlobalStyles.mediumAltText}>covering... </Text>
                     <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.blue }]}>
                         {request.requested_first_name} {request.requested_last_name}{"'s "}
                     </Text>
-                    <Text style={GlobalStyles.mediumText}>({request.requested_primary_role_name}) { }</Text>
+                    <Text style={GlobalStyles.mediumText}>({request.requested_primary_role_name}) {' '}</Text>
                     <Text style={GlobalStyles.mediumAltText}>Shift:</Text>
                 </View>
             ) : (
@@ -43,7 +43,7 @@ const SCRModalContent: React.FC<Props> = ({ request }) => {
                     <Text style={[GlobalStyles.semiBoldMediumText, { color: Colors.blue }]}>
                         {request.requested_first_name} {request.requested_last_name}{"'s "}
                     </Text>
-                    <Text style={GlobalStyles.mediumText}>({request.requested_primary_role_name}) { }</Text>
+                    <Text style={GlobalStyles.mediumText}>({request.requested_primary_role_name}) {' '}</Text>
                     <Text style={GlobalStyles.mediumText}>
                         Shift:
                     </Text>

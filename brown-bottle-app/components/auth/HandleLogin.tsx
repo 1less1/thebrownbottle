@@ -4,7 +4,6 @@ import { View, Text, TextInput, StyleSheet, ActivityIndicator } from 'react-nati
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
-
 import LoadingCircle from '@/components/modular/LoadingCircle';
 import ModularButton from '@/components/modular/ModularButton';
 
@@ -41,7 +40,7 @@ const HandleLogin = () => {
 
       const currentUser = response[0];
       setUser({
-        employee_id: currentUser.employee_id.toString(),
+        employee_id: currentUser.employee_id,
         first_name: currentUser.first_name.toString(),
         last_name: currentUser.last_name.toString(),
         email: currentUser.email.toString(),

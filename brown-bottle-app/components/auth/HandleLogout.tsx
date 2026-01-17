@@ -1,5 +1,5 @@
 import React from 'react';
-import { View  } from 'react-native';
+import { View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';
@@ -20,9 +20,9 @@ const HandleLogout = () => {
 
   return (
     <AnimatedTouchableWrapper onPress={handleLogout}>
-        <View style={[GlobalStyles.tag, ]}>
-        <Ionicons name="log-out-outline" size={30} color="black" style={{ marginTop: 5, marginBottom: 5, marginLeft: 3}} />
-        </View>
+      <View style={[GlobalStyles.tag,]}>
+        <Ionicons name="log-out-outline" size={30} color="black" style={{ marginTop: 5, marginBottom: 5, marginLeft: 3 }} />
+      </View>
     </AnimatedTouchableWrapper>
   );
 };

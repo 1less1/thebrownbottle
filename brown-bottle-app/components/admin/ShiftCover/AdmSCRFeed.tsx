@@ -44,7 +44,7 @@ const AdmSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? HEIGHT * 0.68 : HEIGHT * 0.7;
+    const cardHeight = isMobile ? HEIGHT * 0.7 : HEIGHT * 0.75;
 
     const { user } = useSession();
 

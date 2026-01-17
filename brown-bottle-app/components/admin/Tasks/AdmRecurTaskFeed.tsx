@@ -45,7 +45,7 @@ const AdmRecurTaskFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => 
     const HEIGHT = height;
 
     const isMobile = WIDTH < 768;
-    const cardHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.53;
+    const cardHeight = isMobile ? HEIGHT * 0.5 : HEIGHT * 0.55;
 
     const { user } = useSession();
     const { confirm } = useConfirm();
