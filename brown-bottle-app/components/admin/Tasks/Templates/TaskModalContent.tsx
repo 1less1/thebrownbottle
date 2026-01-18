@@ -81,6 +81,7 @@ const TaskModalContent: React.FC<Props> = ({ formState, setFormState, titleText 
 
                     <TextInput
                         placeholder="Title"
+                        placeholderTextColor={Colors.gray}
                         value={formState.title}
                         onChangeText={(text) => {
                             if (text.length <= TITLE_MAX_CHARS) update({ title: text })
@@ -93,6 +94,7 @@ const TaskModalContent: React.FC<Props> = ({ formState, setFormState, titleText 
 
                     <TextInput
                         placeholder="Description"
+                        placeholderTextColor={Colors.gray}
                         value={formState.description}
                         onChangeText={(text) => {
                             if (text.length <= DESC_MAX_CHARS) update({ description: text });

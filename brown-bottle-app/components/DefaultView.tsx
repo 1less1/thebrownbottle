@@ -14,15 +14,14 @@ const DefaultView: React.FC<DefaultViewProps> = ({ children, backgroundColor = '
 
   return (
 
-    <SafeAreaProvider>
-
-        <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
-
-            {children}
-
-        </SafeAreaView>   
-
-    </SafeAreaProvider> 
+     <SafeAreaProvider>
+      <SafeAreaView
+        edges={['top', 'left', 'right']}
+        style={{ flex: 1, backgroundColor }}
+      >
+        {children}
+      </SafeAreaView>
+    </SafeAreaProvider>
 
   );
 };

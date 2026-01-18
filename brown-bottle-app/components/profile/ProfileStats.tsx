@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { Employee } from "@/types/iEmployee";
 import StatCard from "../modular/StatCard";
 
@@ -10,7 +10,7 @@ const ProfileStats: React.FC<Props> = ({ profile }) => {
   if (!profile) return null; // Avoid crashing while loading
 
   return (
-    <View>
+    <View style={styles.iosMargin}>
       <StatCard
         title="Stat 1"
         value={1}
@@ -51,4 +51,7 @@ const ProfileStats: React.FC<Props> = ({ profile }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  iosMargin: {marginBottom: Platform.OS === 'ios' ? 84 : 0}
+})
 export default ProfileStats
