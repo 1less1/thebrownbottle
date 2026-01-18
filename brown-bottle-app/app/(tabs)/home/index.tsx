@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, TouchableOpacity, Image, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, StatusBar, TouchableOpacity, Image, ScrollView, StyleSheet, Platform } from 'react-native';
 import { useCallback, useState, useContext } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     minWidth: 250,
     flexGrow: 1,
     marginVertical: 20,
+    marginBottom: Platform.OS === 'ios' ? 84 : 0
   },
   announcementsColumn: {
     flexBasis: '55%',

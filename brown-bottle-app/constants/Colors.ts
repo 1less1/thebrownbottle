@@ -25,6 +25,7 @@ export const Colors = {
   mediumTan: '#F0E7E0',
   darkTan: '#ECE1D4',
   tabTan: '#DFD1C0',
+  iosTabTan: '#bcac99',
   yellowTan: '#FFDEAB',
   greyBrown: '#5c533f',
   lightBrown: '#7C580D',

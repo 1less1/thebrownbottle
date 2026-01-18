@@ -119,6 +119,7 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
 
                         <TextInput
                             placeholder="Title"
+                            placeholderTextColor={Colors.gray}
                             value={title}
                             onChangeText={(text) => {
                                 if (text.length <= TITLE_MAX_CHARS) setTitle(text);
@@ -131,6 +132,7 @@ const AdmNewAnnc: React.FC<Props> = ({ onSubmit }) => {
 
                         <TextInput
                             placeholder="Description"
+                            placeholderTextColor={Colors.gray}
                             value={description}
                             onChangeText={(text) => {
                                 if (text.length <= DESC_MAX_CHARS) setDescription(text);
