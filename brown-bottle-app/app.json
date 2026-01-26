@@ -2,7 +2,7 @@
   "expo": {
     "name": "brown-bottle-app",
     "slug": "brown-bottle-app",
-    "projectId": "830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4",
+    "projectId": "56a5de34-e262-4d71-b648-161a8850cc35",
     "android": {
       "package": "com.brownbottle.brownbottleapp",
       "googleServicesFile": "./google-services.json"
@@ -10,7 +10,7 @@
     "extra": {
       "API_BASE_URL": "http://192.168.6.30:5000",
       "eas": {
-        "projectId": "830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4"
+        "projectId": "56a5de34-e262-4d71-b648-161a8850cc35"
       },
       "router": {}
     },

@@ -36,7 +36,7 @@ export async function registerForPushNotificationsAsync() {
   const projectId =
     Constants?.expoConfig?.extra?.eas?.projectId ??
     Constants?.easConfig?.projectId ??
-    "830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4"; // Hardcode as last resort for local dev
+    "56a5de34-e262-4d71-b648-161a8850cc35"; // Hardcode as last resort for local dev
 
   if (!projectId) {
     throw new Error("Expo projectId not found");
