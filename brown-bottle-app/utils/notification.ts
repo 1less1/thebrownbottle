@@ -3,10 +3,19 @@ import { Platform } from "react-native";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 
-// const web
+// Ensures Android has a notification channel so notifications display properly.
+export async function ensureAndroidNotificationChannelAsync() {
+  if (Platform.OS !== "android") return;
+
+  await Notifications.setNotificationChannelAsync("default", {
+    name: "default",
+    importance: Notifications.AndroidImportance.MAX,
+  });
+}
 
 // Registers the current device for push notifications
 export async function registerForPushNotificationsAsync() {
+  await ensureAndroidNotificationChannelAsync();
   // Push notifications do not work on simulators and ignore on web
   if (!Device.isDevice) {
     return null;

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "652216084260",
-    "project_id": "bb-notifications-435a5",
-    "storage_bucket": "bb-notifications-435a5.firebasestorage.app"
+    "project_number": "666874698134",
+    "project_id": "brown-bottle-app",
+    "storage_bucket": "brown-bottle-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:652216084260:android:d7a8a1361704423d8675b1",
+        "mobilesdk_app_id": "1:666874698134:android:3e073f004a9e5d66e1a5b7",
         "android_client_info": {
           "package_name": "com.brownbottle.brownbottleapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA8kVmJZsoUkKBYA9xh_Wc3-vKzr-GiQ-o"
+          "current_key": "AIzaSyAe0aAfiEig_2LKxqofPrVtKaHLT4cSRk8"
         }
       ],
       "services": {

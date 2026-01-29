@@ -16,6 +16,14 @@
     },
     "updates": {
       "url": "https://u.expo.dev/830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4"
+    },
+    "ios": {
+      "bundleIdentifier": "com.brownbottle.brownbottleapp",
+      "supportsTablet": true,
+      "userInterfaceStyle": "light",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     }
   }
 }
