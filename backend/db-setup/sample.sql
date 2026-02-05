@@ -91,16 +91,16 @@ VALUES
 INSERT INTO `thebrownbottle`.`task`
 (`title`, `description`, `author_id`, `section_id`, `due_date`)
 VALUES
-('Line Deep Clean', 'Deep clean the sauté and grill stations before dinner service.', 6, 3, '2026-01-18'),
-('Host Stand Audit', 'Verify menus, buzzers, and floor chart are up to date.', 1, 2, '2026-01-19'),
-('Bar Inventory Check', 'Count all spirits below the par level and note reorders.', 2, 5, '2026-01-20'),
-('Patio Heater Maintenance', 'Test patio heaters and replace empty propane tanks.', 2, 6, '2026-01-20'),
-('Menu Tasting Prep', 'Prep tasting portions for new menu items for staff review.', 1, 1, '2026-01-21'),
-('POS Button Update', 'Confirm new appetizer buttons are live on terminals.', 13, 2, '2026-01-21'),
-('Glassware Polish', 'Polish wine and cocktail glasses before service.', 1, 5, '2026-01-22'),
-('Friday Event Table Setup', 'Set up extra two-tops and reset silverware rolls.', 2, 2, '2026-01-23'),
-('Saturday Brunch Prep', 'Batch hollandaise and cut fruit for brunch.', 6, 1, '2026-01-24'),
-('Walk-in Fridge Temp Log', 'Record 3x daily temperature readings and initial.', 6, 3, '2026-01-24');
+('Line Deep Clean', 'Deep clean the sauté and grill stations before dinner service.', 6, 3, '2026-02-18'),
+('Host Stand Audit', 'Verify menus, buzzers, and floor chart are up to date.', 1, 2, '2026-02-19'),
+('Bar Inventory Check', 'Count all spirits below the par level and note reorders.', 2, 5, '2026-02-20'),
+('Patio Heater Maintenance', 'Test patio heaters and replace empty propane tanks.', 2, 6, '2026-02-20'),
+('Menu Tasting Prep', 'Prep tasting portions for new menu items for staff review.', 1, 1, '2026-02-21'),
+('POS Button Update', 'Confirm new appetizer buttons are live on terminals.', 13, 2, '2026-02-21'),
+('Glassware Polish', 'Polish wine and cocktail glasses before service.', 1, 5, '2026-02-22'),
+('Friday Event Table Setup', 'Set up extra two-tops and reset silverware rolls.', 2, 2, '2026-02-23'),
+('Saturday Brunch Prep', 'Batch hollandaise and cut fruit for brunch.', 6, 1, '2026-02-24'),
+('Walk-in Fridge Temp Log', 'Record 3x daily temperature readings and initial.', 6, 3, '2026-02-24');
 
 -- ======================
 -- Announcement Data (role-aligned)
@@ -121,53 +121,53 @@ VALUES
 INSERT INTO `thebrownbottle`.`shift` (`employee_id`, `start_time`, `date`, `section_id`)
 VALUES
 -- Sun 2026-01-18 (IDs 1..5)
-(1,  '10:00:00', '2026-01-18', 2),
-(4,  '11:00:00', '2026-01-18', 7),
-(11, '12:00:00', '2026-01-18', 5),
-(5,  '09:00:00', '2026-01-18', 3),
-(9,  '09:00:00', '2026-01-18', 4),
+(1,  '10:00:00', '2026-02-18', 2),
+(4,  '11:00:00', '2026-02-18', 7),
+(11, '12:00:00', '2026-02-18', 5),
+(5,  '09:00:00', '2026-02-18', 3),
+(9,  '09:00:00', '2026-02-18', 4),
 
 -- Mon 2026-01-19 (IDs 6..10)
-(2,  '09:00:00', '2026-01-19', 2),
-(3,  '10:00:00', '2026-01-19', 2),
-(8,  '11:00:00', '2026-01-19', 8),
-(12, '08:00:00', '2026-01-19', 1),
-(6,  '13:00:00', '2026-01-19', 3),
+(2,  '09:00:00', '2026-02-19', 2),
+(3,  '10:00:00', '2026-02-19', 2),
+(8,  '11:00:00', '2026-02-19', 8),
+(12, '08:00:00', '2026-02-19', 1),
+(6,  '13:00:00', '2026-02-19', 3),
 
 -- Tue 2026-01-20 (IDs 11..16)
-(13, '09:00:00', '2026-01-20', 2),
-(7,  '10:00:00', '2026-01-20', 2),
-(4,  '16:00:00', '2026-01-20', 6),
-(11, '14:00:00', '2026-01-20', 5),
-(5,  '08:00:00', '2026-01-20', 4),
-(9,  '08:00:00', '2026-01-20', 4),
+(13, '09:00:00', '2026-02-20', 2),
+(7,  '10:00:00', '2026-02-20', 2),
+(4,  '16:00:00', '2026-02-20', 6),
+(11, '14:00:00', '2026-02-20', 5),
+(5,  '08:00:00', '2026-02-20', 4),
+(9,  '08:00:00', '2026-02-20', 4),
 
 -- Wed 2026-01-21 (IDs 17..20)
-(1,  '10:00:00', '2026-01-21', 2),
-(10, '10:00:00', '2026-01-21', 2),
-(8,  '16:00:00', '2026-01-21', 7),
-(12, '08:00:00', '2026-01-21', 1),
+(1,  '10:00:00', '2026-02-21', 2),
+(10, '10:00:00', '2026-02-21', 2),
+(8,  '16:00:00', '2026-02-21', 7),
+(12, '08:00:00', '2026-02-21', 1),
 
 -- Thu 2026-01-22 (IDs 21..25)
-(2,  '09:00:00', '2026-01-22', 2),
-(3,  '10:00:00', '2026-01-22', 2),
-(11, '14:00:00', '2026-01-22', 5),
-(6,  '12:00:00', '2026-01-22', 3),
-(9,  '08:00:00', '2026-01-22', 4),
+(2,  '09:00:00', '2026-02-22', 2),
+(3,  '10:00:00', '2026-02-22', 2),
+(11, '14:00:00', '2026-02-22', 5),
+(6,  '12:00:00', '2026-02-22', 3),
+(9,  '08:00:00', '2026-02-22', 4),
 
 -- Fri 2026-01-23 (IDs 26..29)
-(13, '09:00:00', '2026-01-23', 2),
-(7,  '10:00:00', '2026-01-23', 2),
-(4,  '17:00:00', '2026-01-23', 8),
-(5,  '08:00:00', '2026-01-23', 3),
+(13, '09:00:00', '2026-02-23', 2),
+(7,  '10:00:00', '2026-02-23', 2),
+(4,  '17:00:00', '2026-02-23', 8),
+(5,  '08:00:00', '2026-02-23', 3),
 
 -- Sat 2026-01-24 (IDs 30..36)
-(1,  '12:00:00', '2026-01-24', 2),
-(10, '16:00:00', '2026-01-24', 2),
-(11, '16:00:00', '2026-01-24', 5),
-(12, '09:00:00', '2026-01-24', 1),
-(6,  '14:00:00', '2026-01-24', 3),
-(9,  '09:00:00', '2026-01-24', 4),
+(1,  '12:00:00', '2026-02-24', 2),
+(10, '16:00:00', '2026-02-24', 2),
+(11, '16:00:00', '2026-02-24', 5),
+(12, '09:00:00', '2026-02-24', 1),
+(6,  '14:00:00', '2026-02-24', 3),
+(9,  '09:00:00', '2026-02-24', 4),
 (8,  '17:00:00', '2026-01-24', 7);
 
 -- ======================

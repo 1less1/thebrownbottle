@@ -249,6 +249,7 @@ const EmpActiveTasks: React.FC<Props> = ({ user, parentRefresh, onRefreshDone })
 const styles = StyleSheet.create({
     taskContainer: {
         backgroundColor: "white",
+        marginBottom: 5
     }
 });
 
