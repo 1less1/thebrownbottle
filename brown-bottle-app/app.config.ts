@@ -11,22 +11,32 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "myapp",
 
   newArchEnabled: true,
+
   ios: {
+    // Identifies your iOS app uniquely (required for EAS iOS builds)
+    bundleIdentifier: "com.brownbottle.brownbottleapp",
     supportsTablet: true,
     userInterfaceStyle: "light",
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+    },
   },
+
   android: {
-    package: "com.brownbottle.app",
+    package: "com.brownbottle.brownbottleapp",
+    googleServicesFile: "./google-services.json",
     adaptiveIcon: {
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
   },
+
   web: {
     bundler: "metro",
     output: "static",
     favicon: "./assets/images/favicon.png",
   },
+
   plugins: [
     "expo-router",
     [
@@ -41,17 +51,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "expo-secure-store",
     "expo-web-browser",
   ],
+
   experiments: {
     typedRoutes: true,
   },
+
   extra: {
-    // This allows Constants.expoConfig.extra.eas.projectId to work
     eas: {
       projectId:
         process.env.EXPO_PUBLIC_EAS_PROJECT_ID ??
-        "56a5de34-e262-4d71-b648-161a8850cc35",
+        "21cfca82-3a43-420a-ba88-ddae8b6f644a",
     },
-    // This passes your URL to Constants
     API_BASE_URL: process.env.EXPO_PUBLIC_API_URL,
   },
 });

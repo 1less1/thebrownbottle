@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, useWindowDimensions } from 'react-native';
+import { View, Text, useWindowDimensions, Platform } from 'react-native';
 
 import { GlobalStyles } from "@/constants/GlobalStyles";
 import { Colors } from "@/constants/Colors";
@@ -54,7 +54,7 @@ const AdmTasks = () => {
                     <AdmTaskFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
                 </View>
 
-                <View style={{ marginTop: isMobile ? 16 : 0, width: isMobile ? '100%' : '49%' }}>
+                <View style={{ marginTop: isMobile ? 16 : 0, width: isMobile ? '100%' : '49%', marginBottom: Platform.OS === 'ios' ? 84 : 0 }}>
                     <Text style={GlobalStyles.floatingHeaderText}>Recurring Tasks</Text>
                     <AdmRecurTaskFeed parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
                 </View>
