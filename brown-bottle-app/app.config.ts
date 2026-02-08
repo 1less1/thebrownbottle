@@ -7,18 +7,26 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: "brown-bottle-app",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/images/icon.png",
-  scheme: "myapp",
+  icon: "./assets/images/brownbottlelogo.png",
+  scheme: "brownbottle",
 
   newArchEnabled: true,
 
   ios: {
-    // Identifies your iOS app uniquely (required for EAS iOS builds)
     bundleIdentifier: "com.brownbottle.brownbottleapp",
+    googleServicesFile: "./GoogleService-Info.plist",
     supportsTablet: true,
     userInterfaceStyle: "light",
+
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
+      CFBundleURLTypes: [
+        {
+          CFBundleURLSchemes: [
+            "com.googleusercontent.apps.666874698134-g148uctlsjd92jnc82be33qgs62suan9",
+          ],
+        },
+      ],
     },
   },
 
@@ -39,15 +47,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 
   plugins: [
     "expo-router",
+    "@react-native-google-signin/google-signin",
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/splash-icon.png",
+        image: "./assets/images/brownbottlelogo.png",
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#ffffff",
       },
     ],
+
     "expo-secure-store",
     "expo-web-browser",
   ],

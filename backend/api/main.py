@@ -3,6 +3,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import threading
+from auth.routes import firebase_login
 
 # Import the name of the python file for the different routes
 import employee
@@ -46,7 +47,15 @@ def health_check():
     return {"status": "ok"}
 
 
-# Employee Routes - /employee ---------------------------------------------------------------------------
+# Auth --------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/auth/firebase-login", methods=["POST"])
+def auth_firebase_login():
+    return firebase_login(get_db_connection, request)
+
+
+# Employee Routes - -------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 @app.route('/employee', methods=['GET'], strict_slashes=False)
@@ -55,6 +64,9 @@ def get_employees():
     GET employees by building a modular query
     """
     return employee.get_employees(get_db_connection(), request)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
 
 
 @app.route('/employee/insert', methods=['POST'])
@@ -178,6 +190,7 @@ def delete_task(task_id):
     """
     with request_lock:
         return task.delete_task(get_db_connection(), task_id)
+
 
 @app.route('/task/convert', methods=['POST'])
 def convert_task():
