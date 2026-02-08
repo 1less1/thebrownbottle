@@ -31,12 +31,12 @@ const LandingScreen = () => {
           <View style={{ alignItems: 'center' }}>
             <Image
               source={require('@/assets/images/brownbottlelogo.png')}
-              style={{ width: 150, height: 150, marginTop: 20 }}
+              style={{ width: 200, height: 200, marginTop: 20 }}
             />
           </View>
 
 
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
+          <View style={{ alignItems: 'center', marginTop: 10 }}>
             <HandleLogin />
           </View>
 

@@ -3,23 +3,24 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 import { Employee } from '@/types/iEmployee';
-
 import { registerForPushNotificationsAsync, savePushTokenToStorageAsync } from './notification';
 
 export type User = Partial<Employee>;
 
 type SessionContextType = {
   user: User | null;
+  sessionLoading: boolean;
   setUser: (user: User | null) => Promise<void>;
   clearSession: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextType>({
   user: null,
+  sessionLoading: true,
   // setUser(): Persists the user session and updates state
-  setUser: async () => { },
+  setUser: async () => {},
   // clearSession(): Clears persisted session and resets state
-  clearSession: async () => { },
+  clearSession: async () => {},
 });
 
 const USER_KEY = 'user_session';
@@ -65,6 +66,7 @@ const clearSessionStorage = async () => {
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   useEffect(() => {
     // loadUser(): Restores a previously saved session on app start
@@ -76,18 +78,20 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
       } catch (e) {
         console.error('Error loading user from storage:', e);
+      } finally {
+        // Marks session hydration complete (prevents redirect flicker)
+        setSessionLoading(false);
       }
     };
 
     loadUser();
   }, []);
 
-  // setupPushNotifications(): Registers for push + posts the token to backend when a user is present
   useEffect(() => {
-    // setupPushNotifications(): Encapsulates push-token registration flow
+    // setupPushNotifications(): Registers for push + posts the token to backend when a user is present
     const setupPushNotifications = async () => {
       // Skip web entirely (prevents unnecessary work + console noise)
-      if (Platform.OS === "web") return;
+      if (Platform.OS === 'web') return;
 
       // Only register when we have an employee id
       const employeeId = user?.employee_id;
@@ -96,7 +100,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
       // Guard missing env var so we don't fetch "undefined/..."
       const apiUrl = process.env.EXPO_PUBLIC_API_URL;
       if (!apiUrl) {
-        console.warn("Missing EXPO_PUBLIC_API_URL. Skipping push token registration.");
+        console.warn('Missing EXPO_PUBLIC_API_URL. Skipping push token registration.');
         return;
       }
 
@@ -111,8 +115,8 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         await savePushTokenToStorageAsync(expoPushToken);
 
         const res = await fetch(`${apiUrl}/push-token/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_id: employeeId,
             expo_push_token: expoPushToken,
@@ -124,14 +128,13 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
           console.warn(`Push token registration failed (${res.status}).`);
         }
       } catch (err) {
-        console.error("Push notification setup failed:", err);
+        console.error('Push notification setup failed:', err);
       }
     };
 
     setupPushNotifications();
     // Only rerun when employee id changes (prevents duplicate registrations)
   }, [user?.employee_id]);
-
 
   // setUser(): Persists user session then updates state
   const setUser = async (newUser: User | null) => {
@@ -154,7 +157,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   };
 
   return (
-    <SessionContext.Provider value={{ user, setUser, clearSession }}>
+    <SessionContext.Provider value={{ user, sessionLoading, setUser, clearSession }}>
       {children}
     </SessionContext.Provider>
   );

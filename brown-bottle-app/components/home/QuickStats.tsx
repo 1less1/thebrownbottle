@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 import StatCard from '@/components/modular/StatCard';
@@ -13,6 +13,7 @@ import { getShiftCoverRequest } from '@/routes/shift_cover_request';
 import { getTimeOffRequest } from '@/routes/time_off_request';
 
 import { useSession } from '@/utils/SessionContext';
+
 
 interface Props {
     parentRefresh?: number;
@@ -36,7 +37,33 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
     const { user } = useSession();
 
+    const router = useRouter();
+
+
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+    // Redirects on click
+    const taskRedirect = async () => {
+        await delay(200)
+        router.push('/(tabs)/tasks');
+    }
+
+    const shiftCoverRedirect = async () => {
+        await delay(200)
+        router.push({
+            pathname: '/(tabs)/calendar',
+            params: { tab: 'shiftcover' },
+        });
+    };
+
+    const timeOffRedirect = async () => {
+        await delay(200)
+        router.push({
+            pathname: '/(tabs)/calendar',
+            params: { tab: 'timeoff' },
+        });
+    }
+
 
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
@@ -134,6 +161,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 titleStyle={{ color: Colors.pendingYellow }}
                 valueStyle={{ color: Colors.pendingYellow }}
                 style={styles.card}
+                onPress={taskRedirect}
             />
 
             <StatCard
@@ -148,6 +176,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 titleStyle={{ color: Colors.blue }}
                 valueStyle={{ color: Colors.blue }}
                 style={styles.card}
+                onPress={shiftCoverRedirect}
             />
 
             <StatCard
@@ -162,6 +191,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 titleStyle={{ color: Colors.purple }}
                 valueStyle={{ color: Colors.purple }}
                 style={styles.card}
+                onPress={timeOffRedirect}
             />
 
         </View>

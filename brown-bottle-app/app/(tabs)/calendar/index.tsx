@@ -2,7 +2,9 @@ import { View, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-nativ
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';;
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams } from 'expo-router';
+
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
@@ -18,9 +20,9 @@ import LoadingCircle from '@/components/modular/LoadingCircle';
 import { useSession } from '@/utils/SessionContext'
 
 interface Tab {
-    key: string;
-    title: string;
-    component: React.ReactNode;
+  key: string;
+  title: string;
+  component: React.ReactNode;
 }
 
 const CalendarPage = () => {
@@ -32,7 +34,18 @@ const CalendarPage = () => {
     }, [])
   );
 
+  const params = useLocalSearchParams<{ tab?: string }>();
+
+  useEffect(() => {
+    // applyTabParam():
+    // If a tab param is present, switch to the requested tab.
+    if (params.tab === 'shiftcover') setActiveTab(1);
+    if (params.tab === 'timeoff') setActiveTab(2);
+    if (params.tab === 'shifts') setActiveTab(0);
+  }, [params.tab]);
+
   const { user } = useSession();
+
 
   const [loading, setLoading] = useState<boolean>(true); // Start as true
 

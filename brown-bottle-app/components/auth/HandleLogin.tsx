@@ -139,14 +139,14 @@ const HandleLogin = () => {
 
   return (
     <View style={{ padding: 20, width: 300 }}>
-      <TextInput
+      {/* <TextInput
         value={employeeIdInput}
         onChangeText={setEmployeeIdInput}
         placeholder="Enter Employee ID"
         keyboardType="numeric"
         style={[GlobalStyles.input, { marginBottom: 10 }]}
         editable={!loading}
-      />
+      /> */}
 
       {errorText !== '' && (
         <Text style={[GlobalStyles.errorText, { textAlign: 'center', marginBottom: 10 }]}>
@@ -158,8 +158,8 @@ const HandleLogin = () => {
         <LoadingCircle size={'large'} />
       ) : (
         <>
-          <ModularButton text="Login" onPress={handleLogin} />
-          <View style={{ height: 10 }} />
+          {/* <ModularButton text="Login" onPress={handleLogin} />
+          <View style={{ height: 10 }} /> */}
 
           <ModularButton style={GlobalStyles.googleButton} onPress={handleGoogleLogin}>
             <View style={GlobalStyles.googleInner}>
