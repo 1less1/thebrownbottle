@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image } from 'react-native';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
-
 import LoadingCircle from '@/components/modular/LoadingCircle';
 import ModularButton from '@/components/modular/ModularButton';
 
@@ -12,6 +11,7 @@ import { getEmployee } from '@/routes/employee';
 
 import { signInAndFetchEmployee } from '@/auth/authService';
 import type { Employee } from '@/types/iEmployee';
+import { Colors } from '@/constants/Colors';
 
 // EmployeeSessionFields:
 // Keeps the mapping stable by only depending on the fields we actually store in session.
@@ -32,7 +32,7 @@ type EmployeeSessionFields = Pick<
 
 /**
  * toSessionUser():
- * Converts an employee payload 
+ * Converts an employee payload
  * into the exact shape we store in SessionContext.
  */
 const toSessionUser = (currentUser: EmployeeSessionFields) => {
@@ -87,10 +87,8 @@ const HandleLogin = () => {
         return;
       }
 
-      // getEmployee() returns an array; we only use the first record
       const currentUser = response[0] as unknown as EmployeeSessionFields;
 
-      // setUser(): Store session user in one consistent place
       await setUser(toSessionUser(currentUser));
 
       router.push({ pathname: '/(tabs)/home' });
@@ -110,10 +108,8 @@ const HandleLogin = () => {
     setErrorText('');
 
     try {
-      // signInAndFetchEmployee(): backend-validated employee
       const currentUser = (await signInAndFetchEmployee()) as Employee;
 
-      // setUser(): Store session user in one consistent place
       await setUser(toSessionUser(currentUser));
 
       router.replace({ pathname: '/(tabs)/home' });
@@ -164,7 +160,17 @@ const HandleLogin = () => {
         <>
           <ModularButton text="Login" onPress={handleLogin} />
           <View style={{ height: 10 }} />
-          <ModularButton text="Sign in with Google" onPress={handleGoogleLogin} />
+
+          <ModularButton style={GlobalStyles.googleButton} onPress={handleGoogleLogin}>
+            <View style={GlobalStyles.googleInner}>
+              <Image
+                source={require('../../assets/images/googleicon.png')}
+                style={GlobalStyles.googleIcon}
+                resizeMode="contain"
+              />
+              <Text style={GlobalStyles.googleText}>Sign in with Google</Text>
+            </View>
+          </ModularButton>
         </>
       )}
     </View>
@@ -173,4 +179,3 @@ const HandleLogin = () => {
 
 export default HandleLogin;
 
-const styles = StyleSheet.create({});
