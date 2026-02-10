@@ -334,15 +334,15 @@ export const GlobalStyles = StyleSheet.create({
   // Google Button Styling
   googleButton: {
     backgroundColor: Colors.white,
-    borderColor: '#DADCE0',
+    borderColor: "#DADCE0",
     borderWidth: 1,
     borderRadius: 999,
     paddingVertical: 12,
   },
   googleInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   googleIcon: {
     width: 20,
@@ -350,8 +350,8 @@ export const GlobalStyles = StyleSheet.create({
     marginRight: 12,
   },
   googleText: {
-    color: '#3C4043',
+    color: "#3C4043",
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

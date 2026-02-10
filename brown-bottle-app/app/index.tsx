@@ -36,7 +36,7 @@ const LandingScreen = () => {
           </View>
 
 
-          <View style={{ alignItems: 'center', marginTop: 10 }}>
+          <View style={{ alignItems: 'center'}}>
             <HandleLogin />
           </View>
 

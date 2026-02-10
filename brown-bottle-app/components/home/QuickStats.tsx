@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Colors } from '@/constants/Colors';
 
@@ -14,11 +15,13 @@ import { getTimeOffRequest } from '@/routes/time_off_request';
 
 import { useSession } from '@/utils/SessionContext';
 
-
 interface Props {
     parentRefresh?: number;
     onRefreshDone?: () => void;
 }
+
+// Stores a one-time “next calendar tab” request for the Calendar screen to read.
+const CALENDAR_PENDING_TAB_KEY = 'calendarPendingTab';
 
 const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const { width, height } = useWindowDimensions();
@@ -36,34 +39,41 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const [pendingTimeOffCount, setPendingTimeOffCount] = useState(0);
 
     const { user } = useSession();
-
     const router = useRouter();
 
+    const navigatingRef = useRef(false);
 
     const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-    // Redirects on click
+    const goToCalendarTab = async (tabKey: 'shifts' | 'shiftcover' | 'timeoff') => {
+        if (navigatingRef.current) return;
+        navigatingRef.current = true;
+
+        try {
+            await delay(150);
+            await AsyncStorage.setItem(CALENDAR_PENDING_TAB_KEY, tabKey);
+            router.push('/(tabs)/calendar');
+        } catch (error) {
+            console.error("Navigation failed", error);
+        } finally {
+            setTimeout(() => {
+                navigatingRef.current = false;
+            }, 500);
+        }
+    };
+
     const taskRedirect = async () => {
-        await delay(200)
+        await delay(150);
         router.push('/(tabs)/tasks');
-    }
+    };
 
     const shiftCoverRedirect = async () => {
-        await delay(200)
-        router.push({
-            pathname: '/(tabs)/calendar',
-            params: { tab: 'shiftcover' },
-        });
+        await goToCalendarTab('shiftcover');
     };
 
     const timeOffRedirect = async () => {
-        await delay(200)
-        router.push({
-            pathname: '/(tabs)/calendar',
-            params: { tab: 'timeoff' },
-        });
-    }
-
+        await goToCalendarTab('timeoff');
+    };
 
     /**
      * FETCH ALL STATS FOR QUICK STATS CARDS
@@ -107,25 +117,20 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 setTaskCount(tasks.length);
             }
 
-            // Fetch PENDING Time Off Requests
             const tor = await getTimeOffRequest({
                 employee_id: employeeId,
-                status: ["Pending"],
+                status: ['Pending'],
             });
 
             setPendingTimeOffCount(tor.length);
-
         } catch (error: any) {
-            console.log("There was an error fetching quick stats:", error.message)
+            console.log('There was an error fetching quick stats:', error.message);
             setUpcomingCount(0);
             setTaskCount(0);
             setPendingTimeOffCount(0);
         } finally {
-            if (isInitial) {
-                setLoading(false);
-            } else {
-                setRefreshing(false);
-            }
+            if (isInitial) setLoading(false);
+            else setRefreshing(false);
         }
     }, [user?.employee_id]);
 
@@ -134,21 +139,16 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
         fetchData(true); // Initial Load
 
         const interval = setInterval(() => {
-            fetchData(false); // SILENT Polling
-        }, 20000); // Every 20 seconds
+            fetchData(false);
+        }, 20000);
 
         return () => clearInterval(interval);
     }, [parentRefresh, fetchData]);
 
-
-    if (loading) {
-        return <QuickStatsSkeleton />;
-    }
+    if (loading) return <QuickStatsSkeleton />;
 
     return (
-
         <View style={[styles.container, isMobile ? styles.mobile : styles.desktop]}>
-
             <StatCard
                 loading={loading}
                 title="Pending Tasks"
@@ -193,9 +193,7 @@ const QuickStats: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
                 style={styles.card}
                 onPress={timeOffRedirect}
             />
-
         </View>
-
     );
 };
 

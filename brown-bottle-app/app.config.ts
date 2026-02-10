@@ -16,7 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     googleServicesFile: "./GoogleService-Info.plist",
     supportsTablet: true,
     userInterfaceStyle: "light",
-    icon: "./assets/images/brownbottleicon.png",
+    icon: "./assets/images/iosicon.png",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       CFBundleURLTypes: [
@@ -33,8 +33,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: "com.brownbottle.brownbottleapp",
     googleServicesFile: "./google-services.json",
     adaptiveIcon: {
-      foregroundImage: "./assets/images/adaptiveicon.png",
-      backgroundColor: "#332219",
+      foregroundImage: "./assets/images/adaptive.png",
+      backgroundColor: "#633520",
     },
   },
 
@@ -50,7 +50,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/brownbottlelogo.png",
+        image: "./assets/images/brownbottlesplash.png",
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#ffffff",
