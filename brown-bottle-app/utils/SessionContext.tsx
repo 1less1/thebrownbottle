@@ -1,30 +1,31 @@
-// Session Functions
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 import { Employee } from '@/types/iEmployee';
-
-import { registerForPushNotificationsAsync } from './notification';
+import { registerForPushNotificationsAsync, savePushTokenToStorageAsync } from './notification';
 
 export type User = Partial<Employee>;
 
 type SessionContextType = {
   user: User | null;
+  sessionLoading: boolean;
   setUser: (user: User | null) => Promise<void>;
   clearSession: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextType>({
   user: null,
-  setUser: async () => { },
-  clearSession: async () => { },
+  sessionLoading: true,
+  // setUser(): Persists the user session and updates state
+  setUser: async () => {},
+  // clearSession(): Clears persisted session and resets state
+  clearSession: async () => {},
 });
 
 const USER_KEY = 'user_session';
 
-// Helper: Get user from storage
+// getUserFromStorage(): Reads the saved user session from the correct storage for the current platform
 const getUserFromStorage = async (): Promise<User | null> => {
   if (Platform.OS === 'web') {
     const storedUser = localStorage.getItem(USER_KEY);
@@ -35,7 +36,7 @@ const getUserFromStorage = async (): Promise<User | null> => {
   }
 };
 
-// Helper: Save user to storage
+// saveUserToStorage(): Writes (or removes) the user session in the correct storage for the current platform
 const saveUserToStorage = async (user: User | null) => {
   const serialized = user ? JSON.stringify(user) : null;
 
@@ -54,7 +55,7 @@ const saveUserToStorage = async (user: User | null) => {
   }
 };
 
-// Helper: Clear session storage
+// clearSessionStorage(): Removes the saved user session from the correct storage for the current platform
 const clearSessionStorage = async () => {
   if (Platform.OS === 'web') {
     localStorage.removeItem(USER_KEY);
@@ -65,8 +66,10 @@ const clearSessionStorage = async () => {
 
 export const SessionProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
 
   useEffect(() => {
+    // loadUser(): Restores a previously saved session on app start
     const loadUser = async () => {
       try {
         const storedUser = await getUserFromStorage();
@@ -75,49 +78,65 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         }
       } catch (e) {
         console.error('Error loading user from storage:', e);
+      } finally {
+        // Marks session hydration complete (prevents redirect flicker)
+        setSessionLoading(false);
       }
     };
+
     loadUser();
   }, []);
 
   useEffect(() => {
-    if (!user) return;
-
+    // setupPushNotifications(): Registers for push + posts the token to backend when a user is present
     const setupPushNotifications = async () => {
-      try {
-        // Request permission + get Expo push token
-        const expoPushToken =
-          await registerForPushNotificationsAsync();
+      // Skip web entirely (prevents unnecessary work + console noise)
+      if (Platform.OS === 'web') return;
 
-        // Exit if token was not created (denied or unsupported device)
+      // Only register when we have an employee id
+      const employeeId = user?.employee_id;
+      if (!employeeId) return;
+
+      // Guard missing env var so we don't fetch "undefined/..."
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+      if (!apiUrl) {
+        console.warn('Missing EXPO_PUBLIC_API_URL. Skipping push token registration.');
+        return;
+      }
+
+      try {
+        // registerForPushNotificationsAsync(): Requests permission and returns an Expo push token (or null)
+        const expoPushToken = await registerForPushNotificationsAsync();
+
+        // If token was not created (permission denied / simulator / unsupported), stop
         if (!expoPushToken) return;
 
-        const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+        // savePushTokenToStorageAsync(): Persists token locally so logout can unregister it
+        await savePushTokenToStorageAsync(expoPushToken);
 
-        // console.log("Attempting fetch to:", `${apiUrl}/push-token/register`); // Debug log
-        await fetch(`${apiUrl}/push-token/register`, {
+        const res = await fetch(`${apiUrl}/push-token/register`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: user.employee_id,
+            user_id: employeeId,
             expo_push_token: expoPushToken,
           }),
-        }).catch(err => {
-          console.error("Network Error Details:", err.message);
-          // This will confirm if it's a timeout or a rejected connection
         });
 
+        // If backend rejects token, warn but don’t crash app
+        if (!res.ok) {
+          console.warn(`Push token registration failed (${res.status}).`);
+        }
       } catch (err) {
         console.error('Push notification setup failed:', err);
       }
     };
 
     setupPushNotifications();
-  }, [user]);
+    // Only rerun when employee id changes (prevents duplicate registrations)
+  }, [user?.employee_id]);
 
-
+  // setUser(): Persists user session then updates state
   const setUser = async (newUser: User | null) => {
     try {
       await saveUserToStorage(newUser);
@@ -127,6 +146,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     }
   };
 
+  // clearSession(): Clears persisted session and resets state
   const clearSession = async () => {
     try {
       await clearSessionStorage();
@@ -137,10 +157,11 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
   };
 
   return (
-    <SessionContext.Provider value={{ user, setUser, clearSession }}>
+    <SessionContext.Provider value={{ user, sessionLoading, setUser, clearSession }}>
       {children}
     </SessionContext.Provider>
   );
 };
 
+// useSession(): Convenience hook to access session context values
 export const useSession = () => useContext(SessionContext);

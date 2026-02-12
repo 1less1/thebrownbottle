@@ -1,25 +1,28 @@
-import { Tabs, useLocalSearchParams } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
-import { HapticTab } from '@/components/HapticTab';
-
+import { Tabs, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { GlobalStyles } from '@/constants/GlobalStyles';
 
+import { HapticTab } from '@/components/HapticTab';
 import { Colors } from '@/constants/Colors';
-
-import { IconSymbol } from '@/components/ui/IconSymbol';
 
 // Get Session Data
 import { useSession } from '@/utils/SessionContext';
 
 export default function TabLayout() {
-
   // Get session data
-  const { setUser, user } = useSession();
+  const { sessionLoading, user } = useSession();
+
+  // Prevent redirect flicker while session is restoring
+  if (sessionLoading) {
+    return null;
+  }
+
+  // Blocks access to ANY route under /(tabs) unless a user is signed in
+  if (!user?.employee_id) {
+    return <Redirect href="/" />;
+  }
 
   return (
-    // New Navbar Theme!
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.tabTan,
@@ -27,20 +30,19 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: 'white', // Static background color -> White
+          backgroundColor: 'white',
           borderTopWidth: 0.5,
-          borderColor: Colors.altBorderColor, // Border color
-          elevation: 5, // Shadow for Android
-          shadowOpacity: 0.1, // Shadow for iOS
+          borderColor: Colors.altBorderColor,
+          elevation: 5,
+          shadowOpacity: 0.1,
           shadowRadius: 3,
         },
-      }}>
-
-
+      }}
+    >
       <Tabs.Screen
         name="home/index"
         options={{
-          title: "Home",
+          title: 'Home',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size || 28} color={color} />
           ),
@@ -50,7 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="tasks/index"
         options={{
-          title: "Tasks",
+          title: 'Tasks',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list" size={size || 28} color={color} />
           ),
@@ -60,7 +62,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="calendar/index"
         options={{
-          title: "Calendar",
+          title: 'Calendar',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar" size={size || 28} color={color} />
           ),
@@ -70,7 +72,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile/index"
         options={{
-          title: "Profile",
+          title: 'Profile',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size || 28} color={color} />
           ),
@@ -81,7 +83,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="admin/index"
           options={{
-            title: "Admin",
+            title: 'Admin',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="shield-checkmark" size={size || 28} color={color} />
             ),
@@ -96,6 +98,5 @@ export default function TabLayout() {
         />
       )}
     </Tabs>
-
   );
-};
+}

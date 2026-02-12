@@ -7,9 +7,9 @@
       "googleServicesFile": "./google-services.json"
     },
     "extra": {
-      "API_BASE_URL": "http://192.168.6.30:5000",
+      "API_BASE_URL": "process.env.EXPO_PUBLIC_API_URL",
       "eas": {
-        "projectId": "56a5de34-e262-4d71-b648-161a8850cc35"
+        "projectId": "21cfca82-3a43-420a-ba88-ddae8b6f644a"
       },
       "router": {}
     },

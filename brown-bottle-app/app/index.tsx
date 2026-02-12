@@ -30,14 +30,14 @@ const LandingScreen = () => {
 
           <View style={{ alignItems: 'center' }}>
             <Image
-            source={require('@/assets/images/brown_bottle_logo.jpg')}
-            style={{ width: 150, height: 150, marginTop: 20}}
+              source={require('@/assets/images/brownbottlelogo.png')}
+              style={{ width: 200, height: 200, marginTop: 20 }}
             />
           </View>
 
 
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
-            <HandleLogin/> 
+          <View style={{ alignItems: 'center'}}>
+            <HandleLogin />
           </View>
 
         </View>
@@ -45,7 +45,7 @@ const LandingScreen = () => {
     </DefaultView>
 
   );
-  
+
 }
 
 export default LandingScreen;

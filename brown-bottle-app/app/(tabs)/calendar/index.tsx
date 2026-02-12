@@ -2,7 +2,7 @@ import { View, Text, StatusBar, StyleSheet, TouchableOpacity } from 'react-nativ
 import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';;
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
@@ -15,12 +15,10 @@ import EmpTOR from '@/components/calendar/TimeOff/EmpTOR';
 
 import LoadingCircle from '@/components/modular/LoadingCircle';
 
-import { useSession } from '@/utils/SessionContext'
-
 interface Tab {
-    key: string;
-    title: string;
-    component: React.ReactNode;
+  key: string;
+  title: string;
+  component: React.ReactNode;
 }
 
 const CalendarPage = () => {
@@ -32,14 +30,14 @@ const CalendarPage = () => {
     }, [])
   );
 
-  const { user } = useSession();
-
   const [loading, setLoading] = useState<boolean>(true); // Start as true
 
   const [activeTab, setActiveTab] = useState(0);
+
   const TAB_STORAGE_KEY = 'calendarActiveTab';
 
-  // Save tab index on change
+  const PENDING_TAB_KEY = 'calendarPendingTab';
+
   const handleTabChange = async (index: number) => {
     setActiveTab(index);
     await AsyncStorage.setItem(TAB_STORAGE_KEY, index.toString());
@@ -52,6 +50,19 @@ const CalendarPage = () => {
     { key: 'time off', title: 'Time Off', component: <EmpTOR /> },
   ];
 
+  // New: helper to map a pending tab string into a tab index
+  const getTabIndexFromPendingKey = (pendingKey: string | null): number | null => {
+    if (!pendingKey) return null;
+
+    const normalized = pendingKey.trim().toLowerCase();
+
+    if (normalized === 'shifts') return 0;
+    if (normalized === 'shiftcover' || normalized === 'shift cover') return 1;
+    if (normalized === 'timeoff' || normalized === 'time off') return 2;
+
+    return null;
+  };
+
   // Load Saved Tab If it Exists, otherwise load tab index 0
   useEffect(() => {
     const loadSavedTab = async () => {
@@ -59,6 +70,7 @@ const CalendarPage = () => {
         setLoading(true);
         const savedTabIndex = await AsyncStorage.getItem(TAB_STORAGE_KEY);
         const tabIndex = Number(savedTabIndex);
+
         if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < tabs.length) {
           setActiveTab(tabIndex);
         } else {
@@ -66,22 +78,41 @@ const CalendarPage = () => {
         }
       } catch (error) {
         console.warn('Failed to load saved tab index:', error);
+        setActiveTab(0);
       } finally {
         setLoading(false);
       }
     };
+
     loadSavedTab();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      const applyPendingTabOnFocus = async () => {
+        try {
+          const pending = await AsyncStorage.getItem(PENDING_TAB_KEY);
+          const pendingIndex = getTabIndexFromPendingKey(pending);
+
+          if (pendingIndex !== null) {
+            setActiveTab(pendingIndex);
+            await AsyncStorage.setItem(TAB_STORAGE_KEY, pendingIndex.toString());
+            await AsyncStorage.removeItem(PENDING_TAB_KEY);
+          }
+        } catch (error) {
+          console.warn('Failed to apply pending calendar tab:', error);
+        }
+      };
+
+      applyPendingTabOnFocus();
+    }, [])
+  );
+
   return (
-
     <DefaultView backgroundColor={Colors.white}>
-
       <View style={{ flex: 1, backgroundColor: Colors.bgApp }}>
-
         {/* Calendar Header */}
         <View style={GlobalStyles.pageHeaderContainer}>
-
           <Text style={GlobalStyles.pageHeader}>Calendar</Text>
 
           {/* Tab Bar */}
@@ -99,7 +130,6 @@ const CalendarPage = () => {
               </TouchableOpacity>
             ))}
           </View>
-
         </View>
 
         {/* Tab Content */}
@@ -108,15 +138,10 @@ const CalendarPage = () => {
             <LoadingCircle size="large" />
           </View>
         ) : (
-          <View style={styles.tabContent}>
-            {tabs[activeTab]?.component}
-          </View>
+          <View style={styles.tabContent}>{tabs[activeTab]?.component}</View>
         )}
-
       </View>
-
     </DefaultView>
-
   );
 };
 
