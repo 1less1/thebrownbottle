@@ -23,6 +23,7 @@ services:
       - ./db-setup/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql:ro
       - ./db-setup/events.sql:/docker-entrypoint-initdb.d/04-events.sql:ro
       - ./db-setup/sample.sql:/docker-entrypoint-initdb.d/05-sample.sql:ro
+      - ./db-setup/dev-accounts.sql:/docker-entrypoint-initdb.d/06-dev-accounts.sql:ro
     networks:
      - internal
     healthcheck:

@@ -1,5 +1,8 @@
 */.env
-__pycache__
+*pycache*
 .vscode
 node_modules/
-/backend/api/secrets
+
+# Secrets Ignore
+backend/api/secrets/*
+!backend/api/secrets/.gitkeep
