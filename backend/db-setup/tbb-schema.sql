@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`employee` (
   `phone_number` VARCHAR(20) NOT NULL,
   `wage` DECIMAL(10,2) NOT NULL,
   `admin` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `super_admin` TINYINT UNSIGNED NOT NULL DEFAULT '0',
   `primary_role` INT UNSIGNED NOT NULL,
   `secondary_role` INT UNSIGNED DEFAULT NULL,
   `tertiary_role` INT UNSIGNED DEFAULT NULL,
@@ -73,6 +74,27 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`employee` (
   UNIQUE INDEX `phone_number_UNIQUE` (`phone_number` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
+
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`availability`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`availability` (
+  `availability_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `employee_id` INT UNSIGNED NOT NULL,
+  `day_of_week` ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  `is_available` TINYINT(1) NOT NULL DEFAULT 1, -- 1 = Available, 0 = Unavailable
+  `start_time` TIME NULL DEFAULT NULL, -- Optional: Start of window
+  `end_time` TIME NULL DEFAULT NULL,   -- Optional: End of window
+  PRIMARY KEY (`availability_id`),
+  UNIQUE INDEX `emp_day_unique` (`employee_id`, `day_of_week`),
+  CONSTRAINT `fk_availability_employee`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8mb3;
+
 
 
 -- -----------------------------------------------------
@@ -198,26 +220,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
 
--- -----------------------------------------------------
--- Table `thebrownbottle`.`push_token`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `thebrownbottle`.`push_token` (
-  `push_token_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` INT UNSIGNED NOT NULL,
-  `expo_push_token` VARCHAR(255) NOT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`push_token_id`),
-  UNIQUE INDEX `expo_push_token_UNIQUE` (`expo_push_token` ASC) VISIBLE,
-  INDEX `fk_push_token_user_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `fk_push_token_user`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb3;
-
-
 
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`shift`
@@ -276,6 +278,8 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`shift_cover_request` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
+
+
 -- -----------------------------------------------------
 -- Table `thebrownbottle`.`time_off_request`
 -- -----------------------------------------------------
@@ -297,6 +301,28 @@ CREATE TABLE IF NOT EXISTS `thebrownbottle`.`time_off_request` (
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
+
+
+
+-- -----------------------------------------------------
+-- Table `thebrownbottle`.`push_token`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `thebrownbottle`.`push_token` (
+  `push_token_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `expo_push_token` VARCHAR(255) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`push_token_id`),
+  UNIQUE INDEX `expo_push_token_UNIQUE` (`expo_push_token` ASC) VISIBLE,
+  INDEX `fk_push_token_user_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_push_token_user`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `thebrownbottle`.`employee` (`employee_id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb3;
+
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

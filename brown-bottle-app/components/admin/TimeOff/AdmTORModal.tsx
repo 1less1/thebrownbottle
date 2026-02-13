@@ -10,7 +10,7 @@ import ModularModal from '@/components/modular/ModularModal';
 import ModularButton from '@/components/modular/ModularButton';
 import TORModalContent from '@/components/admin/TimeOff/Templates/TORModalContent';
 
-import { updateTimeOffRequest } from '@/routes/time_off_request';
+import { deleteTimeOffRequest, updateTimeOffRequest } from '@/routes/time_off_request';
 import { TimeOffRequest, UpdateTimeOffRequest } from '@/types/iTimeOff';
 
 import { useConfirm } from '@/hooks/useConfirm';
@@ -83,12 +83,38 @@ const AdmTORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmit
             onSubmit?.();
             onClose();
         } catch (error: any) {
-            console.error("Failed to deny request:", error.message);
+            alert("Failed to deny request: " + error.message);
         } finally {
             setLoading(false);
         }
 
     };
+
+
+    const handleDelete = async () => {
+        if (!request || loading) return;
+
+        const ok = await confirm(
+            "Confirm Delete",
+            "Are you sure you want to delete this request? The time off this employee requested will become available!"
+        );
+        if (!ok) return;
+
+        try {
+            setLoading(true);
+
+            await deleteTimeOffRequest(request.request_id);
+            alert("Request successfully deleted!");
+            onSubmit?.();
+            onClose();
+        } catch (error: any) {
+            alert("Failed to delete request: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+
+    };
+    
 
     return (
 
@@ -117,6 +143,20 @@ const AdmTORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmit
                             textStyle={{ color: Colors.red }}
                             style={[GlobalStyles.borderButton, styles.denyButton]}
                             onPress={handleDeny}
+                            enabled={!loading}
+                        />
+                    </>
+                )}
+
+                {/* Show Delete if request is "Completed" */}
+                {isCompleted && (
+                    <>
+                        {/* Delete Button */}
+                        <ModularButton
+                            text="Delete"
+                            textStyle={{ color: Colors.red }}
+                            style={[GlobalStyles.borderButton, styles.deleteButton]}
+                            onPress={handleDelete}
                             enabled={!loading}
                         />
                     </>
@@ -151,6 +191,12 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         backgroundColor: Colors.bgGreen,
         borderColor: Colors.borderGreen,
+        alignItems: "center"
+    },
+    deleteButton: {
+        flexGrow: 1,
+        backgroundColor: Colors.bgRed,
+        borderColor: Colors.borderRed,
         alignItems: "center"
     },
 })

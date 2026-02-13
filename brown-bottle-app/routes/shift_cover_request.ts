@@ -41,7 +41,7 @@ export async function getShiftCoverRequest(params?: Partial<GetShiftCoverRequest
 }
 
 
-// POST: Inserts a shift coverrequest record within the shift_cover_request table
+// POST: Inserts a shift cover request record within the shift_cover_request table
 export async function insertShiftCoverRequest(fields: InsertShiftCoverRequest) {
 
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};

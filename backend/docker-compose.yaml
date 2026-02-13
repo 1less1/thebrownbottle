@@ -15,7 +15,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - dbdata:/var/lib/mysql
+      - db_data:/var/lib/mysql
 
       # SQL initialization files
       - ./db-setup/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
@@ -53,7 +53,7 @@ services:
 
 
 volumes:
-  dbdata:
+  db_data:
 
 
 networks:

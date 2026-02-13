@@ -5,18 +5,21 @@ from flask_cors import CORS
 import threading
 from auth.routes import firebase_login
 
-# Import the name of the python file for the different routes
-import employee
+# Python SQL Table Handlers
 import role
 import section
-import task
+import employee
+import availability
 import recurring_task
+import task
 import announcement
 import shift
 import shift_cover_request
 import time_off_request
-import schedule
 import push_token
+
+# Custom Python Handlers (Joined SQL Tables)
+import schedule
 
 
 # Initialize environment variables
@@ -53,38 +56,6 @@ def health_check():
 @app.route("/auth/firebase-login", methods=["POST"])
 def auth_firebase_login():
     return firebase_login(get_db_connection, request)
-
-
-# Employee Routes - -------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-@app.route('/employee', methods=['GET'], strict_slashes=False)
-def get_employees():
-    """
-    GET employees by building a modular query
-    """
-    return employee.get_employees(get_db_connection(), request)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
-@app.route('/employee/insert', methods=['POST'])
-def insert_employee():
-    """
-    POST new employees to the 'employee' table
-    """
-    with request_lock:  # Serialize concurrent requests to be processed in order for multiple role inserts from different clients
-        return employee.insert_employee(get_db_connection(), request)
-
-
-@app.route('/employee/update/<int:employee_id>', methods=['PATCH'])
-def update_employee(employee_id):
-    """
-    PATCH (Update) employees by id
-    """
-    with request_lock:
-        return employee.update_employee(get_db_connection(), request, employee_id)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -154,6 +125,118 @@ def update_section(section_id):
 # -------------------------------------------------------------------------------------------------------
 
 
+# Employee Routes - /employee ---------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route('/employee', methods=['GET'], strict_slashes=False)
+def get_employees():
+    """
+    GET employees by building a modular query
+    """
+    return employee.get_employees(get_db_connection(), request)
+
+@app.route('/employee/insert', methods=['POST'])
+def insert_employee():
+    """
+    POST new employees to the 'employee' table
+    """
+    with request_lock:  # Serialize concurrent requests to be processed in order for multiple role inserts from different clients
+        return employee.insert_employee(get_db_connection(), request)
+
+
+@app.route('/employee/update/<int:employee_id>', methods=['PATCH'])
+def update_employee(employee_id):
+    """
+    PATCH (Update) employees by id
+    """
+    with request_lock:
+        return employee.update_employee(get_db_connection(), request, employee_id)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+# Availability Routes - /availability -------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route('/availability', methods=['GET'], strict_slashes=False)
+def get_availability():
+    """
+    GET employee availability (modular query)
+    """
+    return availability.get_availability(get_db_connection(), request)
+
+@app.route('/availability/insert', methods=['POST'])
+def insert_availability():
+    """
+    POST new employee availability to the 'availability' table
+    """
+    with request_lock:
+        return availability.insert_availability(get_db_connection(), request)
+
+@app.route('/availability/update/<int:availability_id>', methods=['PATCH'])
+def update_availability(availability_id):
+    """
+    PATCH (Update) employee availability by id
+    """
+    with request_lock:
+        return availability.update_availability(get_db_connection(), request, availability_id)
+
+
+@app.route('/availability/delete/<int:availability_id>', methods=['DELETE'])
+def delete_availability(availability_id):
+    """
+    DELETE employee availability by id
+    """
+    with request_lock:
+        return availability.delete_availability(get_db_connection(), availability_id)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+# Recurring Task Routes - /recurring-task ---------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+# Admin Based Routes:
+@app.route('/recurring-task', methods=['GET'], strict_slashes=False)
+def get_recurring_tasks():
+    """
+    GET recurring tasks by building a modular query
+    """
+    return recurring_task.get_recurring_tasks(get_db_connection(), request)
+
+
+@app.route('/recurring-task/insert', methods=['POST'])
+def insert_recurring_task():
+    """
+    POST new recurring tasks to the 'recurring_task' table
+    """
+    with request_lock:  # Serialize concurrent requests to be processed in order for multiple recurring task inserts from different clients
+        return recurring_task.insert_recurring_task(get_db_connection(), request)
+
+
+@app.route('/recurring-task/update/<int:recurring_task_id>', methods=['PATCH'])
+def update_recurring_task(recurring_task_id):
+    """
+    PATCH (Update) tasks by id
+    """
+    with request_lock:
+        return recurring_task.update_recurring_task(get_db_connection(), request, recurring_task_id)
+
+
+@app.route('/recurring-task/delete/<int:recurring_task_id>', methods=['DELETE'])
+def delete_recurring_task(recurring_task_id):
+    """
+    DELETE recurring task by id
+    """
+    with request_lock:
+        return recurring_task.delete_recurring_task(get_db_connection(), recurring_task_id)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
 # Task Routes - /task -----------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -200,48 +283,6 @@ def convert_task():
     """
     with request_lock:
         return task.convert_task(get_db_connection(), request)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
-# Recurring Task Routes - /recurring-task ---------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-# Admin Based Routes:
-@app.route('/recurring-task', methods=['GET'], strict_slashes=False)
-def get_recurring_tasks():
-    """
-    GET recurring tasks by building a modular query
-    """
-    return recurring_task.get_recurring_tasks(get_db_connection(), request)
-
-
-@app.route('/recurring-task/insert', methods=['POST'])
-def insert_recurring_task():
-    """
-    POST new recurring tasks to the 'recurring_task' table
-    """
-    with request_lock:  # Serialize concurrent requests to be processed in order for multiple recurring task inserts from different clients
-        return recurring_task.insert_recurring_task(get_db_connection(), request)
-
-
-@app.route('/recurring-task/update/<int:recurring_task_id>', methods=['PATCH'])
-def update_recurring_task(recurring_task_id):
-    """
-    PATCH (Update) tasks by id
-    """
-    with request_lock:
-        return recurring_task.update_recurring_task(get_db_connection(), request, recurring_task_id)
-
-
-@app.route('/recurring-task/delete/<int:recurring_task_id>', methods=['DELETE'])
-def delete_recurring_task(recurring_task_id):
-    """
-    DELETE recurring task by id
-    """
-    with request_lock:
-        return recurring_task.delete_recurring_task(get_db_connection(), recurring_task_id)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
@@ -361,47 +402,6 @@ def get_schedule():
 # -------------------------------------------------------------------------------------------------------
 
 
-# Time Off Request Routes - /tor ------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-@app.route('/tor', methods=['GET'], strict_slashes=False)
-def get_time_off_requests():
-    """
-    GET time off requests by building a modular query
-    """
-    return time_off_request.get_tor(get_db_connection(), request)
-
-
-@app.route('/tor/insert', methods=['POST'])
-def insert_time_off_request():
-    """
-    POST new time off requests to the 'time_off_request' table
-    """
-    with request_lock:  # Serialize concurrent requests to be processed in order for multiple shift inserts from different clients
-        return time_off_request.insert_tor(get_db_connection(), request)
-
-
-@app.route('/tor/update/<int:request_id>', methods=['PATCH'])
-def update_time_off_request(request_id):
-    """
-    PATCH (Update) time off requests by id
-    """
-    with request_lock:
-        return time_off_request.update_tor(get_db_connection(), request, request_id)
-
-
-@app.route('/tor/delete/<int:request_id>', methods=['DELETE'])
-def delete_time_off_request(request_id):
-    """
-    DELETE time off requests by id
-    """
-    with request_lock:
-        return time_off_request.delete_tor(get_db_connection(), request_id)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------------------------------------------------------------------------------------------------
-
-
 # Shift Cover Request Routes - /scr ---------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
@@ -451,7 +451,49 @@ def approve_shift_request(cover_request_id):
 # -------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
-# Push Token Routes ---------------------------------------------------------------------
+
+# Time Off Request Routes - /tor ------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+@app.route('/tor', methods=['GET'], strict_slashes=False)
+def get_time_off_requests():
+    """
+    GET time off requests by building a modular query
+    """
+    return time_off_request.get_tor(get_db_connection(), request)
+
+
+@app.route('/tor/insert', methods=['POST'])
+def insert_time_off_request():
+    """
+    POST new time off requests to the 'time_off_request' table
+    """
+    with request_lock:  # Serialize concurrent requests to be processed in order for multiple shift inserts from different clients
+        return time_off_request.insert_tor(get_db_connection(), request)
+
+
+@app.route('/tor/update/<int:request_id>', methods=['PATCH'])
+def update_time_off_request(request_id):
+    """
+    PATCH (Update) time off requests by id
+    """
+    with request_lock:
+        return time_off_request.update_tor(get_db_connection(), request, request_id)
+
+
+@app.route('/tor/delete/<int:request_id>', methods=['DELETE'])
+def delete_time_off_request(request_id):
+    """
+    DELETE time off requests by id
+    """
+    with request_lock:
+        return time_off_request.delete_tor(get_db_connection(), request_id)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------
+
+
+# Push Token Routes - /push-token -----------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 
