@@ -328,8 +328,8 @@ def update_employee(db, request, employee_id):
         conn.commit()
         rowcount = cursor.rowcount
 
-        if rowcount == 0:
-            return jsonify({"status": "error", "message": "No employee found with given ID"}), 404
+        #if rowcount == 0:
+            #return jsonify({"status": "error", "message": "No employee found with given ID"}), 404
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 

@@ -99,7 +99,7 @@ const RemoveEmp: React.FC<RemoveEmpProps> = ({ onRemove }) => {
         }
     };
 
-    // Fetch Employees on Initialization and State Update
+    // Fetch employees on initialization and state update
     useEffect(() => {
         triggerRefresh(query);
     }, [localRefresh]);

@@ -7,8 +7,8 @@ export interface Employee {
   wage: string; // DECIMAL MySQL types are formatted as strings in JSON
   admin: number;
   primary_role: number;
-  secondary_role: number;
-  tertiary_role: number;
+  secondary_role: number | null;
+  tertiary_role: number | null;
   is_active: number;
   timestamp: string; // When the employee was created
 
@@ -43,6 +43,9 @@ export interface InsertEmployee {
   wage: string;
   admin: number;
   primary_role: number;
+  secondary_role: number | null;
+  tertiary_role: number | null;
+  is_active: number; // Default 1=True in DB
 }
 
 export interface UpdateEmployee {
@@ -53,7 +56,7 @@ export interface UpdateEmployee {
   wage: string;
   admin: number;
   primary_role: number;
-  secondary_role: number;
-  tertiary_role: number;
+  secondary_role: number | null;
+  tertiary_role: number | null;
   is_active: number;
 }

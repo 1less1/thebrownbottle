@@ -21,7 +21,22 @@ interface AddEmpProps {
     onInsert?: () => void;
 }
 
-const adminDropdownOptions = yesNoDropdownOptions;
+interface AddEmployeeForm extends Omit<InsertEmployee, 'primary_role'> {
+    primary_role: number | null;
+}
+
+const defaultFormData: AddEmployeeForm = {
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone_number: "",
+    wage: "",
+    admin: 0,
+    primary_role: null,
+    secondary_role: null,
+    tertiary_role: null,
+    is_active: 1 // Default to active (1 = True)
+};
 
 const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
     const { width, height } = useWindowDimensions();
@@ -32,55 +47,29 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const openModal = () => setModalVisible(true);
-    const closeModal = () => setModalVisible(false);
+    const closeModal = () => {
+        setFormData(defaultFormData);
+        setModalVisible(false);
+    };
 
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [wage, setWage] = useState("");
-    const [admin, setAdmin] = useState(0);
-    const [primaryRole, setPrimaryRole] = useState<number | null>(null);
-    const [secondaryRole, setSecondaryRole] = useState<number | null>(null);
-    const [tertiaryRole, setTertiaryRole] = useState<number | null>(null);
+    const [formData, setFormData] = useState<AddEmployeeForm>(defaultFormData);
 
-    // Build Form Data
-    const formData = useMemo(() => ({
-        first_name: firstName.trim(),
-        last_name: lastName.trim(),
-        email: email.trim(),
-        phone_number: phoneNumber.trim(),
-        wage: wage.trim(),
-        admin: admin,
-        primary_role: primaryRole,
-        secondary_role: secondaryRole,
-        tertiary_role: tertiaryRole,
-    }), [firstName, lastName, email, phoneNumber, wage, admin, primaryRole, secondaryRole, tertiaryRole]);
+    // Generic Input Handler
+    const handleChange = (field: keyof AddEmployeeForm, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+    };
 
+    
     // Form Validation
     const isValidForm = useMemo(() => (
-        formData.first_name!.length > 0 &&
-        formData.last_name!.length > 0 &&
-        isValidEmail(formData.email!) &&
-        isValidPhone(formData.phone_number!) &&
-        formData.wage!.length > 0 &&
-        formData.primary_role != null
-    ), [formData]); // Only recalculates when formData changes
+        (formData.first_name?.trim().length ?? 0) > 0 &&
+        (formData.last_name?.trim().length ?? 0) > 0 &&
+        isValidEmail(formData.email ?? "") &&
+        isValidPhone(formData.phone_number ?? "") &&
+        (formData.wage?.toString().length ?? 0) > 0 &&
+        formData.primary_role !== null
+    ), [formData]);
 
-    // Create a fresh form on modal visibility change
-    useEffect(() => {
-        if (modalVisible) {
-            setFirstName("");
-            setLastName("");
-            setEmail("");
-            setPhoneNumber("");
-            setWage("");
-            setAdmin(0);
-            setPrimaryRole(null);
-            setSecondaryRole(null);
-            setTertiaryRole(null);
-        }
-    }, [modalVisible]);
 
     // Insert Employee Logic
     const handleInsert = async () => {
@@ -89,10 +78,9 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
         try {
             setLoading(true);
 
-            // Construct Insert Payload
-            const insertPayload = { ...formData };
+            const payload = formData as unknown as InsertEmployee;
 
-            await insertEmployee(formData as InsertEmployee);
+            await insertEmployee(payload);
             alert("Employee successfully added!");
             onInsert?.();
             closeModal();
@@ -129,22 +117,22 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>First Name</Text>
                         <TextInput
                             style={GlobalStyles.input}
-                            value={firstName}
-                            onChangeText={setFirstName}
+                            value={formData.first_name}
+                            onChangeText={(val) => handleChange('first_name', val)}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Last Name</Text>
                         <TextInput
                             style={GlobalStyles.input}
-                            value={lastName}
-                            onChangeText={setLastName}
+                            value={formData.last_name}
+                            onChangeText={(val) => handleChange('last_name', val)}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Email</Text>
                         <TextInput
                             style={GlobalStyles.input}
-                            value={email}
-                            onChangeText={setEmail}
+                            value={formData.email}
+                            onChangeText={(val) => handleChange('email', val)}
                             placeholder="email@domain.com"
                             placeholderTextColor={Colors.gray}
                             keyboardType="email-address"
@@ -154,8 +142,8 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Phone</Text>
                         <TextInput
                             style={GlobalStyles.input}
-                            value={phoneNumber}
-                            onChangeText={(text) => setPhoneNumber(formatPhone(text))}
+                            value={formData.phone_number}
+                            onChangeText={(val) => handleChange('phone_number', formatPhone(val))}
                             placeholder="XXX-XXX-XXXX"
                             placeholderTextColor={Colors.gray}
                             keyboardType="phone-pad"
@@ -164,8 +152,8 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Wage</Text>
                         <TextInput
                             style={GlobalStyles.input}
-                            value={wage}
-                            onChangeText={((text) => setWage(formatWage(text)))}
+                            value={formData.wage}
+                            onChangeText={(val) => handleChange('wage', formatWage(val))}
                             placeholder="00.00"
                             placeholderTextColor={Colors.gray}
                             keyboardType="decimal-pad"
@@ -173,32 +161,32 @@ const AddEmp: React.FC<AddEmpProps> = ({ onInsert }) => {
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Admin</Text>
                         <ModularDropdown
-                            data={adminDropdownOptions}
-                            selectedValue={admin}
-                            onSelect={(value) => setAdmin(value as number)}
+                            data={yesNoDropdownOptions}
+                            selectedValue={formData.admin}
+                            onSelect={(val) => handleChange('admin', val as number)}
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Primary Role</Text>
                         <RoleDropdown
-                            selectedRole={primaryRole}
-                            onRoleSelect={setPrimaryRole}
+                            selectedRole={formData.primary_role}
+                            onRoleSelect={(val) => handleChange('primary_role', val)}
                             placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Secondary Role</Text>
                         <RoleDropdown
-                            selectedRole={secondaryRole}
-                            onRoleSelect={setSecondaryRole}
+                            selectedRole={formData.secondary_role}
+                            onRoleSelect={(val) => handleChange('secondary_role', val)}
                             placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />
 
                         <Text style={[GlobalStyles.mediumText, { marginVertical: 6 }]}>Tertiary Role</Text>
                         <RoleDropdown
-                            selectedRole={tertiaryRole}
-                            onRoleSelect={setTertiaryRole}
+                            selectedRole={formData.tertiary_role}
+                            onRoleSelect={(val) => handleChange('tertiary_role', val)}
                             placeholderText="None"
                             containerStyle={styles.dropdownButton}
                         />

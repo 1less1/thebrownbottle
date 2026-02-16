@@ -114,6 +114,34 @@ const AdmTORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmit
         }
 
     };
+
+    
+    const handleUndo = async () => {
+        if (!request || loading) return;
+
+        const ok = await confirm(
+            "Confirm Undo",
+            "Are you sure you want to undo this request? This request will become pending again!"
+        );
+        if (!ok) return;
+        
+        try {
+            setLoading(true);
+
+            const fields: Partial<UpdateTimeOffRequest> = {
+                status: "Pending",
+            };
+
+            await updateTimeOffRequest(request.request_id, fields);
+            alert("Request successfully changed to pending!");
+            onSubmit?.();
+            onClose();
+        } catch (error: any) {
+            alert("Failed to undo request: " + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     
 
     return (
@@ -148,15 +176,16 @@ const AdmTORModal: React.FC<ModalProps> = ({ visible, request, onClose, onSubmit
                     </>
                 )}
 
-                {/* Show Delete if request is "Completed" */}
+                {/* Show Undo if request is "Completed" */}
+                {/* Changes request status to "Pending" */}
                 {isCompleted && (
                     <>
-                        {/* Delete Button */}
+                        {/* Undo Button */}
                         <ModularButton
-                            text="Delete"
-                            textStyle={{ color: Colors.red }}
-                            style={[GlobalStyles.borderButton, styles.deleteButton]}
-                            onPress={handleDelete}
+                            text="Undo"
+                            textStyle={{ color: Colors.yellow }}
+                            style={[GlobalStyles.borderButton, styles.undoButton]}
+                            onPress={handleUndo}
                             enabled={!loading}
                         />
                     </>
@@ -193,10 +222,10 @@ const styles = StyleSheet.create({
         borderColor: Colors.borderGreen,
         alignItems: "center"
     },
-    deleteButton: {
+    undoButton: {
         flexGrow: 1,
-        backgroundColor: Colors.bgRed,
-        borderColor: Colors.borderRed,
+        backgroundColor: Colors.bgYellow,
+        borderColor: Colors.borderYellow,
         alignItems: "center"
     },
 })

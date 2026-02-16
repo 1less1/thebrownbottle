@@ -44,7 +44,7 @@ def get_availability(db, request):
                 CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
                 a.day_of_week,
                 a.is_available,
-                TIME_FORMAT(a.start_time, '%H:%i') AS start_time,
+                TIME_FORMAT(a.start_time, '%h:%i %p') AS start_time,
                 TIME_FORMAT(a.end_time, '%H:%i') AS end_time
             FROM availability a
             JOIN employee e ON a.employee_id = e.employee_id
@@ -188,7 +188,6 @@ def update_availability(db, request, availability_id):
     try:
         # Define Expected Field Types
         field_types = {
-            'employee_id': int,
             'day_of_week': str,
             'is_available': int,
             'start_time': str,
@@ -222,8 +221,8 @@ def update_availability(db, request, availability_id):
         conn.commit()
         rowcount = cursor.rowcount
 
-        if rowcount == 0:
-            return jsonify({"status": "error", "message": "No availability record found with given ID"}), 404
+        #if rowcount == 0:
+            #return jsonify({"status": "error", "message": "No availability record found with given ID"}), 404
 
         return jsonify({"status": "success", "updated_rows": rowcount}), 200
 

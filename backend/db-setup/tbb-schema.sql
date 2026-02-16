@@ -82,7 +82,7 @@ DEFAULT CHARACTER SET = utf8mb3;
 CREATE TABLE IF NOT EXISTS `thebrownbottle`.`availability` (
   `availability_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `employee_id` INT UNSIGNED NOT NULL,
-  `day_of_week` ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+  `day_of_week` ENUM('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday') NOT NULL,
   `is_available` TINYINT(1) NOT NULL DEFAULT 1, -- 1 = Available, 0 = Unavailable
   `start_time` TIME NULL DEFAULT NULL, -- Optional: Start of window
   `end_time` TIME NULL DEFAULT NULL,   -- Optional: End of window
