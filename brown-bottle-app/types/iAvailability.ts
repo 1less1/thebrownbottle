@@ -13,6 +13,7 @@ export interface GetAvailability {
   employee_id: number;
   day_of_week: "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday";
   is_available: 1 | 0;
+  is_active: 1 | 0;
 }
 
 export interface InsertAvailability {

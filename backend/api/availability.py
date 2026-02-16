@@ -20,6 +20,7 @@ def get_availability(db, request):
             'employee_id': int,
             'day_of_week': str,
             'is_available': int, # 1=True, 0=False
+            'is_active': int,    # 1=True, 0=InactiFalseve
         }
 
         # Validate and parse parameters
@@ -32,6 +33,7 @@ def get_availability(db, request):
         employee_id = params.get('employee_id')
         day_of_week = params.get('day_of_week')
         is_available = params.get('is_available')
+        is_active = params.get('is_active')
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -66,12 +68,12 @@ def get_availability(db, request):
             query += " AND a.day_of_week = %s"
             query_params.append(day_of_week)
 
-        if is_available is not None:
-            query += " AND a.is_available = %s"
-            query_params.append(is_available)
+        if is_active is not None:
+            query += " AND e.is_active = %s"
+            query_params.append(is_active)
 
-        # Sorting logic - default by employee then day order
-        query += " ORDER BY a.employee_id ASC, FIELD(day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')"
+        # Sorting logic - default by employee then day order (Sunday through Saturday)
+        query += " ORDER BY a.employee_id ASC, FIELD(day_of_week, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')"
 
         # Execute Query
         cursor.execute(query, tuple(query_params))

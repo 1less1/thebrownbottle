@@ -92,21 +92,36 @@ def get_tor(db, request):
         if employee_id is not None:
             query += " AND tor.employee_id = %s"
             query_params.append(employee_id)
+        
+        # Validate date formats for any provided date strings
+        for date_val, label in [(start_date, "start_date"), (end_date, "end_date")]:
+            if date_val:
+                try:
+                    datetime.strptime(date_val, '%Y-%m-%d')
+                except ValueError:
+                    return jsonify({"error": f"Invalid {label} format. Expected YYYY-MM-DD."}), 400
+        
+        # -----------------------------
+        # Date Range Logic
+        # -----------------------------
+        if start_date and end_date:
+            # Pull records where the request window overlaps with the search window
+            # Scenario: The search range is [start_date] to [end_date]
+            query += """ AND (
+                (tor.start_date BETWEEN %s AND %s) OR 
+                (tor.end_date BETWEEN %s AND %s) OR
+                (tor.start_date <= %s AND tor.end_date >= %s)
+            )"""
+            query_params.extend([start_date, end_date, start_date, end_date, start_date, end_date])
 
-        if start_date:
-            try:
-                datetime.strptime(start_date, '%Y-%m-%d')
-            except ValueError:
-                return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
-            query += " AND tor.start_date = %s"
+        elif start_date:
+            # Scenario: Only start_date provided - fetch records on or after this date
+            query += " AND tor.start_date >= %s"
             query_params.append(start_date)
 
-        if end_date:
-            try:
-                datetime.strptime(end_date, '%Y-%m-%d')
-            except ValueError:
-                return jsonify({"error": "Invalid date format. Expected YYYY-MM-DD."}), 400
-            query += " AND tor.end_date = %s"
+        elif end_date:
+            # Scenario: Only end_date provided - fetch records on or before this date
+            query += " AND tor.end_date <= %s"
             query_params.append(end_date)
 
         if reason is not None:

@@ -18,8 +18,10 @@ import { CheckboxOption } from "@/types/iCheckbox";
 import { convertToSQLDate, formatDateToCellHeader } from "@/utils/dateTimeHelpers";
 import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
 import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeString, getWeekDayList } from "@/routes/schedule";
+
 import { getTimeOffRequest } from "@/routes/time_off_request";
-import { buildBlockedDaysMap, attachBlockedDays } from "@/routes/schedule";
+import { getAvailability } from "@/routes/availability";
+import { buildBlockedDaysMap, attachBlockedDays, buildAvailabilityMap, attachAvailability } from "@/routes/schedule";
 
 import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
 
@@ -95,14 +97,24 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       // Fetch accepted time off requests
       const timeOff = await getTimeOffRequest({
         status: ["Accepted"],
+        start_date: params.start_date
+      });
+
+      // Fetch all availability
+      const availability = await getAvailability({
+        is_active: 1, // only active employees
       });
 
       // Build blocked days
       const blockedDays = buildBlockedDaysMap(timeOff);
 
+      // Map availability
+      const availabilityMap = buildAvailabilityMap(availability);
+
       // Attach to schedule
-      const updatedSchedule = attachBlockedDays(schedule, blockedDays);
-      //console.log("UPDATED SCHEDULE EMPLOYEE:", updatedSchedule[0]);
+      // Attach both blocked days and availability info
+      let updatedSchedule = attachBlockedDays(schedule, blockedDays);
+      updatedSchedule = attachAvailability(updatedSchedule, availabilityMap)
 
       setScheduleData(updatedSchedule);
     } catch (error: any) {
@@ -203,24 +215,29 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         </View>
 
         {employee.shifts.map((shift, dayIndex) => {
+          const dayInfo = weekDays[dayIndex];
+          const avail = employee.availability?.[dayInfo.fullDayName];
+          const isUnavailable = avail?.isAvailable === false;
+          const isBlocked = employee.blockedDays?.has(dayInfo.date) ?? false;
 
-          const dateStr = weekDays[dayIndex].date;
-          const isDisabled = employee.blockedDays?.has(dateStr) ?? false;
+          // isDisabled determines if the cell can be clicked/interacted with
+          const isDisabled = isBlocked || isUnavailable;
+
+          // isHint determines if we are showing "Earliest: HH:MM"
+          const isHint = !shift && avail?.startTime;
 
           return (
-            // Shift Cell Press Logic with support for No Shift (Null) and Blocked/Time Off Shifts (Disabled)
             <Pressable
               key={dayIndex}
               disabled={isDisabled}
-              onPress={
-                isDisabled
-                  ? undefined
-                  : () => handleCellPress(employee, dayIndex, shift)
-              }
+              onPress={isDisabled ? undefined : () => handleCellPress(employee, dayIndex, shift)}
               style={({ hovered }) => [
                 styles.shiftCell,
                 { width: DAY_COL_WIDTH, height: ROW_HEIGHT },
+                // Enable the hover effect for hints and regular cells
                 hovered && !isDisabled && styles.shiftCellHovered,
+                // ONLY apply gray background if blocked (Time Off)
+                // Hints (isHint) will stay white like regular cells
                 isDisabled && styles.shiftCellDisabled,
               ]}
             >
@@ -232,6 +249,23 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
                   <Text style={[styles.shiftSection, isDisabled && styles.shiftTextDisabled]}>
                     {shift.section_name}
                   </Text>
+                </View>
+              ) : isUnavailable ? (
+                <Text style={styles.noShift}></Text>
+              ) : avail?.startTime ? (
+                /* --- HINT CELL CONTENT --- */
+                <View style={styles.hintWrapper}>
+                  {/* The Dash - Now with explicit vertical centering */}
+                  <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center' }]}>
+                    <Text style={styles.noShift}>-</Text>
+                  </View>
+
+                  {/* The Time in the bottom right */}
+                  <View style={styles.hintContainer}>
+                    <Text style={[styles.startTime, isDisabled && styles.shiftTextDisabled]}>
+                      {avail.startTime}
+                    </Text>
+                  </View>
                 </View>
               ) : (
                 <Text style={styles.noShift}>-</Text>
@@ -544,6 +578,23 @@ const styles = StyleSheet.create({
     borderColor: Colors.lightGray,
     padding: 4,
   },
+  hintWrapper: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center', // Centers the dash
+    alignItems: 'center',
+  },
+  hintContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingRight: 4,
+    paddingBottom: 2,
+    // Position absolute prevents the dash from being pushed by this view
+    position: 'absolute',
+  },
   shiftContent: {
     alignItems: 'center',
   },
@@ -554,6 +605,12 @@ const styles = StyleSheet.create({
   noShift: {
     color: Colors.darkGray,
     fontSize: 14,
+    textAlign: 'center',
+  },
+  startTime: {
+    color: "black",
+    fontSize: 10,
+    fontWeight: 600,
   },
   shiftCellHovered: {
     backgroundColor: Colors.lightGray,

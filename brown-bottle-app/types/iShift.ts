@@ -67,5 +67,13 @@ export interface ScheduleEmployee {
   primary_role: number | null;
   primary_role_name: string;
   shifts: (ScheduleShift | null)[]; // 7 Entries: Sunday (1)... to Saturday (7)
-  blockedDays?: Set<string>; // Set of 'YYYY-MM-DD' strings representing blocked days
+  
+  // Make this required to satisfy the 'updatedSchedule' assignment
+  blockedDays: Set<string>; 
+
+  // Define the availability map structure
+  availability?: Record<string, { 
+    isAvailable: boolean; 
+    startTime: string 
+  }>;
 }

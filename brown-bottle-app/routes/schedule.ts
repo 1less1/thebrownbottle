@@ -67,11 +67,11 @@ export const getWeekDayList = (start: Date, days = 7) => {
     d.setDate(start.getDate() + i);
     return {
       date: d.toISOString().split("T")[0], // <-- REAL DATE (YYYY-MM-DD)
-      dayName: d.toLocaleDateString("en-US", { weekday: "short" }),
+      dayName: d.toLocaleDateString("en-US", { weekday: "short" }), // used to map full day names to abbreviated like "Mon" (UI)
+      fullDayName: d.toLocaleDateString("en-US", { weekday: "long" }), // /availability records have full day names like "Monday"
     };
   });
 };
-
 
 // Input: Date for current week start (Date Object)
 // Output: weekStart and weekEnd strings
@@ -119,5 +119,31 @@ export const attachBlockedDays = (
   return schedule.map((emp) => ({
     ...emp,
     blockedDays: blockedDays[emp.employee_id] ?? new Set(),
+  }));
+};
+
+export const buildAvailabilityMap = (availabilityRecords: any[]) => {
+  const map: Record<number, Record<string, { isAvailable: boolean; startTime: string }>> = {};
+
+  availabilityRecords.forEach((rec) => {
+    const empId = rec.employee_id;
+    if (!map[empId]) map[empId] = {};
+    
+    map[empId][rec.day_of_week] = {
+      isAvailable: rec.is_available === 1,
+      startTime: rec.start_time || "",
+    };
+  });
+
+  return map;
+};
+
+export const attachAvailability = (
+  schedule: ScheduleEmployee[],
+  availabilityMap: Record<number, Record<string, { isAvailable: boolean; startTime: string }>>
+) => {
+  return schedule.map((emp) => ({
+    ...emp,
+    availability: availabilityMap[emp.employee_id] ?? {},
   }));
 };
