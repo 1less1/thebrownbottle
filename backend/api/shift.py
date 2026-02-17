@@ -326,8 +326,8 @@ def update_shift(db, request, shift_id):
         conn.commit()
         rowcount = cursor.rowcount
 
-        if rowcount == 0:
-            return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
+        #if rowcount == 0:
+            #return jsonify({"status": "error", "message": "No shift found with given ID"}), 404
 
         dispatch_notification(
             db,

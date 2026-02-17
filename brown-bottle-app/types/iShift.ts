@@ -42,38 +42,3 @@ export interface UpdateShift {
   date: string;       // 'YYYY-MM-DD'
   start_time: string; // 'HH:MM'
 }
-
-export interface ScheduleAPI {
-  role_id?: number | number[]; // Ex: role_id: 1 or role_id = [1, 2, 3]
-  section_id?: number | number[]; // Ex: section_id: 1 or section_id = [1, 2, 3]
-  start_date?: string;
-  end_date?: string;
-  full_name?: string;
-}
-
-export interface ScheduleShift {
-  shift_id: number;
-  date: string;
-  start_time: string;   // e.g., HH:MM AM/PM
-  section_id: number;   
-  section_name: string;
-  day_name: string;     // e.g., "Monday"
-  day_index: number;    // 1–7 (Sunday=1)
-}
-
-export interface ScheduleEmployee {
-  employee_id: number;
-  full_name: string;
-  primary_role: number | null;
-  primary_role_name: string;
-  shifts: (ScheduleShift | null)[]; // 7 Entries: Sunday (1)... to Saturday (7)
-  
-  // Make this required to satisfy the 'updatedSchedule' assignment
-  blockedDays: Set<string>; 
-
-  // Define the availability map structure
-  availability?: Record<string, { 
-    isAvailable: boolean; 
-    startTime: string 
-  }>;
-}

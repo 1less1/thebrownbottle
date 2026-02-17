@@ -23,7 +23,7 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children,
 
         {/* 3. The Modal Card */}
         <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           // keyboardVerticalOffset helps fine-tune the gap between keyboard and input
           keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
           style={styles.modalContainer}

@@ -2,9 +2,9 @@ import Constants from "expo-constants";
 
 import { buildQueryString } from "@/utils/apiHelpers";
 
-import { ScheduleEmployee, ScheduleShift, ScheduleAPI } from "@/types/iShift";
+import { ScheduleAPI, ScheduleEmployee } from "@/types/iSchedule";
 
-// GET: Fetches data from the shift table
+// GET: Fetches data from the shift, availability, and time_off_request tables
 export async function getSchedule(params?: Partial<ScheduleAPI>) {
   // Retrieve Environment Variables
   const { API_BASE_URL } = Constants.expoConfig?.extra || {};
@@ -61,14 +61,20 @@ export const navigateWeek = (date: Date, direction: "prev" | "next") => {
   return newWeek;
 };
 
+const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const DAY_NAMES_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
 export const getWeekDayList = (start: Date, days = 7) => {
+  const startDate = new Date(start);
   return Array.from({ length: days }, (_, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
+    // Modify one date object instead of creating new ones daily
+    const d = i === 0 ? startDate : new Date(startDate.setDate(startDate.getDate() + 1));
+    const dayIndex = d.getDay();
+    
     return {
-      date: d.toISOString().split("T")[0], // <-- REAL DATE (YYYY-MM-DD)
-      dayName: d.toLocaleDateString("en-US", { weekday: "short" }), // used to map full day names to abbreviated like "Mon" (UI)
-      fullDayName: d.toLocaleDateString("en-US", { weekday: "long" }), // /availability records have full day names like "Monday"
+      date: d.toISOString().split("T")[0],
+      dayName: DAY_NAMES_SHORT[dayIndex],
+      fullDayName: DAY_NAMES_LONG[dayIndex],
     };
   });
 };
@@ -93,57 +99,3 @@ export const getWeekRangeString = (start: Date) => {
   return `${formatDate(start)}-${formatDate(end)} ${start.getFullYear()}`;
 };
 
-export const buildBlockedDaysMap = (timeOffRequests: any[]) => {
-  const blocked: Record<number, Set<string>> = {};
-
-  timeOffRequests.forEach((tor) => {
-    const empId = tor.employee_id;
-    if (!blocked[empId]) blocked[empId] = new Set();
-
-    const start = new Date(tor.start_date);
-    const end = new Date(tor.end_date);
-
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-      const dateStr = d.toISOString().split("T")[0];
-      blocked[empId].add(dateStr);
-    }
-  });
-
-  return blocked;
-};
-
-export const attachBlockedDays = (
-  schedule: ScheduleEmployee[],
-  blockedDays: Record<number, Set<string>>
-) => {
-  return schedule.map((emp) => ({
-    ...emp,
-    blockedDays: blockedDays[emp.employee_id] ?? new Set(),
-  }));
-};
-
-export const buildAvailabilityMap = (availabilityRecords: any[]) => {
-  const map: Record<number, Record<string, { isAvailable: boolean; startTime: string }>> = {};
-
-  availabilityRecords.forEach((rec) => {
-    const empId = rec.employee_id;
-    if (!map[empId]) map[empId] = {};
-    
-    map[empId][rec.day_of_week] = {
-      isAvailable: rec.is_available === 1,
-      startTime: rec.start_time || "",
-    };
-  });
-
-  return map;
-};
-
-export const attachAvailability = (
-  schedule: ScheduleEmployee[],
-  availabilityMap: Record<number, Record<string, { isAvailable: boolean; startTime: string }>>
-) => {
-  return schedule.map((emp) => ({
-    ...emp,
-    availability: availabilityMap[emp.employee_id] ?? {},
-  }));
-};

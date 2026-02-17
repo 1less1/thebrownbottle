@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { View, Text, TextInput, ScrollView, FlatList, StyleSheet, useWindowDimensions, Platform, TouchableOpacity, Pressable, Alert } from "react-native";
 import { debounce } from "lodash";
 
@@ -11,17 +11,15 @@ import Card from "@/components/modular/Card";
 import ModularDropdown from "@/components/modular/dropdown/ModularDropdown";
 import ModularButton from "@/components/modular/ModularButton";
 import LoadingCircle from "@/components/modular/LoadingCircle";
+
+import ShiftCell from "@/components/admin/Schedule/ShiftCell";
 import ShiftModal from "@/components/admin/Schedule/ShiftModal";
 
 import { CheckboxOption } from "@/types/iCheckbox";
 
 import { convertToSQLDate, formatDateToCellHeader } from "@/utils/dateTimeHelpers";
-import { ScheduleEmployee, ScheduleShift } from "@/types/iShift";
+import { ScheduleShift, ScheduleAvailability, ScheduleDay, ScheduleEmployee } from "@/types/iSchedule";
 import { getSchedule, getSunday, navigateWeek, getWeekStartEnd, getWeekRangeString, getWeekDayList } from "@/routes/schedule";
-
-import { getTimeOffRequest } from "@/routes/time_off_request";
-import { getAvailability } from "@/routes/availability";
-import { buildBlockedDaysMap, attachBlockedDays, buildAvailabilityMap, attachAvailability } from "@/routes/schedule";
 
 import { exportToCSV, exportToPDF } from "@/utils/exportSchedule";
 
@@ -40,9 +38,7 @@ const isTodayOptions: DropdownOption<number>[] = [
 ];
 
 const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
-  const { width, height } = useWindowDimensions();
-  const WIDTH = width;
-  const HEIGHT = height;
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const [query, setQuery] = useState("");
 
@@ -51,6 +47,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const [error, setError] = useState<string | null>(null);
 
   const [scheduleData, setScheduleData] = useState<ScheduleEmployee[]>([]);
+  const [selectedDay, setSelectedDay] = useState<ScheduleDay | null>(null);
 
   const [selectedSections, setSelectedSections] = useState<CheckboxOption<number>[]>([]);
   const [selectedRoles, setSelectedRoles] = useState<CheckboxOption<number>[]>([]);
@@ -59,13 +56,11 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
   const [shiftModalVisible, setModalVisible] = useState(false);
   const closeShiftModal = () => {
     setModalVisible(false);
-    setSelectedShift(null);
     setSelectedEmployee(null);
+    setSelectedDay(null);
   };
 
-  const [selectedShift, setSelectedShift] = useState<ScheduleShift | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<ScheduleEmployee | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string>("");
 
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => getSunday(new Date()));
 
@@ -92,31 +87,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         params.end_date = weekEndStr;
       }
 
-      const schedule = await getSchedule(params);
-
-      // Fetch accepted time off requests
-      const timeOff = await getTimeOffRequest({
-        status: ["Accepted"],
-        start_date: params.start_date
-      });
-
-      // Fetch all availability
-      const availability = await getAvailability({
-        is_active: 1, // only active employees
-      });
-
-      // Build blocked days
-      const blockedDays = buildBlockedDaysMap(timeOff);
-
-      // Map availability
-      const availabilityMap = buildAvailabilityMap(availability);
-
-      // Attach to schedule
-      // Attach both blocked days and availability info
-      let updatedSchedule = attachBlockedDays(schedule, blockedDays);
-      updatedSchedule = attachAvailability(updatedSchedule, availabilityMap)
-
-      setScheduleData(updatedSchedule);
+      const data = await getSchedule(params);
+      setScheduleData(data);
     } catch (error: any) {
       setError("Failed to fetch schedule data: " + error.message);
       console.error("Failed to fetch schedule data: " + error.message);
@@ -168,34 +140,35 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     triggerRefresh(query)
   }, [parentRefresh, localRefresh, selectedSections, selectedRoles, isToday, currentWeekStart]);
 
+  
   // Layout Calculations
   const weekDays = getWeekDayList(currentWeekStart, 7);
-  const isMobile = WIDTH < 768;
-  const NAME_COL_WIDTH = isMobile ? 170 : Math.max(170, WIDTH * 0.12);
-  const DAY_COL_WIDTH = isMobile ? 135 : Math.max(135, (WIDTH * 0.75) / weekDays.length);
-  const ROW_HEIGHT = isMobile ? 65 : 52;
-  const HEADER_HEIGHT = 45;
-  const cardHeight = isMobile ? height * 0.7 : height * 0.8;
+  const isMobile = screenWidth < 768;
+  const layout = useMemo(() => {
+    return {
+      NAME_COL_WIDTH: isMobile ? 170 : Math.max(170, screenWidth * 0.12),
+      DAY_COL_WIDTH: isMobile ? 135 : Math.max(135, (screenWidth * 0.75) / 7),
+      ROW_HEIGHT: isMobile ? 65 : 52,
+      HEADER_HEIGHT: 45,
+      CARD_HEIGHT: isMobile ? screenHeight * 0.7 : screenHeight * 0.8,
+    };
+  }, [screenWidth, screenHeight, currentWeekStart]);
 
   // UI Rendering
-  const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, shift: ScheduleShift | null) => {
-    const clickedDate = new Date(currentWeekStart);
-    clickedDate.setDate(currentWeekStart.getDate() + dayIndex);
+  const handleCellPress = (employee: ScheduleEmployee, dayIndex: number, day: ScheduleDay) => {
     setSelectedEmployee(employee);
-    setSelectedShift(shift);
-    const sqlDate = convertToSQLDate(clickedDate); // "2025-11-06"
-    setSelectedDate(sqlDate);
+    setSelectedDay(day);
     setModalVisible(true);
   };
 
-  // Render Header Row with column names: "Employee", "Monday", "Tuesday"... "Friday"
+  // Render Header Row with column names: "Employee", "Sunday", "Monday"... "Saturday"
   const renderHeader = () => (
     <View style={[styles.row, styles.headerRow]}>
-      <View style={[styles.headerCell, { width: NAME_COL_WIDTH, height: HEADER_HEIGHT }]}>
+      <View style={[styles.headerCell, { width: layout.NAME_COL_WIDTH, height: layout.HEADER_HEIGHT }]}>
         <Text style={styles.headerText}>Employee</Text>
       </View>
       {weekDays.map((d, i) => (
-        <View key={i} style={[styles.headerCell, { width: DAY_COL_WIDTH, height: HEADER_HEIGHT }]}>
+        <View key={i} style={[styles.headerCell, { width: layout.DAY_COL_WIDTH, height: layout.HEADER_HEIGHT }]}>
           <Text style={styles.headerText}>{d.dayName}</Text>
           <Text style={styles.subHeaderText}>{formatDateToCellHeader(d.date)}</Text>
         </View>
@@ -208,71 +181,23 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
     return (
       <View key={employee.employee_id} style={styles.row}>
 
-        {/* Employee Info */}
-        <View style={[styles.nameCell, { width: NAME_COL_WIDTH, height: ROW_HEIGHT }]}>
+        {/* Employee Info Cell */}
+        <View style={[styles.nameCell, { width: layout.NAME_COL_WIDTH, height: layout.ROW_HEIGHT }]}>
           <Text style={styles.employeeName}>{employee.full_name}</Text>
           <Text style={styles.employeeRole}>({employee.primary_role_name})</Text>
         </View>
 
-        {employee.shifts.map((shift, dayIndex) => {
-          const dayInfo = weekDays[dayIndex];
-          const avail = employee.availability?.[dayInfo.fullDayName];
-          const isUnavailable = avail?.isAvailable === false;
-          const isBlocked = employee.blockedDays?.has(dayInfo.date) ?? false;
-
-          // isDisabled determines if the cell can be clicked/interacted with
-          const isDisabled = isBlocked || isUnavailable;
-
-          // isHint determines if we are showing "Earliest: HH:MM"
-          const isHint = !shift && avail?.startTime;
-
-          return (
-            <Pressable
-              key={dayIndex}
-              disabled={isDisabled}
-              onPress={isDisabled ? undefined : () => handleCellPress(employee, dayIndex, shift)}
-              style={({ hovered }) => [
-                styles.shiftCell,
-                { width: DAY_COL_WIDTH, height: ROW_HEIGHT },
-                // Enable the hover effect for hints and regular cells
-                hovered && !isDisabled && styles.shiftCellHovered,
-                // ONLY apply gray background if blocked (Time Off)
-                // Hints (isHint) will stay white like regular cells
-                isDisabled && styles.shiftCellDisabled,
-              ]}
-            >
-              {shift ? (
-                <View style={styles.shiftContent}>
-                  <Text style={[GlobalStyles.semiBoldSmallText, isDisabled && styles.shiftTextDisabled]}>
-                    {shift.start_time}
-                  </Text>
-                  <Text style={[styles.shiftSection, isDisabled && styles.shiftTextDisabled]}>
-                    {shift.section_name}
-                  </Text>
-                </View>
-              ) : isUnavailable ? (
-                <Text style={styles.noShift}></Text>
-              ) : avail?.startTime ? (
-                /* --- HINT CELL CONTENT --- */
-                <View style={styles.hintWrapper}>
-                  {/* The Dash - Now with explicit vertical centering */}
-                  <View style={[StyleSheet.absoluteFill, { justifyContent: 'center', alignItems: 'center' }]}>
-                    <Text style={styles.noShift}>-</Text>
-                  </View>
-
-                  {/* The Time in the bottom right */}
-                  <View style={styles.hintContainer}>
-                    <Text style={[styles.startTime, isDisabled && styles.shiftTextDisabled]}>
-                      {avail.startTime}
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                <Text style={styles.noShift}>-</Text>
-              )}
-            </Pressable>
-          );
-        })}
+        {/* Shift Cells (7) - 1 for each day */}
+        {employee.days.map((day, dayIndex) => (
+          <ShiftCell
+            key={dayIndex}
+            day={day}
+            width={layout.DAY_COL_WIDTH}
+            height={layout.ROW_HEIGHT}
+            // Change this line:
+            onPress={() => handleCellPress(employee, dayIndex, day)}
+          />
+        ))}
       </View>
     );
   };
@@ -285,7 +210,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
   return (
 
-    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: cardHeight }}>
+    <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: layout.CARD_HEIGHT }}>
 
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>
@@ -350,6 +275,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         </ModularButton>
 
         {/* Export to CSV only shown on web! */}
+        {/*
         {Platform.OS === 'web' && (
           <ModularButton
             onPress={() => exportToCSV(scheduleData, weekDays)}
@@ -362,6 +288,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
             <Ionicons name="download-outline" size={20} color={Colors.black} />
           </ModularButton>
         )}
+        */}
+
 
       </View>
 
@@ -449,13 +377,13 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       </View>
 
       {/* Shift Modal - Add, Update, Delete */}
-      {selectedEmployee && (
+      {/* Null Check selectedEmployee (row) and selectedDay (cell) */}
+      {selectedEmployee && selectedDay && (
         <ShiftModal
           visible={shiftModalVisible}
           onClose={closeShiftModal}
-          shiftData={selectedShift}
-          employeeData={selectedEmployee}
-          date={selectedDate}
+          day={selectedDay}
+          employee={selectedEmployee}
           onUpdate={() => setLocalRefresh((prev) => prev + 1)}
         />
       )}

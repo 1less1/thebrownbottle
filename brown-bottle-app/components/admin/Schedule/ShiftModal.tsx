@@ -16,7 +16,8 @@ import SectionDropdown from "@/components/modular/dropdown/SectionDropdown";
 import LoadingCircle from "@/components/modular/LoadingCircle";
 
 import { insertShift, updateShift, deleteShift } from '@/routes/shift';
-import { ScheduleEmployee, ScheduleShift, Shift, InsertShift, UpdateShift } from '@/types/iShift';
+import { Shift, InsertShift, UpdateShift } from '@/types/iShift';
+import { ScheduleDay, ScheduleEmployee } from '@/types/iSchedule';
 import { buildPatchData } from "@/utils/apiHelpers";
 import { convertToSQL24HRTime, isValidTime } from '@/utils/dateTimeHelpers';
 
@@ -25,17 +26,15 @@ import { useConfirm } from '@/hooks/useConfirm';
 
 interface ShiftModalProps {
   visible: boolean;
-  shiftData: ScheduleShift | null;
-  employeeData: ScheduleEmployee;
-  date: string;
+  day: ScheduleDay;
+  employee: ScheduleEmployee;
   onClose: () => void;
   onUpdate?: () => void;
 }
 
 const patchableKeys: (keyof UpdateShift)[] = ["start_time", "section_id"];
 
-const ShiftModal: React.FC<ShiftModalProps> = ({ visible, shiftData, employeeData, date, onClose, onUpdate }) => {
-
+const ShiftModal: React.FC<ShiftModalProps> = ({ visible, day, employee, onClose, onUpdate }) => {
   const { confirm } = useConfirm();
 
   const [loading, setLoading] = useState(false);
@@ -43,40 +42,42 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, shiftData, employeeDat
   const [startTime, setStartTime] = useState<string>("");
   const [sectionId, setSectionId] = useState<number | null>(null);
 
-  // Build Form Data
-  const formData = useMemo(() => ({
-    start_time: startTime,
-    section_id: sectionId,
-  }), [startTime, sectionId]);
+  const shiftData = day.shift ?? null;
+  const availData = day.availability;
+
 
   // Form Validation
   const isValidForm = useMemo(() => (
-    startTime.trim().length > 0 && isValidTime(startTime)
-    && sectionId !== null
-  ), [formData]);  // Only recalculates when formData changes
+    startTime.trim().length > 0 &&
+    isValidTime(startTime) &&
+    sectionId !== null
+  ), [startTime, sectionId]); //
 
-  // Construct Patch Data (only for existing shifts)
+  // Construct Patch Data
   const patchData = useMemo(() => {
     if (!shiftData) return {};
 
-    // Cast shiftData from ScheduleShift to Shift for comparison
     return buildPatchData(
       shiftData as unknown as Shift,
-      formData as unknown as Shift,
+      { start_time: startTime, section_id: sectionId } as unknown as Shift, // Build object inline
       patchableKeys as any
     );
-  }, [shiftData, formData]);
+  }, [shiftData, startTime, sectionId]);
 
   const isDirty = Object.keys(patchData).length > 0;
   const canSave = shiftData ? (isDirty && isValidForm && !loading) : (isValidForm && !loading);
 
+
   // Create a fresh form or load data on modal visibility
   useEffect(() => {
-    if (visible) {
-      setStartTime(shiftData?.start_time ?? "");
-      setSectionId(shiftData?.section_id ?? null);
+    if (visible && day) {
+      // 1. Priority: shiftData.start_time
+      // 2. Fallback: day.availability.start_time
+      // 3. Default: ""
+      setStartTime(day.shift?.start_time ?? day.availability?.start_time ?? "");
+      setSectionId(day.shift?.section_id ?? null);
     }
-  }, [visible, shiftData]);
+  }, [visible, day]);
 
 
   // Delete Shift Logic
@@ -133,8 +134,8 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, shiftData, employeeDat
       } else {
         // Construct Insert Payload
         const insertPayload = {
-          employee_id: employeeData.employee_id,
-          date: date,
+          employee_id: employee.employee_id,
+          date: day.date,
           section_id: sectionId!, // canSave and isValidForm ensures sectionId is not null here!
           start_time: convertToSQL24HRTime(startTime),
         };
@@ -160,11 +161,11 @@ const ShiftModal: React.FC<ShiftModalProps> = ({ visible, shiftData, employeeDat
       {/* Header */}
       <View>
         <Text style={GlobalStyles.modalTitle}>{shiftData ? 'Edit Shift' : 'Add Shift'}</Text>
-        <Text style={GlobalStyles.semiBoldMediumText}>{employeeData.full_name}</Text>
-        <Text style={GlobalStyles.mediumAltText}>{(date)}</Text>
+        <Text style={GlobalStyles.semiBoldMediumText}>{employee.full_name}</Text>
+        <Text style={GlobalStyles.mediumAltText}>{day.date}</Text>
       </View>
 
-      {!employeeData ? (
+      {!day ? (
         <LoadingCircle size="small" />
       ) : (
         <View style={styles.formContainer}>
