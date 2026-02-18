@@ -63,7 +63,7 @@ const SubmitTimeOff: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
       setLoading(true);
 
       const payload: InsertTimeOffRequest = {
-        employee_id: user.employee_id,
+        employee_id: user.employee_id!,
         reason: reason,
         start_date: startDate,
         end_date: endDate

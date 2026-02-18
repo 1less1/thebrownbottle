@@ -1,5 +1,7 @@
 import React from 'react';
-import { Modal, View, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import { Modal, View, StyleSheet, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform, StyleProp, ViewStyle } from 'react-native';
+
+import { GlobalStyles } from '@/constants/GlobalStyles';
 import { Colors } from '@/constants/Colors';
 
 interface ModularModalProps {
@@ -7,9 +9,10 @@ interface ModularModalProps {
   onClose: () => void;
   children: React.ReactNode;
   scroll?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children, scroll = true }) => {
+const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children, scroll = true, style }) => {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       
@@ -26,7 +29,7 @@ const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children,
           behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           // keyboardVerticalOffset helps fine-tune the gap between keyboard and input
           keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-          style={styles.modalContainer}
+          style={[styles.modalContainer, style]}
         >
           {scroll ? (
             <ScrollView 

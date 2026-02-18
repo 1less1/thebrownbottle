@@ -120,8 +120,7 @@ const CalendarWidget: React.FC<Props> = ({
       const data = await getShift({ employee_id: user.employee_id });
       setShifts(data || []);
     } catch (error: any) {
-      setError("Calendar Wisget failed to fetch shifts!");
-      console.error("CalendarWidget failed to fetch shifts:", error.message);
+      setError("Calendar Widget failed to fetch shifts: " + error.message);
     } finally {
       setLoading(false);
       onRefreshDone?.();
@@ -139,18 +138,33 @@ const CalendarWidget: React.FC<Props> = ({
     // Range mode
     if (mode === "picker" && pickerType === "range" && rangeStart) {
       const range: Record<string, any> = {};
-      const start = new Date(rangeStart);
-      const end = rangeEnd ? new Date(rangeEnd) : start;
+
+      // Use date strings directly to avoid Timezone/ISO UTC shifts
+      const start = new Date(rangeStart + "T00:00:00");
+      const end = rangeEnd ? new Date(rangeEnd + "T00:00:00") : start;
 
       let current = new Date(start);
       while (current <= end) {
-        const date = current.toISOString().split("T")[0];
-        range[date] = { color: Colors.purple, textColor: "white" };
+        // Formats to YYYY-MM-DD manually to stay in local time
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, "0");
+        const d = String(current.getDate()).padStart(2, "0");
+        const dateStr = `${y}-${m}-${d}`;
+
+        range[dateStr] = { color: Colors.purple, textColor: "white" };
         current.setDate(current.getDate() + 1);
       }
 
-      range[rangeStart].startingDay = true;
-      range[end.toISOString().split("T")[0]].endingDay = true;
+      // Safety checks: Only set properties if the keys actually exist in our range object
+      if (range[rangeStart]) {
+        range[rangeStart].startingDay = true;
+      }
+
+      const lastDateStr = rangeEnd || rangeStart;
+      if (range[lastDateStr]) {
+        range[lastDateStr].endingDay = true;
+      }
+
       return range;
     }
 

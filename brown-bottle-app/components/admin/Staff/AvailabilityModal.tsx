@@ -32,8 +32,9 @@ const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Fri
 const AvailabilityModal: React.FC<AvailModalProps> = ({ visible, onClose, employeeId }) => {
     if (!employeeId) return;
 
-    const { height } = useWindowDimensions();
+    const { height, width } = useWindowDimensions();
     const HEIGHT = height;
+    const WIDTH = width;
 
     const { confirm } = useConfirm();
 
@@ -192,7 +193,7 @@ const AvailabilityModal: React.FC<AvailModalProps> = ({ visible, onClose, employ
 
     return (
 
-        <ModularModal visible={visible} onClose={handleClose} scroll={false}>
+        <ModularModal visible={visible} onClose={handleClose} scroll={false} style={{ maxHeight: "80%", width: "80%" }}>
 
             {/* Header */}
             <Text style={GlobalStyles.modalTitle}>Availability</Text>
@@ -203,7 +204,7 @@ const AvailabilityModal: React.FC<AvailModalProps> = ({ visible, onClose, employ
             ) : (
                 <>
 
-                    <View style={[styles.formContainer, { height: HEIGHT * 0.42 }]}>
+                    <View style={[styles.formContainer, { height: HEIGHT * 0.35 }]}>
                         <ScrollView>
                             {formData.map((day, index) => (
                                 <View key={day.day_of_week} style={styles.dayRow}>

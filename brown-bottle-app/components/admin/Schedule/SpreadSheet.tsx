@@ -212,6 +212,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
     <Card style={{ backgroundColor: Colors.white, paddingVertical: 6, height: layout.CARD_HEIGHT }}>
 
+
       {/* Navigation Header */}
       <View style={styles.navigationHeader}>
 
@@ -242,7 +243,8 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       </View>
 
-      {/* Search/Filter Container */}
+
+      {/* Search + Button Container */}
       <View style={styles.searchContainer}>
 
         <TextInput
@@ -275,11 +277,10 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         </ModularButton>
 
         {/* Export to CSV only shown on web! */}
-        {/*
         {Platform.OS === 'web' && (
           <ModularButton
-            onPress={() => exportToCSV(scheduleData, weekDays)}
-            onLongPress={() => Alert.alert("Hint", "Export Current Schedule to Excel File")}
+            onPress={() => exportToPDF(scheduleData)}
+            onLongPress={() => Alert.alert("Hint", "Export Current Schedule")}
             style={{ backgroundColor: Colors.bgGreen }}
             text=""
             textStyle={{ marginRight: 4 }}
@@ -288,10 +289,9 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
             <Ionicons name="download-outline" size={20} color={Colors.black} />
           </ModularButton>
         )}
-        */}
-
-
+        
       </View>
+
 
       {/* Filter Container */}
       <View style={styles.filterContainer}>
@@ -339,6 +339,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
 
       </View>
 
+
       {/* Schedule Spreadsheet */}
       {/* Scroll View = Horizontal */}
       {/* Flat List = Vertical */}
@@ -376,6 +377,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
         </ScrollView>
       </View>
 
+
       {/* Shift Modal - Add, Update, Delete */}
       {/* Null Check selectedEmployee (row) and selectedDay (cell) */}
       {selectedEmployee && selectedDay && (
@@ -389,6 +391,7 @@ const SpreadSheet: React.FC<SpreadSheetProps> = ({ parentRefresh }) => {
       )}
 
     </Card>
+
 
   );
 
