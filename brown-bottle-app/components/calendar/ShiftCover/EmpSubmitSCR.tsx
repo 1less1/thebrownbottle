@@ -71,7 +71,7 @@ const EmpSubmitSCR: React.FC<Props> = ({ visible, onClose, onSubmit }) => {
             setLoading(true);
 
             const payload: InsertShiftCoverRequest = {
-                requested_employee_id: user.employee_id,
+                requested_employee_id: user.employee_id!,
                 shift_id: selectedShift.shift_id,
             };
 

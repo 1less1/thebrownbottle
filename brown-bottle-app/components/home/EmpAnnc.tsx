@@ -95,7 +95,7 @@ const EmpAnnc: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     setAcknowledged((prev) => [...prev, announcementId]);
 
     try {
-      await acknowledgeAnnouncement(announcementId, user.employee_id);
+      await acknowledgeAnnouncement(announcementId, user.employee_id!);
     } catch (error: any) {
       console.log("Error acknowledging announcement:" + error.message);
     }
