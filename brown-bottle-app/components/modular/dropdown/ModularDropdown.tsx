@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { 
-    View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, 
-    TouchableWithoutFeedback, StyleProp, ViewStyle, useWindowDimensions 
+import {
+    View, Text, TouchableOpacity, StyleSheet, Modal, FlatList,
+    TouchableWithoutFeedback, StyleProp, ViewStyle, useWindowDimensions
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -165,8 +165,8 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         alignSelf: "center",
-        minWidth: "55%",
-        maxWidth: "80%",
+        width: "80%",
+        maxWidth: 350,
         maxHeight: "80%",
         backgroundColor: Colors.white,
         elevation: 5,
