@@ -1,5 +1,7 @@
 from push_notifications import send_push_notification
-
+from notifications.events import NotificationEvent
+from notifications.nav import build_notification_data
+from notifications.constants import TASKS_ROUTE
 
 def handle_task_created(db, payload: dict):
     """
@@ -55,6 +57,12 @@ def handle_task_created(db, payload: dict):
         cursor.close()
         return
 
+    # Build navigation-only payload (routes user to Tasks tab)
+    notification_data = build_notification_data(
+        event=NotificationEvent.TASK_CREATED,
+        nav_pathname=TASKS_ROUTE
+    )
+
     # Expo batching
     chunk_size = 100
     for i in range(0, len(tokens), chunk_size):
@@ -62,7 +70,7 @@ def handle_task_created(db, payload: dict):
             expo_push_token=tokens[i:i + chunk_size],
             title="New Task Posted",
             body=title,
-            data={"task_id": task_id}
+            data=notification_data
         )
 
     cursor.close()
