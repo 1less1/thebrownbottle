@@ -15,24 +15,23 @@ interface ModularModalProps {
 const ModularModal: React.FC<ModularModalProps> = ({ visible, onClose, children, scroll = true, style }) => {
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      
+
       {/* 1. Main centering container */}
       <View style={styles.overlay}>
-        
+
         {/* 2. Dismiss background */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.background} />
         </TouchableWithoutFeedback>
 
         {/* 3. The Modal Card */}
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
           // keyboardVerticalOffset helps fine-tune the gap between keyboard and input
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
           style={[styles.modalContainer, style]}
         >
           {scroll ? (
-            <ScrollView 
+            <ScrollView
               style={{ flexShrink: 1 }}
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
@@ -59,7 +58,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '85%',
-    maxWidth: 800 ,
+    maxWidth: 800,
     backgroundColor: 'white',
     borderRadius: 15,
     maxHeight: '85%',
