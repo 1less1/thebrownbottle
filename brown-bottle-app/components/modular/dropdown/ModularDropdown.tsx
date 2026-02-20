@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         alignSelf: "center",
-        width: "80%",
+        width: "55%",
         maxWidth: 350,
         maxHeight: "80%",
         backgroundColor: Colors.white,
