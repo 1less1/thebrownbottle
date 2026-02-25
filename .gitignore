@@ -1,3 +1,6 @@
 */.env
 __pycache__
 .vscode
+
+backend/api/secrets/*
+!backend/api/secrets/ .gitkeep
