@@ -37,20 +37,21 @@ services:
     build: ./api # Looks for Dockerfile in this directory
     container_name: bb-api
     restart: unless-stopped
-    ports:
-      - "5000:5000" # Maps localhost 5000 to container port 5000 
-    env_file: .env
-    environment:
-      - PYTHONUNBUFFERED=1
     depends_on:
       db:
         condition: service_healthy 
+    env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DOMAIN=${DOMAIN}
+      - WWW_DOMAIN=${WWW_DOMAIN}
+    # No local ports open (Internal ONLY) 
     networks:
       - internal
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.api.entrypoints=websecure"
+      - "traefik.http.routers.api.rule=Host(`${DOMAIN}`) || Host(`${WWW_DOMAIN}`)"
+      - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.rate-limit.rateLimit.average=100"
       - "traefik.http.middlewares.rate-limit.rateLimit.burst=50"
