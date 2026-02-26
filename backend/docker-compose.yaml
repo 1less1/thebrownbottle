@@ -50,7 +50,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.services.api.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.rate-limit.rateLimit.average=100"
       - "traefik.http.middlewares.rate-limit.rateLimit.burst=50"
@@ -71,7 +71,7 @@ services:
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     command:
       - "--api.dashboard=true"
-      - "--api.insecure=true" # Change to false for production
+      - "--api.insecure=false" # Change to false for production or true for dev
       # Docker Provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
