@@ -1,0 +1,104 @@
+services:
+
+  # MySQL Database
+  db:
+    build: ./db-setup
+    container_name: bb-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Chicago
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+      # SQL initialization files
+      - ./db-setup/tbb-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db-setup/triggers.sql:/docker-entrypoint-initdb.d/02-triggers.sql:ro
+      - ./db-setup/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql:ro
+      - ./db-setup/events.sql:/docker-entrypoint-initdb.d/04-events.sql:ro
+      - ./db-setup/sample.sql:/docker-entrypoint-initdb.d/05-sample.sql:ro
+      - ./db-setup/dev-accounts.sql:/docker-entrypoint-initdb.d/06-dev-accounts.sql:ro
+    networks:
+     - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  
+  # Backend API 
+  api:
+    build: ./api # Looks for Dockerfile in this directory
+    container_name: bb-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy 
+    env_file: .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DOMAIN=${DOMAIN}
+      - WWW_DOMAIN=${WWW_DOMAIN}
+    ports:
+      - "5000:5000"
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.api.loadbalancer.server.port=5000"
+      - "traefik.http.middlewares.rate-limit.rateLimit.average=100"
+      - "traefik.http.middlewares.rate-limit.rateLimit.burst=50"
+      - "traefik.http.routers.api.middlewares=rate-limit"
+    volumes:
+    - ./api:/app # Binded the local api directory to the container's app directory
+                 # This allows local changes to be refreshed in the container in real time 
+
+
+  traefik: # external ports 80 (HTTP) and 443 (HTTPS)
+    image: traefik:v3.6
+    container_name: bb-traefik
+    restart: always
+    depends_on:
+      - api
+    env_file: .env
+    environment:
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true" # Remove for production
+      # Docker Provider
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=app-network"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:8080:8080" # localhost Traefik Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./letsencrypt:/letsencrypt # Make sure to go into the letsencrypt folder and run the command: chmod 600 acme.json
+    networks:
+      - internal
+
+    
+volumes:
+  db_data:
+
+
+networks:
+  internal:
+    name: app-network
+    driver: bridge
