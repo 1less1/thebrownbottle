@@ -43,7 +43,7 @@ DELIMITER ;
 -- -----------------------------------------------------
 DELIMITER $$
 
-CREATE TRIGGER out_of_date_accept
+CREATE TRIGGER out_of_date_SC_accept
 BEFORE UPDATE ON shift_cover_request
 FOR EACH ROW
 BEGIN
@@ -61,7 +61,7 @@ DELIMITER ;
 -- -----------------------------------------------------
 DELIMITER $$
 
-CREATE TRIGGER duplicate_time_off_request
+CREATE TRIGGER duplicate_time_off_SC_request
 BEFORE INSERT ON time_off_request
 FOR EACH ROW
 BEGIN
