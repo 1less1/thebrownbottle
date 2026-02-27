@@ -23,6 +23,27 @@ END$$
 
 DELIMITER ;
 -- -----------------------------------------------------
+-- Event: duplicate_cover_request
+-- -----------------------------------------------------
+DELIMITER $$
+
+CREATE TRIGGER duplicate_cover_request
+BEFORE INSERT ON shift_cover_request
+FOR EACH ROW
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM shift_cover_request
+    WHERE shift_id = NEW.shift_id
+      AND status = 'Pending'
+  ) THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = 'A pending shift cover request already exists for this shift';
+  END IF;
+END$$
+
+DELIMITER ;
+-- -----------------------------------------------------
 -- Event: out_of_date_request
 -- -----------------------------------------------------
 DELIMITER $$
