@@ -7,11 +7,9 @@ import ModularButton from '@/components/modular/ModularButton';
 
 import { useRouter } from 'expo-router';
 import { useSession } from '@/utils/SessionContext';
-import { getEmployee } from '@/routes/employee';
 
-import { signInAndFetchEmployee } from '@/auth/authService';
+import { signInAndFetchEmployee, validateStoredEmployee, logout } from '@/auth/authService';
 import type { Employee } from '@/types/iEmployee';
-import { Colors } from '@/constants/Colors';
 
 // EmployeeSessionFields:
 // Keeps the mapping stable by only depending on the fields we actually store in session.
@@ -61,44 +59,55 @@ const HandleLogin = () => {
 
   // Auto-skip login if session exists (force close / reopen)
   useEffect(() => {
-    if (user?.employee_id) {
-      router.replace({ pathname: '/(tabs)/home' });
-    }
-  }, [user?.employee_id, router]);
+    const checkUser = async () => {
+      if (!user?.employee_id) return;
 
-  // handleLogin():
-  // - Legacy Employee ID login flow
-  const handleLogin = async () => {
-    if (loading) return;
+      const validEmployee = await validateStoredEmployee(user.employee_id);
 
-    if (!employeeIdInput.trim()) {
-      setErrorText('Please enter your Employee ID.');
-      return;
-    }
-
-    setLoading(true);
-    setErrorText('');
-
-    try {
-      const response = await getEmployee({ employee_id: Number(employeeIdInput) });
-
-      if (!response || response.length === 0) {
-        setErrorText('Login Failed');
+      if (!validEmployee) {
+        await logout();
         return;
       }
 
-      const currentUser = response[0] as unknown as EmployeeSessionFields;
+      router.replace("/(tabs)/home");
+    };
 
-      await setUser(toSessionUser(currentUser));
+    checkUser();
+  }, [user?.employee_id]);
 
-      router.push({ pathname: '/(tabs)/home' });
-    } catch (err) {
-      console.error('Login Failed:', err);
-      setErrorText('Server error.\nPlease try again later!');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // handleLogin():
+  // - Legacy Employee ID login flow
+  // const handleLogin = async () => {
+  //   if (loading) return;
+
+  //   if (!employeeIdInput.trim()) {
+  //     setErrorText('Please enter your Employee ID.');
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setErrorText('');
+
+  //   try {
+  //     const response = await getEmployee({ employee_id: Number(employeeIdInput) });
+
+  //     if (!response || response.length === 0) {
+  //       setErrorText('Login Failed');
+  //       return;
+  //     }
+
+  //     const currentUser = response[0] as unknown as EmployeeSessionFields;
+
+  //     await setUser(toSessionUser(currentUser));
+
+  //     router.push({ pathname: '/(tabs)/home' });
+  //   } catch (err) {
+  //     console.error('Login Failed:', err);
+  //     setErrorText('Server error.\nPlease try again later!');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // handleGoogleLogin():
   const handleGoogleLogin = async () => {

@@ -1,9 +1,34 @@
 import { getFirebaseIdToken } from "./getFirebaseIdToken";
 import { Platform } from "react-native";
 import { auth } from "./firebase";
+import { GetEmployee } from "@/types/iEmployee";
 import type { Employee } from "@/types/iEmployee";
+import { getEmployee } from "@/routes/employee";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+/**
+ * validateStoredEmployee():
+ * - Calls GET /employee with employee_id + is_active=1
+ * - Backend filters inactive employees
+ * - Returns Employee if valid, otherwise null
+ */
+export async function validateStoredEmployee(
+  employeeId: number,
+): Promise<Employee | null> {
+  if (employeeId == null) return null;
+
+  try {
+    const employees = await getEmployee({
+      employee_id: employeeId,
+      is_active: 1,
+    } as Partial<GetEmployee>);
+
+    return employees[0] ?? null;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * signInAndFetchEmployee():
@@ -34,7 +59,7 @@ export async function signInAndFetchEmployee(): Promise<Employee> {
     // Some versions throw this when signIn() was cancelled and getTokens() is called
     if (
       String(err?.message || "").includes(
-        "getTokens requires a user to be signed in"
+        "getTokens requires a user to be signed in",
       )
     ) {
       const cancelErr: any = new Error("SIGN_IN_CANCELLED");
@@ -99,7 +124,9 @@ export async function logout(): Promise<void> {
   // Native Google logout (clear cached account)
   if (Platform.OS !== "web") {
     try {
-      const { GoogleSignin } = require("@react-native-google-signin/google-signin");
+      const {
+        GoogleSignin,
+      } = require("@react-native-google-signin/google-signin");
 
       // Ensure configure() ran at least once (prevents "apiClient is null")
       const webClientId = process.env.EXPO_PUBLIC_WEB_ID;
