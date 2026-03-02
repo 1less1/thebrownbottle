@@ -45,12 +45,13 @@ services:
       - PYTHONUNBUFFERED=1
       - DOMAIN=${DOMAIN}
       - WWW_DOMAIN=${WWW_DOMAIN}
-    # No local ports open (Internal ONLY) 
+    ports:
+      - "5000:5000"
     networks:
       - internal
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.api.rule=Host(`${DOMAIN}`) || Host(`${WWW_DOMAIN}`)"
+      - "traefik.http.routers.api.rule=PathPrefix(`/`)"
       - "traefik.http.routers.api.entrypoints=web"
       - "traefik.http.services.api.loadbalancer.server.port=5000"
       - "traefik.http.middlewares.rate-limit.rateLimit.average=100"
@@ -72,7 +73,7 @@ services:
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
     command:
       - "--api.dashboard=true"
-      - "--api.insecure=false" # Change to false for production or true for dev
+      - "--api.insecure=true" # Remove for production
       # Docker Provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
