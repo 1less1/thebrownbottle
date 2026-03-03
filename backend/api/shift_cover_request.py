@@ -239,6 +239,20 @@ def insert_scr(db, request):
         inserted_id = cursor.lastrowid
 
         conn.commit()
+        
+        # Sends notifications to all employees on SCR Insert. Waiting on more info before uncommenting.
+        # cursor.close()
+        # cursor = None
+
+        # dispatch_notification(
+        #     db,
+        #     NotificationEvent.SHIFT_COVER_CREATED,
+        #     {
+        #         "cover_request_id": inserted_id,          
+        #         "shift_id": shift_id,                     
+        #         "requested_employee_id": requested_employee_id,  # optional but useful
+        #     }
+        # )
 
         return jsonify({"status": "success", "inserted_id": inserted_id}), 201
 

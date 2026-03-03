@@ -1,6 +1,29 @@
 from push_notifications import send_push_notification
 
 
+def notify_all_employees(db, title, body, data):
+    # Sends the same notification to every employee that has a push token.
+    cursor = db.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT employee_id
+            FROM employee
+            WHERE employee.is_active = 1
+        """)
+        employees = cursor.fetchall()
+
+        for row in employees:
+            notify_employee(
+                db,
+                row["employee_id"],  
+                title,
+                body,
+                data or {}
+            )
+    finally:
+        cursor.close()
+
+
 def notify_employee(db, employee_id, title, body, data):
     """
     Sends a push notification to registered devices.
