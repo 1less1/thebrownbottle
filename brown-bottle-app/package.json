@@ -27,7 +27,7 @@
     "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
-    "expo": "~55.0.4",
+    "expo": "~54.0.33",
     "expo-auth-session": "~7.0.10",
     "expo-blur": "~15.0.8",
     "expo-constants": "~18.0.12",
