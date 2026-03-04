@@ -6,3 +6,7 @@ node_modules/
 # Secrets Ignore
 backend/api/secrets/*
 !backend/api/secrets/.gitkeep
+
+backend/web/*
+!backend/web/.gitkeep
+backend/letsencrypt/acme.json
