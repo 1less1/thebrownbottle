@@ -9,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: "portrait",
   scheme: "brownbottle",
 
-  newArchEnabled: true,
+  newArchEnabled: false,
 
   ios: {
     bundleIdentifier: "com.brownbottle.brownbottleapp",
