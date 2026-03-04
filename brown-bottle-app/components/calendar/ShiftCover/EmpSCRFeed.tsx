@@ -22,6 +22,7 @@ import EmpSCRModal from "@/components/calendar/ShiftCover/EmpSCRModal";
 import { getShiftCoverRequest } from "@/routes/shift_cover_request";
 import { ShiftCoverRequest, Status, GetShiftCoverRequest } from "@/types/iShiftCover";
 
+import { useShiftRefresh } from "@/utils/ShiftRefreshContext";
 import { useSession } from "@/utils/SessionContext";
 
 interface Props {
@@ -55,6 +56,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     const cardHeight = isMobile ? HEIGHT * 0.65 : HEIGHT * 0.7;
 
     const { user } = useSession();
+    const { refreshTrigger } = useShiftRefresh();
 
     const [requests, setRequests] = useState<ShiftCoverRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -128,7 +130,7 @@ const EmpSCRFeed: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
     // Fetch shift cover requests on initialiaztion and state update
     useEffect(() => {
         fetchSCR();
-    }, [parentRefresh, localRefresh, fetchSCR]);
+    }, [parentRefresh, localRefresh, refreshTrigger, fetchSCR]);
 
     // UI Rendering
     const renderSCR = (request: ShiftCoverRequest) => {

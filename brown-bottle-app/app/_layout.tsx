@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import Toast from "react-native-toast-message";
 
 import { Colors } from '@/constants/Colors';
+import { ShiftRefreshProvider } from '@/utils/ShiftRefreshContext';
 import { SessionProvider, useSession } from '@/utils/SessionContext';
 
 // Force light theme
@@ -54,25 +55,6 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  useEffect(() => {
-    // This listener is fired whenever a notification is received while the app is foregrounded
-    const notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      console.log("Notification Data: ", notification);
-    });
-
-    // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
-    const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log("Notification Response: ", response);
-      // Here you could navigate to a specific screen based on the notification data
-      // For example: router.push(`/announcement/${response.notification.request.content.data.announcement_id}`);
-    });
-
-    return () => {
-      notificationListener.remove();
-      responseListener.remove();
-    };
-  }, []);
-
   if (!loaded) {
     return null;
   }
@@ -80,20 +62,22 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <SessionProvider>
-        <SplashHandler fontsLoaded={loaded} />
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: Colors.mediumTan,
-            },
-            headerTintColor: Colors.black,
-          }}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-        <Toast />
+        <ShiftRefreshProvider>
+          <SplashHandler fontsLoaded={loaded} />
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: Colors.mediumTan,
+              },
+              headerTintColor: Colors.black,
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+          <Toast />
+        </ShiftRefreshProvider>
       </SessionProvider>
     </ThemeProvider>
   );

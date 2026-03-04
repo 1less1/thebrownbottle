@@ -3,7 +3,7 @@ import { ExpoConfig, ConfigContext } from "@expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "Brown Bottle Mobile",
+  name: "CF Brown Bottle",
   slug: "brown-bottle-app",
   version: "1.0.0",
   orientation: "portrait",
