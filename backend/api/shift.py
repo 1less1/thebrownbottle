@@ -30,7 +30,8 @@ def get_shifts(db, request):
             'start_date': str,
             'end_date': str,
             'is_today': int,  # 1=True, 0=False
-            'next_shift': int  # 1=True, 0=False
+            'next_shift': int,  # 1=True, 0=False
+            'next_count': int,  # Max number of upcoming shifts to return
         }
 
         # Validate and parse parameters
@@ -50,6 +51,9 @@ def get_shifts(db, request):
         end_date = params.get('end_date')
         is_today = params.get('is_today')
         next_shift = params.get('next_shift')
+        next_count = params.get('next_count') or 1
+        if next_count < 1:
+            next_count = 1
 
         conn = db
         cursor = conn.cursor(dictionary=True)
@@ -90,9 +94,10 @@ def get_shifts(db, request):
             query += " AND sh.employee_id = %s"
             query_params.append(employee_id)
 
-            # Correct next-shift logic (time-aware)
-            query += " AND sh.date >= CURDATE()"
-            query += " ORDER BY sh.date ASC, sh.start_time ASC LIMIT 1"
+            # Upcoming shifts from "now" (exclude earlier shifts today)
+            query += " AND (sh.date > CURDATE() OR (sh.date = CURDATE() AND sh.start_time >= CURTIME()))"
+            query += " ORDER BY sh.date ASC, sh.start_time ASC LIMIT %s"
+            query_params.append(int(next_count))
 
             cursor.execute(query, tuple(query_params))
             result = cursor.fetchall()

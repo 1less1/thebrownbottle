@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 export const GlobalStyles = StyleSheet.create({
@@ -354,4 +354,38 @@ export const GlobalStyles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
+
+  // Shift Calendar Styling
+  contentRow: {
+      alignSelf: "center", 
+      gap: 10,
+    },
+    rowLayout: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+    },
+    columnLayout: {
+      flexDirection: "column",
+    },
+    calendarContainer: {
+      minWidth: 0, 
+      marginRight: 20
+    },
+    upcomingContainer: {
+      minWidth: 0,
+    },
+    calendarLarge: {
+      flex: 2, 
+    },
+    upcomingLarge: {
+      flex: 1, 
+    },
+    calendarSmall: {
+      width: "100%",
+    },
+    upcomingSmall: {
+      width: "100%",
+      marginBottom: Platform.OS === 'ios' ? 84 : 0,
+      marginTop: 10
+    },
 });
