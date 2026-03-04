@@ -10,17 +10,25 @@ def handle_announcement_created(db, payload: dict):
     announcement_id = payload["announcement_id"]
     role_id = payload["role_id"]
     title = payload["title"]
+    author_id = payload.get("author_id")
 
     cursor = db.cursor(dictionary=True)
 
     # Fetch recipients
-    cursor.execute("""
+    query = """
         SELECT DISTINCT pt.expo_push_token
         FROM push_token pt
         JOIN employee e ON e.employee_id = pt.user_id
         WHERE e.is_active = 1
-          AND e.primary_role = %s;
-    """, (role_id,))
+          AND e.primary_role = %s
+    """
+    query_params = [role_id]
+
+    if author_id is not None:
+        query += " AND e.employee_id != %s"
+        query_params.append(author_id)
+
+    cursor.execute(query, tuple(query_params))
 
     tokens = [row["expo_push_token"] for row in cursor.fetchall()]
 

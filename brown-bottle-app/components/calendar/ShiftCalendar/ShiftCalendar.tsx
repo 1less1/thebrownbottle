@@ -1,42 +1,48 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, useWindowDimensions } from "react-native";
+import UpcomingShifts from "./UpcomingShifts";
 
-import { Colors } from '@/constants/Colors';
-import { GlobalStyles } from '@/constants/GlobalStyles';
-import { useSession } from '@/utils/SessionContext';
-
-import DefaultView from '@/components/DefaultView'
-import DefaultScrollView from '@/components/DefaultScrollView';
-import Card from '@/components/modular/Card';
-
-import Calendar from '@/components/calendar/Calendar';
+import DefaultScrollView from "@/components/DefaultScrollView";
+import Calendar from "@/components/calendar/Calendar";
+import { GlobalStyles } from "@/constants/GlobalStyles";
+import { useShiftRefresh } from "@/utils/ShiftRefreshContext";
 
 const ShiftCalendar = () => {
-    const { user } = useSession();
+  const { width } = useWindowDimensions();
 
-    const [refreshing, setRefreshing] = useState(false);
-    const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const isLargeScreen = width >= 900;
 
-    const handleRefresh = () => {
-        setRefreshing(true);
-        setRefreshTrigger(prev => prev + 1);
+  const { refreshTrigger } = useShiftRefresh();
 
-        setTimeout(() => {
-            setRefreshing(false);
-        }, 1000);
-    };
+  return (
+    <DefaultScrollView scrollEnabled={true}>
+      <View
+        style={[
+          GlobalStyles.contentRow,
+          isLargeScreen ? GlobalStyles.rowLayout : GlobalStyles.columnLayout,
+          { width: "90%", marginTop: 16 },
+        ]}
+      >
+        <View
+          style={[
+            GlobalStyles.calendarContainer,
+            isLargeScreen ? GlobalStyles.calendarLarge : GlobalStyles.calendarSmall,
+          ]}
+        >
+          <Calendar parentRefresh={refreshTrigger} />
+        </View>
 
-    return (
-
-        <DefaultScrollView scrollEnabled={false} refreshing={refreshing} onRefresh={handleRefresh}>
-
-            <View style={{ flex: 1, width: '90%', marginTop: 16 }}>
-                <Calendar parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
-            </View>
-
-        </DefaultScrollView>
-
-    );
+        <View
+          style={[
+            GlobalStyles.upcomingContainer,
+            isLargeScreen ? GlobalStyles.upcomingLarge : GlobalStyles.upcomingSmall,
+          ]}
+        >
+          <UpcomingShifts parentRefresh={refreshTrigger} />
+        </View>
+      </View>
+    </DefaultScrollView>
+  );
 };
 
 export default ShiftCalendar;

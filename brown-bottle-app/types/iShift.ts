@@ -27,6 +27,7 @@ export interface GetShift {
   end_date: string; // Date Range
   is_today: 1 | 0; // Shift's only Today?
   next_shift: 1 | 0; // Get next shift
+  next_count: number; // Max number of next shifts to return
 }
 
 export interface InsertShift {

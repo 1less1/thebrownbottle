@@ -256,7 +256,8 @@ def insert_tor(db, request):
                 NotificationEvent.TIME_OFF_CREATED,
                 {
                     "request_id": inserted_id,
-                    "employee_id": employee_id
+                    "employee_id": employee_id,
+                    "actor_employee_id": employee_id
                 }
             )
         except Exception as e:

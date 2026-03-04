@@ -10,6 +10,7 @@ from .handlers.shiftCoverHandler import (
     handle_cover_awaiting_approval,
     handle_cover_accepted,
     handle_cover_denied,
+    handle_cover_created
 )
 from .handlers.timeOffHandler import (
     handle_time_off_created,
@@ -34,6 +35,9 @@ def dispatch_notification(db, event: NotificationEvent, payload: dict):
         handle_shift_deleted(db, payload)
 
     # Shift Cover Dispatchers
+    if event == NotificationEvent.SHIFT_COVER_CREATED:
+        handle_cover_created(db, payload)
+
     if event == NotificationEvent.SHIFT_COVER_AWAITING_APPROVAL:
         handle_cover_awaiting_approval(db, payload)
 

@@ -13,6 +13,7 @@ class NotificationEvent(Enum):
     SHIFT_DELETED = "shift.deleted"
 
     # Shift Cover Events
+    SHIFT_COVER_CREATED = "shift_cover.created"
     SHIFT_COVER_AWAITING_APPROVAL = "shift_cover.awaiting_approval"
     SHIFT_COVER_ACCEPTED = "shift_cover.accepted"
     SHIFT_COVER_DENIED = "shift_cover.denied"

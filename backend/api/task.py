@@ -226,7 +226,8 @@ def insert_task(db, request):
             db,
             NotificationEvent.TASK_CREATED,
             {
-                "task_id": inserted_id
+                "task_id": inserted_id,
+                "actor_employee_id": author_id
             }
         )
 

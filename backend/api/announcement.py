@@ -186,7 +186,8 @@ def insert_announcement(db, request):
             {
                 "announcement_id": inserted_id,
                 "role_id": role_id,
-                "title": title
+                "title": title,
+                "author_id": author_id
             }
         )
 

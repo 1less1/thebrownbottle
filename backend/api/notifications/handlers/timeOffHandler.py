@@ -5,6 +5,8 @@ def handle_time_off_created(db, payload):
     """
     Notify managers that a new request has been submitted.
     """
+    actor_employee_id = payload.get("actor_employee_id", payload.get("employee_id"))
+
     notify_managers(
         db,
         "Time Off Request",
@@ -12,7 +14,8 @@ def handle_time_off_created(db, payload):
         {
             "request_id": payload["request_id"],
             "employee_id": payload["employee_id"]
-        }
+        },
+        exclude_employee_id=actor_employee_id
     )
 
 
@@ -38,5 +41,6 @@ def handle_time_off_updated(db, payload):
         body,
         {
             "request_id": payload["request_id"]
-        }
+        },
+        exclude_employee_id=payload.get("actor_employee_id")
     )
