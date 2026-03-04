@@ -1,21 +1,28 @@
 from push_notifications import send_push_notification
 
 
-def notify_all_employees(db, title, body, data):
-    # Sends the same notification to every employee that has a push token.
+def notify_all_employees(db, title, body, data, exclude_employee_id=None):
+    # Sends the same notification to every active employee that has a push token.
     cursor = db.cursor(dictionary=True)
     try:
-        cursor.execute("""
+        query = """
             SELECT employee_id
             FROM employee
             WHERE employee.is_active = 1
-        """)
+        """
+        query_params = []
+
+        if exclude_employee_id is not None:
+            query += " AND employee.employee_id != %s"
+            query_params.append(exclude_employee_id)
+
+        cursor.execute(query, tuple(query_params))
         employees = cursor.fetchall()
 
         for row in employees:
             notify_employee(
                 db,
-                row["employee_id"],  
+                row["employee_id"],
                 title,
                 body,
                 data or {}
@@ -24,10 +31,13 @@ def notify_all_employees(db, title, body, data):
         cursor.close()
 
 
-def notify_employee(db, employee_id, title, body, data):
+def notify_employee(db, employee_id, title, body, data, exclude_employee_id=None):
     """
     Sends a push notification to registered devices.
     """
+    if exclude_employee_id is not None and employee_id == exclude_employee_id:
+        return
+
     cursor = db.cursor(dictionary=True)
 
     cursor.execute("""
@@ -44,22 +54,29 @@ def notify_employee(db, employee_id, title, body, data):
             expo_push_token=token,
             title=title,
             body=body,
-            data=data
+            data=data or {}
         )
 
 
-def notify_managers(db, title, body, data):
+def notify_managers(db, title, body, data, exclude_employee_id=None):
     """
     Sends a push notification to all active managers.
     """
     cursor = db.cursor(dictionary=True)
 
-    cursor.execute("""
+    query = """
         SELECT DISTINCT pt.expo_push_token
         FROM push_token pt
         JOIN employee e ON e.employee_id = pt.user_id
-        WHERE e.admin = 1 AND e.is_active = 1;
-    """)
+        WHERE e.admin = 1 AND e.is_active = 1
+    """
+    query_params = []
+
+    if exclude_employee_id is not None:
+        query += " AND e.employee_id != %s"
+        query_params.append(exclude_employee_id)
+
+    cursor.execute(query, tuple(query_params))
 
     tokens = [row["expo_push_token"] for row in cursor.fetchall()]
     cursor.close()
@@ -69,5 +86,5 @@ def notify_managers(db, title, body, data):
             expo_push_token=token,
             title=title,
             body=body,
-            data=data
+            data=data or {}
         )

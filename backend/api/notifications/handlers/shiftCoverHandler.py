@@ -20,6 +20,7 @@ def handle_cover_created(db, payload: dict):
     # Handles the SHIFT_COVER_CREATED event by broadcasting a notification.
     shift_id = payload.get("shift_id")
     cover_request_id = payload.get("cover_request_id")
+    requested_employee_id = payload.get("requested_employee_id")
 
     # Keep the payload useful for routing on the client later
     data = {
@@ -32,11 +33,14 @@ def handle_cover_created(db, payload: dict):
         db,
         "Shift Available",
         "A new shift is available to cover.",
-        data
+        data,
+        exclude_employee_id=requested_employee_id
     )
 
 
 def handle_cover_awaiting_approval(db, payload):
+    actor_employee_id = payload.get("actor_employee_id")
+
     notify_managers(
         db,
         "Shift Cover Approval Needed",
@@ -44,7 +48,8 @@ def handle_cover_awaiting_approval(db, payload):
         {
             "cover_request_id": payload["cover_request_id"],
             "shift_id": payload["shift_id"]
-        }
+        },
+        exclude_employee_id=actor_employee_id
     )
 
 

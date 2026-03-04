@@ -251,6 +251,7 @@ def insert_scr(db, request):
                 "cover_request_id": inserted_id,
                 "shift_id": shift_id,
                 "requested_employee_id": requested_employee_id,  # optional but useful
+                "actor_employee_id": requested_employee_id,
             }
         )
 
@@ -353,12 +354,15 @@ def update_scr(db, request, cover_request_id):
         if new_status and new_status != old_status:
             try:
                 if new_status == "Awaiting Approval":
+                    actor_employee_id = fields.get("accepted_employee_id")
+
                     dispatch_notification(
                         db,
                         NotificationEvent.SHIFT_COVER_AWAITING_APPROVAL,
                         {
                             "cover_request_id": cover_request_id,
-                            "shift_id": shift_id
+                            "shift_id": shift_id,
+                            "actor_employee_id": actor_employee_id
                         }
                     )
 

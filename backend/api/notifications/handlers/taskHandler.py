@@ -19,7 +19,7 @@ def handle_task_created(db, payload: dict):
 
     # Fetch authoritative task data
     cursor.execute("""
-        SELECT title, section_id, complete
+        SELECT title, section_id, complete, author_id
         FROM task
         WHERE task_id = %s;
     """, (task_id,))
@@ -33,9 +33,10 @@ def handle_task_created(db, payload: dict):
 
     title = task["title"]
     section_id = task["section_id"]
+    actor_employee_id = payload.get("actor_employee_id", task.get("author_id"))
 
     # Fetch push tokens for employees who have a shift TODAY in this section
-    cursor.execute("""
+    query = """
         SELECT DISTINCT pt.expo_push_token
         FROM shift s
         JOIN employee e
@@ -46,8 +47,15 @@ def handle_task_created(db, payload: dict):
             s.date = CURDATE()
             AND s.section_id = %s
             AND e.is_active = 1
-            AND pt.expo_push_token IS NOT NULL;
-    """, (section_id,))
+            AND pt.expo_push_token IS NOT NULL
+    """
+    query_params = [section_id]
+
+    if actor_employee_id is not None:
+        query += " AND e.employee_id != %s"
+        query_params.append(actor_employee_id)
+
+    cursor.execute(query, tuple(query_params))
 
     tokens = [row["expo_push_token"] for row in cursor.fetchall()]
 
