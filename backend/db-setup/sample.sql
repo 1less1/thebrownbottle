@@ -15,10 +15,13 @@ START TRANSACTION;
 INSERT INTO `thebrownbottle`.`section` (`section_name`)
 VALUES
 ('Prep'),
+('Dishroom'),
+('Kitchen'),
 ('Front'),
 ('New Back'),
 ('Old Back'),
 ('Bar'),
+('Bartender'),
 ('Patio'),
 ('Lounge'),
 ('Upstairs');
@@ -28,6 +31,7 @@ VALUES
 -- ======================
 INSERT INTO `thebrownbottle`.`role` (`role_name`)
 VALUES
+('Prep'),
 ('Manager'),
 ('Host'),
 ('Server'),
