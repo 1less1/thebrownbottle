@@ -6,8 +6,8 @@ on:
     branches:
       - main
     paths:
-      - "brown-bottle-app/**"
-      - ".github/workflows/deploy-web.yml"
+      - 'brown-bottle-app/**'
+      - '.github/workflows/deploy-web.yml'
 
   # Allows manual testing from the Actions tab
   workflow_dispatch:
@@ -38,6 +38,14 @@ jobs:
       # Builds the Expo web export into brown-bottle-app/dist
       - name: Export Expo web build
         working-directory: brown-bottle-app
+        env:
+          EXPO_PUBLIC_FIREBASE_API_KEY: ${{ secrets.EXPO_PUBLIC_FIREBASE_API_KEY }}
+          EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
+          EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          EXPO_PUBLIC_FIREBASE_APP_ID: ${{ secrets.EXPO_PUBLIC_FIREBASE_APP_ID }}
+          EXPO_PUBLIC_API_URL: ${{ secrets.EXPO_PUBLIC_API_URL }}
         run: npx expo export --platform web
 
       # Loads the private SSH key into the SSH agent
