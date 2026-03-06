@@ -15,6 +15,6 @@ VALUES
 ('Brad', 'Hoffman', 'brad2dabonelv@gmail.com', '319-404-3338', 99.50, 1, 1, NULL, NULL),
 
 -- Test Account for App Store Testing
-('Test', 'Account', 'textbrownbottle@gmail.com', '313-454-3038', 99.50, 1, 3, NULL, NULL);
+('Test', 'Account', 'testbrownbottle@gmail.com', '313-454-3038', 99.50, 1, 3, NULL, NULL);
 
 COMMIT;
