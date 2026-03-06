@@ -9,4 +9,5 @@ backend/api/secrets/*
 
 backend/web/*
 !backend/web/.gitkeep
+brown-bottle-app/dist
 backend/letsencrypt/acme.json
