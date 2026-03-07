@@ -3,11 +3,14 @@ import { ExpoConfig, ConfigContext } from "@expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
+
   name: "CF Brown Bottle",
   slug: "brown-bottle-app",
   version: "1.0.0",
   orientation: "portrait",
   scheme: "brownbottle",
+
+  icon: "./assets/images/icon.png",
 
   newArchEnabled: true,
 
@@ -16,7 +19,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     googleServicesFile: "./GoogleService-Info.plist",
     supportsTablet: true,
     userInterfaceStyle: "light",
-    icon: "./assets/images/iosicon.png",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
       CFBundleURLTypes: [
@@ -32,10 +34,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   android: {
     package: "com.brownbottle.brownbottleapp",
     googleServicesFile: "./google-services.json",
-    adaptiveIcon: {
-      foregroundImage: "./assets/images/adaptive.png",
-      backgroundColor: "#633520",
-    },
   },
 
   web: {
@@ -56,7 +54,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         backgroundColor: "#ffffff",
       },
     ],
-
     "expo-secure-store",
     "expo-web-browser",
   ],
