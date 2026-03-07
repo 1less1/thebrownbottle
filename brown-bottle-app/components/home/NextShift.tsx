@@ -37,7 +37,7 @@ const NextShift: React.FC<Props> = ({
     if (!employeeId) return;
 
     setLoading(true);
-    await delay(500);
+    await delay(250);
 
     try {
       const data = await getShift({

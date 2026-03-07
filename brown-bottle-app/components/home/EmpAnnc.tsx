@@ -47,7 +47,7 @@ const EmpAnnc: React.FC<Props> = ({ parentRefresh, onRefreshDone }) => {
 
     if (isInitial) {
       setLoading(true);
-      await delay(500);
+      await delay(250);
     } else {
       setRefreshing(true);
     }
