@@ -1,5 +1,5 @@
 import { View, Text, StatusBar, TouchableOpacity, Image, ScrollView, StyleSheet, Platform } from 'react-native';
-import { useCallback, useState, useContext } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { Colors } from '@/constants/Colors';
@@ -12,10 +12,12 @@ import NextShift from '@/components/home/NextShift';
 import QuickStats from '@/components/home/QuickStats';
 import ProfileAvatar from '@/components/ProfileAvatar';
 
-// Get Session Data
 import { useSession } from '@/utils/SessionContext';
 
+import { getEmployee } from '@/routes/employee';
+
 export default function HomeScreen() {
+
   // Dynamic Status Bar
   useFocusEffect(
     useCallback(() => {
@@ -25,14 +27,61 @@ export default function HomeScreen() {
   );
 
   // Get session data
-  const { user } = useSession();
+  const { user, setUser } = useSession();
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  /**
+   * syncEmployee():
+   * Ensures the session user always reflects the latest employee record
+   * so Home never displays stale names.
+   */
+  const syncEmployee = async () => {
+    if (!user?.employee_id) return;
+
+    try {
+      const res = await getEmployee({ employee_id: user.employee_id });
+      const latestEmployee = res?.[0];
+
+      if (!latestEmployee) return;
+
+      // Only update session if the name changed
+      if (
+        latestEmployee.first_name !== user.first_name ||
+        latestEmployee.last_name !== user.last_name
+      ) {
+        await setUser({
+          ...user,
+          first_name: latestEmployee.first_name,
+          last_name: latestEmployee.last_name,
+        });
+      }
+
+    } catch (err) {
+      console.error('Failed to sync employee name:', err);
+    }
+  };
+
+  /**
+   * useEffect():
+   * Runs once when the Home screen loads to sync the session user
+   * with the latest employee record in the database.
+   */
+  useEffect(() => {
+    syncEmployee();
+  }, []);
+
+  /**
+   * handleRefresh():
+   * Triggers refresh for child components and also re-syncs
+   * the employee name from the backend.
+   */
   const handleRefresh = () => {
     setRefreshing(true);
     setRefreshTrigger(prev => prev + 1);
+
+    syncEmployee();
 
     setTimeout(() => {
       setRefreshing(false);
@@ -45,30 +94,33 @@ export default function HomeScreen() {
 
     <DefaultView backgroundColor={Colors.mediumTan}>
 
-
       <View style={{ flex: 1, backgroundColor: Colors.white }}>
-
 
         {/* Medium Tan Background that takes up 85% for Over Scroll */}
         <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: '75%', width: '100%' }} />
-        {/* Easter Egg - If you delete this, you are BUNS! */}
-        <Text style={{ position: 'absolute', top: '75%', width: '100%', textAlign: 'center', padding: 5 }}>Hey Jahmen ;)</Text>
 
+        {/* Easter Egg - If you delete this, you are BUNS! */}
+        <Text style={{ position: 'absolute', top: '75%', width: '100%', textAlign: 'center', padding: 5 }}>
+          Hey Jahmen ;)
+        </Text>
 
         <DefaultScrollView refreshing={refreshing} onRefresh={handleRefresh}>
 
-
           {/* First Strip */}
           <View style={{ backgroundColor: Colors.mediumTan, position: 'absolute', top: 0, height: 180, width: '100%' }} />
+
           {/* Second Strip */}
           <View style={{ backgroundColor: Colors.white, position: 'absolute', top: 150, height: '100%', width: '100%' }} />
 
-
           {/* Profile avatar */}
           <View style={{ marginTop: 90 }}>
-            <ProfileAvatar size={145} fullName={full_name} backgroundColor='#f5f0edff' borderColor='#ffffffff' />
+            <ProfileAvatar
+              size={145}
+              fullName={full_name}
+              backgroundColor='#f5f0edff'
+              borderColor='#ffffffff'
+            />
           </View>
-
 
           {/* Greeting Message */}
           <View style={{ marginTop: 10, marginBottom: 40 }}>
@@ -90,14 +142,17 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.contentRow}>
+
               {/* Announcements column */}
               <View style={styles.announcementsColumn}>
                 <EmpAnnc parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
               </View>
+
               {/* Next Shift column */}
               <View style={styles.nextShiftColumn}>
                 <NextShift parentRefresh={refreshTrigger} onRefreshDone={() => setRefreshing(false)} />
               </View>
+
             </View>
 
           </View>
@@ -140,4 +195,4 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 3,
   }
-})
+});

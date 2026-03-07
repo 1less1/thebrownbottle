@@ -75,40 +75,6 @@ const HandleLogin = () => {
     checkUser();
   }, [user?.employee_id]);
 
-  // handleLogin():
-  // - Legacy Employee ID login flow
-  // const handleLogin = async () => {
-  //   if (loading) return;
-
-  //   if (!employeeIdInput.trim()) {
-  //     setErrorText('Please enter your Employee ID.');
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   setErrorText('');
-
-  //   try {
-  //     const response = await getEmployee({ employee_id: Number(employeeIdInput) });
-
-  //     if (!response || response.length === 0) {
-  //       setErrorText('Login Failed');
-  //       return;
-  //     }
-
-  //     const currentUser = response[0] as unknown as EmployeeSessionFields;
-
-  //     await setUser(toSessionUser(currentUser));
-
-  //     router.push({ pathname: '/(tabs)/home' });
-  //   } catch (err) {
-  //     console.error('Login Failed:', err);
-  //     setErrorText('Server error.\nPlease try again later!');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   // handleGoogleLogin():
   const handleGoogleLogin = async () => {
     if (loading) return;
