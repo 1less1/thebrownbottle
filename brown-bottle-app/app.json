@@ -14,15 +14,26 @@
       "router": {}
     },
     "updates": {
-      "url": "https://u.expo.dev/830eaf2f-d229-46b0-8d28-cb5ecdb4b8a4"
+      "url": "https://u.expo.dev/21cfca82-3a43-420a-ba88-ddae8b6f644a"
     },
     "ios": {
       "bundleIdentifier": "com.brownbottle.brownbottleapp",
       "supportsTablet": true,
       "userInterfaceStyle": "light",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.666874698134-g148uctlsjd92jnc82be33qgs62suan9"
+            ]
+          }
+        ]
+      },
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
